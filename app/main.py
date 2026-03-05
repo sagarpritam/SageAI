@@ -48,6 +48,14 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIM
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 Starting SageAI Security Scanner...")
+
+    # Production config validation
+    errors = settings.validate_production()
+    for err in errors:
+        logger.critical(f"⛔ {err}")
+    if any("CRITICAL" in e for e in errors):
+        raise RuntimeError("Production config validation failed. Fix critical errors above.")
+
     await init_db()
     logger.info("✅ Database tables created")
     yield
@@ -82,6 +90,18 @@ app.add_middleware(SecurityHeadersMiddleware)
 
 # GDPR-compliant audit logging
 app.add_middleware(AuditLogMiddleware)
+
+# Prometheus metrics (exposes /metrics endpoint)
+try:
+    from prometheus_fastapi_instrumentator import Instrumentator
+    Instrumentator(
+        should_group_status_codes=True,
+        should_ignore_untemplated=True,
+        excluded_handlers=["/metrics", "/"],
+    ).instrument(app).expose(app, endpoint="/metrics", tags=["Monitoring"])
+    logger.info("📊 Prometheus metrics enabled at /metrics")
+except ImportError:
+    logger.warning("⚠️  prometheus-fastapi-instrumentator not installed — metrics disabled")
 
 
 # ---------------------

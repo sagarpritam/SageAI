@@ -118,14 +118,31 @@ REMEDIATION = {
 # ---------------------
 # OpenAI Integration
 # ---------------------
-async def ai_explain_finding(finding_type: str, context: str = "") -> dict | None:
+async def ai_explain_finding(finding_type: str, context: str = "", org_id: str = "") -> dict | None:
     """Use OpenAI GPT to generate a detailed vulnerability explanation.
     
-    Returns None if OpenAI is not configured or fails.
+    Protected by circuit breaker + prompt injection sanitization + token tracking.
+    Returns None if OpenAI is not configured, circuit is open, or call fails.
     """
+    from app.services.ai_resilience import openai_breaker, sanitize_for_llm, token_tracker
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return None
+
+    # Circuit breaker check
+    if openai_breaker.is_open():
+        logger.warning("OpenAI circuit breaker is OPEN — skipping AI call")
+        return None
+
+    # Budget check
+    if org_id and not token_tracker.check_budget(org_id):
+        logger.warning(f"Org {org_id} exceeded AI budget — skipping")
+        return None
+
+    # Sanitize inputs
+    safe_type = sanitize_for_llm(finding_type, max_length=200)
+    safe_context = sanitize_for_llm(context, max_length=1000)
 
     prompt = f"""You are a cybersecurity expert. Analyze this vulnerability finding and provide:
 1. A clear summary (1 sentence)
@@ -134,8 +151,8 @@ async def ai_explain_finding(finding_type: str, context: str = "") -> dict | Non
 4. 3-5 specific remediation steps
 5. OWASP Top 10 mapping if applicable
 
-Finding type: {finding_type}
-Additional context: {context or 'None'}
+Finding type: {safe_type}
+Additional context: {safe_context or 'None'}
 
 Respond in JSON format with keys: summary, detail, impact, severity (Critical/High/Medium/Low), remediation_steps (array of strings), owasp_id, owasp_category"""
 
@@ -143,10 +160,7 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
                 "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={
                     "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                     "messages": [{"role": "user", "content": prompt}],
@@ -157,26 +171,46 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
             if response.status_code == 200:
                 import json
-                content = response.json()["choices"][0]["message"]["content"]
+                data = response.json()
+                content = data["choices"][0]["message"]["content"]
+                # Track tokens
+                usage = data.get("usage", {})
+                if org_id and usage:
+                    token_tracker.record_usage(org_id, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+                openai_breaker.record_success()
                 return json.loads(content)
             else:
                 logger.warning(f"OpenAI API error: {response.status_code}")
+                openai_breaker.record_failure()
                 return None
 
     except Exception as e:
         logger.error(f"OpenAI request failed: {e}")
+        openai_breaker.record_failure()
         return None
 
 
-async def ai_analyze_scan(findings: list[dict]) -> dict | None:
+async def ai_analyze_scan(findings: list[dict], org_id: str = "") -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
+    from app.services.ai_resilience import openai_breaker, sanitize_findings_for_llm, token_tracker
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key or not findings:
         return None
 
+    if openai_breaker.is_open():
+        logger.warning("OpenAI circuit breaker is OPEN — skipping AI scan analysis")
+        return None
+
+    if org_id and not token_tracker.check_budget(org_id):
+        logger.warning(f"Org {org_id} exceeded AI budget — skipping scan analysis")
+        return None
+
+    # Sanitize findings before sending to LLM
+    safe_findings = sanitize_findings_for_llm(findings[:20])
     findings_text = "\n".join(
         f"- [{f.get('severity', 'unknown')}] {f.get('type', 'unknown')}: {f.get('detail', f.get('description', ''))}"
-        for f in findings[:20]
+        for f in safe_findings
     )
 
     prompt = f"""You are a cybersecurity analyst writing an executive summary for a security scan.
@@ -194,10 +228,7 @@ Provide a JSON response with:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
                 "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={
                     "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                     "messages": [{"role": "user", "content": prompt}],
@@ -208,10 +239,17 @@ Provide a JSON response with:
 
             if response.status_code == 200:
                 import json
-                return json.loads(response.json()["choices"][0]["message"]["content"])
+                data = response.json()
+                usage = data.get("usage", {})
+                if org_id and usage:
+                    token_tracker.record_usage(org_id, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+                openai_breaker.record_success()
+                return json.loads(data["choices"][0]["message"]["content"])
+            openai_breaker.record_failure()
             return None
     except Exception as e:
         logger.error(f"AI scan analysis failed: {e}")
+        openai_breaker.record_failure()
         return None
 
 

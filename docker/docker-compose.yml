@@ -1,6 +1,6 @@
 ﻿# ================================
-# SageAI — Docker Compose
-# Services: Backend, Frontend, PostgreSQL, Redis
+# SageAI — Docker Compose (Production)
+# Services: Backend, Frontend, PostgreSQL, Redis, Celery Worker, Celery Beat, Flower
 # ================================
 
 services:
@@ -53,11 +53,62 @@ services:
       - DEBUG=False
       - RATE_LIMIT=60/minute
       - REDIS_URL=redis://redis:6379/0
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost}
+      - SENTRY_DSN=${SENTRY_DSN:-}
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ---------- Celery Worker (Background Scans) ----------
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: sage-worker
+    restart: unless-stopped
+    command: celery -A app.tasks worker --loglevel=info --concurrency=4
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://sageai:${POSTGRES_PASSWORD:-sageai_secret_2024}@postgres:5432/sageai
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - REDIS_URL=redis://redis:6379/0
+      - ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ---------- Celery Beat (Scheduled Scans) ----------
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: sage-beat
+    restart: unless-stopped
+    command: celery -A app.tasks beat --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ---------- Flower (Celery Monitoring Dashboard) ----------
+  flower:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: sage-flower
+    restart: unless-stopped
+    command: celery -A app.tasks flower --port=5555 --basic-auth=${FLOWER_USER:-admin}:${FLOWER_PASSWORD:-sageai2024}
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
       redis:
         condition: service_healthy
 
