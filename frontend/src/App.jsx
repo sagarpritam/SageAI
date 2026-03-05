@@ -9,6 +9,7 @@ import Team from './pages/Team';
 import Plan from './pages/Plan';
 import Settings from './pages/Settings';
 import Schedules from './pages/Schedules';
+import ForgotPassword from './pages/ForgotPassword';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('sageai_token');
@@ -23,6 +24,7 @@ export default function App() {
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

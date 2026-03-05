@@ -80,7 +80,7 @@ async def test_sqli(target: str) -> dict | None:
     return None
 
 
-async def run_all_scans(target: str) -> list[dict]:
+async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
     """Run all scan checks against a target and return findings.
     
     Phase 1 — Core Scans (6 checks):
@@ -88,6 +88,8 @@ async def run_all_scans(target: str) -> list[dict]:
 
     Phase 2 — OSINT Enrichment (5 sources):
       Shodan InternetDB, CRT.sh, Mozilla Observatory, VirusTotal, NVD CVE
+    
+    If scan_id is provided, broadcasts real-time progress via WebSocket.
     """
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
@@ -104,29 +106,48 @@ async def run_all_scans(target: str) -> list[dict]:
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=3)
 
+    # Helper to broadcast progress
+    async def _progress(phase: str, progress: int, findings_so_far: int, status: str = "running"):
+        if scan_id:
+            try:
+                from app.routers.ws_routes import broadcast_scan_progress
+                await broadcast_scan_progress(scan_id, {
+                    "phase": phase, "status": status,
+                    "progress": progress, "total": 11,
+                    "findings_count": findings_so_far,
+                })
+            except Exception:
+                pass
+
     # ── Phase 1: Core Scans ──────────────────────────
+    await _progress("headers", 0, 0)
+
     http_results = await asyncio.gather(
         check_security_headers(target),
         test_xss(target),
         test_sqli(target),
         return_exceptions=True,
     )
+    await _progress("xss_sqli", 3, sum(1 for r in http_results if isinstance(r, dict)))
 
     # Socket-based scans in thread pool
     try:
         ssl_results = await loop.run_in_executor(executor, scan_ssl, hostname)
     except Exception:
         ssl_results = []
+    await _progress("ssl", 4, 0)
 
     try:
         port_results = await loop.run_in_executor(executor, scan_ports, hostname)
     except Exception:
         port_results = []
+    await _progress("ports", 5, 0)
 
     try:
         dns_results = await loop.run_in_executor(executor, scan_dns, target)
     except Exception:
         dns_results = []
+    await _progress("dns", 6, 0)
 
     # Collect Phase 1
     findings = []
@@ -137,8 +158,9 @@ async def run_all_scans(target: str) -> list[dict]:
         if isinstance(result_list, list):
             findings.extend(result_list)
 
+    await _progress("osint_start", 6, len(findings))
+
     # ── Phase 2: OSINT Enrichment ────────────────────
-    # Extract server header for CVE matching
     server_header = ""
     try:
         async with httpx.AsyncClient(timeout=5, follow_redirects=True) as client:
@@ -159,5 +181,7 @@ async def run_all_scans(target: str) -> list[dict]:
     for result in osint_results:
         if isinstance(result, list):
             findings.extend(result)
+
+    await _progress("done", 11, len(findings), status="complete")
 
     return findings

@@ -57,7 +57,7 @@ async def create_scan(
 
     # Run async scans
     try:
-        findings = await run_all_scans(payload.target)
+        findings = await run_all_scans(payload.target, scan_id=scan.id)
         risk = calculate_risk(findings)
 
         scan.set_findings(findings)
