@@ -60,8 +60,8 @@ async def auth_headers(client):
         "password": "TestPass123!",
         "organization_name": "TestOrg",
     })
-    r = await client.post("/auth/login", data={
-        "username": "test@sageai.com",
+    r = await client.post("/auth/login", json={
+        "email": "test@sageai.com",
         "password": "TestPass123!",
     })
     token = r.json()["access_token"]

@@ -1,0 +1,11 @@
+# Vercel Ignore
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+test_output.txt
+tests/
+docker/
+.github/
+node_modules/

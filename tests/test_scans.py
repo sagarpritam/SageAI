@@ -9,7 +9,7 @@ async def test_run_scan(client, auth_headers):
     assert r.status_code == 201
     data = r.json()
     assert data["status"] == "completed"
-    assert "risk_score" in data
+    assert "risk_summary" in data
     assert "findings" in data
 
 

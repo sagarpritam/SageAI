@@ -31,8 +31,8 @@ async def test_login_success(client):
         "password": "Pass123!",
         "organization_name": "LoginOrg",
     })
-    r = await client.post("/auth/login", data={
-        "username": "login@test.com",
+    r = await client.post("/auth/login", json={
+        "email": "login@test.com",
         "password": "Pass123!",
     })
     assert r.status_code == 200
@@ -46,8 +46,8 @@ async def test_login_wrong_password(client):
         "password": "Pass123!",
         "organization_name": "WrongOrg",
     })
-    r = await client.post("/auth/login", data={
-        "username": "wrong@test.com",
+    r = await client.post("/auth/login", json={
+        "email": "wrong@test.com",
         "password": "BadPassword!",
     })
     assert r.status_code == 401

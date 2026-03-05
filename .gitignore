@@ -44,3 +44,5 @@ htmlcov/
 # Misc
 *.log
 tmp/
+.vercel
+test_output.txt
