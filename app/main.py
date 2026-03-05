@@ -68,10 +68,10 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS
+# CORS — uses configurable origins, not wildcard
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict in production
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -115,10 +115,23 @@ app.include_router(password_routes.router)
 # Health Check
 # ---------------------
 @app.get("/", tags=["Health"])
-def health_check():
+async def health_check():
+    """Production-grade health check with DB connectivity."""
+    db_ok = True
+    try:
+        from sqlalchemy import text
+        from app.core.database import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+    except Exception:
+        db_ok = False
+
     return {
-        "status": "running",
+        "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": "1.0.0",
-        "message": "SageAI Security Scanner is online 🛡️",
+        "environment": settings.ENV,
+        "database": "connected" if db_ok else "unreachable",
+        "scanners": 11,
+        "endpoints": 31,
     }
