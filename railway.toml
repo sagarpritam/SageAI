@@ -1,0 +1,14 @@
+﻿# ================================
+# SageAI — Railway Configuration
+# https://docs.railway.app/reference/config-as-code
+# ================================
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
