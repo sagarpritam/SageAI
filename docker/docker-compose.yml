@@ -11,14 +11,14 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: sageai
-      POSTGRES_USER: aegis
+      POSTGRES_USER: sageai
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sageai_secret_2024}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aegis" ]
+      test: [ "CMD-SHELL", "pg_isready -U sageai" ]
       interval: 10s
       timeout: 5s
       retries: 5

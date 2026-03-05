@@ -70,4 +70,4 @@ databases:
   - name: SageAI-db
     plan: starter
     databaseName: sageai
-    user: aegis
+    user: sageai

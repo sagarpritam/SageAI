@@ -24,8 +24,8 @@ COPY app/ ./app/
 COPY .env .env
 
 # Create non-root user
-RUN addgroup --system aegis && adduser --system --group aegis
-USER aegis
+RUN addgroup --system sageai && adduser --system --group sageai
+USER sageai
 
 EXPOSE 8000
 
