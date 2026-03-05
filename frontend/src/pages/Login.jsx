@@ -63,6 +63,10 @@ export default function LoginPage() {
                     </button>
                 </form>
 
+                <p style={{ textAlign: 'right', marginTop: '0.25rem', fontSize: '0.8rem' }}>
+                    <Link to="/forgot-password" style={{ color: 'var(--brand-blue-light)', textDecoration: 'none' }}>Forgot password?</Link>
+                </p>
+
                 <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                     Don't have an account? <Link to="/register" className="link">Sign up</Link>
                 </p>
