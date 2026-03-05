@@ -25,7 +25,7 @@ jobs:
       # SAST — scan for security vulnerabilities in Python code
       - run: bandit -r app/ -f json -o bandit-report.json --severity-level medium || true
       - run: bandit -r app/ --severity-level high
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: bandit-report
