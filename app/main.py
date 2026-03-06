@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes
+from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 
@@ -132,6 +132,8 @@ app.include_router(password_routes.router)
 app.include_router(ws_routes.router)
 app.include_router(ai_chat_routes.router)
 app.include_router(ai_command_routes.router)
+app.include_router(integration_routes.router)
+app.include_router(autofix_routes.router)
 
 
 # ---------------------

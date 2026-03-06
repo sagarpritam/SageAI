@@ -39,22 +39,25 @@ services:
     runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://sageai-api.onrender.com
     routes:
       - type: rewrite
         source: /auth/*
-        destination: https://SageAI-api.onrender.com/auth/*
+        destination: https://sageai-api.onrender.com/auth/*
       - type: rewrite
         source: /scan*
-        destination: https://SageAI-api.onrender.com/scan*
+        destination: https://sageai-api.onrender.com/scan*
       - type: rewrite
         source: /reports/*
-        destination: https://SageAI-api.onrender.com/reports/*
+        destination: https://sageai-api.onrender.com/reports/*
       - type: rewrite
         source: /explain/*
-        destination: https://SageAI-api.onrender.com/explain/*
+        destination: https://sageai-api.onrender.com/explain/*
       - type: rewrite
         source: /org/*
-        destination: https://SageAI-api.onrender.com/org/*
+        destination: https://sageai-api.onrender.com/org/*
       - type: rewrite
         source: /*
         destination: /index.html

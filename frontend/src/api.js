@@ -80,5 +80,15 @@ export const forgotPassword = (email) => api.post(`/auth/forgot-password?email=$
 export const resetPassword = (token, password) =>
     api.post(`/auth/reset-password?token=${token}&new_password=${encodeURIComponent(password)}`);
 
+// GitHub Integration
+export const getGitHubStatus = () => api.get('/integrations/github/status');
+export const setGitHubToken = (token) => api.post('/integrations/github/token', { token });
+export const deleteGitHubToken = () => api.delete('/integrations/github/token');
+
+// Self-Healing Code (Auto-Fix)
+export const getAutoFixStatus = () => api.get('/autofix/status');
+export const runAutoFix = (repository, branch = 'main', max_fixes = 5) =>
+    api.post('/autofix/run', { repository, branch, max_fixes });
+
 export default api;
 

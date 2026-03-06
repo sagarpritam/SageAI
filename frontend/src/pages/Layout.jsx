@@ -5,6 +5,7 @@ const NAV_ITEMS = [
     { path: '/scans', label: 'Scans', icon: '🔍' },
     { path: '/schedules', label: 'Schedules', icon: '⏰' },
     { path: '/reports', label: 'Reports', icon: '📄' },
+    { path: '/autofix', label: 'Auto-Fix', icon: '🛡️' },
     { path: '/team', label: 'Team', icon: '👥' },
     { path: '/plan', label: 'Plan & Billing', icon: '💎' },
     { path: '/settings', label: 'Settings', icon: '⚙️' },

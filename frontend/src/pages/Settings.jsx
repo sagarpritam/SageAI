@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listApiKeys, createApiKey, revokeApiKey, listWebhooks, createWebhook, deleteWebhook } from '../api';
+import { listApiKeys, createApiKey, revokeApiKey, listWebhooks, createWebhook, deleteWebhook, getGitHubStatus, setGitHubToken, deleteGitHubToken } from '../api';
 import api from '../api';
 
 export default function Settings() {
@@ -12,7 +12,7 @@ export default function Settings() {
 
             {/* Tab Bar */}
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-                {[['mfa', '🔐 MFA'], ['apikeys', '🔑 API Keys'], ['webhooks', '🔗 Webhooks']].map(([key, label]) => (
+                {[['mfa', '🔐 MFA'], ['apikeys', '🔑 API Keys'], ['webhooks', '🔗 Webhooks'], ['github', '🐙 GitHub']].map(([key, label]) => (
                     <button key={key} className={tab === key ? 'btn-primary' : 'btn-secondary'}
                         onClick={() => setTab(key)} style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
                         {label}
@@ -23,6 +23,7 @@ export default function Settings() {
             {tab === 'mfa' && <MFASection />}
             {tab === 'apikeys' && <ApiKeysSection />}
             {tab === 'webhooks' && <WebhooksSection />}
+            {tab === 'github' && <GitHubSection />}
         </div>
     );
 }
@@ -212,6 +213,93 @@ function WebhooksSection() {
                     </tbody>
                 </table>
             </div>
+        </div>
+    );
+}
+
+// ── GitHub Integration Section ──────────────────────────────────
+function GitHubSection() {
+    const [connected, setConnected] = useState(false);
+    const [token, setToken] = useState('');
+    const [status, setStatus] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getGitHubStatus().then(r => {
+            setConnected(r.data.has_github_token);
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    }, []);
+
+    const handleConnect = async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            await setGitHubToken(token);
+            setConnected(true);
+            setToken('');
+            setStatus('✅ GitHub token securely stored!');
+        } catch (err) {
+            setStatus(err.response?.data?.detail || 'Failed to save token.');
+        } finally { setLoading(false); }
+    };
+
+    const handleDisconnect = async () => {
+        setLoading(true);
+        try {
+            await deleteGitHubToken();
+            setConnected(false);
+            setStatus('Token removed.');
+        } catch (err) {
+            setStatus(err.response?.data?.detail || 'Failed to remove token.');
+        } finally { setLoading(false); }
+    };
+
+    return (
+        <div className="card">
+            <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>🐙 GitHub Integration</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+                Connect your GitHub account to enable Self-Healing Code (auto-fix PRs).
+                Use a Personal Access Token with <code>repo</code> scope.
+            </p>
+
+            {loading ? (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Loading...</p>
+            ) : connected ? (
+                <div className="animate-in">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                        <span style={{ fontSize: '1.25rem' }}>✅</span>
+                        <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>GitHub Connected</p>
+                    </div>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                        Your GitHub token is securely encrypted and stored. You can now use the Self-Healing Code feature.
+                    </p>
+                    <button className="btn-secondary" onClick={handleDisconnect} style={{ fontSize: '0.8rem' }}>
+                        Disconnect GitHub
+                    </button>
+                </div>
+            ) : (
+                <div className="animate-in">
+                    <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                        <input
+                            className="input"
+                            type="password"
+                            placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                            value={token}
+                            onChange={e => setToken(e.target.value)}
+                            style={{ flex: 1 }}
+                        />
+                        <button className="btn-primary" onClick={handleConnect} disabled={!token || loading}>
+                            Connect
+                        </button>
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        💡 Generate a PAT at <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand-blue)' }}>github.com/settings/tokens</a> with <code>repo</code> scope.
+                    </p>
+                </div>
+            )}
+
+            {status && <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: status.includes('✅') ? 'var(--brand-green)' : 'var(--text-secondary)' }}>{status}</p>}
         </div>
     );
 }
