@@ -5,5 +5,6 @@ from app.models.role import RoleEnum
 from app.models.api_key import APIKey
 from app.models.webhook import Webhook
 from app.models.schedule import ScanSchedule
+from app.models.asset import Asset, AssetType, AssetStatus
 
-__all__ = ["Organization", "User", "Scan", "RoleEnum", "APIKey", "Webhook", "ScanSchedule"]
+__all__ = ["Organization", "User", "Scan", "RoleEnum", "APIKey", "Webhook", "ScanSchedule", "Asset", "AssetType", "AssetStatus"]

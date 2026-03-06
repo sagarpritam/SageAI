@@ -7,9 +7,7 @@ const api = axios.create({
 // Attach JWT to every request
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('sageai_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
@@ -19,30 +17,37 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('sageai_token');
+            localStorage.removeItem('sageai_email');
             window.location.href = '/login';
         }
         return Promise.reject(error);
     }
 );
 
-// Auth
+// ── Auth ──────────────────────────────────────────
 export const register = (data) => api.post('/auth/register', data);
 export const login = (data) => api.post('/auth/login', data);
 
-// Scans
+// ── Scans ─────────────────────────────────────────
 export const createScan = (target) => api.post('/scan', { target });
 export const getScan = (id) => api.get(`/scan/${id}`);
 export const listScans = () => api.get('/scans');
 
-// Reports
+// ── Reports ───────────────────────────────────────
 export const getReport = (scanId) => api.get(`/reports/${scanId}`);
 export const downloadPdf = (scanId) =>
     api.get(`/reports/${scanId}/pdf`, { responseType: 'blob' });
+export const downloadHackerOne = (scanId) =>
+    api.get(`/reports/${scanId}/hackerone`);
 
-// AI Explain
+// ── AI Explain ────────────────────────────────────
 export const explainFinding = (type) => api.get(`/explain/${encodeURIComponent(type)}`);
 
-// Organization
+// ── AI Chat (Copilot) ─────────────────────────────
+export const chatWithCopilot = (message) => api.post('/ai/chat', { message });
+export const runAiCommand = (command, context) => api.post('/ai/command', { command, context });
+
+// ── Organization ──────────────────────────────────
 export const getOrgPlan = () => api.get('/org/plan');
 export const getPlans = () => api.get('/org/plans');
 export const getOrgUsers = () => api.get('/org/users');
@@ -50,45 +55,74 @@ export const updateUserRole = (userId, role) =>
     api.patch(`/org/users/${userId}/role?role=${role}`);
 export const getOrgStats = () => api.get('/org/stats');
 
-// API Keys
+// ── API Keys ──────────────────────────────────────
 export const createApiKey = (name) => api.post(`/api-keys?name=${encodeURIComponent(name)}`);
 export const listApiKeys = () => api.get('/api-keys');
 export const revokeApiKey = (id) => api.delete(`/api-keys/${id}`);
 
-// Webhooks
+// ── Webhooks ──────────────────────────────────────
 export const createWebhook = (url, event) =>
     api.post(`/webhooks?url=${encodeURIComponent(url)}&event=${event}`);
 export const listWebhooks = () => api.get('/webhooks');
 export const deleteWebhook = (id) => api.delete(`/webhooks/${id}`);
 
-// Billing
+// ── Billing ───────────────────────────────────────
 export const createCheckout = (plan) => api.post(`/billing/checkout?plan=${plan}`);
 
-// Schedules
+// ── Schedules ─────────────────────────────────────
 export const createSchedule = (target, frequency) =>
     api.post(`/schedules?target=${encodeURIComponent(target)}&frequency=${frequency}`);
 export const listSchedules = () => api.get('/schedules');
 export const deleteSchedule = (id) => api.delete(`/schedules/${id}`);
 
-// MFA
+// ── MFA ───────────────────────────────────────────
 export const setupMFA = () => api.post('/auth/mfa/setup');
 export const verifyMFA = (code) => api.post(`/auth/mfa/verify?code=${code}`);
 export const disableMFA = (code) => api.post(`/auth/mfa/disable?code=${code}`);
 
-// Password Reset
+// ── Password Reset ────────────────────────────────
 export const forgotPassword = (email) => api.post(`/auth/forgot-password?email=${encodeURIComponent(email)}`);
 export const resetPassword = (token, password) =>
     api.post(`/auth/reset-password?token=${token}&new_password=${encodeURIComponent(password)}`);
 
-// GitHub Integration
+// ── GitHub Integration ────────────────────────────
 export const getGitHubStatus = () => api.get('/integrations/github/status');
 export const setGitHubToken = (token) => api.post('/integrations/github/token', { token });
 export const deleteGitHubToken = () => api.delete('/integrations/github/token');
 
-// Self-Healing Code (Auto-Fix)
+// ── Auto-Fix ──────────────────────────────────────
 export const getAutoFixStatus = () => api.get('/autofix/status');
 export const runAutoFix = (repository, branch = 'main', max_fixes = 5) =>
     api.post('/autofix/run', { repository, branch, max_fixes });
+
+// ── Asset Inventory (v2.0) ────────────────────────
+export const discoverAssets = (target, scan_id) =>
+    api.post('/assets/discover/sync', { target, scan_id });
+export const discoverAssetsAsync = (target, scan_id) =>
+    api.post('/assets/discover', { target, scan_id });
+export const getAssetSummary = () => api.get('/assets/summary');
+export const listAssets = (params) => api.get('/assets', { params });
+export const getHighRiskAssets = () => api.get('/assets/high-risk');
+export const getNewAssets = (hours = 24) => api.get(`/assets/new?hours=${hours}`);
+export const getAsset = (id) => api.get(`/assets/${id}`);
+export const deleteAsset = (id) => api.delete(`/assets/${id}`);
+
+// ── Multi-Agent AI System (v2.0) ──────────────────
+export const runAgentAssessment = (target, mode = 'full', use_knowledge_graph = true) =>
+    api.post('/agents/assess', { target, mode, use_knowledge_graph });
+export const runAgentAssessmentAsync = (target, mode = 'full') =>
+    api.post('/agents/assess/async', { target, mode, use_knowledge_graph: true });
+export const getAgentStatus = () => api.get('/agents/status');
+
+// ── Security Knowledge Graph ──────────────────────
+export const getAttackPaths = () => api.get('/agents/graph/paths');
+
+// ── Plugin Marketplace ────────────────────────────
+export const listPlugins = () => api.get('/agents/plugins');
+export const runPlugin = (plugin_name, target) =>
+    api.post('/agents/plugins/run', { plugin_name, target });
+export const runAllPlugins = (target, category) =>
+    api.post(`/agents/plugins/run-all?target=${encodeURIComponent(target)}${category ? `&category=${category}` : ''}`);
 
 export default api;
 

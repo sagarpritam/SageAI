@@ -1,106 +1,52 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { forgotPassword, resetPassword } from '../api';
+import { forgotPassword } from '../api';
 
 export default function ForgotPassword() {
-    const [step, setStep] = useState('email'); // email | token | done
     const [email, setEmail] = useState('');
-    const [token, setToken] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirm, setConfirm] = useState('');
-    const [status, setStatus] = useState('');
+    const [sent, setSent] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSendReset = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            await forgotPassword(email);
-            setStatus('✅ If an account exists with that email, a reset link has been sent.');
-            setStep('token');
-        } catch (err) {
-            setStatus(err.response?.data?.detail || 'Something went wrong');
-        } finally { setLoading(false); }
-    };
-
-    const handleReset = async (e) => {
-        e.preventDefault();
-        if (password !== confirm) {
-            setStatus('Passwords do not match');
-            return;
-        }
-        if (password.length < 8) {
-            setStatus('Password must be at least 8 characters');
-            return;
-        }
-        setLoading(true);
-        try {
-            await resetPassword(token, password);
-            setStatus('✅ Password reset successful!');
-            setStep('done');
-        } catch (err) {
-            setStatus(err.response?.data?.detail || 'Invalid or expired token');
-        } finally { setLoading(false); }
+        setLoading(true); setError('');
+        try { await forgotPassword(email); setSent(true); }
+        catch (err) { setError(err.response?.data?.detail || 'Failed to send reset email'); }
+        finally { setLoading(false); }
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-            <div className="card animate-in" style={{ width: '100%', maxWidth: '420px', padding: '2rem' }}>
-                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                    <span style={{ fontSize: '2rem' }}>🔑</span>
-                    <h1 className="gradient-text" style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '0.5rem' }}>
-                        {step === 'done' ? 'All Set!' : 'Reset Password'}
-                    </h1>
+        <div className="auth-container">
+            <div className="auth-grid" />
+            <div className="auth-orb auth-orb-1" />
+            <div className="auth-orb auth-orb-2" />
+            <div className="auth-card animate-in">
+                <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+                    <div style={{ width: 50, height: 50, margin: '0 auto 1rem', background: 'linear-gradient(135deg, #7c3aed,#4f46e5)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>🔑</div>
+                    <h1 className="gradient-text" style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Reset Password</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>We'll send you a reset link</p>
                 </div>
 
-                {step === 'email' && (
-                    <form onSubmit={handleSendReset}>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                            Enter your email and we'll send a reset link.
-                        </p>
-                        <input className="input" type="email" placeholder="you@company.com" value={email}
-                            onChange={e => setEmail(e.target.value)} required style={{ marginBottom: '1rem' }} />
-                        <button className="btn-primary" style={{ width: '100%' }} disabled={loading}>
-                            {loading ? 'Sending...' : 'Send Reset Link'}
-                        </button>
-                    </form>
-                )}
-
-                {step === 'token' && (
-                    <form onSubmit={handleReset}>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                            Paste the token from your email, then set a new password.
-                        </p>
-                        <input className="input" placeholder="Reset token" value={token}
-                            onChange={e => setToken(e.target.value)} required style={{ marginBottom: '0.75rem' }} />
-                        <input className="input" type="password" placeholder="New password (8+ chars)" value={password}
-                            onChange={e => setPassword(e.target.value)} required style={{ marginBottom: '0.75rem' }} />
-                        <input className="input" type="password" placeholder="Confirm password" value={confirm}
-                            onChange={e => setConfirm(e.target.value)} required style={{ marginBottom: '1rem' }} />
-                        <button className="btn-primary" style={{ width: '100%' }} disabled={loading}>
-                            {loading ? 'Resetting...' : 'Reset Password'}
-                        </button>
-                    </form>
-                )}
-
-                {step === 'done' && (
-                    <div style={{ textAlign: 'center' }}>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--brand-green)', marginBottom: '1.5rem' }}>
-                            Your password has been reset. You can now log in.
-                        </p>
-                        <Link to="/login" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>
-                            Go to Login →
-                        </Link>
+                {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>⚠️ {error}</div>}
+                {sent ? (
+                    <div className="alert alert-success">
+                        ✅ Check your email for the reset link. It may take a few minutes.
                     </div>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ marginBottom: '1.25rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>Email address</label>
+                            <input className="input" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                        </div>
+                        <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem' }} disabled={loading}>
+                            {loading ? <><span className="spinner spinner-sm" /> Sending...</> : 'Send Reset Link →'}
+                        </button>
+                    </form>
                 )}
-
-                {status && <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: status.includes('✅') ? 'var(--brand-green)' : 'var(--text-secondary)' }}>{status}</p>}
-
-                {step !== 'done' && (
-                    <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        Remember now? <Link to="/login" style={{ color: 'var(--brand-blue-light)' }}>Back to login</Link>
-                    </p>
-                )}
+                <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <Link to="/login" className="link">← Back to Sign In</Link>
+                </p>
             </div>
         </div>
     );

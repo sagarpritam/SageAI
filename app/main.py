@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes
+from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes, asset_routes, agent_routes
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 
@@ -57,9 +57,9 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("Production config validation failed. Fix critical errors above.")
 
     await init_db()
-    logger.info("✅ Database tables created")
+    logger.info("✅ Database tables created (v2.0)")
     yield
-    logger.info("👋 Shutting down SageAI")
+    logger.info("👋 Shutting down SageAI v2.0")
 
 
 # ---------------------
@@ -67,8 +67,8 @@ async def lifespan(app: FastAPI):
 # ---------------------
 app = FastAPI(
     title=settings.APP_NAME,
-    description="AI-powered security scanning SaaS platform",
-    version="1.0.0",
+    description="AI-powered Attack Surface Management & Security Platform",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -134,6 +134,8 @@ app.include_router(ai_chat_routes.router)
 app.include_router(ai_command_routes.router)
 app.include_router(integration_routes.router)
 app.include_router(autofix_routes.router)
+app.include_router(asset_routes.router)
+app.include_router(agent_routes.router)
 
 
 # ---------------------
@@ -154,9 +156,10 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "1.0.0",
+        "version": "2.0.0",
         "environment": settings.ENV,
         "database": "connected" if db_ok else "unreachable",
         "scanners": 11,
-        "endpoints": 31,
+        "endpoints": 52,
+        "new_in_v2": ["Asset Inventory", "Attack Surface Management", "AI Copilot", "Bug Bounty Reports", "Multi-Agent AI Team", "Security Knowledge Graph", "Plugin Marketplace"],
     }
