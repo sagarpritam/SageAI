@@ -7,7 +7,7 @@ import io
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.scan import Scan
-from app.services.report_generator import generate_report, generate_pdf_report
+from app.services.report_generator import generate_report, generate_pdf_report, generate_hackerone_report
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
@@ -53,6 +53,29 @@ async def get_report_pdf(
         media_type="application/pdf",
         headers={
             "Content-Disposition": f"attachment; filename=SageAI_report_{scan_id[:8]}.pdf"
+        },
+    )
+
+
+@router.get("/{scan_id}/hackerone")
+async def get_hackerone_report(
+    scan_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Download a HackerOne-formatted Markdown report for Bug Bounty submission."""
+    scan = await _get_scan(scan_id, current_user, db)
+
+    markdown = generate_hackerone_report({
+        "target": scan.target,
+        "findings": scan.get_findings(),
+    })
+
+    return StreamingResponse(
+        io.BytesIO(markdown.encode("utf-8")),
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": f"attachment; filename=hackerone_{scan_id[:8]}.md"
         },
     )
 

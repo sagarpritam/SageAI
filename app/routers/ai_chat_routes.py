@@ -1,9 +1,13 @@
-"""AI Chat interface powered by RAG Knowledge Base."""
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from typing import Optional, Dict, Any
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
 from app.core.security import get_current_user
-from app.models.user import User
+from app.core.database import get_db
+from app.models.scan import Scan
+from app.models.finding import Finding
 from app.services.llm.gateway import llm_gateway
 from app.services.rag.vector_store import vector_store
 import logging
@@ -14,16 +18,21 @@ router = APIRouter(prefix="/ai", tags=["AI Chat"])
 
 class ChatRequest(BaseModel):
     message: str
+    context: Optional[Dict[str, Any]] = None
 
 class ChatResponse(BaseModel):
     reply: str
     sources: list[dict] = []
 
 @router.post("/chat", response_model=ChatResponse)
-async def ai_security_chat(payload: ChatRequest, current_user: User = Depends(get_current_user)):
+async def ai_security_chat(
+    payload: ChatRequest, 
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """
     Chat endpoint for the AI Security Assistant.
-    Retrieves relevant cybersecurity knowledge via RAG and answers the user's question.
+    Retrieves relevant cybersecurity knowledge via RAG, and optionally injects live scan context.
     """
     user_msg = payload.message.strip()
     if not user_msg:
@@ -48,11 +57,34 @@ async def ai_security_chat(payload: ChatRequest, current_user: User = Depends(ge
             "Keep your responses professional, concise, and natively formatted in markdown."
         )
         
+        # ── V2 Scan Context Injection ──
+        if payload.context and "scan_id" in payload.context:
+            scan_id = payload.context["scan_id"]
+            
+            # Verify org ownership
+            org_id = current_user.get("org", "system")
+            result = await db.execute(select(Scan).where(Scan.id == scan_id, Scan.organization_id == str(org_id)))
+            scan = result.scalar_one_or_none()
+            
+            if scan:
+                # Fetch findings
+                f_result = await db.execute(select(Finding).where(Finding.scan_id == scan.id))
+                findings = f_result.scalars().all()
+                
+                scan_context = f"\n\nCURRENT SCAN CONTEXT (Target: {scan.target}):\n"
+                if findings:
+                    for f in findings:
+                        scan_context += f"- [{f.severity}] {f.title}: {f.description}\n"
+                else:
+                    scan_context += "- No vulnerabilities found in this scan.\n"
+                
+                system_prompt += scan_context
+                
         if context_str:
             system_prompt += f"\n\n{context_str}"
             
         # Call LLM Gateway
-        org_id = current_user.memberships[0].organization_id if current_user.memberships else "system"
+        org_id = current_user.get("org", "system")
         reply = await llm_gateway.generate(
             prompt=user_msg,
             system_message=system_prompt,
@@ -64,3 +96,4 @@ async def ai_security_chat(payload: ChatRequest, current_user: User = Depends(ge
     except Exception as e:
         logger.error(f"Chat error: {e}")
         raise HTTPException(status_code=500, detail="The AI Assistant is currently unavailable.")
+

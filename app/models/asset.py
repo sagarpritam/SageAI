@@ -35,9 +35,9 @@ class Asset(Base):
     org_id = Column(String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False)
 
     # Identity
-    asset_type = Column(SAEnum(AssetType), default=AssetType.subdomain, nullable=False)
-    value = Column(String, nullable=False)          # domain/IP/URL/CIDR
-    ip_address = Column(String, nullable=True)
+    asset_type = Column(SAEnum(AssetType), default=AssetType.subdomain, nullable=False, index=True)
+    value = Column(String, nullable=False, index=True)          # domain/IP/URL/CIDR
+    ip_address = Column(String, nullable=True, index=True)
 
     # Discovery metadata
     open_ports = Column(Text, default="[]")          # JSON list  [80, 443, 8080]

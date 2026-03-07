@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.scan import Scan
 from app.models.organization import Organization
+from app.models.finding import Finding
 from app.schemas.scan import ScanRequest, ScanResponse, ScanListItem, Vulnerability, RiskSummary
 from app.services.scanner_service import run_all_scans
 from app.services.risk_engine import calculate_risk
@@ -56,17 +57,32 @@ async def create_scan(
     await db.refresh(scan)
 
     # Run async scans
+    formatted_findings = []
     try:
-        findings = await run_all_scans(payload.target, scan_id=scan.id)
-        risk = calculate_risk(findings)
+        findings_data = await run_all_scans(payload.target, scan_id=scan.id, db=db)
+        risk = calculate_risk(findings_data)
 
-        scan.set_findings(findings)
+        # Legacy JSON compliance
+        scan.set_findings(findings_data)
         scan.risk_score = risk["risk_score"]
         scan.risk_level = risk["risk_level"]
         scan.status = "completed"
-    except Exception:
+
+        # V2 compliance: Store in robust Findings table
+        for f in findings_data:
+            finding = Finding(
+                scan_id=scan.id,
+                title=f.get('type', 'Unknown Vulnerability'),
+                description=f.get('description', ''),
+                severity=f.get('severity', 'Low').capitalize(),
+                cvss_score=f.get('cvss', 0.0),
+                asset_identified=payload.target,
+            )
+            db.add(finding)
+            formatted_findings.append(f)
+
+    except Exception as e:
         scan.status = "failed"
-        findings = []
         risk = {"risk_score": 0, "risk_level": "Low", "total_findings": 0}
 
     await db.commit()
@@ -77,7 +93,7 @@ async def create_scan(
         target=scan.target,
         status=scan.status,
         timestamp=scan.created_at,
-        findings=[Vulnerability(**f) for f in findings],
+        findings=[Vulnerability(**f) for f in formatted_findings] if formatted_findings else [],
         risk_summary=RiskSummary(**risk),
     )
 
@@ -114,6 +130,44 @@ async def get_scan(
     )
 
 
+@router.get("/{scan_id}/findings", response_model=list[dict])
+async def get_scan_findings(
+    scan_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Retrieve granular findings linked to a specific scan."""
+    
+    # 1. Verify org ownership of scan
+    result = await db.execute(
+        select(Scan).where(
+            Scan.id == scan_id,
+            Scan.organization_id == current_user["org"],
+        )
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found")
+        
+    # 2. Extract detailed findings
+    f_result = await db.execute(
+        select(Finding).where(Finding.scan_id == scan_id).order_by(desc(Finding.severity))
+    )
+    findings = f_result.scalars().all()
+    
+    return [
+        {
+            "id": f.id,
+            "title": f.title,
+            "description": f.description,
+            "severity": f.severity,
+            "cvss_score": f.cvss_score,
+            "asset_identified": f.asset_identified,
+            "created_at": f.created_at
+        }
+        for f in findings
+    ]
+
+
 @router.get("s", response_model=list[ScanListItem])
 async def list_scans(
     current_user: dict = Depends(get_current_user),
@@ -139,3 +193,4 @@ async def list_scans(
         )
         for s in scans
     ]
+

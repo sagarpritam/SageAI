@@ -78,4 +78,4 @@ async def test_health_check_fields(client):
     assert data["app"] == "SageAI Security Scanner"
     assert data["environment"] == "development"
     assert "endpoints" in data
-    assert data["version"] == "1.0.0"
+    assert data["version"] == "2.0.0"

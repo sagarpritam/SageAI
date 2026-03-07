@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api from '../api';
+import { chatWithCopilot } from '../api';
 
 const QUICK_COMMANDS = [
     { label: '🌐 Scan a domain', cmd: 'Scan example.com for all vulnerabilities and give me a summary' },
@@ -90,8 +90,8 @@ export default function Copilot() {
         setLoading(true);
 
         try {
-            const res = await api.post('/ai/chat', { message: msg });
-            const reply = res.data?.response || res.data?.message || res.data?.result || 'I processed your request.';
+            const res = await chatWithCopilot(msg);
+            const reply = res.data?.reply || res.data?.message || res.data?.result || 'I processed your request.';
             setMessages(prev => [...prev, { role: 'ai', content: reply, time: new Date() }]);
         } catch (err) {
             const errMsg = err.response?.data?.detail || 'Connection error. Please try again.';

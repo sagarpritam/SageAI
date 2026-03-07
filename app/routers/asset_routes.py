@@ -12,9 +12,9 @@ from sqlalchemy import select, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.security import get_current_user
 from app.models.asset import Asset, AssetType, AssetStatus
 from app.models.user import User
-from app.routers.auth_routes import get_current_user
 from app.schemas.asset import AssetOut, AssetSummary, DiscoveryRequest
 from app.services.asset_inventory.asset_discovery_service import discover_assets
 

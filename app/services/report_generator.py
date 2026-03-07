@@ -265,3 +265,43 @@ def generate_report(scan_data: dict) -> dict:
         },
         "findings": scan_data.get("findings", []),
     }
+
+
+def generate_hackerone_report(scan_data: dict) -> str:
+    """Generate a HackerOne-compliant Markdown report for bug bounty submissions."""
+    findings = scan_data.get("findings", [])
+    target = scan_data.get("target", "Unknown Target")
+    
+    if not findings:
+        return f"# Security Report for {target}\n\nNo vulnerabilities were detected during this scan.\n"
+
+    md = []
+    
+    for finding in findings:
+        title = finding.get("type", "Unknown Vulnerability")
+        desc = finding.get("description", "No description provided.")
+        severity = finding.get("severity", "Low")
+        cvss = finding.get("cvss", "N/A")
+        
+        md.append(f"# {title} in {target}\n")
+        
+        md.append("## Description")
+        md.append(f"{desc}\n")
+        
+        md.append("## Impact")
+        md.append(f"This vulnerability allows attackers to compromise the confidentiality, integrity, or availability of the system. Severity is rated as **{severity}**.\n")
+        
+        md.append("## CVSS Score")
+        md.append(f"{cvss} ({severity})\n")
+        
+        md.append("## Remediation")
+        remediation = REMEDIATION.get(title, {}).get("steps", [])
+        if remediation:
+            for step in remediation:
+                md.append(f"- {step}")
+        else:
+            md.append("Please refer to industry best practices (e.g., OWASP) to remediate this issue.")
+        md.append("\n---\n")
+        
+    return "\n".join(md)
+

@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { listScans, downloadPdf, getReport } from '../api';
+import { listScans, downloadPdf, getReport, downloadHackerOne } from '../api';
 
 const RISK_COLORS = { Critical: '#ef4444', High: '#f97316', Medium: '#f59e0b', Low: '#10b981', Info: '#3b82f6' };
 const RISK_ORDER = { Critical: 0, High: 1, Medium: 2, Low: 3, Info: 4 };
@@ -102,13 +102,19 @@ export default function Reports() {
         setDownloading('');
     };
 
-    const handleHackerOne = (scan) => {
-        const md = HackerOneReport(scan, report);
-        const blob = new Blob([md], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url;
-        a.download = `HackerOne_${scan.target.replace(/[^a-z0-9]/gi, '_')}.md`;
-        a.click(); URL.revokeObjectURL(url);
+    const handleHackerOne = async (scan) => {
+        setDownloading(scan.id + '-h1');
+        try {
+            const res = await downloadHackerOne(scan.id);
+            const url = window.URL.createObjectURL(new Blob([res.data], { type: 'text/markdown' }));
+            const a = document.createElement('a'); a.href = url;
+            a.download = `hackerone_${scan.target.replace(/[^a-z0-9]/gi, '_').slice(0, 20)}.md`;
+            a.click(); window.URL.revokeObjectURL(url);
+        } catch {
+            // Fallback: client-side if API unavailable
+            alert('Could not generate report from server. Try again.');
+        }
+        setDownloading('');
     };
 
     const filtered = scans.filter(s => {

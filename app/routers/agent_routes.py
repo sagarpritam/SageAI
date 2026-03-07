@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.models.user import User
-from app.routers.auth_routes import get_current_user
+from app.core.security import get_current_user
 from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
 from app.services.knowledge_graph import SecurityKnowledgeGraph
 from app.plugins.registry import get_marketplace_listing, run_all_plugins, get_all_plugins

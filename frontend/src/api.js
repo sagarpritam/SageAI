@@ -32,19 +32,23 @@ export const login = (data) => api.post('/auth/login', data);
 export const createScan = (target) => api.post('/scan', { target });
 export const getScan = (id) => api.get(`/scan/${id}`);
 export const listScans = () => api.get('/scans');
+// V2: Returns individual Finding rows for a completed scan (severity, cvss, remediation)
+export const getScanFindings = (scanId) => api.get(`/scan/${scanId}/findings`);
 
 // ── Reports ───────────────────────────────────────
 export const getReport = (scanId) => api.get(`/reports/${scanId}`);
 export const downloadPdf = (scanId) =>
     api.get(`/reports/${scanId}/pdf`, { responseType: 'blob' });
+// V2: Downloads a HackerOne-compliant .md file
 export const downloadHackerOne = (scanId) =>
-    api.get(`/reports/${scanId}/hackerone`);
+    api.get(`/reports/${scanId}/hackerone`, { responseType: 'blob' });
 
 // ── AI Explain ────────────────────────────────────
 export const explainFinding = (type) => api.get(`/explain/${encodeURIComponent(type)}`);
 
 // ── AI Chat (Copilot) ─────────────────────────────
-export const chatWithCopilot = (message) => api.post('/ai/chat', { message });
+// V2: `context` is optional. Pass { scan_id: "..." } to inject live scan findings into the prompt.
+export const chatWithCopilot = (message, context = null) => api.post('/ai/chat', { message, context });
 export const runAiCommand = (command, context) => api.post('/ai/command', { command, context });
 
 // ── Organization ──────────────────────────────────
