@@ -22,7 +22,7 @@ class User(Base):
     mfa_backup_codes = Column(String, nullable=True)
 
     organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     organization = relationship("Organization", back_populates="users")

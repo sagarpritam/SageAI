@@ -22,7 +22,7 @@ class Scan(Base):
     risk_level = Column(String, default="Low")
     status = Column(String, default="pending")  # pending / running / completed / failed
 
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     organization = relationship("Organization", back_populates="scans")

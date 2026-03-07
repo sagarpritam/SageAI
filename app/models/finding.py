@@ -40,7 +40,7 @@ class Finding(Base):
     evidence = Column(Text, nullable=True)  # Raw request/response snippet
 
     # Timestamps
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationship
     scan = relationship("Scan", backref="db_findings")

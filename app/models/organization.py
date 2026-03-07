@@ -14,7 +14,7 @@ class Organization(Base):
     name = Column(String, nullable=False)
     plan = Column(String, default="free")  # free / pro / enterprise
     github_token_encrypted = Column(String, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     users = relationship("User", back_populates="organization")
