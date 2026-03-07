@@ -1,0 +1,72 @@
+{
+    "rewrites": [
+        {
+            "source": "/auth/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/auth/:path*"
+        },
+        {
+            "source": "/scan/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/scan/:path*"
+        },
+        {
+            "source": "/scans/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/scans/:path*"
+        },
+        {
+            "source": "/reports/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/reports/:path*"
+        },
+        {
+            "source": "/explain/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/explain/:path*"
+        },
+        {
+            "source": "/org/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/org/:path*"
+        },
+        {
+            "source": "/api-keys/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/api-keys/:path*"
+        },
+        {
+            "source": "/webhooks/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/webhooks/:path*"
+        },
+        {
+            "source": "/billing/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/billing/:path*"
+        },
+        {
+            "source": "/schedules/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/schedules/:path*"
+        },
+        {
+            "source": "/ai/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/ai/:path*"
+        },
+        {
+            "source": "/assets/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/assets/:path*"
+        },
+        {
+            "source": "/agents/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/agents/:path*"
+        },
+        {
+            "source": "/autofix/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/autofix/:path*"
+        },
+        {
+            "source": "/integrations/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/integrations/:path*"
+        },
+        {
+            "source": "/metrics",
+            "destination": "https://web-production-f984b.up.railway.app/metrics"
+        },
+        {
+            "source": "/((?!assets/).*)",
+            "destination": "/index.html"
+        }
+    ]
+}
