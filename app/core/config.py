@@ -127,6 +127,19 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# ── Railway DATABASE_URL fix ──────────────────────
+# Railway injects `postgresql://` but SQLAlchemy async needs `postgresql+asyncpg://`
+if settings.DATABASE_URL.startswith("postgresql://"):
+    settings.DATABASE_URL = settings.DATABASE_URL.replace(
+        "postgresql://", "postgresql+asyncpg://", 1
+    )
+    logger.info("🔄 Auto-converted DATABASE_URL to use asyncpg driver")
+elif settings.DATABASE_URL.startswith("postgres://"):
+    settings.DATABASE_URL = settings.DATABASE_URL.replace(
+        "postgres://", "postgresql+asyncpg://", 1
+    )
+    logger.info("🔄 Auto-converted DATABASE_URL to use asyncpg driver")
+
 # Load secrets from vault if available (override .env defaults)
 _vault_secret_key = _get_secret("SECRET_KEY")
 if _vault_secret_key and _vault_secret_key != settings.SECRET_KEY:
