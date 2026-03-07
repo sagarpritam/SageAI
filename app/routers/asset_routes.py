@@ -54,7 +54,7 @@ async def trigger_discovery(
     Trigger full attack surface discovery for a root domain.
     Runs the full pipeline: crt.sh → DNS → Shodan → HTTP probe → risk scoring → DB upsert.
     """
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     if not org_id:
         raise HTTPException(status_code=400, detail="User has no organization")
 
@@ -79,7 +79,7 @@ async def trigger_discovery_sync(
     Synchronous asset discovery — waits for completion and returns full summary.
     Best for smaller target domains (< 20 subdomains).
     """
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     if not org_id:
         raise HTTPException(status_code=400, detail="User has no organization")
 
@@ -97,7 +97,7 @@ async def get_asset_summary(
     current_user: User = Depends(get_current_user),
 ):
     """Returns aggregated counts for the organization's attack surface."""
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     result = await db.execute(select(Asset).where(Asset.org_id == org_id))
     assets = result.scalars().all()
 
@@ -139,7 +139,7 @@ async def list_assets(
     current_user: User = Depends(get_current_user),
 ):
     """List discovered assets with optional filtering by type, risk level, and status."""
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     q = select(Asset).where(Asset.org_id == org_id)
 
     if asset_type:
@@ -161,7 +161,7 @@ async def get_high_risk_assets(
     current_user: User = Depends(get_current_user),
 ):
     """Return Critical and High risk assets sorted by risk score."""
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     result = await db.execute(
         select(Asset)
         .where(
@@ -182,7 +182,7 @@ async def get_new_assets(
 ):
     """Assets discovered in the last N hours."""
     from datetime import timezone, timedelta
-    org_id = current_user.org_id
+    org_id = current_user["org"]
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
 
     result = await db.execute(
@@ -204,7 +204,7 @@ async def get_asset(
     """Get full detail for a specific asset including Shodan/SSL data."""
     result = await db.execute(
         select(Asset).where(
-            and_(Asset.id == asset_id, Asset.org_id == current_user.org_id)
+            and_(Asset.id == asset_id, Asset.org_id == current_user["org"])
         )
     )
     asset = result.scalar_one_or_none()
@@ -228,7 +228,7 @@ async def delete_asset(
     """Remove a discovered asset from inventory."""
     result = await db.execute(
         select(Asset).where(
-            and_(Asset.id == asset_id, Asset.org_id == current_user.org_id)
+            and_(Asset.id == asset_id, Asset.org_id == current_user["org"])
         )
     )
     asset = result.scalar_one_or_none()

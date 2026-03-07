@@ -38,7 +38,7 @@ async def run_assessment(
     
     For large targets use mode='quick' for a faster 2-agent run.
     """
-    org_id = str(current_user.org_id)
+    org_id = str(current_user["org"])
     target = req.target.replace("https://", "").replace("http://", "").split("/")[0]
 
     orchestrator = MultiAgentOrchestrator(org_id=org_id)
@@ -72,7 +72,7 @@ async def run_assessment_async(
     current_user: User = Depends(get_current_user),
 ):
     """Starts multi-agent assessment in background. Poll scan results for status."""
-    org_id = str(current_user.org_id)
+    org_id = str(current_user["org"])
     target = req.target.replace("https://", "").replace("http://", "").split("/")[0]
 
     async def _run():
@@ -106,7 +106,7 @@ async def get_attack_paths(
     current_user: User = Depends(get_current_user),
 ):
     """Retrieve stored attack paths from the Security Knowledge Graph."""
-    org_id = str(current_user.org_id)
+    org_id = str(current_user["org"])
     kg = SecurityKnowledgeGraph(org_id=org_id, db=db)
     paths = await kg.get_attack_paths()
     return {"org_id": org_id, "attack_paths": paths, "count": len(paths)}
