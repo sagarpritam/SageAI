@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sageai
+  labels:
+    app.kubernetes.io/name: sageai
+    app.kubernetes.io/version: "2.0"

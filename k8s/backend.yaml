@@ -1,0 +1,86 @@
+# ================================
+# SageAI Backend — Deployment + Service + HPA
+# ================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: sageai
+  labels:
+    app: sageai-backend
+    version: "2.0"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sageai-backend
+  template:
+    metadata:
+      labels:
+        app: sageai-backend
+        version: "2.0"
+    spec:
+      containers:
+        - name: backend
+          image: sageai/backend:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: sageai-config
+            - secretRef:
+                name: sageai-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: sageai
+spec:
+  selector:
+    app: sageai-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# Auto-scale backend 2→8 pods based on CPU
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: sageai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
