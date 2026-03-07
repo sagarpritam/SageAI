@@ -1,74 +1,72 @@
 {
     "version": 2,
-    "builds": [
+    "buildCommand": "cd frontend && npm install && npm run build",
+    "outputDirectory": "frontend/dist",
+    "framework": "vite",
+    "rewrites": [
         {
-            "src": "api/index.py",
-            "use": "@vercel/python"
+            "source": "/auth/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/auth/:path*"
         },
         {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist"
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/auth/(.*)",
-            "dest": "api/index.py"
+            "source": "/scan/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/scan/:path*"
         },
         {
-            "src": "/scan(.*)",
-            "dest": "api/index.py"
+            "source": "/scans/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/scans/:path*"
         },
         {
-            "src": "/scans(.*)",
-            "dest": "api/index.py"
+            "source": "/reports/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/reports/:path*"
         },
         {
-            "src": "/reports/(.*)",
-            "dest": "api/index.py"
+            "source": "/explain/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/explain/:path*"
         },
         {
-            "src": "/explain/(.*)",
-            "dest": "api/index.py"
+            "source": "/org/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/org/:path*"
         },
         {
-            "src": "/org/(.*)",
-            "dest": "api/index.py"
+            "source": "/api-keys/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/api-keys/:path*"
         },
         {
-            "src": "/api-keys(.*)",
-            "dest": "api/index.py"
+            "source": "/webhooks/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/webhooks/:path*"
         },
         {
-            "src": "/webhooks(.*)",
-            "dest": "api/index.py"
+            "source": "/billing/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/billing/:path*"
         },
         {
-            "src": "/billing/(.*)",
-            "dest": "api/index.py"
+            "source": "/schedules/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/schedules/:path*"
         },
         {
-            "src": "/schedules(.*)",
-            "dest": "api/index.py"
+            "source": "/ai/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/ai/:path*"
         },
         {
-            "src": "/ai/(.*)",
-            "dest": "api/index.py"
+            "source": "/assets/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/assets/:path*"
         },
         {
-            "src": "/ws/(.*)",
-            "dest": "api/index.py"
+            "source": "/agents/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/agents/:path*"
         },
         {
-            "src": "/metrics",
-            "dest": "api/index.py"
+            "source": "/autofix/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/autofix/:path*"
         },
         {
-            "src": "/(.*)",
-            "dest": "frontend/$1"
+            "source": "/integrations/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/integrations/:path*"
+        },
+        {
+            "source": "/metrics",
+            "destination": "https://web-production-f984b.up.railway.app/metrics"
         }
     ]
 }
