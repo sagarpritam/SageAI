@@ -28,7 +28,16 @@ Type a message or pick a quick command to get started.`,
     time: new Date(),
 };
 
-function renderContent(text) {
+function renderContent(rawText) {
+    // 1. Sanitize raw text to prevent XSS (escape all HTML tags)
+    const text = rawText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    // 2. Parse Markdown
     return text
         .split('\n')
         .map(line => {

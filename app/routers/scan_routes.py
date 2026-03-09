@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
+from uuid import UUID
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -132,7 +133,7 @@ async def get_scan(
 
 @router.get("/{scan_id}/findings", response_model=list[dict])
 async def get_scan_findings(
-    scan_id: str,
+    scan_id: UUID,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -150,7 +151,7 @@ async def get_scan_findings(
         
     # 2. Extract detailed findings
     f_result = await db.execute(
-        select(Finding).where(Finding.scan_id == scan_id).order_by(desc(Finding.severity))
+        select(Finding).where(Finding.scan_id == str(scan_id)).order_by(desc(Finding.severity))
     )
     findings = f_result.scalars().all()
     

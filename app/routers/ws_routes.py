@@ -11,6 +11,7 @@ import asyncio
 import logging
 from collections import defaultdict
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from uuid import UUID
 
 logger = logging.getLogger("SageAI.ws")
 
@@ -33,11 +34,12 @@ async def broadcast_scan_progress(scan_id: str, data: dict):
 
 
 @router.websocket("/ws/scan/{scan_id}")
-async def scan_progress_ws(websocket: WebSocket, scan_id: str):
+async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
     """WebSocket endpoint for real-time scan progress."""
     await websocket.accept()
-    _channels[scan_id].add(websocket)
-    logger.info(f"WS connected for scan {scan_id} ({len(_channels[scan_id])} clients)")
+    scan_id_str = str(scan_id)
+    _channels[scan_id_str].add(websocket)
+    logger.info(f"WS connected for scan {scan_id_str} ({len(_channels[scan_id_str])} clients)")
 
     try:
         # Keep connection alive, listen for client disconnect
@@ -50,7 +52,7 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: str):
     except WebSocketDisconnect:
         pass
     finally:
-        _channels[scan_id].discard(websocket)
-        if not _channels[scan_id]:
-            del _channels[scan_id]
-        logger.info(f"WS disconnected for scan {scan_id}")
+        _channels[scan_id_str].discard(websocket)
+        if not _channels[scan_id_str]:
+            del _channels[scan_id_str]
+        logger.info(f"WS disconnected for scan {scan_id_str}")
