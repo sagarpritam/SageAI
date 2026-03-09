@@ -1,27 +1,27 @@
-﻿# 🛡️ SageAI 2.0 — AI-Powered Enterprise Security Platform
+﻿# 🛡️ SageAI 3.0 — AI-Powered Enterprise Security & OSINT Platform
 
-> **SageAI 2.0** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, and Bug Bounty — powered by FastAPI, React, and a Multi-Agent AI architecture.
+> **SageAI 3.0** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, Bug Bounty, and **Advanced OSINT Intelligence** — powered by FastAPI, React, and a Multi-Agent AI architecture with 9 integrated intelligence modules.
 
 [![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)](tests/)
-[![Version](https://img.shields.io/badge/version-2.0.0-blueviolet)](#)
+[![Version](https://img.shields.io/badge/version-3.0.0-blueviolet)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20SQLAlchemy-informational)](#)
+[![Modules](https://img.shields.io/badge/intelligence-9%20OSINT%20modules-ff6b6b)](#-intelligence-hub-v30--9-osint-modules)
 
 ---
 
-## 🚀 What's New in v2.0
+## 🔥 What's New in v3.0
 
 | Feature | Description |
 |---------|-------------|
-| 🗺️ **Asset Inventory** | Full Attack Surface Management — discover subdomains, IPs, open ports, tech stacks automatically |
-| 🤖 **Multi-Agent AI** | Specialized agent team: `ReconAgent`, `ScannerAgent`, `ExploitAgent`, `ReportAgent` |
-| 🧠 **Context-Aware Copilot** | AI Copilot with live scan context injection — ask "how do I fix the SQLi you just found?" |
-| 🔍 **Finding Database** | Vulnerabilities stored in dedicated `findings` table (not JSON) — filterable by CVSS, severity, asset |
-| 📝 **HackerOne Export** | One-click Bug Bounty report export in HackerOne Markdown format |
-| 🔬 **Agent Logs** | Full reasoning trail — see exactly what each AI agent did during your scan |
-| 📡 **WebSocket Streams** | Real-time scan progress events streamed to the terminal UI |
-| 🔐 **Security Knowledge Graph** | MITRE ATT&CK-aligned attack path visualization |
-| 🔌 **Plugin Marketplace** | Extensible plugin system for custom security checks |
+| ⚡ **Intelligence Hub** | 9 advanced OSINT modules — Shodan, Maltego, Babel X, SpiderFoot, Social Links, Intel X, Recon-ng, Censys, OSINT Industries |
+| 🕸️ **Maltego Link Analysis** | Canvas-rendered entity relationship graph with nodes, edges, and radial layout |
+| 🌑 **Dark Web Monitoring** | Tor search (Ahmia.fi) + paste site monitoring + Google dork suggestions |
+| 👤 **Identity Resolution** | Sherlock-style username enumeration across 11+ platforms |
+| 📡 **Certificate Transparency** | crt.sh + TLS inspection for certificate monitoring |
+| 🗄️ **Breach Intelligence** | HaveIBeenPwned + Wayback Machine + IntelX archive search |
+| 🔓 **Zero API Keys Required** | All 9 modules work immediately using free OSINT sources |
+| ⬆️ **Premium Upgrades** | Drop in API keys for Shodan Pro, Censys, IntelX, Babel X and auto-upgrade |
 
 ---
 
@@ -30,6 +30,7 @@
 | Category | Capabilities |
 |----------|-------------|
 | **Scanning** | 11-scanner pipeline: Security Headers, XSS, SQLi, SSL/TLS, Port Scan, DNS + OSINT (Shodan, CRT.sh, Mozilla Observatory, VirusTotal, NVD CVE) |
+| **Intelligence Hub** | 9 OSINT modules: Shodan, Maltego, Babel X, SpiderFoot, Social Links, Intel X, Recon-ng, Censys, OSINT Industries |
 | **Asset Discovery** | Subdomain enum (crt.sh), DNS resolution, Shodan port data, HTTP probing, risk scoring per asset |
 | **AI Analysis** | GPT-4o-mini with RAG knowledge base + live scan context injection + circuit breaker |
 | **Multi-Agent** | ReconAgent → ScannerAgent → ExploitAgent → ReportAgent pipeline |
@@ -43,26 +44,59 @@
 
 ---
 
+## 🕵️ Intelligence Hub v3.0 — 9 OSINT Modules
+
+Every module works **immediately without API keys** using free/open-source alternatives. Add premium keys anytime for enhanced capabilities.
+
+| # | Module | Codename | Free Source | Premium Upgrade |
+|---|--------|----------|-------------|-----------------|
+| 01 | **SHODAN** | The Panopticon | Shodan InternetDB (free) | `SHODAN_API_KEY` → Pro banners, screenshots |
+| 02 | **MALTEGO** | Link Analysis | Built-in canvas graph engine | — |
+| 03 | **BABEL X** | The Linguistic Mesh | Ahmia.fi Tor + PasteBin dumps | `BABELX_API_KEY` → Enterprise |
+| 04 | **SPIDERFOOT** | Recon Automation | ipinfo + ThreatCrowd + URLScan | — |
+| 05 | **SOCIAL LINKS** | Neural De-Masking | Sherlock scanner (11 platforms) | `SOCIAL_LINKS_API_KEY` → Enterprise |
+| 06 | **INTEL X** | Archive of Secrets | HIBP + Wayback Machine | `INTELX_API_KEY` → Pro |
+| 07 | **RECON-NG** | The Framework | HackerTarget + HTTP fingerprint | — |
+| 08 | **CENSYS** | The Global Radar | crt.sh + direct TLS inspection | `CENSYS_API_ID` → Pro |
+| 09 | **OSINT IND.** | The Interceptor | Gravatar + GitHub + DNS MX | `OSINT_INDUSTRIES_API_KEY` → Pro |
+
+### Target Types Supported
+
+| Type | Example | Modules Available |
+|------|---------|-------------------|
+| 🌐 Domain | `example.com` | All 9 modules |
+| 📌 IP Address | `8.8.8.8` | Shodan, Censys, SpiderFoot, Recon-ng |
+| 📧 Email | `user@company.com` | OSINT Ind., Intel X, Identity, Dark Web |
+| 👤 Username | `johndoe` | Identity, Intel X, Dark Web |
+| 📱 Phone | `+1234567890` | OSINT Industries |
+
+---
+
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   React Frontend (Vite)                 │
-│  Dashboard │ Asset Inventory │ Scans │ AI Copilot       │
-│  Reports   │ AutoFix         │ Team  │ Settings │ Plan  │
-└─────────────────────────┬───────────────────────────────┘
-                          │ REST + WebSocket
-┌─────────────────────────▼───────────────────────────────┐
-│              FastAPI Backend (52+ endpoints)            │
-│  Auth │ Scan │ Assets │ Reports │ AI │ Billing │ MFA    │
-│  ┌────────────────────────────────────────────┐         │
-│  │  Multi-Agent AI System                     │         │
-│  │  ReconAgent → ScannerAgent → ReportAgent   │         │
-│  └────────────────────────────────────────────┘         │
-│  ┌────────────────────────────────────────────┐         │
-│  │  Prometheus │ Sentry │ Audit Logs │ Vault  │         │
-│  └────────────────────────────────────────────┘         │
-└──┬──────────┬──────────┬──────────────────────┬─────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   React Frontend (Vite)                     │
+│  Dashboard │ Asset Inventory │ Intelligence Hub │ Scans     │
+│  Reports   │ AutoFix │ AI Copilot │ Team │ Settings │ Plan │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ REST + WebSocket
+┌──────────────────────────▼──────────────────────────────────┐
+│              FastAPI Backend (64+ endpoints)                 │
+│  Auth │ Scan │ Assets │ Reports │ AI │ Intelligence │ MFA   │
+│  ┌──────────────────────────────────────────────┐           │
+│  │  Intelligence Hub (9 OSINT modules)          │           │
+│  │  Shodan → Censys → IntelX → SpiderFoot →    │           │
+│  │  Recon-ng → DarkWeb → Identity → Maltego     │           │
+│  └──────────────────────────────────────────────┘           │
+│  ┌──────────────────────────────────────────────┐           │
+│  │  Multi-Agent AI System                       │           │
+│  │  ReconAgent → ScannerAgent → ReportAgent     │           │
+│  └──────────────────────────────────────────────┘           │
+│  ┌──────────────────────────────────────────────┐           │
+│  │  Prometheus │ Sentry │ Audit Logs │ Vault    │           │
+│  └──────────────────────────────────────────────┘           │
+└──┬──────────┬──────────┬──────────────────────┬─────────────┘
    │          │          │                      │
    ▼          ▼          ▼                      ▼
 PostgreSQL   Redis    Celery Workers      Vector Store
@@ -73,16 +107,16 @@ PostgreSQL   Redis    Celery Workers      Vector Store
 
 ---
 
-## 🗄️ Database Models (v2)
+## 🗄️ Database Models
 
 | Model | Table | Purpose |
 |-------|-------|---------|
 | `Organization` | `organizations` | Multi-tenant isolation |
 | `User` | `users` | Auth + RBAC |
 | `Scan` | `scans` | Scan records |
-| **`Finding`** | **`findings`** | **Granular vulnerability rows (NEW v2)** |
-| **`Asset`** | **`assets`** | **Attack surface inventory (NEW v2)** |
-| **`AgentLog`** | **`agent_logs`** | **AI agent reasoning trail (NEW v2)** |
+| `Finding` | `findings` | Granular vulnerability rows |
+| `Asset` | `assets` | Attack surface inventory |
+| `AgentLog` | `agent_logs` | AI agent reasoning trail |
 | `ScanSchedule` | `schedules` | Cron-based scans |
 | `APIKey` | `api_keys` | Programmatic access |
 | `Webhook` | `webhooks` | Event webhooks |
@@ -142,12 +176,12 @@ Spins up **7 services**:
 
 ---
 
-## 📡 API Reference (v2.0 — 52+ Endpoints)
+## 📡 API Reference (v3.0 — 64+ Endpoints)
 
 ### Core
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/` | Health check (DB status, version, scanner count) |
+| `GET` | `/` | Health check (DB status, version, module count) |
 | `GET` | `/metrics` | Prometheus metrics |
 
 ### Auth
@@ -166,10 +200,25 @@ Spins up **7 services**:
 | `POST` | `/scan` | Run 11-scanner + OSINT pipeline |
 | `GET` | `/scan/{id}` | Get scan result |
 | `GET` | `/scans` | List scans (org-scoped) |
-| **`GET`** | **`/scan/{id}/findings`** | **Get granular findings (NEW v2)** |
+| `GET` | `/scan/{id}/findings` | Get granular findings |
 | `WS` | `/ws/scan/{id}` | Real-time scan progress |
 
-### Asset Inventory (NEW v2)
+### Intelligence Hub (NEW v3.0)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/intelligence/sweep` | Full 9-module intelligence sweep |
+| `POST` | `/intelligence/shodan` | Shodan: The Panopticon |
+| `POST` | `/intelligence/censys` | Censys: The Global Radar |
+| `POST` | `/intelligence/intelx` | Intel X: Archive of Secrets |
+| `POST` | `/intelligence/osint-industries` | OSINT Ind.: The Interceptor |
+| `POST` | `/intelligence/spiderfoot` | SpiderFoot: Recon Automation |
+| `POST` | `/intelligence/recon-ng` | Recon-ng: The Framework |
+| `POST` | `/intelligence/darkweb` | Babel X: The Linguistic Mesh |
+| `POST` | `/intelligence/identity` | Social Links: Neural De-Masking |
+| `POST` | `/intelligence/graph` | Maltego: Link Analysis Graph |
+| `GET` | `/intelligence/modules` | List all modules & tier status |
+
+### Asset Inventory
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/assets/discover` | Start async asset discovery |
@@ -186,30 +235,21 @@ Spins up **7 services**:
 |--------|----------|-------------|
 | `GET` | `/reports/{id}` | JSON report |
 | `GET` | `/reports/{id}/pdf` | Downloadable PDF (ReportLab) |
-| **`GET`** | **`/reports/{id}/hackerone`** | **HackerOne Markdown export (NEW v2)** |
+| `GET` | `/reports/{id}/hackerone` | HackerOne Markdown export |
 
 ### AI (Copilot + Agents)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/ai/chat` | Context-aware AI Copilot (supports `scan_id` injection) |
+| `POST` | `/ai/chat` | Context-aware AI Copilot |
 | `POST` | `/ai/command` | AI command execution |
-| `GET` | `/explain/{type}` | OWASP-aligned vulnerability explanation |
-| `POST` | `/agents/assess` | Full multi-agent security assessment |
+| `GET` | `/explain/{type}` | OWASP-aligned vuln explanation |
+| `POST` | `/agents/assess` | Full multi-agent assessment |
 | `POST` | `/agents/assess/async` | Async agent assessment |
 | `GET` | `/agents/status` | Agent system status |
-| `GET` | `/agents/graph/paths` | Security Knowledge Graph attack paths |
-| `GET` | `/agents/plugins` | Plugin marketplace listing |
+| `GET` | `/agents/graph/paths` | Knowledge Graph attack paths |
+| `GET` | `/agents/plugins` | Plugin marketplace |
 | `POST` | `/agents/plugins/run` | Run a specific plugin |
 | `POST` | `/agents/plugins/run-all` | Run all plugins for a target |
-
-### Organization & Team
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/org/plan` | Current org plan |
-| `GET` | `/org/plans` | Available plans |
-| `GET` | `/org/users` | Team members |
-| `PATCH` | `/org/users/{id}/role` | Update member role |
-| `GET` | `/org/stats` | Organization statistics |
 
 ### Management
 | Method | Endpoint | Description |
@@ -218,7 +258,6 @@ Spins up **7 services**:
 | `CRUD` | `/webhooks/*` | Webhook management |
 | `CRUD` | `/schedules/*` | Scheduled scan management |
 | `POST` | `/billing/checkout` | Stripe checkout session |
-| `POST` | `/billing/webhook` | Stripe event webhook |
 | `CRUD` | `/integrations/github/*` | GitHub token management |
 | `POST` | `/autofix/run` | AI-powered auto-fix |
 
@@ -286,9 +325,20 @@ SECRET_KEY=your-production-secret-min-32-chars
 ENV=production
 CORS_ORIGINS=https://your-domain.com
 
-# Optional integrations
+# Optional — AI
 OPENAI_API_KEY=sk-...
+
+# Optional — Intelligence Hub (free alternatives used when not set)
 SHODAN_API_KEY=...
+CENSYS_API_ID=...
+CENSYS_API_SECRET=...
+INTELX_API_KEY=...
+HIBP_API_KEY=...
+OSINT_INDUSTRIES_API_KEY=...
+SOCIAL_LINKS_API_KEY=...
+BABELX_API_KEY=...
+
+# Optional — Integrations
 VIRUSTOTAL_API_KEY=...
 STRIPE_SECRET_KEY=sk_live_...
 SENTRY_DSN=https://...
@@ -305,10 +355,20 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database, security, JWT
 │   ├── models/            # SQLAlchemy models (Scan, Finding, Asset, AgentLog...)
-│   ├── routers/           # 18 API router modules
+│   ├── routers/           # 19 API router modules
 │   ├── schemas/           # Pydantic validators
 │   ├── services/
 │   │   ├── scanner_service.py       # 11-scanner pipeline orchestrator
+│   │   ├── intelligence/            # 🆕 9 OSINT intelligence modules
+│   │   │   ├── shodan_intel.py      #   01: Shodan — The Panopticon
+│   │   │   ├── link_analysis.py     #   02: Maltego — Link Analysis
+│   │   │   ├── darkweb_intel.py     #   03: Babel X — The Linguistic Mesh
+│   │   │   ├── spiderfoot_intel.py  #   04: SpiderFoot — Recon Automation
+│   │   │   ├── identity_intel.py    #   05: Social Links — Neural De-Masking
+│   │   │   ├── intelx_intel.py      #   06: Intel X — Archive of Secrets
+│   │   │   ├── recon_ng_intel.py    #   07: Recon-ng — The Framework
+│   │   │   ├── censys_intel.py      #   08: Censys — The Global Radar
+│   │   │   └── osint_industries_intel.py  # 09: OSINT Ind. — The Interceptor
 │   │   ├── asset_inventory/         # Attack surface discovery
 │   │   ├── agent/                   # Multi-agent AI system
 │   │   ├── llm/                     # LLM Gateway + circuit breaker
@@ -318,12 +378,13 @@ SageAI/
 │   ├── plugins/           # Plugin marketplace registry
 │   └── middleware/        # Audit logging, security headers
 ├── frontend/src/
-│   ├── pages/             # 13 React pages
-│   │   ├── Dashboard.jsx       # Animated stats + threat gauge
-│   │   ├── AssetInventory.jsx  # Attack Surface Management
-│   │   ├── Scans.jsx           # Terminal-style scan execution
-│   │   ├── Copilot.jsx         # Context-aware AI chat
-│   │   ├── Reports.jsx         # PDF + HackerOne export
+│   ├── pages/             # 14 React pages
+│   │   ├── Dashboard.jsx          # Animated stats + threat gauge
+│   │   ├── IntelligenceHub.jsx    # 🆕 9-module OSINT interface + graph
+│   │   ├── AssetInventory.jsx     # Attack Surface Management
+│   │   ├── Scans.jsx              # Terminal-style scan execution
+│   │   ├── Copilot.jsx            # Context-aware AI chat
+│   │   ├── Reports.jsx            # PDF + HackerOne export
 │   │   └── ...
 │   └── api.js             # Centralized Axios API client
 ├── alembic/               # Database migrations
@@ -342,5 +403,8 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
   <strong>Built with ❤️ for the security community</strong><br>
-  <sub>SageAI 2.0 — From Attack Surface Discovery to Bug Bounty Report in minutes</sub>
+  <sub>SageAI 3.0 — From Attack Surface Discovery to Intelligence Hub to Bug Bounty Report in minutes</sub><br><br>
+  <em>These tools aren't just for "research." They are for power.<br>
+  In 2026, you are either the Hunter or the Data Point.<br>
+  <strong>SECURE YOUR SHADOW.</strong></em>
 </div>
