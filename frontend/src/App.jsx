@@ -14,6 +14,7 @@ import AutoFix from './pages/AutoFix';
 import AssetInventory from './pages/AssetInventory';
 import Copilot from './pages/Copilot';
 import Agents from './pages/Agents';
+import IntelligenceHub from './pages/IntelligenceHub';
 import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children }) {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/assets" element={<AssetInventory />} />
           <Route path="/agents" element={<Agents />} />
+          <Route path="/intelligence" element={<IntelligenceHub />} />
           <Route path="/scans" element={<Scans />} />
           <Route path="/schedules" element={<Schedules />} />
           <Route path="/reports" element={<Reports />} />

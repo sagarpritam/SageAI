@@ -22,6 +22,7 @@ const NAV_SECTIONS = [
         label: 'AI Platform',
         items: [
             { path: '/agents', label: 'AI Security Team', icon: '◈', badge: 'NEW' },
+            { path: '/intelligence', label: 'Intelligence Hub', icon: '⚡', badge: 'v3' },
             { path: '/assets', label: 'Asset Inventory', icon: '◉' },
         ]
     },

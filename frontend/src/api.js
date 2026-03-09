@@ -128,5 +128,14 @@ export const runPlugin = (plugin_name, target) =>
 export const runAllPlugins = (target, category) =>
     api.post(`/agents/plugins/run-all?target=${encodeURIComponent(target)}${category ? `&category=${category}` : ''}`);
 
+// ── Intelligence Hub (v3.0 — OSINT) ───────────────
+export const runIntelSweep = (target, target_type = 'domain') =>
+    api.post('/intelligence/sweep', { target, target_type });
+export const runIntelModule = (module, target, target_type = 'domain') =>
+    api.post(`/intelligence/${module}`, { target, target_type });
+export const buildIntelGraph = (target, target_type = 'domain') =>
+    api.post('/intelligence/graph', { target, target_type });
+export const getIntelModules = () => api.get('/intelligence/modules');
+
 export default api;
 

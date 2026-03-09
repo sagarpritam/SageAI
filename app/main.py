@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes, asset_routes, agent_routes
+from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes, asset_routes, agent_routes, intelligence_hub_routes
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 
@@ -136,6 +136,7 @@ app.include_router(integration_routes.router)
 app.include_router(autofix_routes.router)
 app.include_router(asset_routes.router)
 app.include_router(agent_routes.router)
+app.include_router(intelligence_hub_routes.router)
 
 
 # ---------------------
@@ -160,6 +161,8 @@ async def health_check():
         "environment": settings.ENV,
         "database": "connected" if db_ok else "unreachable",
         "scanners": 11,
-        "endpoints": 52,
+        "intelligence_modules": 9,
+        "endpoints": 64,
         "new_in_v2": ["Asset Inventory", "Attack Surface Management", "AI Copilot", "Bug Bounty Reports", "Multi-Agent AI Team", "Security Knowledge Graph", "Plugin Marketplace"],
+        "new_in_v3": ["Shodan Panopticon", "Maltego Link Analysis", "Babel X Dark Web", "SpiderFoot Recon", "Social Links De-Masking", "Intel X Archives", "Recon-ng Framework", "Censys Global Radar", "OSINT Industries Interceptor"],
     }
