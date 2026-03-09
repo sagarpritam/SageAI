@@ -67,6 +67,10 @@
         {
             "source": "/metrics",
             "destination": "https://web-production-f984b.up.railway.app/metrics"
+        },
+        {
+            "source": "/intelligence/:path*",
+            "destination": "https://web-production-f984b.up.railway.app/intelligence/:path*"
         }
     ]
 }
