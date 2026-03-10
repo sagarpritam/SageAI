@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import hash_password, verify_password, create_access_token
+from app.services.mfa_service import verify_totp
 from app.models.user import User
 from app.models.organization import Organization
 from app.schemas.auth import UserCreate, UserLogin, TokenResponse
@@ -66,6 +67,18 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    if user.mfa_enabled:
+        if not payload.mfa_code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="mfa_required",
+            )
+        if not verify_totp(user.mfa_secret, payload.mfa_code):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid MFA code",
+            )
 
     token = create_access_token(
         {

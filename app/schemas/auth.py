@@ -14,6 +14,7 @@ class UserLogin(BaseModel):
 
     email: EmailStr
     password: str
+    mfa_code: str | None = None
 
 
 class TokenResponse(BaseModel):
