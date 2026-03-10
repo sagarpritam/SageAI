@@ -25,23 +25,49 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.asset import Asset, AssetType, AssetStatus
-from app.services import crtsh_client, shodan_client, dns_scanner, port_scanner
+from app.services import crtsh_client, shodan_client, dns_scanner
 
 logger = logging.getLogger("sageai.asset_discovery")
 
 # Ports that indicate specific high-risk services
 HIGH_RISK_PORTS = {
-    22: "SSH", 23: "Telnet", 3389: "RDP", 5900: "VNC",
-    8080: "HTTP-Alt (often dev/admin)", 8443: "HTTPS-Alt",
-    9200: "Elasticsearch", 27017: "MongoDB", 6379: "Redis",
-    5432: "PostgreSQL", 3306: "MySQL", 2375: "Docker API",
-    4848: "GlassFish Admin", 8500: "Consul", 9090: "Prometheus",
+    22: "SSH",
+    23: "Telnet",
+    3389: "RDP",
+    5900: "VNC",
+    8080: "HTTP-Alt (often dev/admin)",
+    8443: "HTTPS-Alt",
+    9200: "Elasticsearch",
+    27017: "MongoDB",
+    6379: "Redis",
+    5432: "PostgreSQL",
+    3306: "MySQL",
+    2375: "Docker API",
+    4848: "GlassFish Admin",
+    8500: "Consul",
+    9090: "Prometheus",
 }
 
 SENSITIVE_KEYWORDS = [
-    "admin", "staging", "dev", "test", "internal", "vpn",
-    "api-dev", "debug", "qa", "uat", "beta", "demo", "legacy",
-    "old", "backup", "jenkins", "jira", "gitlab", "confluence",
+    "admin",
+    "staging",
+    "dev",
+    "test",
+    "internal",
+    "vpn",
+    "api-dev",
+    "debug",
+    "qa",
+    "uat",
+    "beta",
+    "demo",
+    "legacy",
+    "old",
+    "backup",
+    "jenkins",
+    "jira",
+    "gitlab",
+    "confluence",
 ]
 
 
@@ -51,7 +77,9 @@ async def _probe_http(subdomain: str) -> Tuple[int | None, str | None, List[str]
     for scheme in ["https", "http"]:
         url = f"{scheme}://{subdomain}"
         try:
-            async with httpx.AsyncClient(timeout=8, follow_redirects=True, verify=False) as client:  # nosec B501
+            async with httpx.AsyncClient(
+                timeout=8, follow_redirects=True, verify=False
+            ) as client:  # nosec B501
                 resp = await client.get(url)
                 status = resp.status_code
 
@@ -70,7 +98,7 @@ async def _probe_http(subdomain: str) -> Tuple[int | None, str | None, List[str]
                     start = raw.lower().find("<title>")
                     end = raw.lower().find("</title>")
                     if start != -1 and end != -1:
-                        title = raw[start + 7:end].strip()[:120]
+                        title = raw[start + 7 : end].strip()[:120]
 
                 return status, title, list(set(techs))
         except Exception:
@@ -157,7 +185,9 @@ async def discover_assets(
         async with semaphore:
             asset_data = {
                 "value": sub,
-                "asset_type": AssetType.domain if sub == target else AssetType.subdomain,
+                "asset_type": AssetType.domain
+                if sub == target
+                else AssetType.subdomain,
                 "org_id": org_id,
             }
 
@@ -227,7 +257,10 @@ async def discover_assets(
             # Update existing asset
             prev_ports = json.loads(existing.open_ports or "[]")
             curr_ports = item.get("open_ports", [])
-            changed = set(curr_ports) != set(prev_ports) or existing.risk_level != item["risk_level"]
+            changed = (
+                set(curr_ports) != set(prev_ports)
+                or existing.risk_level != item["risk_level"]
+            )
 
             existing.ip_address = item.get("ip_address")
             existing.open_ports = json.dumps(curr_ports)
@@ -285,9 +318,7 @@ async def discover_assets(
     await db.commit()
 
     # ── Step 6: Build summary ─────────────────────────────────────────────
-    all_result = await db.execute(
-        select(Asset).where(Asset.org_id == org_id)
-    )
+    all_result = await db.execute(select(Asset).where(Asset.org_id == org_id))
     all_assets = all_result.scalars().all()
 
     summary = {
@@ -308,5 +339,7 @@ async def discover_assets(
         "scanned_at": now.isoformat(),
     }
 
-    logger.info(f"[ASM] Discovery complete for {target}: {summary['total']} total assets, {len(new_assets)} new")
+    logger.info(
+        f"[ASM] Discovery complete for {target}: {summary['total']} total assets, {len(new_assets)} new"
+    )
     return summary

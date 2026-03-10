@@ -1,4 +1,4 @@
-﻿import os
+import os
 import logging
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -19,9 +19,13 @@ def _fetch_vault_secret(key: str) -> str | None:
     if aws_secret_name:
         try:
             import boto3
-            client = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION", "us-east-1"))
+
+            client = boto3.client(
+                "secretsmanager", region_name=os.getenv("AWS_REGION", "us-east-1")
+            )
             resp = client.get_secret_value(SecretId=aws_secret_name)
             import json
+
             secrets = json.loads(resp["SecretString"])
             return secrets.get(key)
         except Exception as e:
@@ -33,7 +37,10 @@ def _fetch_vault_secret(key: str) -> str | None:
         try:
             from azure.identity import DefaultAzureCredential
             from azure.keyvault.secrets import SecretClient
-            client = SecretClient(vault_url=azure_vault_url, credential=DefaultAzureCredential())
+
+            client = SecretClient(
+                vault_url=azure_vault_url, credential=DefaultAzureCredential()
+            )
             return client.get_secret(key).value
         except Exception as e:
             logger.warning(f"Azure Key Vault lookup failed for '{key}': {e}")
@@ -44,6 +51,7 @@ def _fetch_vault_secret(key: str) -> str | None:
     if vault_addr and vault_token:
         try:
             import httpx
+
             resp = httpx.get(
                 f"{vault_addr}/v1/secret/data/sageai",
                 headers={"X-Vault-Token": vault_token},
@@ -109,7 +117,9 @@ class Settings(BaseSettings):
         errors = []
         if self.is_production:
             if "sqlite" in self.DATABASE_URL:
-                errors.append("CRITICAL: SQLite is not supported in production. Set DATABASE_URL to PostgreSQL")
+                errors.append(
+                    "CRITICAL: SQLite is not supported in production. Set DATABASE_URL to PostgreSQL"
+                )
             if self.SECRET_KEY == "change-me-in-production-use-a-real-secret-key":
                 errors.append("CRITICAL: SECRET_KEY must be changed for production")
             if self.CORS_ORIGINS == "*":

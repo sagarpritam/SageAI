@@ -11,8 +11,11 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.services.mfa_service import (
-    generate_totp_secret, get_totp_uri, generate_qr_code,
-    verify_totp, generate_backup_codes,
+    generate_totp_secret,
+    get_totp_uri,
+    generate_qr_code,
+    verify_totp,
+    generate_backup_codes,
 )
 
 router = APIRouter(prefix="/auth/mfa", tags=["Multi-Factor Auth"])
@@ -59,7 +62,9 @@ async def verify_mfa(
     result = await db.execute(select(User).where(User.id == current_user["sub"]))
     user = result.scalar_one_or_none()
     if not user or not user.mfa_secret:
-        raise HTTPException(status_code=400, detail="MFA not set up — call /auth/mfa/setup first")
+        raise HTTPException(
+            status_code=400, detail="MFA not set up — call /auth/mfa/setup first"
+        )
 
     if not verify_totp(user.mfa_secret, code):
         raise HTTPException(status_code=401, detail="Invalid TOTP code")

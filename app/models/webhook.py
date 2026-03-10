@@ -10,7 +10,9 @@ class Webhook(Base):
 
     id = Column(String, primary_key=True, default=generate_uuid)
     url = Column(String, nullable=False)
-    event = Column(String, nullable=False, default="scan.completed")  # scan.completed, scan.failed
+    event = Column(
+        String, nullable=False, default="scan.completed"
+    )  # scan.completed, scan.failed
     organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
     secret = Column(String, nullable=False)  # For HMAC signature verification
     is_active = Column(Boolean, default=True)

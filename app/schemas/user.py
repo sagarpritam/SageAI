@@ -4,6 +4,7 @@ from datetime import datetime
 
 class UserOut(BaseModel):
     """Public user representation (no password hash)."""
+
     id: str
     email: EmailStr
     role: str
@@ -16,5 +17,6 @@ class UserOut(BaseModel):
 
 class UserUpdate(BaseModel):
     """Fields that can be updated on a user."""
+
     email: EmailStr | None = None
     role: str | None = None

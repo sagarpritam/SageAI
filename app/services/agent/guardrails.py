@@ -14,16 +14,16 @@ logger = logging.getLogger("SageAI.guardrails")
 
 # Files that AI should NEVER modify automatically
 RESTRICTED_FILE_PATTERNS = [
-    r".*auth.*\.py$",          # Authentication logic
-    r".*crypto.*\.py$",        # Cryptography code
-    r".*payment.*\.py$",       # Payment processing
-    r".*billing.*\.py$",       # Billing logic
-    r".*\.env.*$",             # Environment variables
-    r".*secret.*\.py$",        # Secret management
-    r".*\.github/workflows/.*", # CI/CD pipelines
-    r".*\.gitlab-ci.*",        # GitLab CI
-    r".*Dockerfile.*",         # Container configs
-    r".*docker-compose.*",     # Docker orchestration
+    r".*auth.*\.py$",  # Authentication logic
+    r".*crypto.*\.py$",  # Cryptography code
+    r".*payment.*\.py$",  # Payment processing
+    r".*billing.*\.py$",  # Billing logic
+    r".*\.env.*$",  # Environment variables
+    r".*secret.*\.py$",  # Secret management
+    r".*\.github/workflows/.*",  # CI/CD pipelines
+    r".*\.gitlab-ci.*",  # GitLab CI
+    r".*Dockerfile.*",  # Container configs
+    r".*docker-compose.*",  # Docker orchestration
 ]
 
 # Maximum number of lines the AI patch can differ from the original
@@ -46,7 +46,9 @@ def is_file_restricted(file_path: str) -> bool:
     normalized = file_path.replace("\\", "/").lower()
     for pattern in RESTRICTED_FILE_PATTERNS:
         if re.match(pattern, normalized):
-            logger.warning(f"BLOCKED: AI patch attempted to modify restricted file: {file_path}")
+            logger.warning(
+                f"BLOCKED: AI patch attempted to modify restricted file: {file_path}"
+            )
             return True
     return False
 
@@ -58,7 +60,7 @@ def check_patch_size(original: str, patched: str) -> dict:
     """
     original_lines = original.strip().splitlines()
     patched_lines = patched.strip().splitlines()
-    
+
     # Count lines that differ
     max_len = max(len(original_lines), len(patched_lines))
     changed = 0
@@ -74,11 +76,7 @@ def check_patch_size(original: str, patched: str) -> dict:
             f"BLOCKED: AI patch changed {changed} lines (limit: {MAX_LINES_CHANGED})"
         )
 
-    return {
-        "safe": is_safe,
-        "lines_changed": changed,
-        "limit": MAX_LINES_CHANGED
-    }
+    return {"safe": is_safe, "lines_changed": changed, "limit": MAX_LINES_CHANGED}
 
 
 def sanitize_code_for_prompt(code: str) -> str:
@@ -126,5 +124,5 @@ def validate_patch(file_path: str, original_code: str, patched_code: str) -> dic
     return {
         "approved": approved,
         "reasons": reasons,
-        "lines_changed": size_check["lines_changed"]
+        "lines_changed": size_check["lines_changed"],
     }

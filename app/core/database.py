@@ -51,4 +51,5 @@ async def init_db():
         from app.models import Organization, User, Scan  # noqa: F401
         from app.models.asset import Asset  # noqa: F401
         from app.services.knowledge_graph import GraphNode, GraphEdge  # noqa: F401
+
         await conn.run_sync(Base.metadata.create_all)

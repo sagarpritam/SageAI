@@ -16,8 +16,11 @@ async def check_security_headers(target: str) -> dict | None:
             "Referrer-Policy",
         ]
 
-        missing = [h for h in required_headers if h.lower() not in
-                   {k.lower() for k in response.headers.keys()}]
+        missing = [
+            h
+            for h in required_headers
+            if h.lower() not in {k.lower() for k in response.headers.keys()}
+        ]
 
         if missing:
             return {
@@ -35,12 +38,14 @@ async def test_xss(target: str) -> dict | None:
     """Test for reflected XSS vulnerability."""
     payloads = [
         "<script>alert('xss')</script>",
-        "\"><img src=x onerror=prompt(1)>",
+        '"><img src=x onerror=prompt(1)>',
         "'-prompt(8)-'",
     ]
 
     try:
-        async with httpx.AsyncClient(timeout=10, follow_redirects=True, verify=False) as client:  # nosec B501
+        async with httpx.AsyncClient(
+            timeout=10, follow_redirects=True, verify=False
+        ) as client:  # nosec B501
             for payload in payloads:
                 test_url = f"{target}{'&' if '?' in target else '?'}q={payload}"
                 response = await client.get(test_url)
@@ -67,13 +72,21 @@ async def test_sqli(target: str) -> dict | None:
     ]
 
     error_indicators = [
-        "sql syntax", "mysql", "sqlite", "postgresql",
-        "ora-", "warning", "unclosed quotation",
-        "unterminated string", "syntax error",
+        "sql syntax",
+        "mysql",
+        "sqlite",
+        "postgresql",
+        "ora-",
+        "warning",
+        "unclosed quotation",
+        "unterminated string",
+        "syntax error",
     ]
 
     try:
-        async with httpx.AsyncClient(timeout=10, follow_redirects=True, verify=False) as client:  # nosec B501
+        async with httpx.AsyncClient(
+            timeout=10, follow_redirects=True, verify=False
+        ) as client:  # nosec B501
             for payload in payloads:
                 test_url = f"{target}{'&' if '?' in target else '?'}id={payload}"
                 response = await client.get(test_url)
@@ -93,13 +106,13 @@ async def test_sqli(target: str) -> dict | None:
 
 async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
     """Run all scan checks against a target and return findings.
-    
+
     Phase 1 — Core Scans (6 checks):
       Security Headers, XSS, SQLi, SSL/TLS, Ports, DNS
 
     Phase 2 — OSINT Enrichment (5 sources):
       Shodan InternetDB, CRT.sh, Mozilla Observatory, VirusTotal, NVD CVE
-    
+
     If scan_id is provided, broadcasts real-time progress via WebSocket.
     """
     import asyncio
@@ -118,15 +131,23 @@ async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
     executor = ThreadPoolExecutor(max_workers=3)
 
     # Helper to broadcast progress
-    async def _progress(phase: str, progress: int, findings_so_far: int, status: str = "running"):
+    async def _progress(
+        phase: str, progress: int, findings_so_far: int, status: str = "running"
+    ):
         if scan_id:
             try:
                 from app.routers.ws_routes import broadcast_scan_progress
-                await broadcast_scan_progress(scan_id, {
-                    "phase": phase, "status": status,
-                    "progress": progress, "total": 11,
-                    "findings_count": findings_so_far,
-                })
+
+                await broadcast_scan_progress(
+                    scan_id,
+                    {
+                        "phase": phase,
+                        "status": status,
+                        "progress": progress,
+                        "total": 11,
+                        "findings_count": findings_so_far,
+                    },
+                )
             except Exception:
                 pass
 

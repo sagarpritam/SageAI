@@ -3,6 +3,7 @@ SageAI Plugin: Cloud Misconfiguration Scanner
 Detects common cloud security misconfigurations exposed on public endpoints.
 No cloud credentials required — passive HTTP/DNS checks only.
 """
+
 import asyncio
 import httpx
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
@@ -10,16 +11,33 @@ from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
 # Public cloud storage bucket naming patterns
 S3_PATTERNS = [
-    "{target}", "{target}-backup", "{target}-data", "{target}-assets",
-    "{target}-static", "{target}-media", "{target}-prod", "{target}-dev",
+    "{target}",
+    "{target}-backup",
+    "{target}-data",
+    "{target}-assets",
+    "{target}-static",
+    "{target}-media",
+    "{target}-prod",
+    "{target}-dev",
 ]
 
 # Common cloud admin panels that should never be public
 CLOUD_ADMIN_PATHS = [
-    "/.env", "/.git/config", "/admin", "/wp-admin", "/_config",
-    "/config.json", "/secrets.json", "/api/v1/health", "/actuator",
-    "/actuator/env", "/metrics", "/debug", "/__debug__/",
-    "/server-status", "/server-info",
+    "/.env",
+    "/.git/config",
+    "/admin",
+    "/wp-admin",
+    "/_config",
+    "/config.json",
+    "/secrets.json",
+    "/api/v1/health",
+    "/actuator",
+    "/actuator/env",
+    "/metrics",
+    "/debug",
+    "/__debug__/",
+    "/server-status",
+    "/server-info",
 ]
 
 
@@ -42,7 +60,9 @@ class CloudScannerPlugin(SecurityPlugin):
         findings = []
         metadata = {"host": host}
 
-        async with httpx.AsyncClient(timeout=6, verify=False, follow_redirects=False) as client:  # nosec B501
+        async with httpx.AsyncClient(
+            timeout=6, verify=False, follow_redirects=False
+        ) as client:  # nosec B501
             # Check exposed S3 buckets
             bucket_tasks = []
             for pattern in S3_PATTERNS[:5]:
@@ -55,7 +75,10 @@ class CloudScannerPlugin(SecurityPlugin):
                     findings.append(r)
 
             # Check exposed sensitive paths
-            path_tasks = [self._check_path(client, f"https://{host}{path}") for path in CLOUD_ADMIN_PATHS]
+            path_tasks = [
+                self._check_path(client, f"https://{host}{path}")
+                for path in CLOUD_ADMIN_PATHS
+            ]
             path_results = await asyncio.gather(*path_tasks, return_exceptions=True)
             for r in path_results:
                 if r and not isinstance(r, Exception):
@@ -66,12 +89,14 @@ class CloudScannerPlugin(SecurityPlugin):
             try:
                 resp = await client.get(azure_url)
                 if resp.status_code in (200, 400):
-                    findings.append({
-                        "type": "azure_blob_exposed",
-                        "severity": "high",
-                        "detail": f"Azure Blob Storage endpoint accessible: {azure_url}",
-                        "source": "cloud_scanner",
-                    })
+                    findings.append(
+                        {
+                            "type": "azure_blob_exposed",
+                            "severity": "high",
+                            "detail": f"Azure Blob Storage endpoint accessible: {azure_url}",
+                            "source": "cloud_scanner",
+                        }
+                    )
             except Exception:
                 pass
 
@@ -98,8 +123,16 @@ class CloudScannerPlugin(SecurityPlugin):
         try:
             resp = await client.get(url)
             if resp.status_code == 200:
-                path = url.split("//", 1)[-1].split("/", 1)[-1] if "/" in url.split("//", 1)[-1] else ""
-                sensitivity = "critical" if path in ("/.env", "/.git/config", "/secrets.json") else "high"
+                path = (
+                    url.split("//", 1)[-1].split("/", 1)[-1]
+                    if "/" in url.split("//", 1)[-1]
+                    else ""
+                )
+                sensitivity = (
+                    "critical"
+                    if path in ("/.env", "/.git/config", "/secrets.json")
+                    else "high"
+                )
                 return {
                     "type": f"exposed_path_{path.lstrip('/').replace('/', '_') or 'admin'}",
                     "severity": sensitivity,

@@ -1,4 +1,5 @@
 """SageAI Plugin: Shodan Intelligence"""
+
 import socket
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 from app.services import shodan_client
@@ -26,6 +27,5 @@ class ShodanPlugin(SecurityPlugin):
 
         findings = await shodan_client.lookup_ip(host)
         return PluginResult(
-            self.name, target, findings or [],
-            {"ip": ip, "source": "Shodan InternetDB"}
+            self.name, target, findings or [], {"ip": ip, "source": "Shodan InternetDB"}
         )

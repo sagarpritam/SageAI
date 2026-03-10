@@ -1,4 +1,4 @@
-﻿"""GDPR-compliant audit logging middleware.
+"""GDPR-compliant audit logging middleware.
 
 Logs all API access with user context for compliance audit trails.
 Follows GDPR Article 30 requirements for processing records.
@@ -34,6 +34,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         if auth_header.startswith("Bearer "):
             try:
                 from app.core.security import verify_token
+
                 payload = verify_token(auth_header.split(" ")[1])
                 user_id = payload.get("sub", "unknown")
                 org_id = payload.get("org", "unknown")

@@ -37,6 +37,7 @@ async def forgot_password(email: str, db: AsyncSession = Depends(get_db)):
 
     # Send email
     import os
+
     frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
     reset_link = f"{frontend_url}/reset-password?token={token}"
     email_service.send_password_reset(email, reset_link)

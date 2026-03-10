@@ -8,10 +8,10 @@ Plugins can be:
   - Community plugins (dropped into the plugins/ folder)
   - Enterprise plugins (licensed, loaded dynamically)
 """
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timezone
-import logging
 
 
 class PluginMetadata:

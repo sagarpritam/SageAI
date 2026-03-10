@@ -1,1 +1,1 @@
-﻿# SageAI Security Scanner
+# SageAI Security Scanner

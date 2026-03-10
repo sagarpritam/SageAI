@@ -6,7 +6,6 @@ OSINT sweep using free APIs to simulate SpiderFoot's 100+ module approach.
 """
 
 import logging
-import os
 import socket
 
 import httpx
@@ -32,6 +31,7 @@ async def spiderfoot_scan(target: str) -> list[dict]:
 
     # Run all sub-modules concurrently
     import asyncio
+
     sub_results = await asyncio.gather(
         _ipinfo_lookup(ip) if ip else _empty(),
         _threatcrowd_lookup(hostname),
@@ -47,15 +47,22 @@ async def spiderfoot_scan(target: str) -> list[dict]:
 
     # Summarize
     if findings:
-        findings.insert(0, {
-            "module": "spiderfoot",
-            "type": "recon_summary",
-            "severity": "info",
-            "title": f"SpiderFoot: Automated Recon Complete — {len(findings)} Data Points",
-            "detail": f"Automated OSINT profiling of {hostname} gathered {len(findings)} intelligence items from multiple sources.",
-            "data": {"target": hostname, "modules_run": 5, "findings_count": len(findings)},
-            "source": "SageAI SpiderFoot Emulation (free)",
-        })
+        findings.insert(
+            0,
+            {
+                "module": "spiderfoot",
+                "type": "recon_summary",
+                "severity": "info",
+                "title": f"SpiderFoot: Automated Recon Complete — {len(findings)} Data Points",
+                "detail": f"Automated OSINT profiling of {hostname} gathered {len(findings)} intelligence items from multiple sources.",
+                "data": {
+                    "target": hostname,
+                    "modules_run": 5,
+                    "findings_count": len(findings),
+                },
+                "source": "SageAI SpiderFoot Emulation (free)",
+            },
+        )
 
     return findings
 
@@ -72,19 +79,21 @@ async def _ipinfo_lookup(ip: str) -> list[dict]:
             resp = await client.get(f"{IPINFO_API}/{ip}/json")
             if resp.status_code == 200:
                 data = resp.json()
-                findings.append({
-                    "module": "spiderfoot",
-                    "type": "ip_geolocation",
-                    "severity": "info",
-                    "title": f"SpiderFoot: IP Geolocation — {data.get('city', '?')}, {data.get('country', '?')}",
-                    "detail": (
-                        f"IP: {ip} | Org: {data.get('org', 'N/A')} | "
-                        f"City: {data.get('city', '?')} | Region: {data.get('region', '?')} | "
-                        f"Country: {data.get('country', '?')} | ASN: {data.get('org', 'N/A')}"
-                    ),
-                    "data": data,
-                    "source": "ipinfo.io (free)",
-                })
+                findings.append(
+                    {
+                        "module": "spiderfoot",
+                        "type": "ip_geolocation",
+                        "severity": "info",
+                        "title": f"SpiderFoot: IP Geolocation — {data.get('city', '?')}, {data.get('country', '?')}",
+                        "detail": (
+                            f"IP: {ip} | Org: {data.get('org', 'N/A')} | "
+                            f"City: {data.get('city', '?')} | Region: {data.get('region', '?')} | "
+                            f"Country: {data.get('country', '?')} | ASN: {data.get('org', 'N/A')}"
+                        ),
+                        "data": data,
+                        "source": "ipinfo.io (free)",
+                    }
+                )
     except Exception as e:
         logger.warning(f"ipinfo.io error: {e}")
     return findings
@@ -95,7 +104,9 @@ async def _threatcrowd_lookup(hostname: str) -> list[dict]:
     findings = []
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(f"{THREATCROWD_API}/domain/report/", params={"domain": hostname})
+            resp = await client.get(
+                f"{THREATCROWD_API}/domain/report/", params={"domain": hostname}
+            )
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get("response_code") == "1":
@@ -104,37 +115,43 @@ async def _threatcrowd_lookup(hostname: str) -> list[dict]:
                     emails = data.get("emails", [])
 
                     if subdomains:
-                        findings.append({
-                            "module": "spiderfoot",
-                            "type": "subdomains_discovered",
-                            "severity": "info",
-                            "title": f"SpiderFoot: {len(subdomains)} Subdomains Discovered",
-                            "detail": f"Subdomains: {', '.join(subdomains[:15])}",
-                            "data": {"subdomains": subdomains[:30]},
-                            "source": "ThreatCrowd (free)",
-                        })
+                        findings.append(
+                            {
+                                "module": "spiderfoot",
+                                "type": "subdomains_discovered",
+                                "severity": "info",
+                                "title": f"SpiderFoot: {len(subdomains)} Subdomains Discovered",
+                                "detail": f"Subdomains: {', '.join(subdomains[:15])}",
+                                "data": {"subdomains": subdomains[:30]},
+                                "source": "ThreatCrowd (free)",
+                            }
+                        )
 
                     if emails:
-                        findings.append({
-                            "module": "spiderfoot",
-                            "type": "emails_discovered",
-                            "severity": "medium",
-                            "title": f"SpiderFoot: {len(emails)} Email Addresses Found",
-                            "detail": f"Emails: {', '.join(emails[:10])}",
-                            "data": {"emails": emails[:20]},
-                            "source": "ThreatCrowd (free)",
-                        })
+                        findings.append(
+                            {
+                                "module": "spiderfoot",
+                                "type": "emails_discovered",
+                                "severity": "medium",
+                                "title": f"SpiderFoot: {len(emails)} Email Addresses Found",
+                                "detail": f"Emails: {', '.join(emails[:10])}",
+                                "data": {"emails": emails[:20]},
+                                "source": "ThreatCrowd (free)",
+                            }
+                        )
 
                     if resolutions:
-                        findings.append({
-                            "module": "spiderfoot",
-                            "type": "dns_resolutions",
-                            "severity": "info",
-                            "title": f"SpiderFoot: {len(resolutions)} Historical DNS Resolutions",
-                            "detail": f"Historical IPs: {', '.join(r.get('ip_address', '') for r in resolutions[:10])}",
-                            "data": {"resolutions": resolutions[:15]},
-                            "source": "ThreatCrowd (free)",
-                        })
+                        findings.append(
+                            {
+                                "module": "spiderfoot",
+                                "type": "dns_resolutions",
+                                "severity": "info",
+                                "title": f"SpiderFoot: {len(resolutions)} Historical DNS Resolutions",
+                                "detail": f"Historical IPs: {', '.join(r.get('ip_address', '') for r in resolutions[:10])}",
+                                "data": {"resolutions": resolutions[:15]},
+                                "source": "ThreatCrowd (free)",
+                            }
+                        )
     except Exception as e:
         logger.warning(f"ThreatCrowd error: {e}")
     return findings
@@ -153,26 +170,28 @@ async def _urlscan_lookup(hostname: str) -> list[dict]:
                 data = resp.json()
                 results = data.get("results", [])
                 if results:
-                    findings.append({
-                        "module": "spiderfoot",
-                        "type": "urlscan_history",
-                        "severity": "info",
-                        "title": f"SpiderFoot: {len(results)} URLScan Results Found",
-                        "detail": f"Domain has been scanned {data.get('total', len(results))} times on URLScan.io.",
-                        "data": {
-                            "total_scans": data.get("total", len(results)),
-                            "recent_scans": [
-                                {
-                                    "url": r.get("page", {}).get("url", ""),
-                                    "ip": r.get("page", {}).get("ip", ""),
-                                    "server": r.get("page", {}).get("server", ""),
-                                    "date": r.get("task", {}).get("time", ""),
-                                }
-                                for r in results[:5]
-                            ],
-                        },
-                        "source": "URLScan.io (free)",
-                    })
+                    findings.append(
+                        {
+                            "module": "spiderfoot",
+                            "type": "urlscan_history",
+                            "severity": "info",
+                            "title": f"SpiderFoot: {len(results)} URLScan Results Found",
+                            "detail": f"Domain has been scanned {data.get('total', len(results))} times on URLScan.io.",
+                            "data": {
+                                "total_scans": data.get("total", len(results)),
+                                "recent_scans": [
+                                    {
+                                        "url": r.get("page", {}).get("url", ""),
+                                        "ip": r.get("page", {}).get("ip", ""),
+                                        "server": r.get("page", {}).get("server", ""),
+                                        "date": r.get("task", {}).get("time", ""),
+                                    }
+                                    for r in results[:5]
+                                ],
+                            },
+                            "source": "URLScan.io (free)",
+                        }
+                    )
     except Exception as e:
         logger.warning(f"URLScan.io error: {e}")
     return findings
@@ -184,9 +203,12 @@ async def _whois_diy(hostname: str) -> list[dict]:
     try:
         # NS records
         import subprocess
+
         result = subprocess.run(
             ["nslookup", "-type=ns", hostname],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         ns_servers = []
         for line in result.stdout.split("\n"):
@@ -194,15 +216,17 @@ async def _whois_diy(hostname: str) -> list[dict]:
                 ns_servers.append(line.strip())
 
         if ns_servers:
-            findings.append({
-                "module": "spiderfoot",
-                "type": "nameservers",
-                "severity": "info",
-                "title": f"SpiderFoot: Nameservers Identified",
-                "detail": f"NS records: {'; '.join(ns_servers[:5])}",
-                "data": {"nameservers": ns_servers[:10]},
-                "source": "DNS NS Lookup (free)",
-            })
+            findings.append(
+                {
+                    "module": "spiderfoot",
+                    "type": "nameservers",
+                    "severity": "info",
+                    "title": "SpiderFoot: Nameservers Identified",
+                    "detail": f"NS records: {'; '.join(ns_servers[:5])}",
+                    "data": {"nameservers": ns_servers[:10]},
+                    "source": "DNS NS Lookup (free)",
+                }
+            )
     except Exception as e:
         logger.warning(f"WHOIS/NS lookup error: {e}")
     return findings
@@ -220,20 +244,28 @@ async def _dns_enum(hostname: str) -> list[dict]:
     for rtype, desc in record_types.items():
         try:
             import subprocess
+
             result = subprocess.run(
                 ["nslookup", f"-type={rtype}", hostname],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0 and result.stdout.strip():
-                findings.append({
-                    "module": "spiderfoot",
-                    "type": f"dns_{rtype.lower()}",
-                    "severity": "info",
-                    "title": f"SpiderFoot: DNS {rtype} Records — {desc}",
-                    "detail": result.stdout.strip()[:300],
-                    "data": {"record_type": rtype, "raw_output": result.stdout.strip()[:500]},
-                    "source": "DNS Enumeration (free)",
-                })
+                findings.append(
+                    {
+                        "module": "spiderfoot",
+                        "type": f"dns_{rtype.lower()}",
+                        "severity": "info",
+                        "title": f"SpiderFoot: DNS {rtype} Records — {desc}",
+                        "detail": result.stdout.strip()[:300],
+                        "data": {
+                            "record_type": rtype,
+                            "raw_output": result.stdout.strip()[:500],
+                        },
+                        "source": "DNS Enumeration (free)",
+                    }
+                )
         except Exception:
             pass
 

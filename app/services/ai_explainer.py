@@ -16,16 +16,56 @@ logger = logging.getLogger("sageai.ai")
 # OWASP Top 10 Mapping
 # ---------------------
 OWASP_MAP = {
-    "Missing Security Headers": {"owasp_id": "A05:2021", "owasp_category": "Security Misconfiguration", "cwe": "CWE-693"},
-    "Reflected XSS": {"owasp_id": "A03:2021", "owasp_category": "Injection", "cwe": "CWE-79"},
-    "SQL Injection": {"owasp_id": "A03:2021", "owasp_category": "Injection", "cwe": "CWE-89"},
-    "ssl_expired": {"owasp_id": "A02:2021", "owasp_category": "Cryptographic Failures", "cwe": "CWE-295"},
-    "ssl_expiring_soon": {"owasp_id": "A02:2021", "owasp_category": "Cryptographic Failures", "cwe": "CWE-295"},
-    "ssl_weak_protocol": {"owasp_id": "A02:2021", "owasp_category": "Cryptographic Failures", "cwe": "CWE-326"},
-    "ssl_weak_cipher": {"owasp_id": "A02:2021", "owasp_category": "Cryptographic Failures", "cwe": "CWE-327"},
-    "ssl_invalid_cert": {"owasp_id": "A02:2021", "owasp_category": "Cryptographic Failures", "cwe": "CWE-295"},
-    "port_open": {"owasp_id": "A05:2021", "owasp_category": "Security Misconfiguration", "cwe": "CWE-200"},
-    "dns_risky_subdomains": {"owasp_id": "A05:2021", "owasp_category": "Security Misconfiguration", "cwe": "CWE-200"},
+    "Missing Security Headers": {
+        "owasp_id": "A05:2021",
+        "owasp_category": "Security Misconfiguration",
+        "cwe": "CWE-693",
+    },
+    "Reflected XSS": {
+        "owasp_id": "A03:2021",
+        "owasp_category": "Injection",
+        "cwe": "CWE-79",
+    },
+    "SQL Injection": {
+        "owasp_id": "A03:2021",
+        "owasp_category": "Injection",
+        "cwe": "CWE-89",
+    },
+    "ssl_expired": {
+        "owasp_id": "A02:2021",
+        "owasp_category": "Cryptographic Failures",
+        "cwe": "CWE-295",
+    },
+    "ssl_expiring_soon": {
+        "owasp_id": "A02:2021",
+        "owasp_category": "Cryptographic Failures",
+        "cwe": "CWE-295",
+    },
+    "ssl_weak_protocol": {
+        "owasp_id": "A02:2021",
+        "owasp_category": "Cryptographic Failures",
+        "cwe": "CWE-326",
+    },
+    "ssl_weak_cipher": {
+        "owasp_id": "A02:2021",
+        "owasp_category": "Cryptographic Failures",
+        "cwe": "CWE-327",
+    },
+    "ssl_invalid_cert": {
+        "owasp_id": "A02:2021",
+        "owasp_category": "Cryptographic Failures",
+        "cwe": "CWE-295",
+    },
+    "port_open": {
+        "owasp_id": "A05:2021",
+        "owasp_category": "Security Misconfiguration",
+        "cwe": "CWE-200",
+    },
+    "dns_risky_subdomains": {
+        "owasp_id": "A05:2021",
+        "owasp_category": "Security Misconfiguration",
+        "cwe": "CWE-200",
+    },
 }
 
 
@@ -101,15 +141,25 @@ REMEDIATION = {
         "references": ["https://owasp.org/www-community/attacks/SQL_Injection"],
     },
     "ssl_expired": {
-        "steps": ["Renew the SSL certificate immediately", "Set up auto-renewal with Let's Encrypt"],
+        "steps": [
+            "Renew the SSL certificate immediately",
+            "Set up auto-renewal with Let's Encrypt",
+        ],
         "references": ["https://letsencrypt.org/"],
     },
     "ssl_weak_protocol": {
-        "steps": ["Disable TLS 1.0 and 1.1 on the server", "Configure TLS 1.2 as minimum"],
+        "steps": [
+            "Disable TLS 1.0 and 1.1 on the server",
+            "Configure TLS 1.2 as minimum",
+        ],
         "references": ["https://wiki.mozilla.org/Security/Server_Side_TLS"],
     },
     "port_open": {
-        "steps": ["Close unnecessary ports via firewall rules", "Use VPN/SSH tunnels for admin access", "Bind databases to localhost only"],
+        "steps": [
+            "Close unnecessary ports via firewall rules",
+            "Use VPN/SSH tunnels for admin access",
+            "Bind databases to localhost only",
+        ],
         "references": ["https://owasp.org/www-project-web-security-testing-guide/"],
     },
 }
@@ -118,13 +168,19 @@ REMEDIATION = {
 # ---------------------
 # OpenAI Integration
 # ---------------------
-async def ai_explain_finding(finding_type: str, context: str = "", org_id: str = "") -> dict | None:
+async def ai_explain_finding(
+    finding_type: str, context: str = "", org_id: str = ""
+) -> dict | None:
     """Use OpenAI GPT to generate a detailed vulnerability explanation.
-    
+
     Protected by circuit breaker + prompt injection sanitization + token tracking.
     Returns None if OpenAI is not configured, circuit is open, or call fails.
     """
-    from app.services.ai_resilience import openai_breaker, sanitize_for_llm, token_tracker
+    from app.services.ai_resilience import (
+        openai_breaker,
+        sanitize_for_llm,
+        token_tracker,
+    )
 
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -152,7 +208,7 @@ async def ai_explain_finding(finding_type: str, context: str = "", org_id: str =
 5. OWASP Top 10 mapping if applicable
 
 Finding type: {safe_type}
-Additional context: {safe_context or 'None'}
+Additional context: {safe_context or "None"}
 
 Respond in JSON format with keys: summary, detail, impact, severity (Critical/High/Medium/Low), remediation_steps (array of strings), owasp_id, owasp_category"""
 
@@ -160,7 +216,10 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
                 "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
                 json={
                     "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                     "messages": [{"role": "user", "content": prompt}],
@@ -171,12 +230,17 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
             if response.status_code == 200:
                 import json
+
                 data = response.json()
                 content = data["choices"][0]["message"]["content"]
                 # Track tokens
                 usage = data.get("usage", {})
                 if org_id and usage:
-                    token_tracker.record_usage(org_id, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+                    token_tracker.record_usage(
+                        org_id,
+                        usage.get("prompt_tokens", 0),
+                        usage.get("completion_tokens", 0),
+                    )
                 openai_breaker.record_success()
                 return json.loads(content)
             else:
@@ -192,7 +256,11 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
 async def ai_analyze_scan(findings: list[dict], org_id: str = "") -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
-    from app.services.ai_resilience import openai_breaker, sanitize_findings_for_llm, token_tracker
+    from app.services.ai_resilience import (
+        openai_breaker,
+        sanitize_findings_for_llm,
+        token_tracker,
+    )
 
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key or not findings:
@@ -228,7 +296,10 @@ Provide a JSON response with:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
                 "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
                 json={
                     "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                     "messages": [{"role": "user", "content": prompt}],
@@ -239,10 +310,15 @@ Provide a JSON response with:
 
             if response.status_code == 200:
                 import json
+
                 data = response.json()
                 usage = data.get("usage", {})
                 if org_id and usage:
-                    token_tracker.record_usage(org_id, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+                    token_tracker.record_usage(
+                        org_id,
+                        usage.get("prompt_tokens", 0),
+                        usage.get("completion_tokens", 0),
+                    )
                 openai_breaker.record_success()
                 return json.loads(data["choices"][0]["message"]["content"])
             openai_breaker.record_failure()
@@ -258,16 +334,26 @@ Provide a JSON response with:
 # ---------------------
 def explain_finding(finding_type: str) -> dict:
     """Return a comprehensive explanation for a vulnerability type (static fallback)."""
-    explanation = EXPLANATIONS.get(finding_type, {
-        "summary": f"Finding: {finding_type}",
-        "detail": "This finding type has not been catalogued. Consult OWASP resources.",
-        "impact": "Unknown",
-        "severity": "Unknown",
-    })
+    explanation = EXPLANATIONS.get(
+        finding_type,
+        {
+            "summary": f"Finding: {finding_type}",
+            "detail": "This finding type has not been catalogued. Consult OWASP resources.",
+            "impact": "Unknown",
+            "severity": "Unknown",
+        },
+    )
     owasp = OWASP_MAP.get(finding_type)
-    remediation = REMEDIATION.get(finding_type, {"steps": ["Consult security documentation."], "references": []})
+    remediation = REMEDIATION.get(
+        finding_type, {"steps": ["Consult security documentation."], "references": []}
+    )
 
-    return {"finding_type": finding_type, **explanation, "owasp": owasp, "remediation": remediation}
+    return {
+        "finding_type": finding_type,
+        **explanation,
+        "owasp": owasp,
+        "remediation": remediation,
+    }
 
 
 def enrich_findings(findings: list[dict]) -> list[dict]:

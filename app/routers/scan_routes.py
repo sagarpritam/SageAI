@@ -8,7 +8,13 @@ from app.core.security import get_current_user
 from app.models.scan import Scan
 from app.models.organization import Organization
 from app.models.finding import Finding
-from app.schemas.scan import ScanRequest, ScanResponse, ScanListItem, Vulnerability, RiskSummary
+from app.schemas.scan import (
+    ScanRequest,
+    ScanResponse,
+    ScanListItem,
+    Vulnerability,
+    RiskSummary,
+)
 from app.services.scanner_service import run_all_scans
 from app.services.risk_engine import calculate_risk
 from app.services.subscription import check_scan_limit
@@ -73,16 +79,16 @@ async def create_scan(
         for f in findings_data:
             finding = Finding(
                 scan_id=scan.id,
-                title=f.get('type', 'Unknown Vulnerability'),
-                description=f.get('description', ''),
-                severity=f.get('severity', 'Low').capitalize(),
-                cvss_score=f.get('cvss', 0.0),
+                title=f.get("type", "Unknown Vulnerability"),
+                description=f.get("description", ""),
+                severity=f.get("severity", "Low").capitalize(),
+                cvss_score=f.get("cvss", 0.0),
                 asset_identified=payload.target,
             )
             db.add(finding)
             formatted_findings.append(f)
 
-    except Exception as e:
+    except Exception:
         scan.status = "failed"
         risk = {"risk_score": 0, "risk_level": "Low", "total_findings": 0}
 
@@ -94,7 +100,9 @@ async def create_scan(
         target=scan.target,
         status=scan.status,
         timestamp=scan.created_at,
-        findings=[Vulnerability(**f) for f in formatted_findings] if formatted_findings else [],
+        findings=[Vulnerability(**f) for f in formatted_findings]
+        if formatted_findings
+        else [],
         risk_summary=RiskSummary(**risk),
     )
 
@@ -116,7 +124,9 @@ async def get_scan(
     scan = result.scalar_one_or_none()
 
     if not scan:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found"
+        )
 
     findings = scan.get_findings()
     risk = calculate_risk(findings)
@@ -138,7 +148,7 @@ async def get_scan_findings(
     db: AsyncSession = Depends(get_db),
 ):
     """Retrieve granular findings linked to a specific scan."""
-    
+
     # 1. Verify org ownership of scan
     result = await db.execute(
         select(Scan).where(
@@ -147,14 +157,18 @@ async def get_scan_findings(
         )
     )
     if not result.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found")
-        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found"
+        )
+
     # 2. Extract detailed findings
     f_result = await db.execute(
-        select(Finding).where(Finding.scan_id == str(scan_id)).order_by(desc(Finding.severity))
+        select(Finding)
+        .where(Finding.scan_id == str(scan_id))
+        .order_by(desc(Finding.severity))
     )
     findings = f_result.scalars().all()
-    
+
     return [
         {
             "id": f.id,
@@ -163,7 +177,7 @@ async def get_scan_findings(
             "severity": f.severity,
             "cvss_score": f.cvss_score,
             "asset_identified": f.asset_identified,
-            "created_at": f.created_at
+            "created_at": f.created_at,
         }
         for f in findings
     ]
@@ -194,4 +208,3 @@ async def list_scans(
         )
         for s in scans
     ]
-

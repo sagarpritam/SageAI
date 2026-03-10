@@ -1,4 +1,4 @@
-﻿"""Celery task queue configuration for async scan processing.
+"""Celery task queue configuration for async scan processing.
 
 Usage:
   - Start worker: celery -A app.tasks.celery_app worker --loglevel=info

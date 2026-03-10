@@ -57,21 +57,17 @@ class DeveloperAgent:
         self.org_id = org_id
 
     async def generate_patch(
-        self,
-        owner: str,
-        repo: str,
-        finding: Dict[str, Any],
-        branch: str = "main"
+        self, owner: str, repo: str, finding: Dict[str, Any], branch: str = "main"
     ) -> Optional[Dict[str, Any]]:
         """
         Generate a secure patch for a single vulnerability finding.
-        
+
         Args:
             owner: GitHub repository owner
             repo: GitHub repository name
             finding: A single SAST finding dict with keys: file, line, severity, issue_text, etc.
             branch: The branch to read the source code from
-            
+
         Returns:
             A dict with 'file_path', 'original_code', 'patched_code', 'guardrail_result'
             or None if the patch was blocked or failed.
@@ -87,7 +83,9 @@ class DeveloperAgent:
 
         # 1. Fetch the original source code from GitHub
         try:
-            original_code = await self.github.fetch_file_content(owner, repo, file_path, ref=branch)
+            original_code = await self.github.fetch_file_content(
+                owner, repo, file_path, ref=branch
+            )
         except Exception as e:
             logger.error(f"Failed to fetch {file_path} from GitHub: {e}")
             return None
@@ -107,14 +105,12 @@ class DeveloperAgent:
                 issue_text=issue_text,
                 file_path=file_path,
                 line_number=line_number,
-                code=sanitized_code
+                code=sanitized_code,
             )
 
             try:
                 response = await llm_gateway.generate(
-                    prompt,
-                    system_message=DEVELOPER_SYSTEM_PROMPT,
-                    org_id=self.org_id
+                    prompt, system_message=DEVELOPER_SYSTEM_PROMPT, org_id=self.org_id
                 )
             except Exception as e:
                 logger.error(f"  LLM generation failed: {e}")
@@ -126,13 +122,17 @@ class DeveloperAgent:
             # 4. Validate with guardrails
             guardrail_result = validate_patch(file_path, original_code, candidate)
             if not guardrail_result["approved"]:
-                logger.warning(f"  Guardrails rejected patch: {guardrail_result['reasons']}")
+                logger.warning(
+                    f"  Guardrails rejected patch: {guardrail_result['reasons']}"
+                )
                 continue
 
             # 5. Verify by re-running SAST on the patched code
             still_vulnerable = await self._verify_patch(candidate, file_path)
             if still_vulnerable:
-                logger.warning(f"  Patch still has vulnerability after re-scan. Retrying...")
+                logger.warning(
+                    "  Patch still has vulnerability after re-scan. Retrying..."
+                )
                 # Feed back to the LLM for next attempt
                 sanitized_code = candidate
                 continue
@@ -142,7 +142,9 @@ class DeveloperAgent:
             break
 
         if patched_code is None:
-            logger.error(f"DeveloperAgent: Failed to generate a valid patch for {file_path} after {self.MAX_RETRIES} attempts.")
+            logger.error(
+                f"DeveloperAgent: Failed to generate a valid patch for {file_path} after {self.MAX_RETRIES} attempts."
+            )
             return None
 
         return {
@@ -154,9 +156,9 @@ class DeveloperAgent:
                 "severity": severity,
                 "test_id": test_id,
                 "issue_text": issue_text,
-                "line": line_number
+                "line": line_number,
             },
-            "guardrail_result": guardrail_result
+            "guardrail_result": guardrail_result,
         }
 
     async def _verify_patch(self, patched_code: str, file_path: str) -> bool:
@@ -175,7 +177,9 @@ class DeveloperAgent:
             try:
                 result = subprocess.run(
                     ["bandit", full_path, "-f", "json", "-ll"],
-                    capture_output=True, text=True, timeout=30
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
                 )
             except (FileNotFoundError, subprocess.TimeoutExpired):
                 # If bandit isn't available, assume the patch is fine
@@ -193,6 +197,7 @@ class DeveloperAgent:
 
         finally:
             import shutil
+
             shutil.rmtree(tmp_dir, ignore_errors=True)
 
     def _strip_markdown_fences(self, text: str) -> str:
@@ -201,7 +206,7 @@ class DeveloperAgent:
         if text.startswith("```"):
             # Remove opening fence
             first_newline = text.index("\n") if "\n" in text else len(text)
-            text = text[first_newline + 1:]
+            text = text[first_newline + 1 :]
         if text.endswith("```"):
             text = text[:-3]
         return text.strip()

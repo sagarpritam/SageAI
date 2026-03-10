@@ -13,7 +13,9 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 # Plan price IDs from Stripe dashboard
 PLAN_PRICES = {
     "pro": os.getenv("STRIPE_PRO_PRICE_ID", "price_pro_placeholder"),
-    "enterprise": os.getenv("STRIPE_ENTERPRISE_PRICE_ID", "price_enterprise_placeholder"),
+    "enterprise": os.getenv(
+        "STRIPE_ENTERPRISE_PRICE_ID", "price_enterprise_placeholder"
+    ),
 }
 
 
@@ -22,6 +24,7 @@ def get_stripe():
     if not STRIPE_KEY:
         raise HTTPException(status_code=503, detail="Billing not configured")
     import stripe
+
     stripe.api_key = STRIPE_KEY
     return stripe
 
@@ -39,8 +42,10 @@ async def create_checkout_session(plan: str):
             payment_method_types=["card"],
             line_items=[{"price": PLAN_PRICES[plan], "quantity": 1}],
             mode="subscription",
-            success_url=os.getenv("FRONTEND_URL", "http://localhost:5173") + "/plan?success=true",
-            cancel_url=os.getenv("FRONTEND_URL", "http://localhost:5173") + "/plan?canceled=true",
+            success_url=os.getenv("FRONTEND_URL", "http://localhost:5173")
+            + "/plan?success=true",
+            cancel_url=os.getenv("FRONTEND_URL", "http://localhost:5173")
+            + "/plan?canceled=true",
         )
         return {"checkout_url": session.url, "session_id": session.id}
     except Exception as e:
@@ -56,7 +61,9 @@ async def stripe_webhook(request: Request):
     sig_header = request.headers.get("stripe-signature")
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid webhook signature")
 

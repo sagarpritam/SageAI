@@ -49,45 +49,63 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                             unique_domains.add(domain)
 
                 if unique_domains:
-                    findings.append({
-                        "module": "censys",
-                        "type": "certificate_transparency",
-                        "severity": "info",
-                        "title": f"Censys Radar: {len(unique_domains)} Domains in Certificate Transparency",
-                        "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",
-                        "data": {"domains": sorted(unique_domains), "total_certs": len(certs)},
-                        "source": "crt.sh Certificate Transparency (free)",
-                    })
+                    findings.append(
+                        {
+                            "module": "censys",
+                            "type": "certificate_transparency",
+                            "severity": "info",
+                            "title": f"Censys Radar: {len(unique_domains)} Domains in Certificate Transparency",
+                            "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",
+                            "data": {
+                                "domains": sorted(unique_domains),
+                                "total_certs": len(certs),
+                            },
+                            "source": "crt.sh Certificate Transparency (free)",
+                        }
+                    )
 
                 # Check for expired or soon-expiring certs
                 import datetime
+
                 for cert in certs[:5]:
                     not_after = cert.get("not_after", "")
                     if not_after:
                         try:
-                            expiry = datetime.datetime.fromisoformat(not_after.replace("T", " ").split(".")[0])
+                            expiry = datetime.datetime.fromisoformat(
+                                not_after.replace("T", " ").split(".")[0]
+                            )
                             days_left = (expiry - datetime.datetime.utcnow()).days
                             if days_left < 0:
-                                findings.append({
-                                    "module": "censys",
-                                    "type": "expired_certificate",
-                                    "severity": "high",
-                                    "title": f"Censys Radar: Expired Certificate Detected",
-                                    "detail": f"Certificate for {cert.get('common_name', hostname)} expired {abs(days_left)} days ago.",
-                                    "data": {"common_name": cert.get("common_name"), "expired_date": not_after},
-                                    "source": "crt.sh (free)",
-                                })
+                                findings.append(
+                                    {
+                                        "module": "censys",
+                                        "type": "expired_certificate",
+                                        "severity": "high",
+                                        "title": "Censys Radar: Expired Certificate Detected",
+                                        "detail": f"Certificate for {cert.get('common_name', hostname)} expired {abs(days_left)} days ago.",
+                                        "data": {
+                                            "common_name": cert.get("common_name"),
+                                            "expired_date": not_after,
+                                        },
+                                        "source": "crt.sh (free)",
+                                    }
+                                )
                                 break
                             elif days_left < 30:
-                                findings.append({
-                                    "module": "censys",
-                                    "type": "expiring_certificate",
-                                    "severity": "medium",
-                                    "title": f"Censys Radar: Certificate Expiring Soon",
-                                    "detail": f"Certificate for {cert.get('common_name', hostname)} expires in {days_left} days.",
-                                    "data": {"common_name": cert.get("common_name"), "expires_in_days": days_left},
-                                    "source": "crt.sh (free)",
-                                })
+                                findings.append(
+                                    {
+                                        "module": "censys",
+                                        "type": "expiring_certificate",
+                                        "severity": "medium",
+                                        "title": "Censys Radar: Certificate Expiring Soon",
+                                        "detail": f"Certificate for {cert.get('common_name', hostname)} expires in {days_left} days.",
+                                        "data": {
+                                            "common_name": cert.get("common_name"),
+                                            "expires_in_days": days_left,
+                                        },
+                                        "source": "crt.sh (free)",
+                                    }
+                                )
                                 break
                         except Exception:
                             pass
@@ -103,33 +121,37 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                 cert = ssock.getpeercert()
                 protocol = ssock.version()
 
-                findings.append({
-                    "module": "censys",
-                    "type": "tls_inspection",
-                    "severity": "info",
-                    "title": f"Censys Radar: TLS {protocol} Active",
-                    "detail": f"Server supports {protocol}. Issuer: {cert.get('issuer', 'Unknown')}",
-                    "data": {
-                        "protocol": protocol,
-                        "issuer": str(cert.get("issuer", "")),
-                        "subject": str(cert.get("subject", "")),
-                        "serial_number": str(cert.get("serialNumber", "")),
-                        "ip": ip,
-                    },
-                    "source": "Direct TLS Inspection (free)",
-                })
+                findings.append(
+                    {
+                        "module": "censys",
+                        "type": "tls_inspection",
+                        "severity": "info",
+                        "title": f"Censys Radar: TLS {protocol} Active",
+                        "detail": f"Server supports {protocol}. Issuer: {cert.get('issuer', 'Unknown')}",
+                        "data": {
+                            "protocol": protocol,
+                            "issuer": str(cert.get("issuer", "")),
+                            "subject": str(cert.get("subject", "")),
+                            "serial_number": str(cert.get("serialNumber", "")),
+                            "ip": ip,
+                        },
+                        "source": "Direct TLS Inspection (free)",
+                    }
+                )
 
                 # Warn on old TLS versions
                 if protocol in ("TLSv1", "TLSv1.1"):
-                    findings.append({
-                        "module": "censys",
-                        "type": "weak_tls",
-                        "severity": "high",
-                        "title": f"Censys Radar: Weak TLS Version ({protocol})",
-                        "detail": f"Server supports deprecated {protocol}. Upgrade to TLS 1.2+.",
-                        "data": {"protocol": protocol},
-                        "source": "Direct TLS Inspection (free)",
-                    })
+                    findings.append(
+                        {
+                            "module": "censys",
+                            "type": "weak_tls",
+                            "severity": "high",
+                            "title": f"Censys Radar: Weak TLS Version ({protocol})",
+                            "detail": f"Server supports deprecated {protocol}. Upgrade to TLS 1.2+.",
+                            "data": {"protocol": protocol},
+                            "source": "Direct TLS Inspection (free)",
+                        }
+                    )
     except Exception as e:
         logger.warning(f"TLS inspection failed for {hostname}: {e}")
 
@@ -147,7 +169,9 @@ async def _censys_api_scan(hostname: str, api_id: str, api_secret: str) -> list[
                 auth=(api_id, api_secret),
             )
             if resp.status_code == 403:
-                logger.warning("Censys API credentials invalid, falling back to free tier")
+                logger.warning(
+                    "Censys API credentials invalid, falling back to free tier"
+                )
                 return await _censys_free_scan(hostname)
             if resp.status_code != 200:
                 return await _censys_free_scan(hostname)
@@ -162,15 +186,24 @@ async def _censys_api_scan(hostname: str, api_id: str, api_secret: str) -> list[
                     svc_name = svc.get("service_name", "UNKNOWN")
                     port = svc.get("port", "?")
                     transport = svc.get("transport_protocol", "TCP")
-                    findings.append({
-                        "module": "censys",
-                        "type": "exposed_service",
-                        "severity": "medium" if svc_name in ("SSH", "TELNET", "RDP", "FTP") else "info",
-                        "title": f"Censys: {svc_name} on {ip}:{port}",
-                        "detail": f"Service {svc_name} detected on {transport} port {port}",
-                        "data": {"ip": ip, "port": port, "service": svc_name, "transport": transport},
-                        "source": "Censys Search API (Pro)",
-                    })
+                    findings.append(
+                        {
+                            "module": "censys",
+                            "type": "exposed_service",
+                            "severity": "medium"
+                            if svc_name in ("SSH", "TELNET", "RDP", "FTP")
+                            else "info",
+                            "title": f"Censys: {svc_name} on {ip}:{port}",
+                            "detail": f"Service {svc_name} detected on {transport} port {port}",
+                            "data": {
+                                "ip": ip,
+                                "port": port,
+                                "service": svc_name,
+                                "transport": transport,
+                            },
+                            "source": "Censys Search API (Pro)",
+                        }
+                    )
 
     except Exception as e:
         logger.error(f"Censys API error: {e}")

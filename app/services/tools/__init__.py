@@ -22,11 +22,12 @@ TOOLS = [
 
 TOOL_REGISTRY = {tool.name: tool for tool in TOOLS}
 
+
 def get_tool(name: str) -> BaseTool | None:
     """Retrieve a tool by name."""
     return TOOL_REGISTRY.get(name)
 
+
 def get_all_tools() -> list[BaseTool]:
     """Retrieve all available tools."""
     return TOOLS
-

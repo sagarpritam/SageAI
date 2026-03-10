@@ -8,17 +8,29 @@ Detects API security vulnerabilities:
   - CORS misconfigurations
   - GraphQL introspection exposure
 """
+
 import asyncio
 import httpx
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
 
 API_DOC_PATHS = [
-    "/swagger", "/swagger-ui.html", "/swagger-ui", "/api-docs",
-    "/openapi.json", "/openapi.yaml", "/api/swagger.json",
-    "/v1/swagger.json", "/v2/api-docs", "/v3/api-docs",
-    "/graphql", "/graphiql", "/playground",
-    "/api/v1", "/api/v2", "/api",
+    "/swagger",
+    "/swagger-ui.html",
+    "/swagger-ui",
+    "/api-docs",
+    "/openapi.json",
+    "/openapi.yaml",
+    "/api/swagger.json",
+    "/v1/swagger.json",
+    "/v2/api-docs",
+    "/v3/api-docs",
+    "/graphql",
+    "/graphiql",
+    "/playground",
+    "/api/v1",
+    "/api/v2",
+    "/api",
 ]
 
 CORS_HEADERS = ["access-control-allow-origin", "access-control-allow-credentials"]
@@ -33,7 +45,15 @@ class APISecurityPlugin(SecurityPlugin):
             author="SageAI Core",
             description="Detects API security issues: exposed Swagger docs, GraphQL introspection, CORS misconfigs, missing auth headers, and rate limiting bypass indicators.",
             category="api",
-            tags=["api", "rest", "graphql", "swagger", "cors", "authentication", "owasp-api"],
+            tags=[
+                "api",
+                "rest",
+                "graphql",
+                "swagger",
+                "cors",
+                "authentication",
+                "owasp-api",
+            ],
             min_plan="pro",
         )
 
@@ -43,9 +63,13 @@ class APISecurityPlugin(SecurityPlugin):
         findings = []
         metadata = {"host": host, "api_paths_checked": len(API_DOC_PATHS)}
 
-        async with httpx.AsyncClient(timeout=7, verify=False, follow_redirects=True) as client:  # nosec B501
+        async with httpx.AsyncClient(
+            timeout=7, verify=False, follow_redirects=True
+        ) as client:  # nosec B501
             # Check for exposed API documentation
-            doc_tasks = [self._check_api_doc(client, base_url + path) for path in API_DOC_PATHS]
+            doc_tasks = [
+                self._check_api_doc(client, base_url + path) for path in API_DOC_PATHS
+            ]
             doc_results = await asyncio.gather(*doc_tasks, return_exceptions=True)
             for r in doc_results:
                 if r and not isinstance(r, Exception):
@@ -73,8 +97,22 @@ class APISecurityPlugin(SecurityPlugin):
             resp = await client.get(url)
             if resp.status_code == 200:
                 body = resp.text[:1000].lower()
-                if any(kw in body for kw in ["swagger", "openapi", "paths", "info", "graphql", "query"]):
-                    path = url.split("//", 1)[-1].split("/", 1)[-1] if "/" in url.split("//", 1)[-1] else ""
+                if any(
+                    kw in body
+                    for kw in [
+                        "swagger",
+                        "openapi",
+                        "paths",
+                        "info",
+                        "graphql",
+                        "query",
+                    ]
+                ):
+                    path = (
+                        url.split("//", 1)[-1].split("/", 1)[-1]
+                        if "/" in url.split("//", 1)[-1]
+                        else ""
+                    )
                     return {
                         "type": "exposed_api_documentation",
                         "severity": "medium",
@@ -141,7 +179,12 @@ class APISecurityPlugin(SecurityPlugin):
             last = responses[-1]
             has_rate_headers = any(
                 h in last.headers
-                for h in ["x-ratelimit-limit", "retry-after", "x-rate-limit", "ratelimit-limit"]
+                for h in [
+                    "x-ratelimit-limit",
+                    "retry-after",
+                    "x-rate-limit",
+                    "ratelimit-limit",
+                ]
             )
             if not has_rate_headers and all(r.status_code < 400 for r in responses):
                 return {

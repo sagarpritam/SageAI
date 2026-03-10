@@ -8,11 +8,24 @@ logger = logging.getLogger("sageai.port_scanner")
 
 # Common ports and their services
 COMMON_PORTS = {
-    21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP",
-    53: "DNS", 80: "HTTP", 110: "POP3", 143: "IMAP",
-    443: "HTTPS", 445: "SMB", 993: "IMAPS", 995: "POP3S",
-    3306: "MySQL", 3389: "RDP", 5432: "PostgreSQL",
-    6379: "Redis", 8080: "HTTP-Alt", 8443: "HTTPS-Alt",
+    21: "FTP",
+    22: "SSH",
+    23: "Telnet",
+    25: "SMTP",
+    53: "DNS",
+    80: "HTTP",
+    110: "POP3",
+    143: "IMAP",
+    443: "HTTPS",
+    445: "SMB",
+    993: "IMAPS",
+    995: "POP3S",
+    3306: "MySQL",
+    3389: "RDP",
+    5432: "PostgreSQL",
+    6379: "Redis",
+    8080: "HTTP-Alt",
+    8443: "HTTPS-Alt",
     27017: "MongoDB",
 }
 
@@ -41,17 +54,22 @@ def scan_ports(hostname: str, ports: dict = None, timeout: float = 2.0) -> list[
             if is_open:
                 open_ports.append((port, service))
                 severity = "high" if port in RISKY_PORTS else "info"
-                findings.append({
-                    "type": "port_open",
-                    "severity": severity,
-                    "detail": f"Port {port} ({service}) is open" + (" — should not be public" if port in RISKY_PORTS else ""),
-                })
+                findings.append(
+                    {
+                        "type": "port_open",
+                        "severity": severity,
+                        "detail": f"Port {port} ({service}) is open"
+                        + (" — should not be public" if port in RISKY_PORTS else ""),
+                    }
+                )
 
     if not open_ports:
-        findings.append({
-            "type": "port_scan_info",
-            "severity": "info",
-            "detail": "No common ports found open",
-        })
+        findings.append(
+            {
+                "type": "port_scan_info",
+                "severity": "info",
+                "detail": "No common ports found open",
+            }
+        )
 
     return findings

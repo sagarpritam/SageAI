@@ -11,7 +11,9 @@ from app.schemas.auth import UserCreate, UserLogin, TokenResponse
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
 async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     """Register a new user and organization."""
 
@@ -40,12 +42,14 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(user)
 
     # Generate JWT
-    token = create_access_token({
-        "sub": user.id,
-        "email": user.email,
-        "org": user.organization_id,
-        "role": user.role,
-    })
+    token = create_access_token(
+        {
+            "sub": user.id,
+            "email": user.email,
+            "org": user.organization_id,
+            "role": user.role,
+        }
+    )
 
     return TokenResponse(access_token=token)
 
@@ -63,11 +67,13 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
             detail="Invalid email or password",
         )
 
-    token = create_access_token({
-        "sub": user.id,
-        "email": user.email,
-        "org": user.organization_id,
-        "role": user.role,
-    })
+    token = create_access_token(
+        {
+            "sub": user.id,
+            "email": user.email,
+            "org": user.organization_id,
+            "role": user.role,
+        }
+    )
 
     return TokenResponse(access_token=token)

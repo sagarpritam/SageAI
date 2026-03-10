@@ -3,12 +3,13 @@ SageAI 2.0 — ScannerAgent
 Runs the vulnerability scanning pipeline against discovered hosts.
 Orchestrates all security tools and returns structured findings.
 """
+
 import logging
 import asyncio
 from typing import Dict, Any, List
 
 from app.services.llm.gateway import llm_gateway
-from app.services.tools import get_all_tools, get_tool
+from app.services.tools import get_all_tools
 
 logger = logging.getLogger("SageAI.scanner_agent")
 
@@ -67,7 +68,9 @@ class ScannerAgent:
         """Select relevant tools based on context keywords. Falls back to all scan tools."""
         all_tools = get_all_tools()
         # Filter out dev/PR tools for external scanning
-        scan_tools = [t for t in all_tools if t.name not in ("sast_scanner", "github_pr")]
+        scan_tools = [
+            t for t in all_tools if t.name not in ("sast_scanner", "github_pr")
+        ]
 
         context_lower = context.lower()
         selected_names = set()
@@ -87,10 +90,13 @@ class ScannerAgent:
         logger.info(f"[ScannerAgent] Scanning {target} (context: {context})")
 
         tools = self._select_tools(context)
-        logger.info(f"[ScannerAgent] Running {len(tools)} tools: {[t.name for t in tools]}")
+        logger.info(
+            f"[ScannerAgent] Running {len(tools)} tools: {[t.name for t in tools]}"
+        )
 
         # Run all tools concurrently
         sem = asyncio.Semaphore(6)
+
         async def run_tool(tool):
             async with sem:
                 try:
@@ -99,7 +105,9 @@ class ScannerAgent:
                 except Exception as e:
                     return tool.name, {"error": str(e)}
 
-        results = await asyncio.gather(*[run_tool(t) for t in tools], return_exceptions=True)
+        results = await asyncio.gather(
+            *[run_tool(t) for t in tools], return_exceptions=True
+        )
         tool_results = {}
         for r in results:
             if not isinstance(r, Exception):
@@ -108,10 +116,14 @@ class ScannerAgent:
 
         # AI triage
         import json
+
         findings = []
         try:
             # Summarize tool results (truncate to avoid token limit)
-            summarized = {k: (v[:3] if isinstance(v, list) else v) for k, v in tool_results.items()}
+            summarized = {
+                k: (v[:3] if isinstance(v, list) else v)
+                for k, v in tool_results.items()
+            }
             prompt = SCANNER_PROMPT.format(
                 target=target,
                 tool_results=json.dumps(summarized, indent=2)[:6000],
@@ -129,15 +141,17 @@ class ScannerAgent:
             for tool_name, data in tool_results.items():
                 if isinstance(data, list):
                     for item in data:
-                        findings.append({
-                            "type": item.get("type", "finding"),
-                            "description": item.get("detail", ""),
-                            "severity": item.get("severity", "info").capitalize(),
-                            "source": tool_name,
-                            "owasp": None,
-                            "cve": None,
-                            "evidence": str(item)[:200],
-                        })
+                        findings.append(
+                            {
+                                "type": item.get("type", "finding"),
+                                "description": item.get("detail", ""),
+                                "severity": item.get("severity", "info").capitalize(),
+                                "source": tool_name,
+                                "owasp": None,
+                                "cve": None,
+                                "evidence": str(item)[:200],
+                            }
+                        )
 
         return {
             "agent": "ScannerAgent",

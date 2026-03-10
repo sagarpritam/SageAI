@@ -4,9 +4,8 @@ Provides endpoints for running intelligence sweeps, individual module
 lookups, and retrieving the entity relationship graph.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from typing import Optional
 import logging
 
 from app.core.security import get_current_user
@@ -17,6 +16,7 @@ router = APIRouter(prefix="/intelligence", tags=["Intelligence Hub"])
 
 # ── Request / Response Models ─────────────────────
 
+
 class IntelligenceSweepRequest(BaseModel):
     target: str = Field(..., description="Domain, IP, email, username, or phone number")
     target_type: str = Field(
@@ -24,12 +24,14 @@ class IntelligenceSweepRequest(BaseModel):
         description="Type of target: domain, ip, email, username, phone",
     )
 
+
 class ModuleScanRequest(BaseModel):
     target: str
     target_type: str = "domain"
 
 
 # ── Full Sweep ────────────────────────────────────
+
 
 @router.post("/sweep")
 async def run_intelligence_sweep(
@@ -42,10 +44,13 @@ async def run_intelligence_sweep(
     """
     valid_types = ("domain", "ip", "email", "username", "phone")
     if req.target_type not in valid_types:
-        raise HTTPException(status_code=400, detail=f"target_type must be one of: {valid_types}")
+        raise HTTPException(
+            status_code=400, detail=f"target_type must be one of: {valid_types}"
+        )
 
     try:
         from app.services.intelligence import run_full_intelligence_sweep
+
         results = await run_full_intelligence_sweep(req.target, req.target_type)
         return {
             "status": "complete",
@@ -53,15 +58,19 @@ async def run_intelligence_sweep(
         }
     except Exception as e:
         logger.error(f"Intelligence sweep failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Intelligence sweep failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Intelligence sweep failed: {str(e)}"
+        )
 
 
 # ── Individual Module Endpoints ───────────────────
+
 
 @router.post("/shodan")
 async def run_shodan_scan(req: ModuleScanRequest, user=Depends(get_current_user)):
     """01 // SHODAN: THE PANOPTICON — Device & infrastructure search."""
     from app.services.intelligence.shodan_intel import shodan_scan
+
     return {"module": "shodan", "findings": await shodan_scan(req.target)}
 
 
@@ -69,6 +78,7 @@ async def run_shodan_scan(req: ModuleScanRequest, user=Depends(get_current_user)
 async def run_censys_scan(req: ModuleScanRequest, user=Depends(get_current_user)):
     """08 // CENSYS: THE GLOBAL RADAR — Server & certificate monitoring."""
     from app.services.intelligence.censys_intel import censys_scan
+
     return {"module": "censys", "findings": await censys_scan(req.target)}
 
 
@@ -76,6 +86,7 @@ async def run_censys_scan(req: ModuleScanRequest, user=Depends(get_current_user)
 async def run_intelx_search(req: ModuleScanRequest, user=Depends(get_current_user)):
     """06 // INTEL X: THE ARCHIVE OF SECRETS — Breach & dark web archives."""
     from app.services.intelligence.intelx_intel import intelx_search
+
     return {"module": "intelx", "findings": await intelx_search(req.target)}
 
 
@@ -83,13 +94,18 @@ async def run_intelx_search(req: ModuleScanRequest, user=Depends(get_current_use
 async def run_osint_industries(req: ModuleScanRequest, user=Depends(get_current_user)):
     """09 // OSINT INDUSTRIES: THE INTERCEPTOR — Email/phone correlation."""
     from app.services.intelligence.osint_industries_intel import osint_industries_lookup
-    return {"module": "osint_industries", "findings": await osint_industries_lookup(req.target, req.target_type)}
+
+    return {
+        "module": "osint_industries",
+        "findings": await osint_industries_lookup(req.target, req.target_type),
+    }
 
 
 @router.post("/spiderfoot")
 async def run_spiderfoot(req: ModuleScanRequest, user=Depends(get_current_user)):
     """04 // SPIDERFOOT: RECON AUTOMATION — Multi-source profiling."""
     from app.services.intelligence.spiderfoot_intel import spiderfoot_scan
+
     return {"module": "spiderfoot", "findings": await spiderfoot_scan(req.target)}
 
 
@@ -97,6 +113,7 @@ async def run_spiderfoot(req: ModuleScanRequest, user=Depends(get_current_user))
 async def run_recon_ng(req: ModuleScanRequest, user=Depends(get_current_user)):
     """07 // RECON-NG: THE FRAMEWORK — Modular recon."""
     from app.services.intelligence.recon_ng_intel import recon_ng_scan
+
     return {"module": "recon_ng", "findings": await recon_ng_scan(req.target)}
 
 
@@ -104,6 +121,7 @@ async def run_recon_ng(req: ModuleScanRequest, user=Depends(get_current_user)):
 async def run_darkweb_search(req: ModuleScanRequest, user=Depends(get_current_user)):
     """03 // BABEL X: THE LINGUISTIC MESH — Dark web monitoring."""
     from app.services.intelligence.darkweb_intel import darkweb_search
+
     return {"module": "darkweb", "findings": await darkweb_search(req.target)}
 
 
@@ -111,16 +129,23 @@ async def run_darkweb_search(req: ModuleScanRequest, user=Depends(get_current_us
 async def run_identity_resolve(req: ModuleScanRequest, user=Depends(get_current_user)):
     """05 // SOCIAL LINKS: NEURAL DE-MASKING — Identity resolution."""
     from app.services.intelligence.identity_intel import identity_resolve
-    return {"module": "identity", "findings": await identity_resolve(req.target, req.target_type)}
+
+    return {
+        "module": "identity",
+        "findings": await identity_resolve(req.target, req.target_type),
+    }
 
 
 @router.post("/graph")
-async def build_relationship_graph(req: ModuleScanRequest, user=Depends(get_current_user)):
+async def build_relationship_graph(
+    req: ModuleScanRequest, user=Depends(get_current_user)
+):
     """02 // MALTEGO: LINK ANALYSIS — Build entity relationship graph.
 
     Note: This requires running a full sweep first to collect data.
     """
     from app.services.intelligence import run_full_intelligence_sweep
+
     results = await run_full_intelligence_sweep(req.target, req.target_type)
     return {
         "module": "link_analysis",
@@ -131,10 +156,12 @@ async def build_relationship_graph(req: ModuleScanRequest, user=Depends(get_curr
 
 # ── Status ────────────────────────────────────────
 
+
 @router.get("/modules")
 async def list_intelligence_modules(user=Depends(get_current_user)):
     """List all available intelligence modules and their status."""
     import os
+
     return {
         "modules": [
             {

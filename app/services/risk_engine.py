@@ -30,7 +30,7 @@ FINDING_TYPE_BONUS = {
 
 def calculate_risk(findings: list[dict]) -> dict:
     """Calculate an aggregate risk score from scan findings.
-    
+
     Scoring:
       - Base: sum of severity weights per finding
       - Bonus: extra weight for critical finding types (SQLi, expired SSL, etc.)

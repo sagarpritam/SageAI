@@ -2,6 +2,7 @@
 SageAI 2.0 — Multi-Agent API Routes
 Exposes the multi-agent security team via REST endpoints.
 """
+
 import logging
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -13,7 +14,7 @@ from app.models.user import User
 from app.core.security import get_current_user
 from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
 from app.services.knowledge_graph import SecurityKnowledgeGraph
-from app.plugins.registry import get_marketplace_listing, run_all_plugins, get_all_plugins
+from app.plugins.registry import get_marketplace_listing, run_all_plugins
 
 router = APIRouter(prefix="/agents", tags=["Multi-Agent AI"])
 logger = logging.getLogger("SageAI.agent_routes")
@@ -21,7 +22,7 @@ logger = logging.getLogger("SageAI.agent_routes")
 
 class AssessmentRequest(BaseModel):
     target: str
-    mode: str = "full"              # full | quick | recon
+    mode: str = "full"  # full | quick | recon
     use_knowledge_graph: bool = True
 
 
@@ -35,14 +36,18 @@ async def run_assessment(
     """
     Triggers the full 5-agent security assessment:
     ReconAgent → ScannerAgent → ExploitAgent → KnowledgeGraph → ReportAgent
-    
+
     For large targets use mode='quick' for a faster 2-agent run.
     """
     org_id = str(current_user["org"])
     target = req.target.replace("https://", "").replace("http://", "").split("/")[0]
 
     orchestrator = MultiAgentOrchestrator(org_id=org_id)
-    kg = SecurityKnowledgeGraph(org_id=org_id, db=db) if req.use_knowledge_graph else None
+    kg = (
+        SecurityKnowledgeGraph(org_id=org_id, db=db)
+        if req.use_knowledge_graph
+        else None
+    )
 
     if req.mode == "quick":
         try:
@@ -80,7 +85,11 @@ async def run_assessment_async(
         await orchestrator.run_full_assessment(target=target)
 
     background_tasks.add_task(_run)
-    return {"status": "started", "target": target, "message": "Multi-agent assessment running in background."}
+    return {
+        "status": "started",
+        "target": target,
+        "message": "Multi-agent assessment running in background.",
+    }
 
 
 @router.get("/status", summary="List Available Agents")
@@ -88,17 +97,38 @@ async def list_agents(current_user: User = Depends(get_current_user)):
     """Returns the list of AI agents available in the system."""
     return {
         "agents": [
-            {"name": "ReconAgent", "role": "Attack surface discovery — subdomains, DNS, Shodan", "status": "online"},
-            {"name": "ScannerAgent", "role": "Vulnerability scanning — ports, SSL, HTTP, OSINT", "status": "online"},
-            {"name": "ExploitAgent", "role": "Exploitability verification — safe HTTP probes + AI analysis", "status": "online"},
-            {"name": "DeveloperAgent", "role": "Code remediation — SAST patching + GitHub PRs", "status": "online"},
-            {"name": "ReportAgent", "role": "Report generation — Executive summary + HackerOne format", "status": "online"},
+            {
+                "name": "ReconAgent",
+                "role": "Attack surface discovery — subdomains, DNS, Shodan",
+                "status": "online",
+            },
+            {
+                "name": "ScannerAgent",
+                "role": "Vulnerability scanning — ports, SSL, HTTP, OSINT",
+                "status": "online",
+            },
+            {
+                "name": "ExploitAgent",
+                "role": "Exploitability verification — safe HTTP probes + AI analysis",
+                "status": "online",
+            },
+            {
+                "name": "DeveloperAgent",
+                "role": "Code remediation — SAST patching + GitHub PRs",
+                "status": "online",
+            },
+            {
+                "name": "ReportAgent",
+                "role": "Report generation — Executive summary + HackerOne format",
+                "status": "online",
+            },
         ],
         "orchestrator": "MultiAgentOrchestrator v2.0",
     }
 
 
 # ── Knowledge Graph Routes ─────────────────────────────────────────
+
 
 @router.get("/graph/paths", summary="Get Attack Paths from Knowledge Graph")
 async def get_attack_paths(
@@ -113,6 +143,7 @@ async def get_attack_paths(
 
 
 # ── Plugin Marketplace Routes ──────────────────────────────────────
+
 
 @router.get("/plugins", summary="Plugin Marketplace Listing")
 async def list_plugins(current_user: User = Depends(get_current_user)):
@@ -137,9 +168,12 @@ async def run_plugin_endpoint(
 ):
     """Run a named security plugin against a target."""
     from app.plugins.registry import run_plugin
+
     result = await run_plugin(req.plugin_name, req.target)
     if result is None:
-        raise HTTPException(status_code=404, detail=f"Plugin '{req.plugin_name}' not found")
+        raise HTTPException(
+            status_code=404, detail=f"Plugin '{req.plugin_name}' not found"
+        )
     return result.to_dict()
 
 
@@ -150,7 +184,6 @@ async def run_all_plugins_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     """Run all applicable plugins against a target (or filter by category)."""
-    from app.plugins.registry import run_all_plugins
     plan = "pro"  # TODO: pull from user's plan
     results = await run_all_plugins(target, category=category, plan=plan)
     return {

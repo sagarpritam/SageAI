@@ -5,11 +5,13 @@ from datetime import datetime
 
 class ScanRequest(BaseModel):
     """Scan request body."""
+
     target: str
 
 
 class Vulnerability(BaseModel):
     """Individual finding from a scan."""
+
     type: str
     description: Optional[str] = None
     severity: str
@@ -18,6 +20,7 @@ class Vulnerability(BaseModel):
 
 class RiskSummary(BaseModel):
     """Aggregated risk score."""
+
     risk_score: int
     risk_level: str
     total_findings: int
@@ -25,6 +28,7 @@ class RiskSummary(BaseModel):
 
 class ScanResponse(BaseModel):
     """Full scan result returned to client."""
+
     id: str
     target: str
     status: str
@@ -35,6 +39,7 @@ class ScanResponse(BaseModel):
 
 class ScanListItem(BaseModel):
     """Summary item for scan listing."""
+
     id: str
     target: str
     status: str

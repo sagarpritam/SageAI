@@ -12,7 +12,9 @@ class ScanSchedule(Base):
     organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
     created_by = Column(String, ForeignKey("users.id"), nullable=False)
     target = Column(String, nullable=False)
-    frequency = Column(String, nullable=False, default="weekly")  # daily, weekly, monthly
+    frequency = Column(
+        String, nullable=False, default="weekly"
+    )  # daily, weekly, monthly
     is_active = Column(Boolean, default=True)
     last_run_at = Column(DateTime, nullable=True)
     next_run_at = Column(DateTime, nullable=True)

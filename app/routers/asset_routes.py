@@ -2,9 +2,10 @@
 SageAI 2.0 — Asset Inventory Routes
 REST API for Attack Surface Management.
 """
+
 import json
 import logging
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
@@ -15,7 +16,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.asset import Asset, AssetType, AssetStatus
 from app.models.user import User
-from app.schemas.asset import AssetOut, AssetSummary, DiscoveryRequest
+from app.schemas.asset import DiscoveryRequest
 from app.services.asset_inventory.asset_discovery_service import discover_assets
 
 router = APIRouter(prefix="/assets", tags=["Asset Inventory"])
@@ -59,9 +60,7 @@ async def trigger_discovery(
         raise HTTPException(status_code=400, detail="User has no organization")
 
     # Run in background for large scans
-    background_tasks.add_task(
-        discover_assets, org_id, req.target, db, req.scan_id
-    )
+    background_tasks.add_task(discover_assets, org_id, req.target, db, req.scan_id)
     return {
         "status": "discovery_started",
         "target": req.target,
@@ -102,6 +101,7 @@ async def get_asset_summary(
     assets = result.scalars().all()
 
     from datetime import timezone, timedelta
+
     now = datetime.now(timezone.utc)
     yesterday = now - timedelta(hours=24)
 
@@ -119,7 +119,9 @@ async def get_asset_summary(
         "ips": sum(1 for a in assets if a.asset_type == AssetType.ip),
         "servers": sum(1 for a in assets if a.asset_type == AssetType.server),
         "apis": sum(1 for a in assets if a.asset_type == AssetType.api),
-        "cloud_resources": sum(1 for a in assets if a.asset_type == AssetType.cloud_resource),
+        "cloud_resources": sum(
+            1 for a in assets if a.asset_type == AssetType.cloud_resource
+        ),
         "high_risk": sum(1 for a in assets if a.risk_level in ("High", "Critical")),
         "critical": sum(1 for a in assets if a.risk_level == "Critical"),
         "active": sum(1 for a in assets if a.status == AssetStatus.active),
@@ -164,9 +166,7 @@ async def get_high_risk_assets(
     org_id = current_user["org"]
     result = await db.execute(
         select(Asset)
-        .where(
-            and_(Asset.org_id == org_id, Asset.risk_level.in_(["Critical", "High"]))
-        )
+        .where(and_(Asset.org_id == org_id, Asset.risk_level.in_(["Critical", "High"])))
         .order_by(desc(Asset.risk_score))
         .limit(50)
     )
@@ -182,6 +182,7 @@ async def get_new_assets(
 ):
     """Assets discovered in the last N hours."""
     from datetime import timezone, timedelta
+
     org_id = current_user["org"]
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
 

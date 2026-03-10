@@ -20,7 +20,9 @@ async def create_schedule(
 ):
     """Create a scheduled scan (admin only)."""
     if frequency not in ("daily", "weekly", "monthly"):
-        raise HTTPException(status_code=400, detail="Frequency must be daily, weekly, or monthly")
+        raise HTTPException(
+            status_code=400, detail="Frequency must be daily, weekly, or monthly"
+        )
 
     schedule = ScanSchedule(
         target=target,
@@ -30,7 +32,12 @@ async def create_schedule(
     )
     db.add(schedule)
     await db.commit()
-    return {"id": schedule.id, "target": target, "frequency": frequency, "is_active": True}
+    return {
+        "id": schedule.id,
+        "target": target,
+        "frequency": frequency,
+        "is_active": True,
+    }
 
 
 @router.get("")
@@ -45,9 +52,13 @@ async def list_schedules(
     schedules = result.scalars().all()
     return [
         {
-            "id": s.id, "target": s.target, "frequency": s.frequency,
-            "is_active": s.is_active, "run_count": s.run_count,
-            "last_run_at": s.last_run_at, "next_run_at": s.next_run_at,
+            "id": s.id,
+            "target": s.target,
+            "frequency": s.frequency,
+            "is_active": s.is_active,
+            "run_count": s.run_count,
+            "last_run_at": s.last_run_at,
+            "next_run_at": s.next_run_at,
         }
         for s in schedules
     ]

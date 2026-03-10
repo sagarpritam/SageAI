@@ -32,7 +32,16 @@ class JSONFormatter(logging.Formatter):
             }
 
         # Add extra fields
-        for key in ("request_id", "user_id", "org_id", "ip", "method", "path", "status_code", "duration_ms"):
+        for key in (
+            "request_id",
+            "user_id",
+            "org_id",
+            "ip",
+            "method",
+            "path",
+            "status_code",
+            "duration_ms",
+        ):
             if hasattr(record, key):
                 log_entry[key] = getattr(record, key)
 
@@ -52,9 +61,9 @@ def setup_logging(level: str = "INFO", json_output: bool = True):
     if json_output:
         handler.setFormatter(JSONFormatter())
     else:
-        handler.setFormatter(logging.Formatter(
-            "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
-        ))
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
+        )
 
     root_logger.addHandler(handler)
 

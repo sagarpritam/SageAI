@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -7,7 +7,11 @@ import io
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.scan import Scan
-from app.services.report_generator import generate_report, generate_pdf_report, generate_hackerone_report
+from app.services.report_generator import (
+    generate_report,
+    generate_pdf_report,
+    generate_hackerone_report,
+)
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
@@ -21,13 +25,15 @@ async def get_report_json(
     """Get a JSON report for a completed scan."""
     scan = await _get_scan(scan_id, current_user, db)
 
-    return generate_report({
-        "id": scan.id,
-        "target": scan.target,
-        "risk_score": scan.risk_score,
-        "risk_level": scan.risk_level,
-        "findings": scan.get_findings(),
-    })
+    return generate_report(
+        {
+            "id": scan.id,
+            "target": scan.target,
+            "risk_score": scan.risk_score,
+            "risk_level": scan.risk_level,
+            "findings": scan.get_findings(),
+        }
+    )
 
 
 @router.get("/{scan_id}/pdf")
@@ -39,14 +45,16 @@ async def get_report_pdf(
     """Download a professional PDF security report for a completed scan."""
     scan = await _get_scan(scan_id, current_user, db)
 
-    pdf_bytes = generate_pdf_report({
-        "id": scan.id,
-        "target": scan.target,
-        "risk_score": scan.risk_score,
-        "risk_level": scan.risk_level,
-        "findings": scan.get_findings(),
-        "created_at": str(scan.created_at),
-    })
+    pdf_bytes = generate_pdf_report(
+        {
+            "id": scan.id,
+            "target": scan.target,
+            "risk_score": scan.risk_score,
+            "risk_level": scan.risk_level,
+            "findings": scan.get_findings(),
+            "created_at": str(scan.created_at),
+        }
+    )
 
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
@@ -66,10 +74,12 @@ async def get_hackerone_report(
     """Download a HackerOne-formatted Markdown report for Bug Bounty submission."""
     scan = await _get_scan(scan_id, current_user, db)
 
-    markdown = generate_hackerone_report({
-        "target": scan.target,
-        "findings": scan.get_findings(),
-    })
+    markdown = generate_hackerone_report(
+        {
+            "target": scan.target,
+            "findings": scan.get_findings(),
+        }
+    )
 
     return StreamingResponse(
         io.BytesIO(markdown.encode("utf-8")),
@@ -91,7 +101,9 @@ async def _get_scan(scan_id: str, current_user: dict, db: AsyncSession) -> Scan:
     scan = result.scalar_one_or_none()
 
     if not scan:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found"
+        )
 
     if scan.status != "completed":
         raise HTTPException(

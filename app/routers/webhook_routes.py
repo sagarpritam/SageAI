@@ -1,4 +1,4 @@
-﻿"""Webhook management and delivery."""
+"""Webhook management and delivery."""
 
 import hashlib
 import hmac
@@ -27,7 +27,9 @@ async def create_webhook(
 ):
     """Register a webhook endpoint (admin only)."""
     if event not in ("scan.completed", "scan.failed"):
-        raise HTTPException(status_code=400, detail="Event must be 'scan.completed' or 'scan.failed'")
+        raise HTTPException(
+            status_code=400, detail="Event must be 'scan.completed' or 'scan.failed'"
+        )
 
     secret = secrets.token_hex(32)
     webhook = Webhook(
@@ -60,7 +62,13 @@ async def list_webhooks(
     hooks = result.scalars().all()
 
     return [
-        {"id": h.id, "url": h.url, "event": h.event, "is_active": h.is_active, "created_at": h.created_at}
+        {
+            "id": h.id,
+            "url": h.url,
+            "event": h.event,
+            "is_active": h.is_active,
+            "created_at": h.created_at,
+        }
         for h in hooks
     ]
 
@@ -73,7 +81,9 @@ async def delete_webhook(
 ):
     """Delete a webhook."""
     result = await db.execute(
-        select(Webhook).where(Webhook.id == webhook_id, Webhook.organization_id == current_user["org"])
+        select(Webhook).where(
+            Webhook.id == webhook_id, Webhook.organization_id == current_user["org"]
+        )
     )
     hook = result.scalar_one_or_none()
     if not hook:

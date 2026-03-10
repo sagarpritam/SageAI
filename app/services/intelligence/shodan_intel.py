@@ -50,62 +50,74 @@ async def _shodan_free_scan(ip: str) -> list[dict]:
 
         vulns = data.get("vulns", [])
         if vulns:
-            findings.append({
-                "module": "shodan",
-                "type": "known_vulnerabilities",
-                "severity": "high",
-                "title": f"Shodan: {len(vulns)} Known Vulnerabilities",
-                "detail": f"Shodan InternetDB reports {len(vulns)} known CVEs for this IP: {', '.join(vulns[:10])}",
-                "data": {"cve_ids": vulns, "ip": ip},
-                "source": "Shodan InternetDB (free)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "known_vulnerabilities",
+                    "severity": "high",
+                    "title": f"Shodan: {len(vulns)} Known Vulnerabilities",
+                    "detail": f"Shodan InternetDB reports {len(vulns)} known CVEs for this IP: {', '.join(vulns[:10])}",
+                    "data": {"cve_ids": vulns, "ip": ip},
+                    "source": "Shodan InternetDB (free)",
+                }
+            )
 
         ports = data.get("ports", [])
         if ports:
-            findings.append({
-                "module": "shodan",
-                "type": "open_ports",
-                "severity": "medium" if any(p in [21, 23, 445, 3389] for p in ports) else "info",
-                "title": f"Shodan: {len(ports)} Open Ports Detected",
-                "detail": f"Ports: {', '.join(str(p) for p in ports[:20])}",
-                "data": {"ports": ports, "ip": ip},
-                "source": "Shodan InternetDB (free)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "open_ports",
+                    "severity": "medium"
+                    if any(p in [21, 23, 445, 3389] for p in ports)
+                    else "info",
+                    "title": f"Shodan: {len(ports)} Open Ports Detected",
+                    "detail": f"Ports: {', '.join(str(p) for p in ports[:20])}",
+                    "data": {"ports": ports, "ip": ip},
+                    "source": "Shodan InternetDB (free)",
+                }
+            )
 
         cpes = data.get("cpes", [])
         if cpes:
-            findings.append({
-                "module": "shodan",
-                "type": "software_detected",
-                "severity": "info",
-                "title": f"Shodan: {len(cpes)} Software Components Identified",
-                "detail": f"CPEs: {', '.join(cpes[:10])}",
-                "data": {"cpes": cpes, "ip": ip},
-                "source": "Shodan InternetDB (free)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "software_detected",
+                    "severity": "info",
+                    "title": f"Shodan: {len(cpes)} Software Components Identified",
+                    "detail": f"CPEs: {', '.join(cpes[:10])}",
+                    "data": {"cpes": cpes, "ip": ip},
+                    "source": "Shodan InternetDB (free)",
+                }
+            )
 
         hostnames = data.get("hostnames", [])
         if hostnames:
-            findings.append({
-                "module": "shodan",
-                "type": "associated_hostnames",
-                "severity": "info",
-                "title": f"Shodan: {len(hostnames)} Associated Hostnames",
-                "detail": f"Hostnames: {', '.join(hostnames[:10])}",
-                "data": {"hostnames": hostnames, "ip": ip},
-                "source": "Shodan InternetDB (free)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "associated_hostnames",
+                    "severity": "info",
+                    "title": f"Shodan: {len(hostnames)} Associated Hostnames",
+                    "detail": f"Hostnames: {', '.join(hostnames[:10])}",
+                    "data": {"hostnames": hostnames, "ip": ip},
+                    "source": "Shodan InternetDB (free)",
+                }
+            )
 
         if not vulns and not ports and not cpes:
-            findings.append({
-                "module": "shodan",
-                "type": "clean",
-                "severity": "info",
-                "title": "Shodan: No Issues Found",
-                "detail": f"IP {ip} is not indexed or has no known exposures.",
-                "data": {"ip": ip},
-                "source": "Shodan InternetDB (free)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "clean",
+                    "severity": "info",
+                    "title": "Shodan: No Issues Found",
+                    "detail": f"IP {ip} is not indexed or has no known exposures.",
+                    "data": {"ip": ip},
+                    "source": "Shodan InternetDB (free)",
+                }
+            )
 
     except Exception as e:
         logger.error(f"Shodan free scan error: {e}")
@@ -133,15 +145,17 @@ async def _shodan_pro_scan(ip: str, api_key: str) -> list[dict]:
         # Vulnerabilities
         vulns = data.get("vulns", [])
         if vulns:
-            findings.append({
-                "module": "shodan",
-                "type": "known_vulnerabilities",
-                "severity": "high",
-                "title": f"Shodan Pro: {len(vulns)} Known Vulnerabilities",
-                "detail": f"CVEs: {', '.join(vulns[:15])}",
-                "data": {"cve_ids": vulns, "ip": ip},
-                "source": "Shodan REST API (Pro)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "known_vulnerabilities",
+                    "severity": "high",
+                    "title": f"Shodan Pro: {len(vulns)} Known Vulnerabilities",
+                    "detail": f"CVEs: {', '.join(vulns[:15])}",
+                    "data": {"cve_ids": vulns, "ip": ip},
+                    "source": "Shodan REST API (Pro)",
+                }
+            )
 
         # Services & banners
         services = data.get("data", [])
@@ -150,28 +164,37 @@ async def _shodan_pro_scan(ip: str, api_key: str) -> list[dict]:
             product = svc.get("product", "Unknown")
             version = svc.get("version", "")
             banner_snippet = (svc.get("data", ""))[:200]
-            findings.append({
-                "module": "shodan",
-                "type": "service_banner",
-                "severity": "info",
-                "title": f"Shodan Pro: Service on port {port} — {product} {version}",
-                "detail": f"Banner: {banner_snippet}",
-                "data": {"port": port, "product": product, "version": version, "transport": svc.get("transport")},
-                "source": "Shodan REST API (Pro)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "service_banner",
+                    "severity": "info",
+                    "title": f"Shodan Pro: Service on port {port} — {product} {version}",
+                    "detail": f"Banner: {banner_snippet}",
+                    "data": {
+                        "port": port,
+                        "product": product,
+                        "version": version,
+                        "transport": svc.get("transport"),
+                    },
+                    "source": "Shodan REST API (Pro)",
+                }
+            )
 
         # OS detection
         os_name = data.get("os")
         if os_name:
-            findings.append({
-                "module": "shodan",
-                "type": "os_detection",
-                "severity": "info",
-                "title": f"Shodan Pro: OS Detected — {os_name}",
-                "detail": f"Operating system: {os_name}",
-                "data": {"os": os_name, "ip": ip},
-                "source": "Shodan REST API (Pro)",
-            })
+            findings.append(
+                {
+                    "module": "shodan",
+                    "type": "os_detection",
+                    "severity": "info",
+                    "title": f"Shodan Pro: OS Detected — {os_name}",
+                    "detail": f"Operating system: {os_name}",
+                    "data": {"os": os_name, "ip": ip},
+                    "source": "Shodan REST API (Pro)",
+                }
+            )
 
     except Exception as e:
         logger.error(f"Shodan Pro scan error: {e}")

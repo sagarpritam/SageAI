@@ -1,4 +1,5 @@
 """SageAI Plugin: SSL/TLS Scanner"""
+
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 from app.services.ssl_scanner import scan_ssl
 
@@ -21,5 +22,7 @@ class SSLPlugin(SecurityPlugin):
         try:
             findings = await scan_ssl(host)
         except Exception as e:
-            findings = [{"type": "ssl_scan_error", "detail": str(e), "severity": "info"}]
+            findings = [
+                {"type": "ssl_scan_error", "detail": str(e), "severity": "info"}
+            ]
         return PluginResult(self.name, target, findings or [], {"host": host})

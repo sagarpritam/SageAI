@@ -1,9 +1,10 @@
 """
 SageAI 2.0 — Asset Pydantic Schemas
 """
+
 from __future__ import annotations
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 from pydantic import BaseModel
 from app.models.asset import AssetType, AssetStatus
 

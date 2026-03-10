@@ -57,31 +57,41 @@ async def analyze_site(hostname: str) -> list[dict]:
                 else:
                     severity = "info"
 
-                findings.append({
-                    "type": "observatory_grade",
-                    "severity": severity,
-                    "detail": f"Mozilla Observatory grade: {grade} ({score}/100) — {tests_passed}/{tests_total} tests passed",
-                    "grade": grade,
-                    "score": score,
-                    "source": "Mozilla Observatory",
-                })
+                findings.append(
+                    {
+                        "type": "observatory_grade",
+                        "severity": severity,
+                        "detail": f"Mozilla Observatory grade: {grade} ({score}/100) — {tests_passed}/{tests_total} tests passed",
+                        "grade": grade,
+                        "score": score,
+                        "source": "Mozilla Observatory",
+                    }
+                )
 
             # Get detailed test results
             scan_id = data.get("id")
             if scan_id:
-                tests_response = await client.get(f"{OBSERVATORY_API}/getScanResults", params={"scan": scan_id})
+                tests_response = await client.get(
+                    f"{OBSERVATORY_API}/getScanResults", params={"scan": scan_id}
+                )
                 if tests_response.status_code == 200:
                     tests = tests_response.json()
-                    failed_tests = {k: v for k, v in tests.items() if isinstance(v, dict) and not v.get("pass", True)}
+                    failed_tests = {
+                        k: v
+                        for k, v in tests.items()
+                        if isinstance(v, dict) and not v.get("pass", True)
+                    }
 
                     for test_name, test_data in list(failed_tests.items())[:5]:
-                        findings.append({
-                            "type": "observatory_test_fail",
-                            "severity": "medium",
-                            "detail": f"Observatory: {test_name.replace('-', ' ').title()} — {test_data.get('score_description', 'Failed')}",
-                            "test_name": test_name,
-                            "source": "Mozilla Observatory",
-                        })
+                        findings.append(
+                            {
+                                "type": "observatory_test_fail",
+                                "severity": "medium",
+                                "detail": f"Observatory: {test_name.replace('-', ' ').title()} — {test_data.get('score_description', 'Failed')}",
+                                "test_name": test_name,
+                                "source": "Mozilla Observatory",
+                            }
+                        )
 
     except httpx.TimeoutException:
         logger.warning("Mozilla Observatory timeout")

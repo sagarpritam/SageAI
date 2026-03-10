@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -10,7 +10,27 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth_routes, scan_routes, report_routes, explain_routes, org_routes, apikey_routes, webhook_routes, billing_routes, schedule_routes, mfa_routes, password_routes, ws_routes, ai_chat_routes, ai_command_routes, integration_routes, autofix_routes, asset_routes, agent_routes, intelligence_hub_routes
+from app.routers import (
+    auth_routes,
+    scan_routes,
+    report_routes,
+    explain_routes,
+    org_routes,
+    apikey_routes,
+    webhook_routes,
+    billing_routes,
+    schedule_routes,
+    mfa_routes,
+    password_routes,
+    ws_routes,
+    ai_chat_routes,
+    ai_command_routes,
+    integration_routes,
+    autofix_routes,
+    asset_routes,
+    agent_routes,
+    intelligence_hub_routes,
+)
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 
@@ -20,6 +40,7 @@ from app.middleware.security import SecurityHeadersMiddleware
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 if SENTRY_DSN:
     import sentry_sdk
+
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         traces_sample_rate=0.2,
@@ -54,7 +75,9 @@ async def lifespan(app: FastAPI):
     for err in errors:
         logger.critical(f"⛔ {err}")
     if any("CRITICAL" in e for e in errors):
-        raise RuntimeError("Production config validation failed. Fix critical errors above.")
+        raise RuntimeError(
+            "Production config validation failed. Fix critical errors above."
+        )
 
     await init_db()
     logger.info("✅ Database tables created (v2.0)")
@@ -94,6 +117,7 @@ app.add_middleware(AuditLogMiddleware)
 # Prometheus metrics (exposes /metrics endpoint)
 try:
     from prometheus_fastapi_instrumentator import Instrumentator
+
     Instrumentator(
         should_group_status_codes=True,
         should_ignore_untemplated=True,
@@ -101,7 +125,9 @@ try:
     ).instrument(app).expose(app, endpoint="/metrics", tags=["Monitoring"])
     logger.info("📊 Prometheus metrics enabled at /metrics")
 except ImportError:
-    logger.warning("⚠️  prometheus-fastapi-instrumentator not installed — metrics disabled")
+    logger.warning(
+        "⚠️  prometheus-fastapi-instrumentator not installed — metrics disabled"
+    )
 
 
 # ---------------------
@@ -149,6 +175,7 @@ async def health_check():
     try:
         from sqlalchemy import text
         from app.core.database import AsyncSessionLocal
+
         async with AsyncSessionLocal() as session:
             await session.execute(text("SELECT 1"))
     except Exception:
@@ -163,6 +190,24 @@ async def health_check():
         "scanners": 11,
         "intelligence_modules": 9,
         "endpoints": 64,
-        "new_in_v2": ["Asset Inventory", "Attack Surface Management", "AI Copilot", "Bug Bounty Reports", "Multi-Agent AI Team", "Security Knowledge Graph", "Plugin Marketplace"],
-        "new_in_v3": ["Shodan Panopticon", "Maltego Link Analysis", "Babel X Dark Web", "SpiderFoot Recon", "Social Links De-Masking", "Intel X Archives", "Recon-ng Framework", "Censys Global Radar", "OSINT Industries Interceptor"],
+        "new_in_v2": [
+            "Asset Inventory",
+            "Attack Surface Management",
+            "AI Copilot",
+            "Bug Bounty Reports",
+            "Multi-Agent AI Team",
+            "Security Knowledge Graph",
+            "Plugin Marketplace",
+        ],
+        "new_in_v3": [
+            "Shodan Panopticon",
+            "Maltego Link Analysis",
+            "Babel X Dark Web",
+            "SpiderFoot Recon",
+            "Social Links De-Masking",
+            "Intel X Archives",
+            "Recon-ng Framework",
+            "Censys Global Radar",
+            "OSINT Industries Interceptor",
+        ],
     }

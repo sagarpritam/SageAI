@@ -19,10 +19,13 @@ async def search_cves(keyword: str, max_results: int = 5) -> list[dict]:
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.get(NVD_API, params={
-                "keywordSearch": keyword,
-                "resultsPerPage": max_results,
-            })
+            response = await client.get(
+                NVD_API,
+                params={
+                    "keywordSearch": keyword,
+                    "resultsPerPage": max_results,
+                },
+            )
 
             if response.status_code != 200:
                 logger.warning(f"NVD API returned {response.status_code}")
@@ -51,18 +54,30 @@ async def search_cves(keyword: str, max_results: int = 5) -> list[dict]:
 
                 # Get description
                 descriptions = cve.get("descriptions", [])
-                desc = next((d["value"] for d in descriptions if d.get("lang") == "en"), "No description")
+                desc = next(
+                    (d["value"] for d in descriptions if d.get("lang") == "en"),
+                    "No description",
+                )
 
-                severity_map = {"CRITICAL": "critical", "HIGH": "high", "MEDIUM": "medium", "LOW": "low"}
+                severity_map = {
+                    "CRITICAL": "critical",
+                    "HIGH": "high",
+                    "MEDIUM": "medium",
+                    "LOW": "low",
+                }
 
-                findings.append({
-                    "type": "nvd_cve",
-                    "severity": severity_map.get(str(cvss_severity).upper(), "medium"),
-                    "detail": f"{cve_id} (CVSS {cvss_score}): {desc[:150]}",
-                    "cve_id": cve_id,
-                    "cvss_score": cvss_score,
-                    "source": "NVD/NIST",
-                })
+                findings.append(
+                    {
+                        "type": "nvd_cve",
+                        "severity": severity_map.get(
+                            str(cvss_severity).upper(), "medium"
+                        ),
+                        "detail": f"{cve_id} (CVSS {cvss_score}): {desc[:150]}",
+                        "cve_id": cve_id,
+                        "cvss_score": cvss_score,
+                        "source": "NVD/NIST",
+                    }
+                )
 
     except httpx.TimeoutException:
         logger.warning("NVD API timeout")

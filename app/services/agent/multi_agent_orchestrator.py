@@ -18,11 +18,10 @@ Replaces single-agent pipeline with a coordinated AI security team:
 Each agent is autonomous and communicates through structured data contracts.
 The orchestrator manages the workflow, error recovery, and aggregation.
 """
-import json
+
 import logging
-import asyncio
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 from app.services.agent.recon_agent import ReconAgent
 from app.services.agent.scanner_agent import ScannerAgent
@@ -53,7 +52,7 @@ class MultiAgentOrchestrator:
     ) -> Dict[str, Any]:
         """
         Run the complete 5-agent security assessment pipeline.
-        
+
         Returns a comprehensive result dict with each agent's output
         plus a merged final report.
         """
@@ -69,16 +68,33 @@ class MultiAgentOrchestrator:
             recon_result = await self.recon_agent.run(target)
         except Exception as e:
             logger.error(f"[MultiAgent] ReconAgent failed: {e}")
-            recon_result = {"agent": "ReconAgent", "target": target, "subdomains": [target], "error": str(e), "ai_summary": {}}
-        timeline.append({"phase": "recon", "duration_s": (datetime.now(timezone.utc) - t0).total_seconds()})
-        logger.info(f"[MultiAgent] ReconAgent found {len(recon_result.get('subdomains', []))} hosts")
+            recon_result = {
+                "agent": "ReconAgent",
+                "target": target,
+                "subdomains": [target],
+                "error": str(e),
+                "ai_summary": {},
+            }
+        timeline.append(
+            {
+                "phase": "recon",
+                "duration_s": (datetime.now(timezone.utc) - t0).total_seconds(),
+            }
+        )
+        logger.info(
+            f"[MultiAgent] ReconAgent found {len(recon_result.get('subdomains', []))} hosts"
+        )
 
         # ── Phase 2: Scanning ────────────────────────────────────────
         t0 = datetime.now(timezone.utc)
         logger.info("[MultiAgent] Phase 2: ScannerAgent starting")
         # Scan the primary target + top interesting hosts from recon
-        interesting = recon_result.get("ai_summary", {}).get("interesting_hosts", [])[:3]
-        primary_targets = list(dict.fromkeys([target] + interesting))  # dedupe, preserve order
+        interesting = recon_result.get("ai_summary", {}).get("interesting_hosts", [])[
+            :3
+        ]
+        primary_targets = list(
+            dict.fromkeys([target] + interesting)
+        )  # dedupe, preserve order
 
         scanner_results_list = []
         for scan_target in primary_targets[:3]:  # cap at 3 for performance
@@ -86,7 +102,9 @@ class MultiAgentOrchestrator:
                 res = await self.scanner_agent.run(scan_target, context=scan_context)
                 scanner_results_list.append(res)
             except Exception as e:
-                logger.warning(f"[MultiAgent] ScannerAgent failed for {scan_target}: {e}")
+                logger.warning(
+                    f"[MultiAgent] ScannerAgent failed for {scan_target}: {e}"
+                )
 
         # Merge scanner results
         all_findings = []
@@ -102,7 +120,12 @@ class MultiAgentOrchestrator:
             "findings": all_findings,
             "scan_count": len(scanner_results_list),
         }
-        timeline.append({"phase": "scan", "duration_s": (datetime.now(timezone.utc) - t0).total_seconds()})
+        timeline.append(
+            {
+                "phase": "scan",
+                "duration_s": (datetime.now(timezone.utc) - t0).total_seconds(),
+            }
+        )
         logger.info(f"[MultiAgent] ScannerAgent found {len(all_findings)} raw findings")
 
         # ── Phase 3: Exploit Verification ───────────────────────────
@@ -113,11 +136,21 @@ class MultiAgentOrchestrator:
         except Exception as e:
             logger.error(f"[MultiAgent] ExploitAgent failed: {e}")
             exploit_result = {
-                "agent": "ExploitAgent", "target": target,
-                "verified_findings": all_findings, "critical_confirmed": 0, "error": str(e)
+                "agent": "ExploitAgent",
+                "target": target,
+                "verified_findings": all_findings,
+                "critical_confirmed": 0,
+                "error": str(e),
             }
-        timeline.append({"phase": "exploit", "duration_s": (datetime.now(timezone.utc) - t0).total_seconds()})
-        logger.info(f"[MultiAgent] ExploitAgent confirmed {exploit_result.get('critical_confirmed', 0)} critical findings")
+        timeline.append(
+            {
+                "phase": "exploit",
+                "duration_s": (datetime.now(timezone.utc) - t0).total_seconds(),
+            }
+        )
+        logger.info(
+            f"[MultiAgent] ExploitAgent confirmed {exploit_result.get('critical_confirmed', 0)} critical findings"
+        )
 
         # ── Phase 4: Knowledge Graph Attack Paths ───────────────────
         attack_paths = []
@@ -133,7 +166,12 @@ class MultiAgentOrchestrator:
                 attack_paths = graph_data.get("attack_paths", [])
             except Exception as e:
                 logger.warning(f"[MultiAgent] Knowledge graph failed: {e}")
-            timeline.append({"phase": "graph", "duration_s": (datetime.now(timezone.utc) - t0).total_seconds()})
+            timeline.append(
+                {
+                    "phase": "graph",
+                    "duration_s": (datetime.now(timezone.utc) - t0).total_seconds(),
+                }
+            )
 
         # ── Phase 5: Report Generation ───────────────────────────────
         t0 = datetime.now(timezone.utc)
@@ -149,12 +187,19 @@ class MultiAgentOrchestrator:
         except Exception as e:
             logger.error(f"[MultiAgent] ReportAgent failed: {e}")
             report_result = {
-                "agent": "ReportAgent", "target": target,
-                "risk_score": 0, "risk_level": "Unknown",
+                "agent": "ReportAgent",
+                "target": target,
+                "risk_score": 0,
+                "risk_level": "Unknown",
                 "markdown_report": f"Report generation failed: {e}",
                 "error": str(e),
             }
-        timeline.append({"phase": "report", "duration_s": (datetime.now(timezone.utc) - t0).total_seconds()})
+        timeline.append(
+            {
+                "phase": "report",
+                "duration_s": (datetime.now(timezone.utc) - t0).total_seconds(),
+            }
+        )
 
         total_duration = (datetime.now(timezone.utc) - started_at).total_seconds()
 
@@ -194,7 +239,9 @@ class MultiAgentOrchestrator:
         """
         if mode == "quick":
             scanner_result = await self.scanner_agent.run(target, context="quick scan")
-            exploit_result = await self.exploit_agent.run(target, scanner_result.get("findings", []))
+            exploit_result = await self.exploit_agent.run(
+                target, scanner_result.get("findings", [])
+            )
             return await self.report_agent.run(
                 target=target,
                 recon_result={"ai_summary": {}, "subdomains": [target]},

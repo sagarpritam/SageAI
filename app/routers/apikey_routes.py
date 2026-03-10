@@ -1,4 +1,4 @@
-﻿"""API Key management routes."""
+"""API Key management routes."""
 
 import secrets
 from fastapi import APIRouter, Depends, HTTPException
@@ -70,7 +70,9 @@ async def revoke_api_key(
 ):
     """Revoke an API key (admin only)."""
     result = await db.execute(
-        select(APIKey).where(APIKey.id == key_id, APIKey.organization_id == current_user["org"])
+        select(APIKey).where(
+            APIKey.id == key_id, APIKey.organization_id == current_user["org"]
+        )
     )
     key = result.scalar_one_or_none()
     if not key:

@@ -23,6 +23,7 @@ class CircuitBreaker:
       OPEN    → requests are blocked (fast-fail)
       HALF_OPEN → one test request allowed to check recovery
     """
+
     failure_threshold: int = 3
     reset_timeout: int = 60  # seconds
     _failure_count: int = 0
@@ -46,7 +47,9 @@ class CircuitBreaker:
         self._last_failure_time = time.time()
         if self._failure_count >= self.failure_threshold:
             self._state = "OPEN"
-            logger.warning(f"Circuit breaker → OPEN after {self._failure_count} failures")
+            logger.warning(
+                f"Circuit breaker → OPEN after {self._failure_count} failures"
+            )
 
     def is_open(self) -> bool:
         return self.state == "OPEN"
@@ -112,7 +115,10 @@ def sanitize_findings_for_llm(findings: list[dict]) -> list[dict]:
             if isinstance(value, str):
                 clean[key] = sanitize_for_llm(value, max_length=500)
             elif isinstance(value, list):
-                clean[key] = [sanitize_for_llm(str(v), 200) if isinstance(v, str) else v for v in value[:20]]
+                clean[key] = [
+                    sanitize_for_llm(str(v), 200) if isinstance(v, str) else v
+                    for v in value[:20]
+                ]
             else:
                 clean[key] = value
         sanitized.append(clean)
@@ -127,13 +133,18 @@ class TokenTracker:
     In production, persist to database. This in-memory version is for
     demonstration and testing.
     """
+
     # org_id → {"prompt_tokens": int, "completion_tokens": int, "total_cost": float}
-    usage: dict = field(default_factory=lambda: defaultdict(lambda: {
-        "prompt_tokens": 0,
-        "completion_tokens": 0,
-        "total_cost": 0.0,
-        "request_count": 0,
-    }))
+    usage: dict = field(
+        default_factory=lambda: defaultdict(
+            lambda: {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_cost": 0.0,
+                "request_count": 0,
+            }
+        )
+    )
 
     # Pricing per 1M tokens (gpt-4o-mini)
     INPUT_PRICE_PER_1M: float = 0.15
@@ -145,11 +156,12 @@ class TokenTracker:
         entry["prompt_tokens"] += prompt_tokens
         entry["completion_tokens"] += completion_tokens
         entry["request_count"] += 1
-        entry["total_cost"] += (
-            (prompt_tokens / 1_000_000) * self.INPUT_PRICE_PER_1M +
-            (completion_tokens / 1_000_000) * self.OUTPUT_PRICE_PER_1M
+        entry["total_cost"] += (prompt_tokens / 1_000_000) * self.INPUT_PRICE_PER_1M + (
+            completion_tokens / 1_000_000
+        ) * self.OUTPUT_PRICE_PER_1M
+        logger.info(
+            f"Token usage for org {org_id}: +{prompt_tokens}in/{completion_tokens}out, total=${entry['total_cost']:.4f}"
         )
-        logger.info(f"Token usage for org {org_id}: +{prompt_tokens}in/{completion_tokens}out, total=${entry['total_cost']:.4f}")
 
     def get_usage(self, org_id: str) -> dict:
         return dict(self.usage[org_id])

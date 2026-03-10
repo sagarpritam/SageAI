@@ -20,10 +20,13 @@ async def search_certificates(domain: str) -> list[dict]:
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.get(f"{CRTSH_API}/", params={
-                "q": f"%.{domain}",
-                "output": "json",
-            })
+            response = await client.get(
+                f"{CRTSH_API}/",
+                params={
+                    "q": f"%.{domain}",
+                    "output": "json",
+                },
+            )
 
             if response.status_code != 200:
                 return findings
@@ -43,36 +46,55 @@ async def search_certificates(domain: str) -> list[dict]:
             subdomains = sorted(unique_names)
 
             if subdomains:
-                findings.append({
-                    "type": "crtsh_certificates",
-                    "severity": "info",
-                    "detail": f"CRT.sh found {len(certs)} certificates for {len(subdomains)} unique names",
-                    "total_certs": len(certs),
-                    "source": "crt.sh",
-                })
+                findings.append(
+                    {
+                        "type": "crtsh_certificates",
+                        "severity": "info",
+                        "detail": f"CRT.sh found {len(certs)} certificates for {len(subdomains)} unique names",
+                        "total_certs": len(certs),
+                        "source": "crt.sh",
+                    }
+                )
 
             # Flag potentially sensitive subdomains
-            sensitive_keywords = ["admin", "staging", "dev", "test", "internal", "vpn", "api-dev", "debug", "qa", "uat"]
-            sensitive = [s for s in subdomains if any(kw in s for kw in sensitive_keywords)]
+            sensitive_keywords = [
+                "admin",
+                "staging",
+                "dev",
+                "test",
+                "internal",
+                "vpn",
+                "api-dev",
+                "debug",
+                "qa",
+                "uat",
+            ]
+            sensitive = [
+                s for s in subdomains if any(kw in s for kw in sensitive_keywords)
+            ]
 
             if sensitive:
-                findings.append({
-                    "type": "crtsh_sensitive_subdomains",
-                    "severity": "medium",
-                    "detail": f"Sensitive subdomains found via cert transparency: {', '.join(sensitive[:8])}",
-                    "subdomains": sensitive[:15],
-                    "source": "crt.sh",
-                })
+                findings.append(
+                    {
+                        "type": "crtsh_sensitive_subdomains",
+                        "severity": "medium",
+                        "detail": f"Sensitive subdomains found via cert transparency: {', '.join(sensitive[:8])}",
+                        "subdomains": sensitive[:15],
+                        "source": "crt.sh",
+                    }
+                )
 
             # Flag wildcard certificates
             wildcards = [s for s in subdomains if s.startswith("*.")]
             if wildcards:
-                findings.append({
-                    "type": "crtsh_wildcards",
-                    "severity": "low",
-                    "detail": f"Wildcard certificates found: {', '.join(wildcards[:5])}",
-                    "source": "crt.sh",
-                })
+                findings.append(
+                    {
+                        "type": "crtsh_wildcards",
+                        "severity": "low",
+                        "detail": f"Wildcard certificates found: {', '.join(wildcards[:5])}",
+                        "source": "crt.sh",
+                    }
+                )
 
     except httpx.TimeoutException:
         logger.warning("CRT.sh timeout")

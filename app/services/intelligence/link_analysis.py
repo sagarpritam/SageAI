@@ -22,9 +22,13 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
     edges = []
 
     def _node_id(label: str) -> str:
-        return hashlib.md5(label.lower().encode(), usedforsecurity=False).hexdigest()[:12]
+        return hashlib.md5(label.lower().encode(), usedforsecurity=False).hexdigest()[
+            :12
+        ]
 
-    def _add_node(label: str, node_type: str, severity: str = "info", extra_data: dict = None):
+    def _add_node(
+        label: str, node_type: str, severity: str = "info", extra_data: dict = None
+    ):
         nid = _node_id(label)
         if nid not in nodes:
             nodes[nid] = {
@@ -37,17 +41,22 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
         return nid
 
     def _add_edge(source_id: str, target_id: str, label: str, weight: int = 1):
-        edges.append({
-            "source": source_id,
-            "target": target_id,
-            "label": label,
-            "weight": weight,
-        })
+        edges.append(
+            {
+                "source": source_id,
+                "target": target_id,
+                "label": label,
+                "weight": weight,
+            }
+        )
 
     # Root node (the target)
     root_type_map = {
-        "domain": "domain", "ip": "ip", "email": "email",
-        "username": "person", "phone": "phone",
+        "domain": "domain",
+        "ip": "ip",
+        "email": "email",
+        "username": "person",
+        "phone": "phone",
     }
     root_id = _add_node(target, root_type_map.get(target_type, "unknown"))
 
@@ -56,9 +65,14 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
         if finding.get("type") == "open_ports":
             ports = finding.get("data", {}).get("ports", [])
             for port in ports[:10]:
-                port_id = _add_node(f"Port {port}", "port",
-                                    "high" if port in [21, 23, 445, 3389] else "info")
-                _add_edge(root_id, port_id, "exposes", 2 if port in [21, 23, 445, 3389] else 1)
+                port_id = _add_node(
+                    f"Port {port}",
+                    "port",
+                    "high" if port in [21, 23, 445, 3389] else "info",
+                )
+                _add_edge(
+                    root_id, port_id, "exposes", 2 if port in [21, 23, 445, 3389] else 1
+                )
 
         elif finding.get("type") == "known_vulnerabilities":
             cves = finding.get("data", {}).get("cve_ids", [])
@@ -79,8 +93,11 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
                 _add_edge(root_id, dom_id, "cert_includes")
 
         elif finding.get("type") in ("expired_certificate", "weak_tls"):
-            issue_id = _add_node(finding.get("title", "TLS Issue"), "vulnerability",
-                                 finding.get("severity", "medium"))
+            issue_id = _add_node(
+                finding.get("title", "TLS Issue"),
+                "vulnerability",
+                finding.get("severity", "medium"),
+            )
             _add_edge(root_id, issue_id, "has_issue", 2)
 
     # Process IntelX / breach results
@@ -135,8 +152,11 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
     # Process Dark Web results
     for finding in intel_results.get("darkweb", []):
         if finding.get("type") in ("tor_mentions", "paste_leaks"):
-            dw_id = _add_node(finding.get("title", "Dark Web"), "darkweb",
-                              finding.get("severity", "high"))
+            dw_id = _add_node(
+                finding.get("title", "Dark Web"),
+                "darkweb",
+                finding.get("severity", "high"),
+            )
             _add_edge(root_id, dw_id, "mentioned_on", 3)
 
     # Process Identity results
@@ -144,8 +164,7 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
         if finding.get("type") == "username_enumeration":
             for platform in finding.get("data", {}).get("platforms", []):
                 plat_id = _add_node(
-                    f"{platform.get('platform', '?')}/{target}",
-                    "social_account"
+                    f"{platform.get('platform', '?')}/{target}", "social_account"
                 )
                 _add_edge(root_id, plat_id, "has_account", 2)
 
@@ -175,7 +194,9 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
     # Count node types
     for node in graph["nodes"]:
         ntype = node["type"]
-        graph["stats"]["node_types"][ntype] = graph["stats"]["node_types"].get(ntype, 0) + 1
+        graph["stats"]["node_types"][ntype] = (
+            graph["stats"]["node_types"].get(ntype, 0) + 1
+        )
 
     logger.info(f"Link analysis graph built: {len(nodes)} nodes, {len(edges)} edges")
     return graph

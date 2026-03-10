@@ -20,18 +20,23 @@ def sanitize_url(url: str) -> str:
         return url
 
     # Must start with http:// or https://
-    if not re.match(r'^https?://', url, re.IGNORECASE):
+    if not re.match(r"^https?://", url, re.IGNORECASE):
         raise ValueError("URL must start with http:// or https://")
 
     # Remove potentially dangerous characters
     url = url.strip()
-    url = re.sub(r'[<>"\'`;]', '', url)
+    url = re.sub(r'[<>"\'`;]', "", url)
 
     # Block local/internal addresses
     blocked_patterns = [
-        r'localhost', r'127\.0\.0\.1', r'0\.0\.0\.0',
-        r'10\.\d+\.\d+\.\d+', r'172\.(1[6-9]|2\d|3[01])\.\d+\.\d+',
-        r'192\.168\.\d+\.\d+', r'\[::1\]', r'169\.254\.\d+\.\d+',
+        r"localhost",
+        r"127\.0\.0\.1",
+        r"0\.0\.0\.0",
+        r"10\.\d+\.\d+\.\d+",
+        r"172\.(1[6-9]|2\d|3[01])\.\d+\.\d+",
+        r"192\.168\.\d+\.\d+",
+        r"\[::1\]",
+        r"169\.254\.\d+\.\d+",
     ]
     for pattern in blocked_patterns:
         if re.search(pattern, url, re.IGNORECASE):
@@ -46,7 +51,7 @@ def sanitize_email(email: str) -> str:
         return email
 
     email = email.strip().lower()
-    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+    if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
         raise ValueError("Invalid email format")
 
     return email

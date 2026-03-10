@@ -3,6 +3,7 @@ SageAI 2.0 — ReportAgent
 Generates comprehensive security reports from multi-agent findings.
 Supports: Executive Summary, Technical Deep-dive, HackerOne format, PDF metadata.
 """
+
 import json
 import logging
 from datetime import datetime, timezone
@@ -64,7 +65,10 @@ class ReportAgent:
 
         # Compute risk score
         severity_weights = {"Critical": 10, "High": 7, "Medium": 4, "Low": 1, "Info": 0}
-        raw_score = sum(severity_weights.get(f.get("severity", "Info"), 0) for f in verified_findings)
+        raw_score = sum(
+            severity_weights.get(f.get("severity", "Info"), 0)
+            for f in verified_findings
+        )
         normalized = min(raw_score, 100) if verified_findings else 0
 
         if normalized >= 70:
@@ -99,7 +103,9 @@ class ReportAgent:
             )
         except Exception as e:
             logger.warning(f"[ReportAgent] AI report generation failed: {e}")
-            markdown_report = self._fallback_report(target, all_findings, risk_level, normalized)
+            markdown_report = self._fallback_report(
+                target, all_findings, risk_level, normalized
+            )
 
         # Severity breakdown
         severity_counts = {}
@@ -117,7 +123,9 @@ class ReportAgent:
             "critical_confirmed": critical_count,
             "severity_breakdown": severity_counts,
             "subdomains_found": len(recon_result.get("subdomains", [])),
-            "attack_surface_rating": recon_result.get("ai_summary", {}).get("attack_surface_rating", "Unknown"),
+            "attack_surface_rating": recon_result.get("ai_summary", {}).get(
+                "attack_surface_rating", "Unknown"
+            ),
             "attack_paths": attack_paths,
             "verified_findings": verified_findings,
             "all_findings": all_findings,

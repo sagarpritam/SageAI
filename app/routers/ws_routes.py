@@ -39,7 +39,9 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
     await websocket.accept()
     scan_id_str = str(scan_id)
     _channels[scan_id_str].add(websocket)
-    logger.info(f"WS connected for scan {scan_id_str} ({len(_channels[scan_id_str])} clients)")
+    logger.info(
+        f"WS connected for scan {scan_id_str} ({len(_channels[scan_id_str])} clients)"
+    )
 
     try:
         # Keep connection alive, listen for client disconnect

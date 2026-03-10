@@ -15,7 +15,13 @@ PLAN_LIMITS = {
         "display_name": "Pro",
         "max_scans_per_month": 100,
         "max_users": 10,
-        "features": ["basic_scanning", "json_reports", "pdf_reports", "ai_explanations", "priority_support"],
+        "features": [
+            "basic_scanning",
+            "json_reports",
+            "pdf_reports",
+            "ai_explanations",
+            "priority_support",
+        ],
         "price_monthly": 49,
     },
     "enterprise": {
@@ -23,8 +29,14 @@ PLAN_LIMITS = {
         "max_scans_per_month": -1,  # unlimited
         "max_users": -1,  # unlimited
         "features": [
-            "basic_scanning", "json_reports", "pdf_reports", "ai_explanations",
-            "priority_support", "api_access", "custom_integrations", "sla",
+            "basic_scanning",
+            "json_reports",
+            "pdf_reports",
+            "ai_explanations",
+            "priority_support",
+            "api_access",
+            "custom_integrations",
+            "sla",
         ],
         "price_monthly": 199,
     },

@@ -34,20 +34,20 @@ def _generate_pr_body(patch_result: Dict[str, Any]) -> str:
 ### Vulnerability Detected
 | Field | Value |
 |-------|-------|
-| **Type** | `{vuln['type']}` |
-| **Severity** | `{vuln['severity']}` |
-| **Test ID** | `{vuln['test_id']}` |
-| **File** | `{patch_result['file_path']}` |
-| **Line** | `{vuln['line']}` |
+| **Type** | `{vuln["type"]}` |
+| **Severity** | `{vuln["severity"]}` |
+| **Test ID** | `{vuln["test_id"]}` |
+| **File** | `{patch_result["file_path"]}` |
+| **Line** | `{vuln["line"]}` |
 
 ### Description
-{vuln['issue_text']}
+{vuln["issue_text"]}
 
 ### Fix Applied
 AI-generated secure patch that resolves the vulnerability while preserving business logic.
 
 ### Verification
-- ✅ Guardrails passed ({guardrails['lines_changed']} lines changed)
+- ✅ Guardrails passed ({guardrails["lines_changed"]} lines changed)
 - ✅ Post-patch SAST re-scan: **Clean**
 
 ### Security Impact
@@ -82,7 +82,7 @@ class GitHubPRTool(BaseTool):
     async def run(self, target: str, **kwargs) -> Dict[str, Any]:
         """
         Run the auto-fix workflow.
-        
+
         Args:
             target: GitHub repo in 'owner/repo' format
             **kwargs:
@@ -103,7 +103,9 @@ class GitHubPRTool(BaseTool):
 
         parts = target.strip("/").split("/")
         if len(parts) != 2:
-            return {"error": f"Invalid repo format. Expected 'owner/repo', got '{target}'"}
+            return {
+                "error": f"Invalid repo format. Expected 'owner/repo', got '{target}'"
+            }
         owner, repo = parts
 
         github = GitHubService(github_token)
@@ -115,7 +117,7 @@ class GitHubPRTool(BaseTool):
             "fixed": [],
             "failed": [],
             "blocked": [],
-            "pull_requests": []
+            "pull_requests": [],
         }
 
         for finding in findings:
@@ -125,22 +127,28 @@ class GitHubPRTool(BaseTool):
             logger.info(f"Processing: {vuln_type} in {file_path}")
 
             # 1. Generate the AI patch
-            patch_result = await agent.generate_patch(owner, repo, finding, branch=base_branch)
+            patch_result = await agent.generate_patch(
+                owner, repo, finding, branch=base_branch
+            )
 
             if patch_result is None:
-                results["failed"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "reason": "AI could not generate a valid patch after retries."
-                })
+                results["failed"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "reason": "AI could not generate a valid patch after retries.",
+                    }
+                )
                 continue
 
             if not patch_result["guardrail_result"]["approved"]:
-                results["blocked"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "reasons": patch_result["guardrail_result"]["reasons"]
-                })
+                results["blocked"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "reasons": patch_result["guardrail_result"]["reasons"],
+                    }
+                )
                 continue
 
             # 2. Create a branch for the fix
@@ -149,28 +157,35 @@ class GitHubPRTool(BaseTool):
                 await github.create_branch(owner, repo, base_branch, branch_name)
             except Exception as e:
                 logger.error(f"Failed to create branch {branch_name}: {e}")
-                results["failed"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "reason": f"Branch creation failed: {str(e)}"
-                })
+                results["failed"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "reason": f"Branch creation failed: {str(e)}",
+                    }
+                )
                 continue
 
             # 3. Commit the patched file
             commit_message = f"fix: resolve {vuln_type} in {file_path}\n\nAuto-fixed by SageAI Developer Agent."
             try:
                 commit_url = await github.commit_file(
-                    owner, repo, branch_name,
-                    file_path, patch_result["patched_code"],
-                    commit_message
+                    owner,
+                    repo,
+                    branch_name,
+                    file_path,
+                    patch_result["patched_code"],
+                    commit_message,
                 )
             except Exception as e:
                 logger.error(f"Failed to commit patch: {e}")
-                results["failed"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "reason": f"Commit failed: {str(e)}"
-                })
+                results["failed"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "reason": f"Commit failed: {str(e)}",
+                    }
+                )
                 continue
 
             # 4. Open a Pull Request
@@ -178,24 +193,29 @@ class GitHubPRTool(BaseTool):
             pr_body = _generate_pr_body(patch_result)
             try:
                 pr_url = await github.create_pull_request(
-                    owner, repo, branch_name, base_branch,
-                    pr_title, pr_body
+                    owner, repo, branch_name, base_branch, pr_title, pr_body
                 )
                 results["pull_requests"].append(pr_url)
-                results["fixed"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "pr_url": pr_url,
-                    "lines_changed": patch_result["guardrail_result"]["lines_changed"]
-                })
+                results["fixed"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "pr_url": pr_url,
+                        "lines_changed": patch_result["guardrail_result"][
+                            "lines_changed"
+                        ],
+                    }
+                )
                 logger.info(f"✅ PR created: {pr_url}")
             except Exception as e:
                 logger.error(f"Failed to create PR: {e}")
-                results["failed"].append({
-                    "file": file_path,
-                    "vulnerability": vuln_type,
-                    "reason": f"PR creation failed: {str(e)}"
-                })
+                results["failed"].append(
+                    {
+                        "file": file_path,
+                        "vulnerability": vuln_type,
+                        "reason": f"PR creation failed: {str(e)}",
+                    }
+                )
 
         # Summary
         results["summary"] = (

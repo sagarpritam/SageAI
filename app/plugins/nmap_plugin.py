@@ -1,4 +1,5 @@
 """SageAI Plugin: Nmap Port Scanner"""
+
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 from app.services.tools.nmap_scanner import NmapScannerTool
 

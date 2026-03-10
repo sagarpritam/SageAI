@@ -42,12 +42,14 @@ async def check_url_reputation(url: str) -> list[dict]:
                     data={"url": url},
                 )
                 if response.status_code == 200:
-                    findings.append({
-                        "type": "virustotal_submitted",
-                        "severity": "info",
-                        "detail": "URL submitted to VirusTotal for analysis — results will be available in a few minutes",
-                        "source": "VirusTotal",
-                    })
+                    findings.append(
+                        {
+                            "type": "virustotal_submitted",
+                            "severity": "info",
+                            "detail": "URL submitted to VirusTotal for analysis — results will be available in a few minutes",
+                            "source": "VirusTotal",
+                        }
+                    )
                 return findings
 
             if response.status_code != 200:
@@ -63,38 +65,46 @@ async def check_url_reputation(url: str) -> list[dict]:
             total = malicious + suspicious + harmless + undetected
 
             if malicious > 0:
-                findings.append({
-                    "type": "virustotal_malicious",
-                    "severity": "critical" if malicious >= 5 else "high",
-                    "detail": f"VirusTotal: {malicious}/{total} vendors flagged this URL as malicious",
-                    "malicious_count": malicious,
-                    "total_vendors": total,
-                    "source": "VirusTotal",
-                })
+                findings.append(
+                    {
+                        "type": "virustotal_malicious",
+                        "severity": "critical" if malicious >= 5 else "high",
+                        "detail": f"VirusTotal: {malicious}/{total} vendors flagged this URL as malicious",
+                        "malicious_count": malicious,
+                        "total_vendors": total,
+                        "source": "VirusTotal",
+                    }
+                )
             elif suspicious > 0:
-                findings.append({
-                    "type": "virustotal_suspicious",
-                    "severity": "medium",
-                    "detail": f"VirusTotal: {suspicious}/{total} vendors flagged this URL as suspicious",
-                    "source": "VirusTotal",
-                })
+                findings.append(
+                    {
+                        "type": "virustotal_suspicious",
+                        "severity": "medium",
+                        "detail": f"VirusTotal: {suspicious}/{total} vendors flagged this URL as suspicious",
+                        "source": "VirusTotal",
+                    }
+                )
             else:
-                findings.append({
-                    "type": "virustotal_clean",
-                    "severity": "info",
-                    "detail": f"VirusTotal: URL is clean — 0/{total} vendors flagged it",
-                    "source": "VirusTotal",
-                })
+                findings.append(
+                    {
+                        "type": "virustotal_clean",
+                        "severity": "info",
+                        "detail": f"VirusTotal: URL is clean — 0/{total} vendors flagged it",
+                        "source": "VirusTotal",
+                    }
+                )
 
             # Check reputation score
             reputation = data.get("reputation", 0)
             if reputation < -10:
-                findings.append({
-                    "type": "virustotal_bad_reputation",
-                    "severity": "high",
-                    "detail": f"VirusTotal community reputation score: {reputation} (negative = bad)",
-                    "source": "VirusTotal",
-                })
+                findings.append(
+                    {
+                        "type": "virustotal_bad_reputation",
+                        "severity": "high",
+                        "detail": f"VirusTotal community reputation score: {reputation} (negative = bad)",
+                        "source": "VirusTotal",
+                    }
+                )
 
     except Exception as e:
         logger.error(f"VirusTotal error: {e}")

@@ -57,10 +57,18 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
             spiderfoot_scan(target),
             return_exceptions=True,
         )
-        results["shodan"] = domain_results[0] if isinstance(domain_results[0], list) else []
-        results["censys"] = domain_results[1] if isinstance(domain_results[1], list) else []
-        results["recon_ng"] = domain_results[2] if isinstance(domain_results[2], list) else []
-        results["spiderfoot"] = domain_results[3] if isinstance(domain_results[3], list) else []
+        results["shodan"] = (
+            domain_results[0] if isinstance(domain_results[0], list) else []
+        )
+        results["censys"] = (
+            domain_results[1] if isinstance(domain_results[1], list) else []
+        )
+        results["recon_ng"] = (
+            domain_results[2] if isinstance(domain_results[2], list) else []
+        )
+        results["spiderfoot"] = (
+            domain_results[3] if isinstance(domain_results[3], list) else []
+        )
 
     # Email / phone lookups
     if target_type in ("email", "phone"):
@@ -73,8 +81,12 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
             darkweb_search(target),
             return_exceptions=True,
         )
-        results["intelx"] = breach_results[0] if isinstance(breach_results[0], list) else []
-        results["darkweb"] = breach_results[1] if isinstance(breach_results[1], list) else []
+        results["intelx"] = (
+            breach_results[0] if isinstance(breach_results[0], list) else []
+        )
+        results["darkweb"] = (
+            breach_results[1] if isinstance(breach_results[1], list) else []
+        )
 
     # Username identity resolution
     if target_type in ("username", "email"):
@@ -92,5 +104,7 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
         "modules_run": [k for k in results if k != "_meta"],
     }
 
-    logger.info(f"Intelligence sweep complete for {target} ({target_type}): {total_findings} findings")
+    logger.info(
+        f"Intelligence sweep complete for {target} ({target_type}): {total_findings} findings"
+    )
     return results

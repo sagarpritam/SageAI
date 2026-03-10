@@ -3,10 +3,11 @@ SageAI 2.0 — ReconAgent
 Responsible for all reconnaissance: subdomain enumeration, DNS resolution,
 asset fingerprinting, and building the initial attack surface map.
 """
+
 import logging
 import asyncio
 import socket
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from app.services.llm.gateway import llm_gateway
 from app.services import crtsh_client, dns_scanner, shodan_client
@@ -82,12 +83,15 @@ class ReconAgent:
                 return host, {}
 
         sem = asyncio.Semaphore(8)
+
         async def bounded_enrich(h):
             async with sem:
                 return await enrich(h)
 
         top_hosts = list(subdomains)[:15]
-        results = await asyncio.gather(*[bounded_enrich(h) for h in top_hosts], return_exceptions=True)
+        results = await asyncio.gather(
+            *[bounded_enrich(h) for h in top_hosts], return_exceptions=True
+        )
         for r in results:
             if not isinstance(r, Exception):
                 host, data = r
@@ -98,7 +102,9 @@ class ReconAgent:
         shodan_summary = {
             host: {
                 "ip": d.get("ip"),
-                "ports": [f.get("ports", []) for f in d.get("shodan", []) if "ports" in str(f)][:1],
+                "ports": [
+                    f.get("ports", []) for f in d.get("shodan", []) if "ports" in str(f)
+                ][:1],
             }
             for host, d in list(shodan_entries.items())[:8]
         }
@@ -114,6 +120,7 @@ class ReconAgent:
                 prompt, system_message=RECON_SYSTEM, org_id=self.org_id
             )
             import json
+
             cleaned = ai_response.replace("```json", "").replace("```", "").strip()
             ai_summary = json.loads(cleaned)
         except Exception as e:

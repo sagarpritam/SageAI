@@ -20,7 +20,7 @@ logger = logging.getLogger("SageAI.sast_scanner")
 class SASTScanner(BaseTool):
     """
     Static Analysis Security Testing tool.
-    Clones a GitHub repository and runs Bandit to find vulnerabilities 
+    Clones a GitHub repository and runs Bandit to find vulnerabilities
     in Python source code, returning exact file paths and line numbers.
     """
 
@@ -39,7 +39,7 @@ class SASTScanner(BaseTool):
     async def run(self, target: str, **kwargs) -> Dict[str, Any]:
         """
         Run SAST scan on a GitHub repository.
-        
+
         Args:
             target: GitHub repo in 'owner/repo' format (e.g., 'sagarpritam/my-app')
             **kwargs:
@@ -48,37 +48,52 @@ class SASTScanner(BaseTool):
         """
         github_token = kwargs.get("github_token", "")
         branch = kwargs.get("branch", "main")
-        
+
         owner_repo = target.strip("/")
         if "/" not in owner_repo:
-            return {"error": f"Invalid repo format. Expected 'owner/repo', got '{target}'"}
+            return {
+                "error": f"Invalid repo format. Expected 'owner/repo', got '{target}'"
+            }
 
         tmp_dir = tempfile.mkdtemp(prefix="sageai_sast_")
-        
+
         try:
             # Clone the repository
             if github_token:
-                clone_url = f"https://x-access-token:{github_token}@github.com/{owner_repo}.git"
+                clone_url = (
+                    f"https://x-access-token:{github_token}@github.com/{owner_repo}.git"
+                )
             else:
                 clone_url = f"https://github.com/{owner_repo}.git"
 
             logger.info(f"Cloning {owner_repo} (branch: {branch}) for SAST scan...")
             result = subprocess.run(
-                ["git", "clone", "--depth", "1", "--branch", branch, clone_url, tmp_dir],
-                capture_output=True, text=True, timeout=60
+                [
+                    "git",
+                    "clone",
+                    "--depth",
+                    "1",
+                    "--branch",
+                    branch,
+                    clone_url,
+                    tmp_dir,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
             )
             if result.returncode != 0:
                 return {"error": f"Failed to clone repository: {result.stderr.strip()}"}
 
             # Run Bandit (Python SAST)
             findings = await self._run_bandit(tmp_dir, owner_repo)
-            
+
             return {
                 "repository": owner_repo,
                 "branch": branch,
                 "scanner": "bandit",
                 "total_findings": len(findings),
-                "findings": findings
+                "findings": findings,
             }
 
         except subprocess.TimeoutExpired:
@@ -94,8 +109,17 @@ class SASTScanner(BaseTool):
         """Run Bandit on the cloned repository and parse JSON output."""
         try:
             result = subprocess.run(
-                ["bandit", "-r", repo_path, "-f", "json", "-ll"],  # -ll = medium+ severity
-                capture_output=True, text=True, timeout=120
+                [
+                    "bandit",
+                    "-r",
+                    repo_path,
+                    "-f",
+                    "json",
+                    "-ll",
+                ],  # -ll = medium+ severity
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
         except FileNotFoundError:
             logger.warning("Bandit is not installed. Install with: pip install bandit")
@@ -109,7 +133,7 @@ class SASTScanner(BaseTool):
         try:
             data = json.loads(result.stdout)
         except json.JSONDecodeError:
-            logger.error(f"Failed to parse Bandit output")
+            logger.error("Failed to parse Bandit output")
             return []
 
         findings = []
@@ -120,18 +144,20 @@ class SASTScanner(BaseTool):
                 file_path = file_path.replace(repo_path + os.sep, "")
                 file_path = file_path.replace("\\", "/")  # Normalize to forward slashes
 
-            findings.append({
-                "file": file_path,
-                "line": item.get("line_number"),
-                "col": item.get("col_offset", 0),
-                "severity": item.get("issue_severity", "UNKNOWN"),
-                "confidence": item.get("issue_confidence", "UNKNOWN"),
-                "test_id": item.get("test_id", ""),
-                "test_name": item.get("test_name", ""),
-                "issue_text": item.get("issue_text", ""),
-                "code": item.get("code", ""),
-                "cwe": item.get("issue_cwe", {}).get("id", None),
-                "more_info": item.get("more_info", "")
-            })
+            findings.append(
+                {
+                    "file": file_path,
+                    "line": item.get("line_number"),
+                    "col": item.get("col_offset", 0),
+                    "severity": item.get("issue_severity", "UNKNOWN"),
+                    "confidence": item.get("issue_confidence", "UNKNOWN"),
+                    "test_id": item.get("test_id", ""),
+                    "test_name": item.get("test_name", ""),
+                    "issue_text": item.get("issue_text", ""),
+                    "code": item.get("code", ""),
+                    "cwe": item.get("issue_cwe", {}).get("id", None),
+                    "more_info": item.get("more_info", ""),
+                }
+            )
 
         return findings

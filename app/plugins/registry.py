@@ -8,6 +8,7 @@ Supports:
   - Category-based filtering
   - Plan-gating (free/pro/enterprise plugins)
 """
+
 import importlib
 import inspect
 import logging
@@ -30,6 +31,7 @@ def _auto_discover():
         return
 
     import app.plugins as plugin_pkg
+
     for _, module_name, is_pkg in pkgutil.iter_modules(plugin_pkg.__path__):
         if module_name in ("base", "registry") or is_pkg:
             continue
@@ -44,9 +46,13 @@ def _auto_discover():
                     try:
                         instance = obj()
                         _REGISTRY[instance.name] = instance
-                        logger.info(f"[PluginRegistry] Loaded: {instance.meta.name} v{instance.meta.version}")
+                        logger.info(
+                            f"[PluginRegistry] Loaded: {instance.meta.name} v{instance.meta.version}"
+                        )
                     except Exception as e:
-                        logger.warning(f"[PluginRegistry] Failed to instantiate {obj.__name__}: {e}")
+                        logger.warning(
+                            f"[PluginRegistry] Failed to instantiate {obj.__name__}: {e}"
+                        )
         except Exception as e:
             logger.warning(f"[PluginRegistry] Failed to load module {module_name}: {e}")
 
@@ -103,6 +109,7 @@ async def run_plugin(name: str, target: str, **kwargs) -> Optional[PluginResult]
     except Exception as e:
         logger.error(f"[PluginRegistry] Plugin '{name}' failed on {target}: {e}")
         from app.plugins.base import PluginResult
+
         return PluginResult(name, target, [], error=str(e))
 
 
@@ -114,6 +121,7 @@ async def run_all_plugins(
 ) -> List[PluginResult]:
     """Run all plugins (or filtered by category/plan) against a target."""
     import asyncio
+
     _auto_discover()
 
     plugins = list(_REGISTRY.values())
@@ -121,7 +129,11 @@ async def run_all_plugins(
         plugins = [p for p in plugins if p.category == category]
 
     plan_order = {"free": 0, "pro": 1, "enterprise": 2}
-    plugins = [p for p in plugins if plan_order.get(p.meta.min_plan, 0) <= plan_order.get(plan, 0)]
+    plugins = [
+        p
+        for p in plugins
+        if plan_order.get(p.meta.min_plan, 0) <= plan_order.get(plan, 0)
+    ]
 
     if not plugins:
         return []

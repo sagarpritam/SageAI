@@ -11,13 +11,14 @@ The LLM traverses this graph to answer:
 
 No Neo4j required — PostgreSQL's JSONB gives us graph-like queries.
 """
+
 import json
 import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
-from sqlalchemy import Column, String, Text, DateTime, Float, func, select
+from sqlalchemy import Column, String, Text, DateTime, Float, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import Base
@@ -29,28 +30,38 @@ logger = logging.getLogger("SageAI.knowledge_graph")
 # ── DB Model ──────────────────────────────────────────────────────────
 class GraphNode(Base):
     """Represents a node in the security knowledge graph."""
+
     __tablename__ = "kg_nodes"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     org_id = Column(String, nullable=False)
-    node_type = Column(String, nullable=False)   # asset | technology | vulnerability | cve | network_zone
-    label = Column(String, nullable=False)        # human-readable name
-    properties = Column(Text, default="{}")       # JSON blob
+    node_type = Column(
+        String, nullable=False
+    )  # asset | technology | vulnerability | cve | network_zone
+    label = Column(String, nullable=False)  # human-readable name
+    properties = Column(Text, default="{}")  # JSON blob
     risk_score = Column(Float, default=0.0)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
 
 class GraphEdge(Base):
     """Represents a directed edge between two graph nodes."""
+
     __tablename__ = "kg_edges"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     org_id = Column(String, nullable=False)
-    source_id = Column(String, nullable=False)   # FK to kg_nodes.id
-    target_id = Column(String, nullable=False)   # FK to kg_nodes.id
-    edge_type = Column(String, nullable=False)   # HOSTS | RUNS | HAS_VULN | LEADS_TO | EXPOSES
-    weight = Column(Float, default=1.0)          # higher = more dangerous path
+    source_id = Column(String, nullable=False)  # FK to kg_nodes.id
+    target_id = Column(String, nullable=False)  # FK to kg_nodes.id
+    edge_type = Column(
+        String, nullable=False
+    )  # HOSTS | RUNS | HAS_VULN | LEADS_TO | EXPOSES
+    weight = Column(Float, default=1.0)  # higher = more dangerous path
     properties = Column(Text, default="{}")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -107,7 +118,9 @@ class SecurityKnowledgeGraph:
         Build/update the knowledge graph from scan results.
         Returns attack paths computed by AI.
         """
-        logger.info(f"[KnowledgeGraph] Building graph for {target} ({len(assets)} assets, {len(findings)} findings)")
+        logger.info(
+            f"[KnowledgeGraph] Building graph for {target} ({len(assets)} assets, {len(findings)} findings)"
+        )
 
         # Extract technologies from findings
         technologies = set()
@@ -118,25 +131,45 @@ class SecurityKnowledgeGraph:
             sev = f.get("severity", "Info")
 
             # Extract tech hints from finding
-            for tech_keyword in ["nginx", "apache", "wordpress", "jenkins", "react", "nodejs",
-                                 "mysql", "postgresql", "redis", "mongodb", "elasticsearch",
-                                 "php", "python", "java", "ruby", "docker", "kubernetes"]:
+            for tech_keyword in [
+                "nginx",
+                "apache",
+                "wordpress",
+                "jenkins",
+                "react",
+                "nodejs",
+                "mysql",
+                "postgresql",
+                "redis",
+                "mongodb",
+                "elasticsearch",
+                "php",
+                "python",
+                "java",
+                "ruby",
+                "docker",
+                "kubernetes",
+            ]:
                 if tech_keyword.lower() in (evidence + vuln_type).lower():
                     technologies.add(tech_keyword)
 
-            vulnerabilities.append({
-                "type": vuln_type,
-                "severity": sev,
-                "confirmed": f.get("confirmed", False),
-                "host": target,
-            })
+            vulnerabilities.append(
+                {
+                    "type": vuln_type,
+                    "severity": sev,
+                    "confirmed": f.get("confirmed", False),
+                    "host": target,
+                }
+            )
 
         # Persist to DB if available
         if self.db:
             await self._persist_nodes(target, assets, findings, technologies)
 
         # AI attack path analysis
-        attack_paths = await self._compute_attack_paths(target, assets, vulnerabilities, technologies)
+        attack_paths = await self._compute_attack_paths(
+            target, assets, vulnerabilities, technologies
+        )
 
         return {
             "target": target,
@@ -171,7 +204,13 @@ class SecurityKnowledgeGraph:
 
             # Create vulnerability nodes
             for finding in findings:
-                sev_score = {"Critical": 9.0, "High": 7.0, "Medium": 5.0, "Low": 2.0, "Info": 0.5}
+                sev_score = {
+                    "Critical": 9.0,
+                    "High": 7.0,
+                    "Medium": 5.0,
+                    "Low": 2.0,
+                    "Info": 0.5,
+                }
                 node = GraphNode(
                     org_id=self.org_id,
                     node_type="vulnerability",
@@ -223,37 +262,43 @@ class SecurityKnowledgeGraph:
         high = [v for v in vulnerabilities if v.get("severity") == "High"]
 
         if critical:
-            paths.append({
-                "path": f"Internet → {target} → {critical[0]['type']} → Full Compromise",
-                "risk_level": "Critical",
-                "entry_point": target,
-                "pivot_points": [],
-                "final_impact": "Full system compromise",
-                "likelihood": "High",
-                "cvss_estimate": 9.5,
-            })
+            paths.append(
+                {
+                    "path": f"Internet → {target} → {critical[0]['type']} → Full Compromise",
+                    "risk_level": "Critical",
+                    "entry_point": target,
+                    "pivot_points": [],
+                    "final_impact": "Full system compromise",
+                    "likelihood": "High",
+                    "cvss_estimate": 9.5,
+                }
+            )
 
         if high:
-            paths.append({
-                "path": f"Internet → {target} → {high[0]['type']} → Data Exfiltration",
-                "risk_level": "High",
-                "entry_point": target,
-                "pivot_points": [],
-                "final_impact": "Data exfiltration or privilege escalation",
-                "likelihood": "Medium",
-                "cvss_estimate": 7.5,
-            })
+            paths.append(
+                {
+                    "path": f"Internet → {target} → {high[0]['type']} → Data Exfiltration",
+                    "risk_level": "High",
+                    "entry_point": target,
+                    "pivot_points": [],
+                    "final_impact": "Data exfiltration or privilege escalation",
+                    "likelihood": "Medium",
+                    "cvss_estimate": 7.5,
+                }
+            )
 
         if len(assets) > 3:
-            paths.append({
-                "path": f"Internet → {assets[0]} → Lateral Movement → {assets[-1]}",
-                "risk_level": "Medium",
-                "entry_point": assets[0],
-                "pivot_points": assets[1:-1][:2],
-                "final_impact": "Internal network lateral movement",
-                "likelihood": "Medium",
-                "cvss_estimate": 5.5,
-            })
+            paths.append(
+                {
+                    "path": f"Internet → {assets[0]} → Lateral Movement → {assets[-1]}",
+                    "risk_level": "Medium",
+                    "entry_point": assets[0],
+                    "pivot_points": assets[1:-1][:2],
+                    "final_impact": "Internal network lateral movement",
+                    "likelihood": "Medium",
+                    "cvss_estimate": 5.5,
+                }
+            )
 
         return paths
 
@@ -264,7 +309,10 @@ class SecurityKnowledgeGraph:
         try:
             result = await self.db.execute(
                 select(GraphNode)
-                .where(GraphNode.org_id == self.org_id, GraphNode.node_type == "vulnerability")
+                .where(
+                    GraphNode.org_id == self.org_id,
+                    GraphNode.node_type == "vulnerability",
+                )
                 .order_by(GraphNode.risk_score.desc())
                 .limit(20)
             )
