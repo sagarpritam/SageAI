@@ -42,7 +42,7 @@ class CloudScannerPlugin(SecurityPlugin):
         findings = []
         metadata = {"host": host}
 
-        async with httpx.AsyncClient(timeout=6, verify=False, follow_redirects=False) as client:
+        async with httpx.AsyncClient(timeout=6, verify=False, follow_redirects=False) as client:  # nosec B501
             # Check exposed S3 buckets
             bucket_tasks = []
             for pattern in S3_PATTERNS[:5]:

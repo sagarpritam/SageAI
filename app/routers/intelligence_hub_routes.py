@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import logging
 
-from app.core.auth import get_current_user
+from app.core.security import get_current_user
 
 logger = logging.getLogger("sageai.routes.intelligence")
 router = APIRouter(prefix="/intelligence", tags=["Intelligence Hub"])
