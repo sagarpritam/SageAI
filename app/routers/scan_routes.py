@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from uuid import UUID
@@ -18,12 +18,15 @@ from app.schemas.scan import (
 from app.services.scanner_service import run_all_scans
 from app.services.risk_engine import calculate_risk
 from app.services.subscription import check_scan_limit
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/scan", tags=["Scanning"])
 
 
 @router.post("", response_model=ScanResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute")
 async def create_scan(
+    request: Request,
     payload: ScanRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
