@@ -6,13 +6,16 @@ Docs: https://nvd.nist.gov/developers/vulnerabilities
 """
 
 import logging
+
 import httpx
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger("sageai.nvd")
 
 NVD_API = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
 async def search_cves(keyword: str, max_results: int = 5) -> list[dict]:
     """Search NVD for CVEs matching a keyword (e.g., 'apache 2.4', 'nginx', 'openssl')."""
     findings = []

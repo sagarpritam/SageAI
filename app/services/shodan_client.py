@@ -8,13 +8,16 @@ Docs: https://internetdb.shodan.io/
 
 import logging
 import socket
+
 import httpx
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger("sageai.shodan")
 
 SHODAN_API = "https://internetdb.shodan.io"
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
 async def lookup_ip(hostname: str) -> list[dict]:
     """Look up an IP in Shodan InternetDB for known ports, vulns, and services."""
     findings = []

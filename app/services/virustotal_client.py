@@ -7,13 +7,16 @@ Requires free API key (500 requests/day): https://www.virustotal.com/gui/join-us
 import os
 import logging
 import base64
+
 import httpx
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger("sageai.virustotal")
 
 VT_API = "https://www.virustotal.com/api/v3"
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
 async def check_url_reputation(url: str) -> list[dict]:
     """Check a URL's reputation on VirusTotal (70+ security vendors)."""
     findings = []
