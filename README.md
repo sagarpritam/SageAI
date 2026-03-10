@@ -1,16 +1,16 @@
-﻿# 🛡️ SageAI 3.0 — AI-Powered Enterprise Security & OSINT Platform
+﻿# 🛡️ SageAI — AI-Powered Enterprise Security & OSINT Platform
 
-> **SageAI 3.0** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, Bug Bounty, and **Advanced OSINT Intelligence** — powered by FastAPI, React, and a Multi-Agent AI architecture with 9 integrated intelligence modules.
+> **SageAI** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, Bug Bounty, and **Advanced OSINT Intelligence** — powered by FastAPI, React, and a Multi-Agent AI architecture with 9 integrated intelligence modules.
 
 [![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)](tests/)
-[![Version](https://img.shields.io/badge/version-3.0.0-blueviolet)](#)
+[![Version](https://img.shields.io/badge/version-latest-blueviolet)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20SQLAlchemy-informational)](#)
-[![Modules](https://img.shields.io/badge/intelligence-9%20OSINT%20modules-ff6b6b)](#-intelligence-hub-v30--9-osint-modules)
+[![Modules](https://img.shields.io/badge/intelligence-9%20OSINT%20modules-ff6b6b)](#-intelligence-hub--9-osint-modules)
 
 ---
 
-## 🔥 What's New in v3.0
+## 🔥 Core Capabilities
 
 | Feature | Description |
 |---------|-------------|
@@ -44,7 +44,7 @@
 
 ---
 
-## 🕵️ Intelligence Hub v3.0 — 9 OSINT Modules
+## 🕵️ Intelligence Hub — 9 OSINT Modules
 
 Every module works **immediately without API keys** using free/open-source alternatives. Add premium keys anytime for enhanced capabilities.
 
@@ -176,7 +176,7 @@ Spins up **7 services**:
 
 ---
 
-## 📡 API Reference (v3.0 — 64+ Endpoints)
+## 📡 API Reference (64+ Endpoints)
 
 ### Core
 | Method | Endpoint | Description |
@@ -203,7 +203,7 @@ Spins up **7 services**:
 | `GET` | `/scan/{id}/findings` | Get granular findings |
 | `WS` | `/ws/scan/{id}` | Real-time scan progress |
 
-### Intelligence Hub (NEW v3.0)
+### Intelligence Hub
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/intelligence/sweep` | Full 9-module intelligence sweep |
@@ -403,7 +403,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
   <strong>Built with ❤️ for the security community</strong><br>
-  <sub>SageAI 3.0 — From Attack Surface Discovery to Intelligence Hub to Bug Bounty Report in minutes</sub><br><br>
+  <sub>SageAI — From Attack Surface Discovery to Intelligence Hub to Bug Bounty Report in minutes</sub><br><br>
   <em>These tools aren't just for "research." They are for power.<br>
   In 2026, you are either the Hunter or the Data Point.<br>
   <strong>SECURE YOUR SHADOW.</strong></em>
