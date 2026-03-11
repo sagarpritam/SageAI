@@ -11,6 +11,7 @@ from app.core.database import get_db
 from app.core.security import hash_password
 from app.models.user import User
 from app.services.email_service import email_service
+from app.schemas.responses import MessageResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 _reset_tokens: dict[str, dict] = {}
 
 
-@router.post("/forgot-password")
+@router.post("/forgot-password", response_model=MessageResponse)
 async def forgot_password(email: str, db: AsyncSession = Depends(get_db)):
     """Send a password reset link to the user's email."""
     result = await db.execute(select(User).where(User.email == email))
@@ -45,7 +46,7 @@ async def forgot_password(email: str, db: AsyncSession = Depends(get_db)):
     return {"message": "If that email exists, a reset link has been sent"}
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=MessageResponse)
 async def reset_password(
     token: str,
     new_password: str,
