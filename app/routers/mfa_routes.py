@@ -17,11 +17,12 @@ from app.services.mfa_service import (
     verify_totp,
     generate_backup_codes,
 )
+from app.schemas.responses import MFASetupResponse, MFAStateResponse
 
 router = APIRouter(prefix="/auth/mfa", tags=["Multi-Factor Auth"])
 
 
-@router.post("/setup")
+@router.post("/setup", response_model=MFASetupResponse)
 async def setup_mfa(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -52,7 +53,7 @@ async def setup_mfa(
     }
 
 
-@router.post("/verify")
+@router.post("/verify", response_model=MFAStateResponse)
 async def verify_mfa(
     code: str,
     current_user: dict = Depends(get_current_user),
@@ -75,7 +76,7 @@ async def verify_mfa(
     return {"message": "MFA activated successfully", "mfa_enabled": True}
 
 
-@router.post("/disable")
+@router.post("/disable", response_model=MFAStateResponse)
 async def disable_mfa(
     code: str,
     current_user: dict = Depends(get_current_user),
