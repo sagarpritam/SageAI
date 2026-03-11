@@ -25,6 +25,19 @@ async def test_register_duplicate_email(client):
 
 
 @pytest.mark.asyncio
+async def test_register_weak_password(client):
+    payload = {"email": "weak@test.com", "password": "weak", "organization_name": "OrgWeak"}
+    r = await client.post("/auth/register", json=payload)
+    assert r.status_code == 422
+    assert "Password must be at least 8 characters long" in r.text
+
+    payload2 = {"email": "weak2@test.com", "password": "onlylowercase!", "organization_name": "OrgWeak"}
+    r2 = await client.post("/auth/register", json=payload2)
+    assert r2.status_code == 422
+    assert "Password must contain at least one uppercase letter" in r2.text
+
+
+@pytest.mark.asyncio
 async def test_login_success(client):
     await client.post("/auth/register", json={
         "email": "login@test.com",
