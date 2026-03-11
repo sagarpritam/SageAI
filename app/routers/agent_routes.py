@@ -15,6 +15,13 @@ from app.core.security import get_current_user
 from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
 from app.services.knowledge_graph import SecurityKnowledgeGraph
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
+from app.schemas.responses import (
+    AsyncAssessmentResponse,
+    AgentListResponse,
+    AttackPathResponse,
+    PluginListingResponse,
+    PluginRunAllResponse,
+)
 
 router = APIRouter(prefix="/agents", tags=["Multi-Agent AI"])
 logger = logging.getLogger("SageAI.agent_routes")
@@ -69,7 +76,7 @@ async def run_assessment(
         raise HTTPException(status_code=500, detail=f"Assessment failed: {str(e)}")
 
 
-@router.post("/assess/async", summary="Start Async Assessment (Background)")
+@router.post("/assess/async", summary="Start Async Assessment (Background)", response_model=AsyncAssessmentResponse)
 async def run_assessment_async(
     req: AssessmentRequest,
     background_tasks: BackgroundTasks,
@@ -92,7 +99,7 @@ async def run_assessment_async(
     }
 
 
-@router.get("/status", summary="List Available Agents")
+@router.get("/status", summary="List Available Agents", response_model=AgentListResponse)
 async def list_agents(current_user: User = Depends(get_current_user)):
     """Returns the list of AI agents available in the system."""
     return {
@@ -130,7 +137,7 @@ async def list_agents(current_user: User = Depends(get_current_user)):
 # ── Knowledge Graph Routes ─────────────────────────────────────────
 
 
-@router.get("/graph/paths", summary="Get Attack Paths from Knowledge Graph")
+@router.get("/graph/paths", summary="Get Attack Paths from Knowledge Graph", response_model=AttackPathResponse)
 async def get_attack_paths(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -145,7 +152,7 @@ async def get_attack_paths(
 # ── Plugin Marketplace Routes ──────────────────────────────────────
 
 
-@router.get("/plugins", summary="Plugin Marketplace Listing")
+@router.get("/plugins", summary="Plugin Marketplace Listing", response_model=PluginListingResponse)
 async def list_plugins(current_user: User = Depends(get_current_user)):
     """Lists all available security plugins with metadata."""
     plugins = get_marketplace_listing()
@@ -177,7 +184,7 @@ async def run_plugin_endpoint(
     return result.to_dict()
 
 
-@router.post("/plugins/run-all", summary="Run All Plugins Against a Target")
+@router.post("/plugins/run-all", summary="Run All Plugins Against a Target", response_model=PluginRunAllResponse)
 async def run_all_plugins_endpoint(
     target: str,
     category: Optional[str] = None,
