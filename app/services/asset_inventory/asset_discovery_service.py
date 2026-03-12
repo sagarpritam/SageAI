@@ -77,9 +77,7 @@ async def _probe_http(subdomain: str) -> Tuple[int | None, str | None, List[str]
     for scheme in ["https", "http"]:
         url = f"{scheme}://{subdomain}"
         try:
-            async with httpx.AsyncClient(
-                timeout=8, follow_redirects=True, verify=False
-            ) as client:  # nosec B501
+            async with get_http_client(follow_redirects=True, timeout=8) as client:
                 resp = await client.get(url)
                 status = resp.status_code
 

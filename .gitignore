@@ -38,6 +38,10 @@ frontend/.env
 docker/*.log
 
 # Testing
+bandit_high*.txt
+bandit*.log
+flake8.log
+git_diff.txt
 htmlcov/
 .coverage
 .pytest_cache/

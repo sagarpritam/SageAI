@@ -10,10 +10,10 @@ cache:
 stages:
   - lint
   - test
+  - security
 
 before_script:
-  - python -m venv .venv
-  - source .venv/bin/activate
+  # Virtualenvs add unnecessary overhead in CI; use the image's system python.
   - pip install --upgrade pip
   - pip install -r requirements-dev.txt
 
@@ -21,6 +21,7 @@ lint:
   stage: lint
   script:
     - ruff check .
+    - ruff format --check .
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -28,8 +29,18 @@ lint:
 test:
   stage: test
   script:
-    - pip install -r requirements.txt
+    # Install the application (runtime) dependencies directly from pyproject.toml
+    - pip install .
     - pytest tests/ -v
+  security:
+    stage: security
+    script:
+      - pip install bandit
+      - bandit -r . -ll
+    allow_failure: false
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "push"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

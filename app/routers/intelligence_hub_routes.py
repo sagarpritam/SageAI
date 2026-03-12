@@ -1,33 +1,27 @@
-"""Intelligence Routes — API endpoints for the OSINT Intelligence Hub.
 
-Provides endpoints for running intelligence sweeps, individual module
-lookups, and retrieving the entity relationship graph.
-"""
+"""Intelligence Hub router."""
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
-import logging
+# ────────────────────── Standard library ──────────────────────
+from typing import List
 
+# ────────────────────── Third‑party ──────────────────────
+from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+
+# ────────────────────── Local imports ──────────────────────
+from app.schemas.intelligence import (
+    IntelligenceSweepResponse,
+    LinkAnalysisResponse,
+    ModuleListResponse,
+    ModuleScanResponse,
+)
 from app.core.security import get_current_user
 
-logger = logging.getLogger("sageai.routes.intelligence")
-router = APIRouter(prefix="/intelligence", tags=["Intelligence Hub"])
+router = APIRouter()
 
-
-# ── Request / Response Models ─────────────────────
-
-
-class IntelligenceSweepRequest(BaseModel):
-    target: str = Field(..., description="Domain, IP, email, username, or phone number")
-    target_type: str = Field(
-        default="domain",
-        description="Type of target: domain, ip, email, username, phone",
-    )
-
-
-class ModuleScanRequest(BaseModel):
-    target: str
-    target_type: str = "domain"
+# NOTE: The duplicate Pydantic model definitions that previously existed
+# further down in this file have been removed.  The imported models from
+# ``app.schemas.intelligence`` are now the single source of truth.
 
 
 # ── Full Sweep ────────────────────────────────────

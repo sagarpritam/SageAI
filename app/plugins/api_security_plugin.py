@@ -63,9 +63,7 @@ class APISecurityPlugin(SecurityPlugin):
         findings = []
         metadata = {"host": host, "api_paths_checked": len(API_DOC_PATHS)}
 
-        async with httpx.AsyncClient(
-            timeout=7, verify=False, follow_redirects=True
-        ) as client:  # nosec B501
+            async with get_http_client(follow_redirects=True, timeout=7) as client:
             # Check for exposed API documentation
             doc_tasks = [
                 self._check_api_doc(client, base_url + path) for path in API_DOC_PATHS

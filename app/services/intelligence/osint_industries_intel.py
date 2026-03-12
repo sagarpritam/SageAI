@@ -118,11 +118,9 @@ async def _check_email(email: str) -> list[dict]:
 
         # 3. Gravatar lookup
         try:
-            import hashlib
+            from app.utils.hash import deterministic_sha256
 
-            email_hash = hashlib.md5(
-                email.lower().strip().encode(), usedforsecurity=False
-            ).hexdigest()
+            email_hash = deterministic_sha256(email.lower().strip())
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(f"https://en.gravatar.com/{email_hash}.json")
                 if resp.status_code == 200:
