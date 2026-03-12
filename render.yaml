@@ -31,7 +31,7 @@ services:
       - key: RATE_LIMIT
         value: 60/minute
       - key: PYTHON_VERSION
-        value: 3.13.0
+        value: 3.11.0
 
   # React Frontend (Static Site)
   - type: web

@@ -6,7 +6,7 @@ react-force-graph or vis.js.
 """
 
 import logging
-import hashlib
+from app.utils.hash import deterministic_sha256
 
 logger = logging.getLogger("sageai.intelligence.link_analysis")
 
@@ -22,9 +22,7 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
     edges = []
 
     def _node_id(label: str) -> str:
-        return hashlib.md5(label.lower().encode(), usedforsecurity=False).hexdigest()[
-            :12
-        ]
+        return deterministic_sha256(label.lower(), length=12)
 
     def _add_node(
         label: str, node_type: str, severity: str = "info", extra_data: dict = None

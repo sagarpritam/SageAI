@@ -1,0 +1,46 @@
+image: python:3.11-slim
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+stages:
+  - lint
+  - test
+  - security
+
+before_script:
+  # Virtualenvs add unnecessary overhead in CI; use the image's system python.
+  - pip install --upgrade pip
+  - pip install -r requirements-dev.txt
+
+lint:
+  stage: lint
+  script:
+    - ruff check .
+    - ruff format --check .
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+test:
+  stage: test
+  script:
+    # Install the application (runtime) dependencies directly from pyproject.toml
+    - pip install .
+    - pytest tests/ -v
+  security:
+    stage: security
+    script:
+      - pip install bandit
+      - bandit -r . -ll
+    allow_failure: false
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "push"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

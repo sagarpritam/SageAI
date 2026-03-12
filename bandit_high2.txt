@@ -1,0 +1,9 @@
+app/plugins\api_security_plugin.py:46 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/plugins\cloud_scanner_plugin.py:45 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/services\agent\exploit_agent.py:55 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/services\agent\exploit_agent.py:71 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/services\agent\exploit_agent.py:86 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/services\asset_inventory\asset_discovery_service.py:54 Call to httpx with verify=False disabling SSL certificate checks, security issue.
+app/services\intelligence\link_analysis.py:25 Use of weak MD5 hash for security. Consider usedforsecurity=False
+app/services\intelligence\osint_industries_intel.py:107 Use of weak MD5 hash for security. Consider usedforsecurity=False
+app/services\tools\github_pr_tool.py:23 Use of weak MD5 hash for security. Consider usedforsecurity=False
