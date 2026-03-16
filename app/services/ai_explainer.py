@@ -168,34 +168,27 @@ REMEDIATION = {
 # ---------------------
 # OpenAI Integration
 # ---------------------
+# ---------------------
+# OpenAI / NVIDIA Integration
+# ---------------------
 async def ai_explain_finding(
-    finding_type: str, context: str = "", org_id: str = ""
+    finding_type: str, 
+    context: str = "", 
+    org_id: str = "",
+    provider: str = None
 ) -> dict | None:
-    """Use OpenAI GPT to generate a detailed vulnerability explanation.
+    """Use AI to generate a detailed vulnerability explanation.
 
     Protected by circuit breaker + prompt injection sanitization + token tracking.
-    Returns None if OpenAI is not configured, circuit is open, or call fails.
+    Returns None if no LLM configured or call fails.
     """
-    from app.services.ai_resilience import (
-        openai_breaker,
-        sanitize_for_llm,
-        token_tracker,
-    )
+    from app.services.llm.gateway import llm_gateway
+    from app.services.ai_resilience import sanitize_for_llm
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        return None
-
-    # Circuit breaker check
-    if openai_breaker.is_open():
-        logger.warning("OpenAI circuit breaker is OPEN — skipping AI call")
-        return None
-
-    # Budget check
-    if org_id and not token_tracker.check_budget(org_id):
-        logger.warning(f"Org {org_id} exceeded AI budget — skipping")
-        return None
-
+    # Choose provider (prefer NVIDIA if key exists and not specified)
+    from app.core.config import settings
+    llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
+    
     # Sanitize inputs
     safe_type = sanitize_for_llm(finding_type, max_length=200)
     safe_context = sanitize_for_llm(context, max_length=1000)
@@ -213,66 +206,39 @@ Additional context: {safe_context or "None"}
 Respond in JSON format with keys: summary, detail, impact, severity (Critical/High/Medium/Low), remediation_steps (array of strings), owasp_id, owasp_category"""
 
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.3,
-                    "response_format": {"type": "json_object"},
-                },
-            )
-
-            if response.status_code == 200:
-                import json
-
-                data = response.json()
-                content = data["choices"][0]["message"]["content"]
-                # Track tokens
-                usage = data.get("usage", {})
-                if org_id and usage:
-                    token_tracker.record_usage(
-                        org_id,
-                        usage.get("prompt_tokens", 0),
-                        usage.get("completion_tokens", 0),
-                    )
-                openai_breaker.record_success()
-                return json.loads(content)
-            else:
-                logger.warning(f"OpenAI API error: {response.status_code}")
-                openai_breaker.record_failure()
-                return None
+        raw_content = await llm_gateway.generate(
+            prompt=prompt,
+            provider=llm_provider,
+            org_id=org_id,
+            temperature=0.3,
+            response_format={"type": "json_object"} if llm_provider == "openai" else None
+        )
+        
+        if not raw_content:
+            return None
+            
+        import json
+        return json.loads(raw_content)
 
     except Exception as e:
-        logger.error(f"OpenAI request failed: {e}")
-        openai_breaker.record_failure()
+        logger.error(f"AI explained finding failed: {e}")
         return None
 
 
-async def ai_analyze_scan(findings: list[dict], org_id: str = "") -> dict | None:
+async def ai_analyze_scan(
+    findings: list[dict], 
+    org_id: str = "",
+    provider: str = None
+) -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
-    from app.services.ai_resilience import (
-        openai_breaker,
-        sanitize_findings_for_llm,
-        token_tracker,
-    )
+    from app.services.llm.gateway import llm_gateway
+    from app.services.ai_resilience import sanitize_findings_for_llm
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or not findings:
+    if not findings:
         return None
 
-    if openai_breaker.is_open():
-        logger.warning("OpenAI circuit breaker is OPEN — skipping AI scan analysis")
-        return None
-
-    if org_id and not token_tracker.check_budget(org_id):
-        logger.warning(f"Org {org_id} exceeded AI budget — skipping scan analysis")
-        return None
+    from app.core.config import settings
+    llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     # Sanitize findings before sending to LLM
     safe_findings = sanitize_findings_for_llm(findings[:20])
@@ -293,39 +259,21 @@ Provide a JSON response with:
 - overall_risk: Critical/High/Medium/Low"""
 
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.3,
-                    "response_format": {"type": "json_object"},
-                },
-            )
-
-            if response.status_code == 200:
-                import json
-
-                data = response.json()
-                usage = data.get("usage", {})
-                if org_id and usage:
-                    token_tracker.record_usage(
-                        org_id,
-                        usage.get("prompt_tokens", 0),
-                        usage.get("completion_tokens", 0),
-                    )
-                openai_breaker.record_success()
-                return json.loads(data["choices"][0]["message"]["content"])
-            openai_breaker.record_failure()
+        raw_content = await llm_gateway.generate(
+            prompt=prompt,
+            provider=llm_provider,
+            org_id=org_id,
+            temperature=0.3,
+            response_format={"type": "json_object"} if llm_provider == "openai" else None
+        )
+        
+        if not raw_content:
             return None
+            
+        import json
+        return json.loads(raw_content)
     except Exception as e:
         logger.error(f"AI scan analysis failed: {e}")
-        openai_breaker.record_failure()
         return None
 
 

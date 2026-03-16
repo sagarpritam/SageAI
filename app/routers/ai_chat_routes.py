@@ -20,6 +20,7 @@ router = APIRouter(prefix="/ai", tags=["AI Chat"])
 class ChatRequest(BaseModel):
     message: str
     context: Optional[Dict[str, Any]] = None
+    provider: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -35,7 +36,8 @@ async def ai_security_chat(
 ):
     """
     Chat endpoint for the AI Security Assistant.
-    Retrieves relevant cybersecurity knowledge via RAG, and optionally injects live scan context.
+    Retrieves relevant cybersecurity knowledge via RAG, 
+    and optionally injects live scan context.
     """
     user_msg = payload.message.strip()
     if not user_msg:
@@ -94,8 +96,14 @@ async def ai_security_chat(
 
         # Call LLM Gateway
         org_id = current_user.get("org", "system")
+        from app.core.config import settings
+        chat_provider = payload.provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
+        
         reply = await llm_gateway.generate(
-            prompt=user_msg, system_message=system_prompt, org_id=str(org_id)
+            prompt=user_msg, 
+            system_message=system_prompt, 
+            org_id=str(org_id),
+            provider=chat_provider
         )
 
         return ChatResponse(reply=reply, sources=sources)

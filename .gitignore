@@ -40,8 +40,11 @@ docker/*.log
 # Testing
 bandit_high*.txt
 bandit*.log
+bandit-report.json
 flake8.log
 git_diff.txt
+pytest_errors.log
+test_out.txt
 htmlcov/
 .coverage
 .pytest_cache/

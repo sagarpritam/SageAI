@@ -24,7 +24,11 @@ import httpx
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.utils.http_client import get_http_client
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.asset import Asset, AssetType, AssetStatus
+from app.models.asm_event import ASMEvent, ASMEventType, ASMEventSeverity
 from app.services import crtsh_client, shodan_client, dns_scanner
 
 logger = logging.getLogger("sageai.asset_discovery")
@@ -275,6 +279,21 @@ async def discover_assets(
 
             if changed:
                 updated_assets.append(existing.value)
+                
+                # Check for specific diffs to log events
+                new_ports = list(set(curr_ports) - set(prev_ports))
+                if new_ports:
+                    evt = ASMEvent(
+                        org_id=org_id,
+                        asset_id=existing.id,
+                        scan_id=scan_id,
+                        event_type=ASMEventType.new_port,
+                        severity=ASMEventSeverity.medium,
+                        title=f"New open ports discovered on {item['value']}",
+                        description=f"Detected new ports: {', '.join(map(str, new_ports))}",
+                        details=json.dumps({"new_ports": new_ports, "all_ports": curr_ports})
+                    )
+                    db.add(evt)
         else:
             # Create new asset
             new_asset = Asset(
@@ -297,6 +316,30 @@ async def discover_assets(
             )
             db.add(new_asset)
             new_assets.append(item["value"])
+            await db.flush() # ensure new_asset.id is populated
+            
+            # Emit ASM new asset record event
+            evt_type = (ASMEventType.new_subdomain if item["asset_type"] == AssetType.subdomain
+                        else ASMEventType.new_ip if item["asset_type"] == AssetType.ip
+                        else ASMEventType.new_service)
+            
+            evt_title = f"New {item['asset_type'].value} discovered: {item['value']}"
+            
+            evt = ASMEvent(
+                org_id=org_id,
+                asset_id=new_asset.id,
+                scan_id=scan_id,
+                event_type=evt_type,
+                severity=ASMEventSeverity.info,
+                title=evt_title,
+                description=f"A new {item['asset_type'].value} was found during continuous enumeration.",
+                details=json.dumps({
+                    "value": item["value"], 
+                    "ip": item.get("ip_address"),
+                    "ports": item.get("open_ports", [])
+                })
+            )
+            db.add(evt)
 
     await db.commit()
 

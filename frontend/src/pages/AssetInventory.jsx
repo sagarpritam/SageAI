@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import api from '../api';
+import api, { getAssetEvents } from '../api';
+import ASMEventCard from '../components/ASMEventCard';
 
 const ASSET_TYPE_COLORS = {
     domain: 'var(--brand-violet-light)',
@@ -72,16 +72,85 @@ function AssetCard({ asset }) {
                 </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                <span>First seen: {asset.first_seen ? new Date(asset.first_seen).toLocaleDateString() : '—'}</span>
-                <span style={{
-                    padding: '2px 8px', borderRadius: '999px',
-                    background: asset.status === 'active' ? 'rgba(16,185,129,0.1)' : 'rgba(107,114,128,0.15)',
-                    color: asset.status === 'active' ? '#6ee7b7' : 'var(--text-muted)',
-                    border: `1px solid ${asset.status === 'active' ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
-                }}>
-                    {asset.status}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                    First seen: {asset.first_seen ? new Date(asset.first_seen).toLocaleDateString() : '—'}
                 </span>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); asset.onViewHistory(asset); }}
+                        style={{ 
+                            background: 'none', border: '1px solid var(--border-color)', 
+                            borderRadius: '4px', fontSize: '0.62rem', padding: '2px 6px',
+                            color: 'var(--brand-violet-light)', cursor: 'pointer'
+                        }}
+                    >
+                        ⌛ History
+                    </button>
+                    <span style={{
+                        padding: '2px 8px', borderRadius: '999px',
+                        fontSize: '0.68rem',
+                        background: asset.status === 'active' ? 'rgba(16,185,129,0.1)' : 'rgba(107,114,128,0.15)',
+                        color: asset.status === 'active' ? '#6ee7b7' : 'var(--text-muted)',
+                        border: `1px solid ${asset.status === 'active' ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
+                    }}>
+                        {asset.status}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function AssetHistoryPanel({ asset, onClose }) {
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!asset) return;
+        setLoading(true);
+        getAssetEvents(asset.id)
+            .then(res => setEvents(res.data || []))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, [asset]);
+
+    if (!asset) return null;
+
+    return (
+        <div className="animate-in" style={{
+            position: 'fixed', top: 0, right: 0, bottom: 0, width: '450px',
+            background: 'var(--bg-page)', borderLeft: '1px solid var(--border-color)',
+            boxShadow: '-10px 0 30px rgba(0,0,0,0.5)', zIndex: 1000,
+            display: 'flex', flexDirection: 'column'
+        }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Asset History</h3>
+                    <div className="mono" style={{ fontSize: '0.75rem', color: 'var(--brand-cyan-light)', marginTop: '0.25rem' }}>{asset.value}</div>
+                </div>
+                <button className="btn-secondary" style={{ padding: '0.4rem 0.8rem' }} onClick={onClose}>✕ Close</button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '3rem' }}>
+                        <div className="spinner" />
+                        <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Fetching event history...</p>
+                    </div>
+                ) : events.length > 0 ? (
+                    <div>
+                        {events.map((evt, i) => (
+                            <ASMEventCard key={evt.id} event={evt} isLast={i === events.length - 1} />
+                        ))}
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⌛</div>
+                        <p>No historical events found for this asset.</p>
+                        <p style={{ fontSize: '0.8rem' }}>ASM will log port changes or new discoveries as they happen.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -98,6 +167,7 @@ export default function AssetInventory() {
     const [filterType, setFilterType] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [historyAsset, setHistoryAsset] = useState(null);
 
     const fetchAll = async () => {
         try {
@@ -243,8 +313,20 @@ export default function AssetInventory() {
                     </div>
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.875rem' }}>
-                        {filteredAssets.map(a => <AssetCard key={a.id} asset={a} />)}
+                        {filteredAssets.map(a => (
+                            <AssetCard 
+                                key={a.id} 
+                                asset={{ ...a, onViewHistory: setHistoryAsset }} 
+                            />
+                        ))}
                     </div>
+                )}
+                
+                {historyAsset && (
+                    <AssetHistoryPanel 
+                        asset={historyAsset} 
+                        onClose={() => setHistoryAsset(null)} 
+                    />
                 )}
             </div>
         </div>

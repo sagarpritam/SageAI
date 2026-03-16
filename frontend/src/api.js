@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '',
@@ -136,6 +136,10 @@ export const runIntelModule = (module, target, target_type = 'domain') =>
 export const buildIntelGraph = (target, target_type = 'domain') =>
     api.post('/intelligence/graph', { target, target_type });
 export const getIntelModules = () => api.get('/intelligence/modules');
+
+// ── ASM (Attack Surface Management) ───────────────
+export const getAsmEvents = (limit = 50) => api.get(`/api/asm/events?limit=${limit}`);
+export const getAssetEvents = (assetId) => api.get(`/api/asm/events/asset/${assetId}`);
 
 export default api;
 

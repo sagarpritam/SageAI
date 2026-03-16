@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './pages/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,6 +15,8 @@ import AssetInventory from './pages/AssetInventory';
 import Copilot from './pages/Copilot';
 import Agents from './pages/Agents';
 import IntelligenceHub from './pages/IntelligenceHub';
+import ASMTimeline from './pages/ASMTimeline';
+import AIRedTeam from './pages/AIRedTeam';
 import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children }) {
@@ -36,8 +38,10 @@ export default function App() {
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/assets" element={<AssetInventory />} />
+          <Route path="/asm-timeline" element={<ASMTimeline />} />
           <Route path="/agents" element={<Agents />} />
           <Route path="/intelligence" element={<IntelligenceHub />} />
+          <Route path="/redteam" element={<AIRedTeam />} />
           <Route path="/scans" element={<Scans />} />
           <Route path="/schedules" element={<Schedules />} />
           <Route path="/reports" element={<Reports />} />

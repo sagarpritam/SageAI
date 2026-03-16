@@ -1,10 +1,11 @@
-﻿# 🛡️ SageAI — AI-Powered Enterprise Security & OSINT Platform
+# 🛡️ SageAI — AI-Powered Enterprise Security & OSINT Platform
 
 > **SageAI** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, Bug Bounty, and **Advanced OSINT Intelligence** — powered by FastAPI, React, and a Multi-Agent AI architecture with 9 integrated intelligence modules.
 
 [![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)](tests/)
+[![Audit](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml)
+[![Deploy](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml)
 [![Version](https://img.shields.io/badge/version-latest-blueviolet)](#)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20SQLAlchemy-informational)](#)
 [![Modules](https://img.shields.io/badge/intelligence-9%20OSINT%20modules-ff6b6b)](#-intelligence-hub--9-osint-modules)
 

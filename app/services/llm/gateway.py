@@ -4,13 +4,18 @@ import logging
 from .base import BaseLLM
 from .openai_client import OpenAIClient
 from .anthropic_client import AnthropicClient
+from .nvidia_client import NvidiaClient
 
 from app.services.ai_resilience import token_tracker
 
 logger = logging.getLogger("SageAI.llm")
 
 # Initialize registered providers
-PROVIDERS = {"openai": OpenAIClient(), "anthropic": AnthropicClient()}
+PROVIDERS = {
+    "openai": OpenAIClient(), 
+    "anthropic": AnthropicClient(),
+    "nvidia": NvidiaClient()
+}
 
 
 class LLMGateway:

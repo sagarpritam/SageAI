@@ -146,7 +146,7 @@ async def get_scan(
 
 @router.get("/{scan_id}/findings", response_model=list[dict])
 async def get_scan_findings(
-    scan_id: UUID,
+    scan_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

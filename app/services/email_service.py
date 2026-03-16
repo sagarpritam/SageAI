@@ -1,45 +1,42 @@
-"""Email service — transactional emails via SMTP."""
+"""Email service — transactional emails via Resend."""
 
 import os
 import logging
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import resend
+
+from app.core.config import settings
 
 logger = logging.getLogger("sageai.email")
 
 
 class EmailService:
-    """Send transactional emails."""
+    """Send transactional emails via Resend."""
 
     def __init__(self):
-        self.host = os.getenv("SMTP_HOST", "smtp.gmail.com")
-        self.port = int(os.getenv("SMTP_PORT", "587"))
-        self.user = os.getenv("SMTP_USER", "")
-        self.password = os.getenv("SMTP_PASSWORD", "")
-        self.from_email = os.getenv("SMTP_FROM", self.user or "noreply@sageai.com")
+        self.api_key = settings.RESEND_API_KEY
+        if self.api_key:
+            resend.api_key = self.api_key
+        # Use SMTP_FROM from settings if available, otherwise default to onboarding
+        self.from_email = os.getenv("SMTP_FROM", "onboarding@resend.dev")
 
     def _send(self, to: str, subject: str, html_body: str):
-        """Send an email."""
-        if not self.user or not self.password:
-            logger.warning("SMTP not configured — email not sent")
+        """Send an email via Resend."""
+        if not self.api_key:
+            logger.warning("Resend API key not configured — email not sent")
             return False
 
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = f"SageAI <{self.from_email}>"
-        msg["To"] = to
-        msg.attach(MIMEText(html_body, "html"))
-
         try:
-            with smtplib.SMTP(self.host, self.port) as server:
-                server.starttls()
-                server.login(self.user, self.password)
-                server.send_message(msg)
-            logger.info(f"Email sent to {to}: {subject}")
+            params = {
+                "from": f"SageAI <{self.from_email}>",
+                "to": [to],
+                "subject": subject,
+                "html": html_body,
+            }
+            email = resend.Emails.send(params)
+            logger.info(f"Email sent to {to} via Resend: {email.get('id')}")
             return True
         except Exception as e:
-            logger.error(f"Email failed to {to}: {e}")
+            logger.error(f"Resend email failed to {to}: {e}")
             return False
 
     def send_scan_result(self, to: str, target: str, risk_level: str, risk_score: int):

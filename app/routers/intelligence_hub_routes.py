@@ -10,9 +10,11 @@ import httpx
 
 # ────────────────────── Local imports ──────────────────────
 from app.schemas.intelligence import (
+    IntelligenceSweepRequest,
     IntelligenceSweepResponse,
     LinkAnalysisResponse,
     ModuleListResponse,
+    ModuleScanRequest,
     ModuleScanResponse,
 )
 from app.core.security import get_current_user

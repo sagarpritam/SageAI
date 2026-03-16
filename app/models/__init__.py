@@ -7,7 +7,9 @@ from app.models.webhook import Webhook
 from app.models.schedule import ScanSchedule
 from app.models.asset import Asset, AssetType, AssetStatus
 from app.models.finding import Finding, FindingSeverity
+from app.models.finding import Finding, FindingSeverity
 from app.models.agent_log import AgentLog
+from app.models.asm_event import ASMEvent, ASMEventType, ASMEventSeverity
 
 __all__ = [
     "Organization",
@@ -23,4 +25,7 @@ __all__ = [
     "Finding",
     "FindingSeverity",
     "AgentLog",
+    "ASMEvent",
+    "ASMEventType",
+    "ASMEventSeverity",
 ]

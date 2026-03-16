@@ -81,6 +81,13 @@ class Settings(BaseSettings):
     APP_NAME: str = "SageAI Security Scanner"
     ENV: str = "development"
     DEBUG: bool = True
+    
+    # LLM Keys
+    OPENAI_API_KEY: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    NVIDIA_API_KEY: str = ""
+    RESEND_API_KEY: str = ""
+    AUDITOR_BASE_URL: str = "http://localhost:8081"
 
     # Database — SQLite for dev, PostgreSQL for production
     DATABASE_URL: str = "sqlite+aiosqlite:///./sageai.db"

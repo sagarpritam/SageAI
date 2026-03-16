@@ -29,6 +29,8 @@ from app.routers import (
     asset_routes,
     agent_routes,
     intelligence_hub_routes,
+    asm_routes,
+    redteam_routes,
 )
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
@@ -162,6 +164,8 @@ app.include_router(autofix_routes.router)
 app.include_router(asset_routes.router)
 app.include_router(agent_routes.router)
 app.include_router(intelligence_hub_routes.router)
+app.include_router(asm_routes.router)
+app.include_router(redteam_routes.router)
 
 
 # ---------------------

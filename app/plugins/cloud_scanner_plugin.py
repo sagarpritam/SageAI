@@ -6,6 +6,7 @@ No cloud credentials required — passive HTTP/DNS checks only.
 
 import asyncio
 import httpx
+from app.utils.http_client import get_http_client
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
 

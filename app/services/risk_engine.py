@@ -86,3 +86,64 @@ def calculate_risk(findings: list[dict]) -> dict:
         "risk_level": level,
         "total_findings": len(findings),
     }
+
+
+async def calculate_risk_ai(
+    findings: list[dict], 
+    org_id: str = "system",
+    provider: str = None
+) -> dict:
+    """Use AI to calculate a context-aware risk score.
+    
+    This analyzes finding interactions (e.g., exposed DB + SQLi) which
+    standard algorithmic scoring might miss.
+    """
+    if not findings:
+        return {"risk_score": 0, "risk_level": "Low", "total_findings": 0}
+
+    from app.services.llm.gateway import llm_gateway
+    from app.core.config import settings
+    llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
+
+    findings_summary = "\n".join(
+        f"- [{f.get('severity', 'info')}] {f.get('type', 'Unknown')}: {f.get('title', f.get('description', ''))}"
+        for f in findings[:30]
+    )
+
+    prompt = f"""You are a senior security risk analyst. Review these scan findings and provide a multi-dimensional risk assessment.
+
+Findings:
+{findings_summary}
+
+Analyze the interaction between these findings. For example, a "medium" port exposure combined with a "high" vulnerability on that same service should escalate the overall risk.
+
+Respond in JSON format with:
+- risk_score: 0-100 (integer)
+- risk_level: Critical/High/Medium/Low
+- reasoning: Short explanation of the AI's logic
+- priority_finding: The single most dangerous discovery
+"""
+
+    try:
+        raw_response = await llm_gateway.generate(
+            prompt=prompt,
+            provider=llm_provider,
+            org_id=org_id,
+            temperature=0.2
+        )
+        
+        if not raw_response:
+            # Fallback to algorithmic
+            return calculate_risk(findings)
+            
+        import json
+        ai_data = json.loads(raw_response)
+        return {
+            **ai_data,
+            "total_findings": len(findings),
+            "engine": ("AI-Powered (NVIDIA)" if llm_provider == "nvidia" 
+                      else "AI-Powered")
+        }
+    except Exception:
+        # Fallback to algorithmic
+        return calculate_risk(findings)

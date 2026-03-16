@@ -21,8 +21,10 @@ class AgentOrchestrator:
     4. Reporter -> generates summary
     """
 
-    def __init__(self, org_id: str = "system"):
+    def __init__(self, org_id: str = "system", provider: str = None):
         self.org_id = org_id
+        from app.core.config import settings
+        self.provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     async def _planner_phase(self, user_prompt: str, target: str) -> List[str]:
         """Decide which tools to run based on user prompt."""
@@ -39,6 +41,7 @@ class AgentOrchestrator:
             prompt,
             system_message="You are the Planner Agent. Output ONLY a valid JSON list of strings.",
             org_id=self.org_id,
+            provider=self.provider,
         )
 
         try:
@@ -92,6 +95,7 @@ class AgentOrchestrator:
             prompt,
             system_message="You are the Analyzer Agent. Output ONLY a valid JSON array of vulnerability objects.",
             org_id=self.org_id,
+            provider=self.provider,
         )
 
         try:

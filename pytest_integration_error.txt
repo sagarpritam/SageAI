@@ -1,0 +1,90 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.11, pytest-8.0.0, pluggy-1.6.0
+rootdir: C:\Users\pc\Downloads\SageAI
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-0.23.5, cov-7.0.0, httpx-0.30.0
+asyncio: mode=Mode.AUTO
+collected 2 items
+
+tests\test_integration_lifecycle.py F.                                   [100%]
+
+================================== FAILURES ===================================
+__________________________ test_full_scan_lifecycle ___________________________
+
+client = <httpx.AsyncClient object at 0x00000257CD935BE0>
+auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZWZiNzM5Mi1kOGViLTRkNWUtOTg3NC0xNWFmMzQxMzc...U1Ny1iYjdkLWRmMzllZDgyNGJhNCIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc3MzQ4NjUwMH0.vzEAEtREu7-JU6Pc4feIcaTBv4EpBrwib0bG0zlt1Lk'}
+mock_run_scans = <AsyncMock name='run_all_scans' id='2576134688784'>
+
+    @pytest.mark.asyncio
+    async def test_full_scan_lifecycle(client, auth_headers, mock_run_scans):
+        # 1. Trigger the scan
+        payload = {"target": "https://integration-test.com"}
+        create_resp = await client.post("/scan", json=payload, headers=auth_headers)
+    
+        assert create_resp.status_code == 201
+        create_data = create_resp.json()
+        assert create_data["status"] == "completed"
+        assert create_data["target"] == "https://integration-test.com"
+    
+        # Verify the mock was called
+        mock_run_scans.assert_called_once()
+    
+        scan_id = create_data["id"]
+        assert scan_id is not None
+    
+        # Assert risk was calculated
+        assert create_data["risk_summary"]["risk_level"] in ("High", "Critical")
+    
+        # 2. Verify the scan was persisted along with the specific findings
+        findings_resp = await client.get(f"/scan/{scan_id}/findings", headers=auth_headers)
+>       assert findings_resp.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests\test_integration_lifecycle.py:48: AssertionError
+---------------------------- Captured stderr setup ----------------------------
+2026-03-14 15:38:20,339 | INFO     | SageAI | \u27a1\ufe0f  POST /auth/register\n2026-03-14 15:38:20,371 | INFO     | SageAI.audit | api_access\n2026-03-14 15:38:20,371 | INFO     | SageAI | \u2b05\ufe0f  POST /auth/register \u2192 201\n2026-03-14 15:38:20,372 | INFO     | httpx | HTTP Request: POST http://test/auth/register "HTTP/1.1 201 Created"\n2026-03-14 15:38:20,372 | INFO     | SageAI | \u27a1\ufe0f  POST /auth/login\n2026-03-14 15:38:20,382 | INFO     | SageAI.audit | api_access\n2026-03-14 15:38:20,383 | INFO     | SageAI | \u2b05\ufe0f  POST /auth/login \u2192 200\n2026-03-14 15:38:20,383 | INFO     | httpx | HTTP Request: POST http://test/auth/login "HTTP/1.1 200 OK"
+----------------------------- Captured log setup ------------------------------
+INFO     SageAI:main.py:137 \u27a1\ufe0f  POST /auth/register\nINFO     SageAI.audit:audit.py:48 api_access\nINFO     SageAI:main.py:139 \u2b05\ufe0f  POST /auth/register \u2192 201\nINFO     httpx:_client.py:1773 HTTP Request: POST http://test/auth/register "HTTP/1.1 201 Created"\nINFO     SageAI:main.py:137 \u27a1\ufe0f  POST /auth/login\nINFO     SageAI.audit:audit.py:48 api_access\nINFO     SageAI:main.py:139 \u2b05\ufe0f  POST /auth/login \u2192 200\nINFO     httpx:_client.py:1773 HTTP Request: POST http://test/auth/login "HTTP/1.1 200 OK"
+---------------------------- Captured stderr call -----------------------------
+2026-03-14 15:38:20,384 | INFO     | SageAI | \u27a1\ufe0f  POST /scan\n2026-03-14 15:38:20,398 | INFO     | SageAI.audit | api_access\n2026-03-14 15:38:20,399 | INFO     | SageAI | \u2b05\ufe0f  POST /scan \u2192 201\n2026-03-14 15:38:20,399 | INFO     | httpx | HTTP Request: POST http://test/scan "HTTP/1.1 201 Created"\n2026-03-14 15:38:20,399 | INFO     | SageAI | \u27a1\ufe0f  GET /scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings\n2026-03-14 15:38:20,401 | INFO     | SageAI.audit | api_access\n2026-03-14 15:38:20,401 | INFO     | SageAI | \u2b05\ufe0f  GET /scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings \u2192 404\n2026-03-14 15:38:20,401 | INFO     | httpx | HTTP Request: GET http://test/scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings "HTTP/1.1 404 Not Found"
+------------------------------ Captured log call ------------------------------
+INFO     SageAI:main.py:137 \u27a1\ufe0f  POST /scan\nINFO     SageAI.audit:audit.py:48 api_access\nINFO     SageAI:main.py:139 \u2b05\ufe0f  POST /scan \u2192 201\nINFO     httpx:_client.py:1773 HTTP Request: POST http://test/scan "HTTP/1.1 201 Created"\nINFO     SageAI:main.py:137 \u27a1\ufe0f  GET /scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings\nINFO     SageAI.audit:audit.py:48 api_access\nINFO     SageAI:main.py:139 \u2b05\ufe0f  GET /scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings \u2192 404\nINFO     httpx:_client.py:1773 HTTP Request: GET http://test/scan/676cd1f0-39c9-4d8e-b310-4d23b59fd660/findings "HTTP/1.1 404 Not Found"
+============================== warnings summary ===============================
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11: DeprecationWarning: ast.NameConstant is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    haveNameConstant = hasattr(ast,'NameConstant')
+
+tests/test_integration_lifecycle.py::test_full_scan_lifecycle
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_asyncio\plugin.py:769: DeprecationWarning: The event_loop fixture provided by pytest-asyncio has been redefined in
+  c:\Users\pc\Downloads\SageAI\tests\conftest.py:16
+  Replacing the event_loop fixture with a custom implementation is deprecated
+  and will lead to errors in the future.
+  If you want to request an asyncio event loop with a scope other than function
+  scope, use the "scope" argument to the asyncio mark when marking the tests.
+  If you want to return different types of event loops, use the event_loop_policy
+  fixture.
+  
+    warnings.warn(
+
+tests/test_integration_lifecycle.py::test_full_scan_lifecycle
+tests/test_integration_lifecycle.py::test_full_scan_lifecycle
+tests/test_integration_lifecycle.py::test_scan_failure_lifecycle
+tests/test_integration_lifecycle.py::test_scan_failure_lifecycle
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\jose\jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_integration_lifecycle.py::test_full_scan_lifecycle - assert...
+================== 1 failed, 1 passed, 10 warnings in 0.28s ===================

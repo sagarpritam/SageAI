@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
-import { getOrgStats, getOrgPlan, listScans } from '../api';
+import { getOrgStats, getOrgPlan, listScans, getAsmEvents } from '../api';
+import ASMEventCard from '../components/ASMEventCard';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
     const [stats, setStats] = useState(null);
     const [plan, setPlan] = useState(null);
     const [recentScans, setRecentScans] = useState([]);
+    const [asmEvents, setAsmEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [now, setNow] = useState(new Date());
 
@@ -46,11 +48,12 @@ export default function Dashboard() {
     }, []);
 
     useEffect(() => {
-        Promise.all([getOrgStats(), getOrgPlan(), listScans()])
-            .then(([s, p, sc]) => {
+        Promise.all([getOrgStats(), getOrgPlan(), listScans(), getAsmEvents(5)])
+            .then(([s, p, sc, asm]) => {
                 setStats(s.data);
                 setPlan(p.data);
                 setRecentScans(sc.data.slice(0, 5));
+                setAsmEvents(asm.data || []);
             })
             .catch(() => { })
             .finally(() => setLoading(false));
@@ -248,6 +251,34 @@ export default function Dashboard() {
                         <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                             <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>◎</div>
                             <p>No scans yet. Head to <a href="/scans" style={{ color: 'var(--brand-violet-light)' }}>Scans</a> to get started.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* ── ASM Event Timeline ────────────────────── */}
+                <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '1.5rem' }}>
+                    <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span className="risk-dot risk-dot-critical" style={{ background: 'var(--brand-violet)', boxShadow: '0 0 6px var(--brand-violet)', animation: 'pulse 2s infinite' }} />
+                            Continuous ASM Live Feed
+                        </span>
+                        <a href="/asm-timeline" style={{ fontSize: '0.75rem', color: 'var(--brand-violet-light)', textDecoration: 'none' }}>View full timeline →</a>
+                    </div>
+                    {asmEvents.length > 0 ? (
+                        <div style={{ padding: '0 1.5rem' }}>
+                            {asmEvents.map((evt, i) => (
+                                <ASMEventCard 
+                                    key={evt.id} 
+                                    event={evt} 
+                                    isLast={i === asmEvents.length - 1} 
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>◖</div>
+                            <p>No changes detected in your attack surface recently.</p>
+                            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>ASM continuously monitors your assets automatically.</p>
                         </div>
                     )}
                 </div>

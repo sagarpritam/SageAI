@@ -11,6 +11,7 @@ Detects API security vulnerabilities:
 
 import asyncio
 import httpx
+from app.utils.http_client import get_http_client
 from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
 
@@ -63,7 +64,7 @@ class APISecurityPlugin(SecurityPlugin):
         findings = []
         metadata = {"host": host, "api_paths_checked": len(API_DOC_PATHS)}
 
-            async with get_http_client(follow_redirects=True, timeout=7) as client:
+        async with get_http_client(follow_redirects=True, timeout=7) as client:
             # Check for exposed API documentation
             doc_tasks = [
                 self._check_api_doc(client, base_url + path) for path in API_DOC_PATHS

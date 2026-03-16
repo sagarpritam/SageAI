@@ -7,6 +7,7 @@ Usage:
 
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 # Redis URL from env or default
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -28,6 +29,12 @@ celery_app.conf.update(
     task_soft_time_limit=240,
     worker_max_tasks_per_child=100,
     worker_prefetch_multiplier=1,
+    beat_schedule={
+        "asm-continuous-recon-12h": {
+            "task": "SageAI.asm_scheduled_recon",
+            "schedule": crontab(minute=0, hour='*/12'),  # Every 12 hours
+        }
+    }
 )
 
 
@@ -74,3 +81,21 @@ def cleanup_old_scans(days: int = 90):
     """Scheduled task to clean up scans older than N days."""
     # This would be called by Celery Beat
     pass
+
+@celery_app.task(name="SageAI.asm_scheduled_recon")
+def asm_scheduled_recon():
+    """
+    Scheduled task that orchestrates the Continuous Attack Surface Management (ASM).
+    Runs every 12 hours to:
+    1. Fetch all active organizations and their root domains.
+    2. Dispatch recon workflows (Subfinder/Amass/Shodan).
+    3. Push results to the ASM diff engine.
+    """
+    import asyncio
+    from app.services.asm.diff_engine import run_asm_diff
+    
+    # Needs a new event loop inside celery
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_asm_diff())
+    return {"status": "dispatched"}
+

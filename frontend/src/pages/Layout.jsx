@@ -1,4 +1,4 @@
-﻿import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 const NAV_SECTIONS = [
     {
@@ -22,8 +22,8 @@ const NAV_SECTIONS = [
         label: 'AI Platform',
         items: [
             { path: '/agents', label: 'AI Security Team', icon: '◈', badge: 'NEW' },
+            { path: '/redteam', label: 'AI Red Teaming', icon: '🎯', badge: 'PRO' },
             { path: '/intelligence', label: 'Intelligence Hub', icon: '⚡', badge: 'v3' },
-            { path: '/assets', label: 'Asset Inventory', icon: '◉' },
         ]
     },
     {
