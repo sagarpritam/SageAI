@@ -1,4 +1,5 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Layout from './pages/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -50,6 +51,7 @@ export default function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   );
 }
