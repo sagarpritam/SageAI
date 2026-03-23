@@ -1,4 +1,5 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Layout from './pages/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -25,31 +26,34 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+    <>
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Protected */}
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/assets" element={<AssetInventory />} />
-          <Route path="/agents" element={<Agents />} />
-          <Route path="/intelligence" element={<IntelligenceHub />} />
-          <Route path="/scans" element={<Scans />} />
-          <Route path="/schedules" element={<Schedules />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/autofix" element={<AutoFix />} />
-          <Route path="/copilot" element={<Copilot />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/plan" element={<Plan />} />
-          <Route path="/settings" element={<Settings />} />
-        </Route>
+          {/* Protected */}
+          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/assets" element={<AssetInventory />} />
+            <Route path="/agents" element={<Agents />} />
+            <Route path="/intelligence" element={<IntelligenceHub />} />
+            <Route path="/scans" element={<Scans />} />
+            <Route path="/schedules" element={<Schedules />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/autofix" element={<AutoFix />} />
+            <Route path="/copilot" element={<Copilot />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/plan" element={<Plan />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+      <Analytics />
+    </>
   );
 }
