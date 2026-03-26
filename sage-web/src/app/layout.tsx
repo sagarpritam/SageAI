@@ -13,8 +13,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SageAI — AI-Powered Cybersecurity Platform",
-  description: "Enterprise-grade vulnerability scanning, OSINT intelligence, and AI-powered threat analysis. Protect your attack surface with SageAI.",
+  title: {
+    default: "SageAI — Autonomous AI Pentester",
+    template: "%s | SageAI"
+  },
+  description: "Enterprise-grade vulnerability scanning, OSINT intelligence, and AI-powered threat analysis. Run a full pentest in 60 seconds.",
+  keywords: ["cybersecurity", "AI security", "pentesting", "vulnerability scanner", "OSINT"],
+  authors: [{ name: "SageAI" }],
+  openGraph: {
+    title: "SageAI — Autonomous AI Pentester",
+    description: "Run a full AI-powered pentest on any domain in 60 seconds. Fix vulnerabilities before hackers find them.",
+    url: "https://sageai.example.com",
+    siteName: "SageAI",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SageAI Dashboard Preview"
+      }
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SageAI — Autonomous AI Pentester",
+    description: "Run a full AI-powered pentest on any domain in 60 seconds.",
+    images: ["/og-image.png"],
+  },
 };
 
 import { cookies } from "next/headers";

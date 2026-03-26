@@ -2,6 +2,48 @@ import { Shield, Sparkles, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { RiskGauge } from "@/components/RiskGauge";
 import { VulnerabilityList } from "@/components/VulnerabilityList";
+import type { Metadata, ResolvingMetadata } from 'next';
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ token: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { token } = await params;
+  const backendUrl = process.env.API_URL || "http://localhost:8000";
+
+  try {
+    const res = await fetch(`${backendUrl}/scan/public/${token}`, { cache: "no-store" });
+    if (res.ok) {
+      const scanData = await res.json();
+      const findingCount = scanData.findings?.length || 0;
+      const title = `SageAI Pentest: ${scanData.target}`;
+      const description = `Autonomous AI pentest found ${findingCount} vulnerabilities on ${scanData.target} with a ${scanData.risk_summary?.risk_level || 'Medium'} risk level. View the full interactive security report.`;
+      
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          url: `https://sageai.example.com/report/${token}`,
+          type: "website",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+        }
+      };
+    }
+  } catch (e) {
+    // Fallback to default
+  }
+
+  return {
+    title: "SageAI Security Report",
+    description: "View the results of an autonomous AI pentest.",
+  };
+}
 
 // Server Component
 export default async function PublicReportPage({
