@@ -34,7 +34,8 @@ async def osint_industries_lookup(
     target: str, target_type: str = "email"
 ) -> list[dict]:
     """Look up an email or phone number across platforms."""
-    api_key = os.getenv("OSINT_INDUSTRIES_API_KEY")
+    from app.core.config import settings
+    api_key = settings.OSINT_INDUSTRIES_API_KEY
 
     if api_key:
         return await _osint_ind_api(target, target_type, api_key)
@@ -120,7 +121,7 @@ async def _check_email(email: str) -> list[dict]:
         try:
             import hashlib
 
-            email_hash = hashlib.md5(email.lower().strip().encode("utf-8")).hexdigest()
+            email_hash = hashlib.md5(email.lower().strip().encode()).hexdigest()
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(f"https://en.gravatar.com/{email_hash}.json")
                 if resp.status_code == 200:

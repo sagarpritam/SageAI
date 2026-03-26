@@ -97,7 +97,7 @@ async def get_asset_summary(
 ):
     """Returns aggregated counts for the organization's attack surface."""
     org_id = current_user["org"]
-    result = await db.execute(select(Asset).where(Asset.org_id == org_id))
+    result = await db.execute(select(Asset).where(Asset.organization_id == org_id))
     assets = result.scalars().all()
 
     from datetime import timezone, timedelta
@@ -142,7 +142,7 @@ async def list_assets(
 ):
     """List discovered assets with optional filtering by type, risk level, and status."""
     org_id = current_user["org"]
-    q = select(Asset).where(Asset.org_id == org_id)
+    q = select(Asset).where(Asset.organization_id == org_id)
 
     if asset_type:
         q = q.where(Asset.asset_type == asset_type)
@@ -166,7 +166,7 @@ async def get_high_risk_assets(
     org_id = current_user["org"]
     result = await db.execute(
         select(Asset)
-        .where(and_(Asset.org_id == org_id, Asset.risk_level.in_(["Critical", "High"])))
+        .where(and_(Asset.organization_id == org_id, Asset.risk_level.in_(["Critical", "High"])))
         .order_by(desc(Asset.risk_score))
         .limit(50)
     )
@@ -188,7 +188,7 @@ async def get_new_assets(
 
     result = await db.execute(
         select(Asset)
-        .where(and_(Asset.org_id == org_id, Asset.first_seen >= cutoff))
+        .where(and_(Asset.organization_id == org_id, Asset.first_seen >= cutoff))
         .order_by(desc(Asset.first_seen))
         .limit(100)
     )
@@ -205,7 +205,7 @@ async def get_asset(
     """Get full detail for a specific asset including Shodan/SSL data."""
     result = await db.execute(
         select(Asset).where(
-            and_(Asset.id == asset_id, Asset.org_id == current_user["org"])
+            and_(Asset.id == asset_id, Asset.organization_id == current_user["org"])
         )
     )
     asset = result.scalar_one_or_none()
@@ -229,7 +229,7 @@ async def delete_asset(
     """Remove a discovered asset from inventory."""
     result = await db.execute(
         select(Asset).where(
-            and_(Asset.id == asset_id, Asset.org_id == current_user["org"])
+            and_(Asset.id == asset_id, Asset.organization_id == current_user["org"])
         )
     )
     asset = result.scalar_one_or_none()

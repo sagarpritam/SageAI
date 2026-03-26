@@ -39,8 +39,8 @@ class Asset(Base):
     __tablename__ = "assets"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    org_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    organization_id = Column(
+        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Identity

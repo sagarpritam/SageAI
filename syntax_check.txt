@@ -1,0 +1,26 @@
+﻿python :   File 
+"<string>", line 1
+At line:1 char:1
++ python -c "import 
+py_compile; import os; 
+errors=[]; 
+[errors.append(f' ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (  File "<stri   
+ ng>", line 1:Strin    
+g) [], RemoteExcep    
+tion
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+SyntaxError: 
+assignment expression 
+cannot rebind 
+comprehension 
+iteration variable 'e'

@@ -17,7 +17,7 @@ async def get_asm_events(
     org_id = current_user["org"]
     stmt = (
         select(ASMEvent)
-        .where(ASMEvent.org_id == org_id)
+        .where(ASMEvent.organization_id == org_id)
         .order_by(desc(ASMEvent.created_at))
         .limit(limit)
     )
@@ -48,7 +48,7 @@ async def get_asset_asm_events(
     stmt = (
         select(ASMEvent)
         .where(
-            ASMEvent.org_id == org_id,
+            ASMEvent.organization_id == org_id,
             ASMEvent.asset_id == asset_id
         )
         .order_by(desc(ASMEvent.created_at))

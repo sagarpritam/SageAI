@@ -63,7 +63,7 @@ async def test_osint_industries_api_mocked(httpx_mock: HTTPXMock, monkeypatch):
     """
     Tests the Pro OSINT Industries API pipeline using a mocked API key and response.
     """
-    monkeypatch.setenv("OSINT_INDUSTRIES_API_KEY", "mock_key_123")
+    monkeypatch.setattr("app.core.config.settings.OSINT_INDUSTRIES_API_KEY", "mock_key_123")
     target = "test@example.com"
 
     # Mock OSINT Industries API

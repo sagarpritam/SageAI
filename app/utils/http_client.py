@@ -1,6 +1,7 @@
 """
-Utility wrapper around httpx.AsyncClient that enforces TLS verification
-in production environments.
+Utility wrapper around httpx.AsyncClient that enforces TLS verification.
+
+SSL certificate verification is ALWAYS enabled to prevent man-in-the-middle attacks.
 """
 
 import os
@@ -9,18 +10,13 @@ import httpx
 
 def get_http_client(*, follow_redirects: bool = True, timeout: int = 10) -> httpx.AsyncClient:
     """
-    Return an AsyncClient with proper TLS verification.
+    Return an AsyncClient with proper TLS verification enabled.
 
-    The ``ENV`` environment variable determines whether SSL verification
-    is enforced. In ``production`` verification is always on; in other
-    environments (development, test) we keep the default behaviour of
-    httpx (which also verifies certificates).
+    SSL verification is always enabled regardless of environment to ensure
+    secure connections and prevent man-in-the-middle attacks.
     """
-    env = os.getenv("ENV", "development").lower()
-    # ``verify`` is *True* for production; otherwise we disable it for development/test if needed.
-    verify = True if env == "production" else False
     return httpx.AsyncClient(
         timeout=timeout,
-        verify=verify,
+        verify=True,  # Always verify SSL certificates
         follow_redirects=follow_redirects,
     )

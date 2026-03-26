@@ -11,6 +11,8 @@ import socket
 
 import httpx
 
+from app.core.config import settings
+
 logger = logging.getLogger("sageai.intelligence.shodan")
 
 INTERNETDB_API = "https://internetdb.shodan.io"
@@ -20,7 +22,7 @@ SHODAN_REST_API = "https://api.shodan.io"
 async def shodan_scan(target: str) -> list[dict]:
     """Run Shodan intelligence scan on a target domain or IP."""
     findings = []
-    api_key = os.getenv("SHODAN_API_KEY")
+    api_key = settings.SHODAN_API_KEY
 
     # Resolve to IP
     hostname = target.replace("https://", "").replace("http://", "").split("/")[0]

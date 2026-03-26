@@ -3,6 +3,8 @@ import httpx
 from unittest.mock import patch, MagicMock
 from app.services.intelligence.shodan_intel import shodan_scan
 from app.services.intelligence.censys_intel import censys_scan
+from app.services.intelligence.phishstats_intel import phishstats_scan
+from app.services.intelligence.urlhaus_intel import urlhaus_scan
 
 @pytest.fixture
 def mock_dns_resolve():
@@ -13,7 +15,7 @@ def mock_dns_resolve():
 @pytest.mark.asyncio
 async def test_shodan_free_scan(httpx_mock, mock_dns_resolve, monkeypatch):
     # Ensure no API key is set to trigger free scan
-    monkeypatch.delenv("SHODAN_API_KEY", raising=False)
+    monkeypatch.setattr("app.core.config.settings.SHODAN_API_KEY", None)
     
     # Mocking the InternetDB API
     httpx_mock.add_response(
@@ -41,7 +43,7 @@ async def test_shodan_free_scan(httpx_mock, mock_dns_resolve, monkeypatch):
 @pytest.mark.asyncio
 async def test_shodan_pro_scan(httpx_mock, mock_dns_resolve, monkeypatch):
     # Set the API key to trigger Pro scan
-    monkeypatch.setenv("SHODAN_API_KEY", "test_key")
+    monkeypatch.setattr("app.core.config.settings.SHODAN_API_KEY", "test_key")
     
     # Mocking the REST API
     httpx_mock.add_response(
@@ -144,3 +146,52 @@ async def test_censys_api_scan(httpx_mock, mock_dns_resolve, monkeypatch):
     assert svc_finding is not None
     assert svc_finding["data"]["port"] == 80
     assert svc_finding["data"]["service"] == "HTTP"
+
+@pytest.mark.asyncio
+async def test_phishstats_api_scan(httpx_mock, mock_dns_resolve):
+    httpx_mock.add_response(
+        url="https://phishstats.info:2096/api/phishing?_where=(ip,eq,badguy.com)~or(domain,eq,badguy.com)",
+        json={
+            "data": [
+                {
+                    "id": 12345,
+                    "url": "http://badguy.com/login",
+                    "title": "Fake Bank Login",
+                    "score": 10
+                }
+            ]
+        }
+    )
+    
+    findings = await phishstats_scan("badguy.com")
+    
+    assert len(findings) == 1
+    assert findings[0]["type"] == "malicious_activity"
+    assert "Fake Bank Login" in findings[0]["title"]
+    assert "http://badguy.com/login" in findings[0]["description"]
+
+@pytest.mark.asyncio
+async def test_urlhaus_api_scan(httpx_mock, mock_dns_resolve):
+    httpx_mock.add_response(
+        url="https://urlhaus-api.abuse.ch/v1/host/",
+        method="POST",
+        json={
+            "query_status": "ok",
+            "host": "badguy.com",
+            "urls": [
+                {
+                    "id": 12345,
+                    "url_status": "online",
+                    "url": "http://badguy.com/malware.exe",
+                    "tags": ["elf", "mirai"]
+                }
+            ]
+        }
+    )
+    
+    findings = await urlhaus_scan("badguy.com")
+    
+    assert len(findings) == 1
+    assert findings[0]["type"] == "malware_distribution"
+    assert "mirai" in findings[0]["description"]
+    assert "online" in findings[0]["description"]

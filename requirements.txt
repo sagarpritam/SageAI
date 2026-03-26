@@ -18,6 +18,8 @@ resend
 
 markdown
 weasyprint
+celery
+redis
 
 # Development & Resilience Tools
 ruff==0.15.5

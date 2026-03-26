@@ -20,7 +20,8 @@ PASTE_SOURCES = [
 
 async def darkweb_search(target: str) -> list[dict]:
     """Search dark web and paste sites for target references."""
-    api_key = os.getenv("BABELX_API_KEY")
+    from app.core.config import settings
+    api_key = settings.BABELX_API_KEY
 
     if api_key:
         return await _babelx_api_search(target, api_key)

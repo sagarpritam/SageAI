@@ -6,14 +6,14 @@ Defines plan tiers and their limits. Will be extended with Stripe integration.
 PLAN_LIMITS = {
     "free": {
         "display_name": "Free",
-        "max_scans_per_month": 5,
+        "max_scans_per_month": 3,
         "max_users": 2,
         "features": ["basic_scanning", "json_reports"],
         "price_monthly": 0,
     },
     "pro": {
         "display_name": "Pro",
-        "max_scans_per_month": 100,
+        "max_scans_per_month": -1,  # unlimited for Pro to encourage upgrade
         "max_users": 10,
         "features": [
             "basic_scanning",

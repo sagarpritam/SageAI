@@ -26,13 +26,13 @@ def mock_run_scans():
 @pytest.mark.asyncio
 async def test_full_scan_lifecycle(client, auth_headers, mock_run_scans):
     # 1. Trigger the scan
-    payload = {"target": "https://integration-test.com"}
+    payload = {"target": "https://integration-test.com/"}
     create_resp = await client.post("/scan", json=payload, headers=auth_headers)
     
     assert create_resp.status_code == 201
     create_data = create_resp.json()
     assert create_data["status"] == "completed"
-    assert create_data["target"] == "https://integration-test.com"
+    assert create_data["target"] == "https://integration-test.com/"
     
     # Verify the mock was called
     mock_run_scans.assert_called_once()

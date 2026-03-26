@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 from typing import List, Optional
 from datetime import datetime
 
@@ -6,7 +6,9 @@ from datetime import datetime
 class ScanRequest(BaseModel):
     """Scan request body."""
 
-    target: str
+    target: HttpUrl = Field(..., description="Target URL to scan")
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class Vulnerability(BaseModel):
@@ -34,7 +36,10 @@ class ScanResponse(BaseModel):
     status: str
     timestamp: datetime
     findings: List[Vulnerability]
+    analyzed_findings: Optional[List[dict]] = None
     risk_summary: RiskSummary
+    report: Optional[dict] = None
+    graph: Optional[dict] = None
 
 
 class ScanListItem(BaseModel):

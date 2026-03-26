@@ -1,0 +1,47 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.11, pytest-8.0.0, pluggy-1.6.0
+rootdir: C:\Users\pc\Downloads\SageAI
+configfile: pyproject.toml
+plugins: anyio-4.12.1, locust-2.43.3, asyncio-0.23.5, cov-7.0.0, httpx-0.30.0
+asyncio: mode=Mode.AUTO
+collected 3 items
+
+tests\test_security.py .FF                                               [100%]
+
+================================== FAILURES ===================================
+______________ test_http_client_verification[development-False] _______________
+tests\test_security.py:17: in test_http_client_verification
+    assert kwargs.get("verify") is expected_verify
+E   AssertionError: assert True is False
+E    +  where True = <built-in method get of dict object at 0x00000281104F60C0>('verify')
+E    +    where <built-in method get of dict object at 0x00000281104F60C0> = {'follow_redirects': True, 'timeout': 10, 'verify': True}.get
+__________________ test_http_client_verification[test-False] __________________
+tests\test_security.py:17: in test_http_client_verification
+    assert kwargs.get("verify") is expected_verify
+E   AssertionError: assert True is False
+E    +  where True = <built-in method get of dict object at 0x0000028114D40740>('verify')
+E    +    where <built-in method get of dict object at 0x0000028114D40740> = {'follow_redirects': True, 'timeout': 10, 'verify': True}.get
+============================== warnings summary ===============================
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11: DeprecationWarning: ast.NameConstant is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    haveNameConstant = hasattr(ast,'NameConstant')
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\__init__.py:113
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.0.1)/charset_normalizer (3.4.4) doesn't match a supported version!
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_security.py::test_http_client_verification[development-False]
+FAILED tests/test_security.py::test_http_client_verification[test-False] - As...
+=================== 2 failed, 1 passed, 6 warnings in 0.16s ===================

@@ -4,7 +4,7 @@ SageAI 4.0 — Continuous ASM Diff Engine
 
 import logging
 from sqlalchemy import select
-from app.core.database import SessionLocal
+from app.core.database import AsyncSessionLocal
 from app.models.organization import Organization
 from app.models.asset import Asset, AssetType
 from app.services.asset_inventory.asset_discovery_service import discover_assets
@@ -18,7 +18,7 @@ async def run_asm_diff():
     """
     logger.info("[ASM] Starting continuous scheduled recon...")
     try:
-        async with SessionLocal() as db:
+        async with AsyncSessionLocal() as db:
             # Get all organizations
             org_result = await db.execute(select(Organization))
             orgs = org_result.scalars().all()

@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 @pytest.mark.parametrize("env,expected_verify", [
     ("production", True),
-    ("development", False),
-    ("test", False),
+    ("development", True),
+    ("test", True),
 ])
 def test_http_client_verification(monkeypatch, env, expected_verify):
     monkeypatch.setenv("ENV", env)

@@ -45,6 +45,8 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
     from app.services.intelligence.darkweb_intel import darkweb_search
     from app.services.intelligence.identity_intel import identity_resolve
     from app.services.intelligence.link_analysis import build_link_graph
+    from app.services.intelligence.phishstats_intel import phishstats_scan
+    from app.services.intelligence.urlhaus_intel import urlhaus_scan
 
     results = {}
 
@@ -55,6 +57,8 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
             censys_scan(target),
             recon_ng_scan(target),
             spiderfoot_scan(target),
+            phishstats_scan(target),
+            urlhaus_scan(target),
             return_exceptions=True,
         )
         results["shodan"] = (
@@ -68,6 +72,12 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
         )
         results["spiderfoot"] = (
             domain_results[3] if isinstance(domain_results[3], list) else []
+        )
+        results["phishstats"] = (
+            domain_results[4] if isinstance(domain_results[4], list) else []
+        )
+        results["urlhaus"] = (
+            domain_results[5] if isinstance(domain_results[5], list) else []
         )
 
     # Email / phone lookups

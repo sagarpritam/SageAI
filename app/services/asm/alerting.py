@@ -5,7 +5,7 @@ Checks for unsent ASM events and dispatches them to configured webhooks (e.g. Sl
 import logging
 import httpx
 from sqlalchemy import select
-from app.core.database import SessionLocal
+from app.core.database import AsyncSessionLocal
 from app.models.asm_event import ASMEvent
 from app.models.webhook import Webhook
 
@@ -13,9 +13,9 @@ logger = logging.getLogger("sageai.asm.alerting")
 
 async def dispatch_unnotified_events():
     """Find ASM events that haven't triggered alerts and send them."""
-    async with SessionLocal() as db:
+    async with AsyncSessionLocal() as db:
         # Fetch unsent events
-        stmt = select(ASMEvent).where(ASMEvent.is_alert_sent == "false")
+        stmt = select(ASMEvent).where(ASMEvent.is_alert_sent == False)
         result = await db.execute(stmt)
         events = result.scalars().all()
         
@@ -42,6 +42,6 @@ async def dispatch_unnotified_events():
                     logger.warning(f"Failed to trigger webhook {hook.url} for ASM Event {evt.id}: {e}")
 
             # Mark sent regardless of webhooks existence so we don't loop
-            evt.is_alert_sent = "true"
+            evt.is_alert_sent = True
             
         await db.commit()

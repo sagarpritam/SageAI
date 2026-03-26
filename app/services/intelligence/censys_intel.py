@@ -9,7 +9,7 @@ import os
 import ssl
 import socket
 
-import httpx
+import httpx  # pyre-ignore[21]
 
 logger = logging.getLogger("sageai.intelligence.censys")
 
@@ -17,14 +17,16 @@ CENSYS_API = "https://search.censys.io/api/v2"
 CRTSH_API = "https://crt.sh"
 
 
+from app.core.config import settings  # pyre-ignore[21]
+
 async def censys_scan(target: str) -> list[dict]:
     """Run Censys-style intelligence scan."""
-    api_id = os.getenv("CENSYS_API_ID")
-    api_secret = os.getenv("CENSYS_API_SECRET")
+    api_id = settings.CENSYS_API_ID
+    api_secret = settings.CENSYS_API_SECRET
 
     hostname = target.replace("https://", "").replace("http://", "").split("/")[0]
 
-    if api_id and api_secret:
+    if api_id:
         return await _censys_api_scan(hostname, api_id, api_secret)
     else:
         return await _censys_free_scan(hostname)
@@ -32,15 +34,16 @@ async def censys_scan(target: str) -> list[dict]:
 
 async def _censys_free_scan(hostname: str) -> list[dict]:
     """Free alternative: crt.sh certificate transparency + TLS inspection."""
-    findings = []
+    findings: list[dict] = []
 
     # 1. Certificate Transparency via crt.sh
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(f"{CRTSH_API}/?q=%25.{hostname}&output=json")
             if resp.status_code == 200:
-                certs = resp.json()
-                unique_domains = set()
+                raw_certs = resp.json()
+                certs: list[dict] = raw_certs if isinstance(raw_certs, list) else []
+                unique_domains: set[str] = set()
                 for cert in certs:
                     name = cert.get("name_value", "")
                     for domain in name.split("\n"):
@@ -55,7 +58,7 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                             "type": "certificate_transparency",
                             "severity": "info",
                             "title": f"Censys Radar: {len(unique_domains)} Domains in Certificate Transparency",
-                            "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",
+                            "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",  # pyre-ignore[16, 58]
                             "data": {
                                 "domains": sorted(unique_domains),
                                 "total_certs": len(certs),
@@ -67,7 +70,7 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                 # Check for expired or soon-expiring certs
                 import datetime
 
-                for cert in certs[:5]:
+                for cert in certs[:5]:  # pyre-ignore[16, 58]
                     not_after = cert.get("not_after", "")
                     if not_after:
                         try:
@@ -118,8 +121,9 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
         context = ssl.create_default_context()
         with socket.create_connection((hostname, 443), timeout=10) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-                cert = ssock.getpeercert()
-                protocol = ssock.version()
+                cert_raw = ssock.getpeercert()
+                cert: dict = cert_raw if isinstance(cert_raw, dict) else {}
+                protocol = ssock.version() or "Unknown"
 
                 findings.append(
                     {
@@ -160,7 +164,7 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
 
 async def _censys_api_scan(hostname: str, api_id: str, api_secret: str) -> list[dict]:
     """Full Censys Search API v2 (requires API credentials)."""
-    findings = []
+    findings: list[dict] = []
     try:
         async with httpx.AsyncClient(timeout=20) as client:
             resp = await client.get(

@@ -1,0 +1,180 @@
+﻿python : C:\Users\pc\Ap
+pData\Local\Programs\Py
+thon\Python313\Lib\site
+-packages\requests\__in
+it__.py:113: RequestsDe
+pendencyWarning: 
+urllib3 (2.6.3) or 
+chardet (7.0.1)/charset
+_normalizer (3.4.4) 
+doesn't match a 
+supported version!
+At line:1 char:1
++ python -c "import 
+importlib, os, 
+traceback; mods=['app.c
+ore.config',' ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\pc\A   
+ pp...ported versio    
+n!:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  warnings.warn(
+Traceback (most recent 
+call last):
+  File "<string>", 
+line 1, in <module>
+    import importlib, 
+os, traceback; mods=['a
+pp.core.config','app.co
+re.database','app.core.
+security','app.core.rat
+e_limit','app.models.sc
+an','app.models.user','
+app.models.organization
+','app.models.finding',
+'app.models.asset','app
+.models.api_key','app.m
+odels.webhook','app.mod
+els.schedule','app.mode
+ls.agent_log','app.mode
+ls.asm_event','app.mode
+ls.asset_diff','app.ser
+vices.subscription','ap
+p.services.risk_engine'
+,'app.services.scanner_
+service','app.services.
+email_service','app.par
+sers.nuclei_parser','ap
+p.parsers.nmap_parser',
+'app.parsers.subfinder_
+parser','app.tools.subf
+inder_wrapper','app.too
+ls.nmap_wrapper','app.t
+ools.nuclei_wrapper','a
+pp.agents.planner','app
+.agents.analyzer','app.
+agents.reporter','app.a
+gents.decision_engine',
+'app.pipeline','app.tas
+ks']; [print(f'OK  
+{m}') if importlib.impo
+rt_module(m) else None 
+for m in mods]
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+    ~~~~~~~~~~~~~~~~~~~
+~~~~^^^
+  File "C:\Users\pc\App
+Data\Local\Programs\Pyt
+hon\Python313\Lib\impor
+tlib\__init__.py", 
+line 88, in 
+import_module
+    return _bootstrap._
+gcd_import(name[level:]
+, package, level)
+           ~~~~~~~~~~~~
+~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+  File "<frozen importl
+ib._bootstrap>", line 
+1387, in _gcd_import
+  File "<frozen importl
+ib._bootstrap>", line 
+1360, in _find_and_load
+  File "<frozen importl
+ib._bootstrap>", line 
+1331, in 
+_find_and_load_unlocked
+  File "<frozen importl
+ib._bootstrap>", line 
+935, in _load_unlocked
+  File "<frozen importl
+ib._bootstrap_external>
+", line 1023, in 
+exec_module
+  File "<frozen importl
+ib._bootstrap>", line 
+488, in _call_with_fram
+es_removed
+  File "C:\Users\pc\Dow
+nloads\SageAI\app\tasks
+.py", line 11, in 
+<module>
+    from celery import 
+Celery
+ModuleNotFoundError: 
+No module named 
+'celery'
+OK  app.core.config
+OK  app.core.database
+OK  app.core.security
+OK  app.core.rate_limit
+OK  app.models.scan
+OK  app.models.user
+OK  app.models.organization
+OK  app.models.finding
+OK  app.models.asset
+OK  app.models.api_key
+OK  app.models.webhook
+OK  app.models.schedule
+OK  app.models.agent_log
+OK  app.models.asm_event
+OK  app.models.asset_diff
+OK  app.services.subscription
+OK  app.services.risk_engine
+OK  app.services.scanner_service
+OK  app.services.email_service
+OK  app.parsers.nuclei_parser
+OK  app.parsers.nmap_parser
+OK  app.parsers.subfinder_parser
+OK  app.tools.subfinder_wrapper
+OK  app.tools.nmap_wrapper
+OK  app.tools.nuclei_wrapper
+OK  app.agents.planner
+OK  app.agents.analyzer
+OK  app.agents.reporter
+OK  app.agents.decision_engine
+OK  app.pipeline

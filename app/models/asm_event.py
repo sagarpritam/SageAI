@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 import enum
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, Enum as SAEnum
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, Enum as SAEnum, Boolean
 
 from app.core.database import Base
 
@@ -41,7 +41,7 @@ class ASMEvent(Base):
     __tablename__ = "asm_events"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    org_id = Column(
+    organization_id = Column(
         String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
     
@@ -62,7 +62,6 @@ class ASMEvent(Base):
     # Stores precise change details depending on the event, e.g. {"port": 80, "service": "http"}
     details = Column(Text, default="{}") 
     
-    # Alerting tracking - stored as string "false", "true" for simple DB agnostic bool
-    is_alert_sent = Column(String, default="false") 
+    is_alert_sent = Column(Boolean, default=False) 
     
     created_at = Column(DateTime, default=datetime.utcnow, index=True)

@@ -1,4 +1,8 @@
 """Pytest configuration and fixtures for SageAI tests."""
+import uuid
+from app.core.rate_limit import limiter
+
+limiter.enabled = False
 
 import asyncio
 import pytest
@@ -55,13 +59,15 @@ async def client(db_session):
 @pytest_asyncio.fixture
 async def auth_headers(client):
     """Register a user and return auth headers."""
+    test_id = str(uuid.uuid4())[:8]
+    email = f"test_{test_id}@sageai.com"
     await client.post("/auth/register", json={
-        "email": "test@sageai.com",
+        "email": email,
         "password": "TestPass123!",
-        "organization_name": "TestOrg",
+        "organization_name": f"TestOrg_{test_id}",
     })
     r = await client.post("/auth/login", json={
-        "email": "test@sageai.com",
+        "email": email,
         "password": "TestPass123!",
     })
     token = r.json()["access_token"]

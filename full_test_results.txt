@@ -1,0 +1,47 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.11, pytest-8.0.0, pluggy-1.6.0
+rootdir: C:\Users\pc\Downloads\SageAI
+configfile: pyproject.toml
+plugins: anyio-4.12.1, locust-2.43.3, asyncio-0.23.5, cov-7.0.0, httpx-0.30.0
+asyncio: mode=Mode.AUTO
+collected 103 items / 1 error
+
+=================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_asm_enhanced.py _________________
+ImportError while importing test module 'C:\Users\pc\Downloads\SageAI\tests\test_asm_enhanced.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\AppData\Local\Programs\Python\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests\test_asm_enhanced.py:3: in <module>
+    from app.main import app
+app\main.py:12: in <module>
+    from app.routers import (
+app\routers\password_routes.py:13: in <module>
+    from app.services.email_service import email_service
+app\services\email_service.py:5: in <module>
+    import resend
+E   ModuleNotFoundError: No module named 'resend'
+============================== warnings summary ===============================
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:291: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.9/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11: DeprecationWarning: ast.NameConstant is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    haveNameConstant = hasattr(ast,'NameConstant')
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\__init__.py:113
+  C:\Users\pc\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.0.1)/charset_normalizer (3.4.4) doesn't match a supported version!
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/test_asm_enhanced.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+======================== 5 warnings, 1 error in 1.55s =========================

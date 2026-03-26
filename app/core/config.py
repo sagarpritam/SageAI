@@ -83,11 +83,37 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # LLM Keys
+    INTERNAL_SERVICE_KEY: str = ""
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     NVIDIA_API_KEY: str = ""
     RESEND_API_KEY: str = ""
     AUDITOR_BASE_URL: str = "http://localhost:8081"
+
+    # Intelligence & OSINT API Keys
+    VIRUSTOTAL_API_KEY: str = ""
+    BREACH_API_KEY: str = ""
+    BABELX_API_KEY: str = ""
+    SOCIAL_LINKS_API_KEY: str = ""
+    INTELX_API_KEY: str = ""
+    HIBP_API_KEY: str = ""
+    OSINT_INDUSTRIES_API_KEY: str = ""
+    SHODAN_API_KEY: str = ""
+    CENSYS_API_ID: str = ""
+    CENSYS_API_SECRET: str = ""
+
+    # LLM Configuration
+    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_MAX_RETRIES: int = 3
+    LLM_TIMEOUT: int = 30
+
+    # Tool binary paths (override if not on $PATH)
+    SUBFINDER_BIN: str = "subfinder"
+    NMAP_BIN: str = "nmap"
+    NUCLEI_BIN: str = "nuclei"
+    SUBFINDER_TIMEOUT: int = 60
+    NMAP_TIMEOUT: int = 120
+    NUCLEI_TIMEOUT: int = 180
 
     # Database — SQLite for dev, PostgreSQL for production
     DATABASE_URL: str = "sqlite+aiosqlite:///./sageai.db"
@@ -102,7 +128,11 @@ class Settings(BaseSettings):
 
     # CORS — comma-separated origins
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "http://localhost:3000"
+    
+    # Payments
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
 
     # Database connection pool (PostgreSQL only)
     DB_POOL_SIZE: int = 5

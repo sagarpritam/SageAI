@@ -47,6 +47,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        # Validate internal service key for Next.js to FastAPI proxy
+        if settings.INTERNAL_SERVICE_KEY and token == settings.INTERNAL_SERVICE_KEY:
+            return {"sub": "clerk-proxy", "org": "clerk-org", "role": "admin"}
+            
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )

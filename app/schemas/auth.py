@@ -1,5 +1,5 @@
 import re
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
 
 
 class UserCreate(BaseModel):
@@ -8,6 +8,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     organization_name: str
+
+    model_config = ConfigDict(extra="forbid")
 
     @field_validator("password")
     @classmethod
@@ -31,6 +33,8 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
     mfa_code: str | None = None
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class TokenResponse(BaseModel):

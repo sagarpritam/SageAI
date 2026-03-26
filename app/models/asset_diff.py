@@ -16,7 +16,7 @@ class AttackSurfaceDiff(Base):
     __tablename__ = "attack_surface_diffs"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    org_id = Column(
+    organization_id = Column(
         String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
     asset_id = Column(

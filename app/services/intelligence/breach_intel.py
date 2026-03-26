@@ -27,7 +27,8 @@ async def breach_scan(target: str, target_type: str = "domain") -> Dict[str, Any
     # Simulated delay for OSINT aggregation
     await asyncio.sleep(2)
 
-    api_key = os.getenv("BREACH_API_KEY")
+    from app.core.config import settings
+    api_key = settings.BREACH_API_KEY
     if not api_key:
         logger.warning("No BREACH_API_KEY set. Returning generic simulated OSINT results for demonstration.")
         return _get_mock_breach_data(target, target_type)

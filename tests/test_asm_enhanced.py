@@ -4,32 +4,32 @@ from app.main import app
 from app.models.asm_event import ASMEvent, ASMEventType, ASMEventSeverity
 from app.models.asset import Asset, AssetType
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.database import SessionLocal
+from app.core.database import AsyncSessionLocal, Base
 
 @pytest.mark.asyncio
-async def test_get_asm_events_asset(client: AsyncClient, auth_headers, test_db: AsyncSession):
+async def test_get_asm_events_asset(client: AsyncClient, auth_headers, db_session: AsyncSession):
     # 1. Create a dummy asset
     asset = Asset(
-        org_id="test-org-id", # This should match what's in conftest auth_headers if possible, or we mock
+        organization_id="test-org-id", # This should match what's in conftest auth_headers if possible, or we mock
         asset_type=AssetType.subdomain,
         value="test-asset.example.com",
         status="active"
     )
-    test_db.add(asset)
-    await test_db.commit()
-    await test_db.refresh(asset)
+    db_session.add(asset)
+    await db_session.commit()
+    await db_session.refresh(asset)
     
     # 2. Add an ASM event for this asset
     event = ASMEvent(
-        org_id="test-org-id",
+        organization_id="test-org-id",
         asset_id=asset.id,
         event_type=ASMEventType.new_port,
         severity=ASMEventSeverity.medium,
         title="Test Event",
         description="Testing asset-specific events"
     )
-    test_db.add(event)
-    await test_db.commit()
+    db_session.add(event)
+    await db_session.commit()
     
     # 3. Call the new endpoint
     # Note: We need to ensure the org_id matches the one in current_user.

@@ -37,6 +37,7 @@
 | **Multi-Agent** | ReconAgent → ScannerAgent → ExploitAgent → ReportAgent pipeline |
 | **Risk Engine** | OSINT-aware CVSS-weighted risk scoring with attack surface correlation |
 | **Multi-Tenant** | Org isolation, RBAC, plan-based scan limits (Free/Pro/Enterprise) |
+| **Production UX** | Next.js 15 SSR, Zero-Warning ESLint codebase, strict A11y & loading skeletons |
 | **Auth** | JWT + MFA (TOTP/QR), password reset, API keys, audit logging |
 | **Bug Bounty** | HackerOne-compliant Markdown export + PDF reports with OWASP mappings |
 | **Real-Time** | WebSocket scan progress (`/ws/scan/{id}`) with granular phase events |
@@ -77,7 +78,7 @@ Every module works **immediately without API keys** using free/open-source alter
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   React Frontend (Vite)                     │
+│                   Next.js 15 Frontend                       │
 │  Dashboard │ Asset Inventory │ Intelligence Hub │ Scans     │
 │  Reports   │ AutoFix │ AI Copilot │ Team │ Settings │ Plan │
 └──────────────────────────┬──────────────────────────────────┘
@@ -150,11 +151,11 @@ cp .env.example .env         # Edit with your settings
 alembic upgrade head
 
 # Frontend
-cd frontend && npm install && cd ..
+cd sage-web && npm install && cd ..
 
 # Start both
 uvicorn app.main:app --reload          # Backend  → http://localhost:8000
-cd frontend && npm run dev             # Frontend → http://localhost:5173
+cd sage-web && npm run dev             # Frontend → http://localhost:3000
 ```
 
 ### Docker (Full Stack)
@@ -378,16 +379,14 @@ SageAI/
 │   │   └── risk_engine.py           # CVSS-weighted risk scoring
 │   ├── plugins/           # Plugin marketplace registry
 │   └── middleware/        # Audit logging, security headers
-├── frontend/src/
-│   ├── pages/             # 14 React pages
-│   │   ├── Dashboard.jsx          # Animated stats + threat gauge
-│   │   ├── IntelligenceHub.jsx    # 🆕 9-module OSINT interface + graph
-│   │   ├── AssetInventory.jsx     # Attack Surface Management
-│   │   ├── Scans.jsx              # Terminal-style scan execution
-│   │   ├── Copilot.jsx            # Context-aware AI chat
-│   │   ├── Reports.jsx            # PDF + HackerOne export
+├── sage-web/src/
+│   ├── app/               # Next.js App Router
+│   │   ├── scan/page.tsx          # Animated stats + threat gauge
+│   │   ├── intelligence/page.tsx  # 🆕 9-module OSINT interface + graph
+│   │   ├── team/page.tsx          # Team & RBAC Management
+│   │   ├── history/page.tsx       # Past Scans
 │   │   └── ...
-│   └── api.js             # Centralized Axios API client
+│   └── components/        # React Components
 ├── alembic/               # Database migrations
 ├── tests/                 # 45 tests across 6 files
 ├── docker/                # Dockerfiles + Compose

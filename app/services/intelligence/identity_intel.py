@@ -45,7 +45,8 @@ USERNAME_PLATFORMS = {
 
 async def identity_resolve(target: str, target_type: str = "username") -> list[dict]:
     """Resolve a username or email to linked identities across platforms."""
-    api_key = os.getenv("SOCIAL_LINKS_API_KEY")
+    from app.core.config import settings
+    api_key = settings.SOCIAL_LINKS_API_KEY
 
     if api_key:
         return await _social_links_api(target, target_type, api_key)

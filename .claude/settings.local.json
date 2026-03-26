@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(python -m ruff check app/ api/ --statistics)",
+      "Bash(python -m pytest tests/ --collect-only)",
+      "Bash(python:*)"
+    ]
+  }
+}

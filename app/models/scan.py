@@ -21,6 +21,7 @@ class Scan(Base):
     risk_score = Column(Integer, default=0)
     risk_level = Column(String, default="Low")
     status = Column(String, default="pending")  # pending / running / completed / failed
+    share_token = Column(String, unique=True, nullable=True)
 
     created_at = Column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

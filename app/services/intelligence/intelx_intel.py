@@ -19,7 +19,8 @@ INTELX_API = "https://2.intelx.io"
 
 async def intelx_search(target: str) -> list[dict]:
     """Search for historical breaches and archived data."""
-    api_key = os.getenv("INTELX_API_KEY")
+    from app.core.config import settings
+    api_key = settings.INTELX_API_KEY
 
     if api_key:
         return await _intelx_api_search(target, api_key)
@@ -32,7 +33,8 @@ async def _intelx_free_search(target: str) -> list[dict]:
     findings = []
 
     # 1. HaveIBeenPwned — breach check (works for emails and domains)
-    hibp_key = os.getenv("HIBP_API_KEY", "")
+    from app.core.config import settings
+    hibp_key = settings.HIBP_API_KEY
     if "@" in target:
         # Email breach check
         try:

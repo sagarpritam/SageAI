@@ -14,6 +14,10 @@ class Organization(Base):
     name = Column(String, nullable=False)
     plan = Column(String, default="free")  # free / pro / enterprise
     github_token_encrypted = Column(String, nullable=True)
+    
+    # Stripe Integration
+    stripe_customer_id = Column(String, nullable=True, unique=True)
+    stripe_subscription_id = Column(String, nullable=True, unique=True)
     created_at = Column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
