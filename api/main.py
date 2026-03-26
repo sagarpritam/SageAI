@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import scan, payments
+from api.routers import scan, payments, export, email_reports
 
 app = FastAPI(title="SageAI Scanning API", description="Phase 5 Autonomous Scanning API")
 
@@ -15,6 +15,8 @@ app.add_middleware(
 
 app.include_router(scan.router)
 app.include_router(payments.router)
+app.include_router(export.router)
+app.include_router(email_reports.router)
 
 @app.get("/")
 def health_check():
