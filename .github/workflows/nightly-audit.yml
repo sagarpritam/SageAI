@@ -16,8 +16,14 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: pip install -r requirements.txt
+
+      - name: Frontend Sanity Check (Lint & Build)
+        run: |
+          cd sage-web
+          npm install
+          npm run lint
 
       - name: Run NeMo Security Audit
         env:
