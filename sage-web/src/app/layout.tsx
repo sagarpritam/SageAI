@@ -23,6 +23,7 @@ import { NavNotifications } from "@/components/NavNotifications";
 import { MobileNav } from "@/components/MobileNav";
 import { CommandPalette } from "@/components/CommandPalette";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
 export default async function RootLayout({
   children,
@@ -84,7 +85,9 @@ export default async function RootLayout({
           </div>
         </header>
         <main className="flex-1 w-full relative">
-          {children}
+          <AnalyticsProvider>
+            {children}
+          </AnalyticsProvider>
         </main>
         {userEmail && (
           <>

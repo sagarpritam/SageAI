@@ -2,6 +2,7 @@
 
 import { Share2, Check } from "lucide-react";
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface ShareButtonProps {
   scanId: string;
@@ -13,6 +14,7 @@ export function ShareButton({ scanId }: ShareButtonProps) {
 
   const handleShare = async () => {
     setLoading(true);
+    posthog.capture('viral_share_clicked', { scanId });
     try {
       const res = await fetch(`/api/scan/${scanId}/share`, { method: "POST" });
       if (!res.ok) throw new Error("Share link generation failed");

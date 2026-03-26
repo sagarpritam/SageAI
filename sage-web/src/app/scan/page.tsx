@@ -12,6 +12,7 @@ import { RiskGauge } from "@/components/RiskGauge";
 import { ExportButton } from "@/components/ExportButton";
 import { ShareButton } from "@/components/ShareButton";
 import axios from "axios";
+import posthog from "posthog-js";
 
 interface RiskData {
   risk_score: number;
@@ -33,6 +34,7 @@ export default function Home() {
   const startScan = async (target: string) => {
     setScanState("running");
     setLogs([]);
+    posthog.capture('scan_initiated', { target });
     
     // Fallback ID if API fails
     let newScanId = "mock-scan-id";
@@ -232,6 +234,7 @@ export default function Home() {
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("I just scanned my site with SageAI — found " + vulnerabilities.length + " vulnerabilities 😳 Run your own autonomous pentest in 60 seconds.")}&url=https://sageai.example.com`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => posthog.capture('viral_share_twitter_clicked')}
                   className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/80 text-white px-6 py-2 rounded-md font-bold transition flex items-center"
                 >
                   Share on Twitter
@@ -240,6 +243,7 @@ export default function Home() {
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=https://sageai.example.com`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => posthog.capture('viral_share_linkedin_clicked')}
                   className="bg-[#0A66C2] hover:bg-[#0A66C2]/80 text-white px-6 py-2 rounded-md font-bold transition flex items-center"
                 >
                   Share on LinkedIn

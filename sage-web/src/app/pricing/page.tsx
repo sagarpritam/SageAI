@@ -4,11 +4,13 @@ import { Sparkles, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 export default function PricingPage() {
   const router = useRouter();
 
   const handleCheckout = async () => {
+    posthog.capture('checkout_started', { tier: 'founder' });
     try {
       // Call our Stripe checkout API proxy
       const res = await fetch("/api/checkout", { method: "POST" });
