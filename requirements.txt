@@ -30,3 +30,5 @@ bandit==1.7.7
 
 # NVIDIA NeMo Microservices
 nemo-microservices
+stripe
+PyJWT
