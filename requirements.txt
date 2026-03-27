@@ -10,6 +10,8 @@
 #   pip-compile --output-file=requirements.txt pyproject.toml
 #
 # --------------------------------------------------------------------
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
 colorama==0.4.6
 email-validator>=2.0.0
 asyncpg>=0.29.0
