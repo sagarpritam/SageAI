@@ -231,7 +231,7 @@ export default function Home() {
                 {scanId && <ShareButton scanId={scanId} />}
                 {scanId && <ExportButton scanId={scanId} />}
                 <a 
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("I just scanned my site with SageAI — found " + vulnerabilities.length + " vulnerabilities 😳 Run your own autonomous pentest in 60 seconds.")}&url=https://sageai.example.com`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("I just scanned my site with SageAI — found " + vulnerabilities.length + " vulnerabilities 😳 Run your own autonomous pentest in 60 seconds.")}&url=https://sageai.vercel.app`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => posthog.capture('viral_share_twitter_clicked')}
@@ -240,7 +240,7 @@ export default function Home() {
                   Share on Twitter
                 </a>
                 <a 
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=https://sageai.example.com`}
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=https://sageai.vercel.app`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => posthog.capture('viral_share_linkedin_clicked')}

@@ -24,7 +24,7 @@ export async function generateMetadata(
         openGraph: {
           title,
           description,
-          url: `https://sageai.example.com/report/${token}`,
+          url: `https://sageai.vercel.app/report/${token}`,
           type: "website",
         },
         twitter: {
