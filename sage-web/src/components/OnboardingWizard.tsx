@@ -65,8 +65,10 @@ export function OnboardingWizard() {
       <div className="bg-zinc-900 border border-emerald-900/40 rounded-2xl shadow-2xl w-[440px] max-w-[95vw] overflow-hidden">
         {/* Progress bar */}
         <div className="h-1 bg-zinc-800">
-
-          <div className="h-1 bg-emerald-500 transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div 
+            className="h-1 bg-emerald-500 transition-all duration-300 progress-bar-fill" 
+            style={{ '--progress-width': `${progress}%` } as React.CSSProperties} 
+          />
         </div>
 
         {/* Header */}

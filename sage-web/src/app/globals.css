@@ -216,3 +216,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Dynamic width utilities — driven by CSS variables set from React */
+.score-bar-fill {
+  width: var(--score-width, 0%);
+}
+
+.progress-bar-fill {
+  width: var(--progress-width, 0%);
+}

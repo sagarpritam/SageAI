@@ -101,11 +101,10 @@ export function ComplianceCenter() {
           </div>
 
           {/* Score Bar */}
-          <div className="w-full bg-zinc-800 rounded-full h-2.5">
-
+          <div className="w-full bg-zinc-800 rounded-full h-2.5 overflow-hidden">
             <div
-              className={`h-2.5 rounded-full transition-all duration-500 ${scoreBarColor(report.score)}`}
-              style={{ width: `${report.score}%` }}
+              className={`h-2.5 rounded-full transition-all duration-500 score-bar-fill ${scoreBarColor(report.score)}`}
+              style={{ '--score-width': `${report.score}%` } as React.CSSProperties}
             />
           </div>
 

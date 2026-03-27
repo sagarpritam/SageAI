@@ -188,6 +188,7 @@ Spins up **7 services**:
 | `GET` | `/metrics` | Prometheus metrics |
 
 ### Auth
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `POST` | `/auth/register` | Create account + org |
@@ -198,6 +199,7 @@ Spins up **7 services**:
 | `POST` | `/auth/reset-password` | Reset password |
 
 ### Scanning
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `POST` | `/scan` | Run 11-scanner + OSINT pipeline |
@@ -207,6 +209,7 @@ Spins up **7 services**:
 | `WS` | `/ws/scan/{id}` | Real-time scan progress |
 
 ### Intelligence Hub
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `POST` | `/intelligence/sweep` | Full 9-module intelligence sweep |
@@ -222,6 +225,7 @@ Spins up **7 services**:
 | `GET` | `/intelligence/modules` | List all modules & tier status |
 
 ### Asset Inventory
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `POST` | `/assets/discover` | Start async asset discovery |
@@ -234,6 +238,7 @@ Spins up **7 services**:
 | `DELETE` | `/assets/{id}` | Remove asset |
 
 ### Reports & Exports
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `GET` | `/reports/{id}` | JSON report |
@@ -241,6 +246,7 @@ Spins up **7 services**:
 | `GET` | `/reports/{id}/hackerone` | HackerOne Markdown export |
 
 ### AI (Copilot + Agents)
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `POST` | `/ai/chat` | Context-aware AI Copilot |
@@ -315,6 +321,7 @@ PYTHONPATH=. pytest tests/ -v
 ## 🌐 Deployment
 
 Pre-configured for:
+
 - **Render** — `render.yaml` blueprint
 - **Railway** — `railway.toml`
 - **Heroku** — `Procfile`
@@ -353,7 +360,7 @@ See [`.env.example`](.env.example) for the full list.
 
 ## 📁 Project Structure
 
-```
+```text
 SageAI/
 ├── app/
 │   ├── core/              # Config, database, security, JWT
