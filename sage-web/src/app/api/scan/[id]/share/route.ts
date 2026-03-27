@@ -5,7 +5,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const backendUrl = process.env.API_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
   const { id } = await params;
 
   const cookieStore = await cookies();

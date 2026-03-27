@@ -8,7 +8,7 @@ export async function generateMetadata(
   { params }: { params: Promise<{ token: string }> }
 ): Promise<Metadata> {
   const { token } = await params;
-  const backendUrl = process.env.API_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
 
   try {
     const res = await fetch(`${backendUrl}/scan/public/${token}`, { cache: "no-store" });
@@ -51,7 +51,7 @@ export default async function PublicReportPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const backendUrl = process.env.API_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
 
   let scanData = null;
   let error = null;

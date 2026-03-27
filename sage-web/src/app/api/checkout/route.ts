@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export async function POST() {
-  const backendUrl = process.env.API_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
 
