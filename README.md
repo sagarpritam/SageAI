@@ -68,7 +68,7 @@ Every module works **immediately without API keys** using free/open-source alter
 | --- | --- | --- |
 | 🌐 Domain | `example.com` | All 9 modules |
 | 📌 IP Address | `8.8.8.8` | Shodan, Censys, SpiderFoot, Recon-ng |
-| 📧 Email | `user@company.com` | OSINT Ind., Intel X, Identity, Dark Web |
+| 📧 Email | `user@company.com` | OSINT Ind., Intel X, Dark Web |
 | 👤 Username | `johndoe` | Identity, Intel X, Dark Web |
 | 📱 Phone | `+1234567890` | OSINT Industries |
 
@@ -76,7 +76,7 @@ Every module works **immediately without API keys** using free/open-source alter
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                   Next.js 15 Frontend                       │
 │  Dashboard │ Asset Inventory │ Intelligence Hub │ Scans     │
@@ -181,6 +181,7 @@ Spins up **7 services**:
 ## 📡 API Reference (64+ Endpoints)
 
 ### Core
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | `GET` | `/` | Health check (DB status, version, module count) |
