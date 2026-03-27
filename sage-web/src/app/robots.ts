@@ -1,12 +1,14 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/dashboard/', '/api/'],
-    },
-    sitemap: 'https://sageai.example.com/sitemap.xml',
-  }
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/", "/dashboard/", "/scan/", "/history/", "/settings/"],
+      },
+    ],
+    sitemap: "https://sageai.vercel.app/sitemap.xml",
+  };
 }

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SageAI — Autonomous AI Pentester",
     description: "Run a full AI-powered pentest on any domain in 60 seconds. Fix vulnerabilities before hackers find them.",
-    url: "https://sageai.example.com",
+    url: "https://sageai.vercel.app",
     siteName: "SageAI",
     images: [
       {
