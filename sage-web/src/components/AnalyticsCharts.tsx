@@ -17,10 +17,10 @@ interface AnalyticsData {
 }
 
 const sevColors: Record<string, string> = {
-  Critical: "#dc2626",
-  High: "#f97316",
-  Medium: "#eab308",
-  Low: "#10b981",
+  Critical: "bg-red-600",
+  High: "bg-orange-500",
+  Medium: "bg-yellow-500",
+  Low: "bg-emerald-500",
 };
 
 export function AnalyticsCharts() {
@@ -206,7 +206,7 @@ export function AnalyticsCharts() {
           <div className="space-y-2">
             {Object.entries(data.severityCounts).map(([level, count]) => (
               <div key={level} className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: sevColors[level] }} />
+                <span className={`w-3 h-3 rounded-full ${sevColors[level]}`} />
                 <span className="text-sm text-zinc-300 w-16">{level}</span>
                 <span className="text-sm font-bold text-white">{count}</span>
                 <span className="text-xs text-zinc-500">({total ? Math.round((count / total) * 100) : 0}%)</span>

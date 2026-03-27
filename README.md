@@ -5,8 +5,8 @@
 [![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)](tests/)
 [![Audit](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml)
 [![Deploy](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml)
-[![Version](https://img.shields.io/badge/version-latest-blueviolet)](#)
-[![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20SQLAlchemy-informational)](#)
+![Version](https://img.shields.io/badge/version-latest-blueviolet)
+![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20SQLAlchemy-informational)
 [![Modules](https://img.shields.io/badge/intelligence-9%20OSINT%20modules-ff6b6b)](#-intelligence-hub--9-osint-modules)
 
 ---
@@ -14,7 +14,7 @@
 ## 🔥 Core Capabilities
 
 | Feature | Description |
-|---------|-------------|
+| --- | --- |
 | ⚡ **Intelligence Hub** | 9 advanced OSINT modules — Shodan, Maltego, Babel X, SpiderFoot, Social Links, Intel X, Recon-ng, Censys, OSINT Industries |
 | 🕸️ **Maltego Link Analysis** | Canvas-rendered entity relationship graph with nodes, edges, and radial layout |
 | 🌑 **Dark Web Monitoring** | Tor search (Ahmia.fi) + paste site monitoring + Google dork suggestions |
@@ -29,7 +29,7 @@
 ## ⚡ Feature Matrix
 
 | Category | Capabilities |
-|----------|-------------|
+| --- | --- |
 | **Scanning** | 11-scanner pipeline: Security Headers, XSS, SQLi, SSL/TLS, Port Scan, DNS + OSINT (Shodan, CRT.sh, Mozilla Observatory, VirusTotal, NVD CVE) |
 | **Intelligence Hub** | 9 OSINT modules: Shodan, Maltego, Babel X, SpiderFoot, Social Links, Intel X, Recon-ng, Censys, OSINT Industries |
 | **Asset Discovery** | Subdomain enum (crt.sh), DNS resolution, Shodan port data, HTTP probing, risk scoring per asset |
@@ -51,7 +51,7 @@
 Every module works **immediately without API keys** using free/open-source alternatives. Add premium keys anytime for enhanced capabilities.
 
 | # | Module | Codename | Free Source | Premium Upgrade |
-|---|--------|----------|-------------|-----------------|
+| --- | --- | --- | --- | --- |
 | 01 | **SHODAN** | The Panopticon | Shodan InternetDB (free) | `SHODAN_API_KEY` → Pro banners, screenshots |
 | 02 | **MALTEGO** | Link Analysis | Built-in canvas graph engine | — |
 | 03 | **BABEL X** | The Linguistic Mesh | Ahmia.fi Tor + PasteBin dumps | `BABELX_API_KEY` → Enterprise |
@@ -65,7 +65,7 @@ Every module works **immediately without API keys** using free/open-source alter
 ### Target Types Supported
 
 | Type | Example | Modules Available |
-|------|---------|-------------------|
+| --- | --- | --- |
 | 🌐 Domain | `example.com` | All 9 modules |
 | 📌 IP Address | `8.8.8.8` | Shodan, Censys, SpiderFoot, Recon-ng |
 | 📧 Email | `user@company.com` | OSINT Ind., Intel X, Identity, Dark Web |
@@ -112,7 +112,7 @@ PostgreSQL   Redis    Celery Workers      Vector Store
 ## 🗄️ Database Models
 
 | Model | Table | Purpose |
-|-------|-------|---------|
+| --- | --- | --- |
 | `Organization` | `organizations` | Multi-tenant isolation |
 | `User` | `users` | Auth + RBAC |
 | `Scan` | `scans` | Scan records |
@@ -167,7 +167,7 @@ docker compose -f docker/docker-compose.yml up -d
 Spins up **7 services**:
 
 | Service | Port | Description |
-|---------|------|-------------|
+| --- | --- | --- |
 | `sage-backend` | 8000 | FastAPI + Gunicorn |
 | `sage-frontend` | 80 | Nginx + React |
 | `sage-db` | 5432 | PostgreSQL 16 |
@@ -182,13 +182,13 @@ Spins up **7 services**:
 
 ### Core
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `GET` | `/` | Health check (DB status, version, module count) |
 | `GET` | `/metrics` | Prometheus metrics |
 
 ### Auth
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `POST` | `/auth/register` | Create account + org |
 | `POST` | `/auth/login` | JWT login |
 | `POST` | `/auth/mfa/setup` | Enable TOTP MFA |
@@ -198,7 +198,7 @@ Spins up **7 services**:
 
 ### Scanning
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `POST` | `/scan` | Run 11-scanner + OSINT pipeline |
 | `GET` | `/scan/{id}` | Get scan result |
 | `GET` | `/scans` | List scans (org-scoped) |
@@ -207,7 +207,7 @@ Spins up **7 services**:
 
 ### Intelligence Hub
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `POST` | `/intelligence/sweep` | Full 9-module intelligence sweep |
 | `POST` | `/intelligence/shodan` | Shodan: The Panopticon |
 | `POST` | `/intelligence/censys` | Censys: The Global Radar |
@@ -222,7 +222,7 @@ Spins up **7 services**:
 
 ### Asset Inventory
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `POST` | `/assets/discover` | Start async asset discovery |
 | `POST` | `/assets/discover/sync` | Synchronous asset discovery |
 | `GET` | `/assets` | List all assets (paginated, filterable) |
@@ -234,14 +234,14 @@ Spins up **7 services**:
 
 ### Reports & Exports
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `GET` | `/reports/{id}` | JSON report |
 | `GET` | `/reports/{id}/pdf` | Downloadable PDF (ReportLab) |
 | `GET` | `/reports/{id}/hackerone` | HackerOne Markdown export |
 
 ### AI (Copilot + Agents)
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `POST` | `/ai/chat` | Context-aware AI Copilot |
 | `POST` | `/ai/command` | AI command execution |
 | `GET` | `/explain/{type}` | OWASP-aligned vuln explanation |
@@ -255,7 +255,7 @@ Spins up **7 services**:
 
 ### Management
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| --- | --- | --- |
 | `CRUD` | `/api-keys/*` | Programmatic API key management |
 | `CRUD` | `/webhooks/*` | Webhook management |
 | `CRUD` | `/schedules/*` | Scheduled scan management |
@@ -288,7 +288,7 @@ PYTHONPATH=. pytest tests/ -v
 ## 🔒 Security Architecture
 
 | Feature | Implementation |
-|---------|---------------|
+| --- | --- |
 | **Circuit Breaker** | OpenAI calls fail-fast after 3 consecutive failures |
 | **Prompt Injection Protection** | 12 regex patterns sanitize scanner output before LLM |
 | **Token Budget Tracking** | Per-org LLM usage with configurable limits |
@@ -303,7 +303,7 @@ PYTHONPATH=. pytest tests/ -v
 ## 📊 Monitoring
 
 | Tool | Purpose | Access |
-|------|---------|--------|
+| --- | --- | --- |
 | **Prometheus** | API latency, request rates, error rates | `/metrics` |
 | **Flower** | Celery queue depth, worker health, task failures | `localhost:5555` |
 | **Sentry** | Exception tracking, performance monitoring | Dashboard |

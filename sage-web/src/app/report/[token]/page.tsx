@@ -2,11 +2,10 @@ import { Shield, Sparkles, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { RiskGauge } from "@/components/RiskGauge";
 import { VulnerabilityList } from "@/components/VulnerabilityList";
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ token: string }> },
-  parent: ResolvingMetadata
+  { params }: { params: Promise<{ token: string }> }
 ): Promise<Metadata> {
   const { token } = await params;
   const backendUrl = process.env.API_URL || "http://localhost:8000";
@@ -35,7 +34,7 @@ export async function generateMetadata(
         }
       };
     }
-  } catch (e) {
+  } catch {
     // Fallback to default
   }
 
