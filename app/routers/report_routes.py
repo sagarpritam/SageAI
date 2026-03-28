@@ -7,6 +7,7 @@ import io
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.scan import Scan
+from app.models.organization import Organization
 from app.services.report_generator import (
     generate_report,
     generate_pdf_report,
@@ -14,6 +15,19 @@ from app.services.report_generator import (
 )
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
+
+
+async def _check_export_plan(current_user: dict, db: AsyncSession):
+    """Raise 402 if the user's org is on the free plan."""
+    org_result = await db.execute(
+        select(Organization).where(Organization.id == current_user["org"])
+    )
+    org = org_result.scalar_one_or_none()
+    if org and getattr(org, "plan", "free") == "free":
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Export requires a Pro or Enterprise plan.",
+        )
 
 
 @router.get("/{scan_id}")
@@ -43,6 +57,7 @@ async def get_report_pdf(
     db: AsyncSession = Depends(get_db),
 ):
     """Download a professional PDF security report for a completed scan."""
+    await _check_export_plan(current_user, db)
     scan = await _get_scan(scan_id, current_user, db)
 
     pdf_bytes = generate_pdf_report(
@@ -72,6 +87,7 @@ async def get_hackerone_report(
     db: AsyncSession = Depends(get_db),
 ):
     """Download a HackerOne-formatted Markdown report for Bug Bounty submission."""
+    await _check_export_plan(current_user, db)
     scan = await _get_scan(scan_id, current_user, db)
 
     markdown = generate_hackerone_report(

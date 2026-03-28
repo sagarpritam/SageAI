@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Users, Shield, UserCog } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Users, Shield, UserCog, Lock } from "lucide-react";
 import axios from "axios";
 
 interface TeamUser {
@@ -14,20 +14,29 @@ interface TeamUser {
 export function TeamManager() {
   const [users, setUsers] = useState<TeamUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState<string | null>(null);
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     setLoading(true);
     axios.get("/api/org?action=users")
       .then(r => setUsers(Array.isArray(r.data) ? r.data : []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
-  };
-
-  useEffect(() => { 
-    setTimeout(() => {
-      fetchUsers(); 
-    }, 0);
   }, []);
+
+  useEffect(() => {
+    axios.get("/api/org?action=plan")
+      .then(r => {
+        const p = r.data?.plan || "free";
+        setPlan(p);
+        if (p !== "free") fetchUsers();
+        else setLoading(false);
+      })
+      .catch(() => {
+        setPlan("free");
+        setLoading(false);
+      });
+  }, [fetchUsers]);
 
   const updateRole = async (userId: string, newRole: string) => {
     try {
@@ -37,6 +46,27 @@ export function TeamManager() {
       alert("Failed to update role");
     }
   };
+
+  // Upgrade wall for free users
+  if (plan === "free") {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+        <div className="w-16 h-16 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+          <Lock className="w-8 h-8 text-zinc-500" />
+        </div>
+        <h3 className="text-xl font-black text-white">Team Management is a Pro Feature</h3>
+        <p className="text-sm text-zinc-400 max-w-md">
+          Invite team members, assign roles, and collaborate on security scans — available on the Pro and Enterprise plans.
+        </p>
+        <a
+          href="/pricing"
+          className="inline-block px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-lg font-bold text-white transition-all"
+        >
+          Upgrade Now →
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -75,3 +105,4 @@ export function TeamManager() {
     </div>
   );
 }
+

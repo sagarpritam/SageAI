@@ -351,8 +351,18 @@ async def download_pdf_report(
     scan = await db.get(Scan, scan_id)
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
-    if str(scan.organization_id) != current_user["org"]:
+    
+    # Service key bypasses org check because the Next.js proxy already validated the user session
+    is_service = current_user.get("sub") == "clerk-proxy"
+    if not is_service and str(scan.organization_id) != current_user["org"]:
         raise HTTPException(status_code=403, detail="Access denied")
+
+    org = await db.get(Organization, scan.organization_id)
+    if org and org.plan == "free":
+        raise HTTPException(
+            status_code=402,
+            detail="PDF Export requires a Pro or Enterprise plan.",
+        )
 
     # Fetch findings
     finding_rows = await db.execute(

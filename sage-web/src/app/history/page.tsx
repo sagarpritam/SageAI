@@ -51,6 +51,28 @@ export default function HistoryPage() {
     fetchScans();
   }, []);
 
+  const downloadPdf = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/scan/${id}/pdf`);
+      if (res.status === 402) {
+        alert("🔒 PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade.");
+        return;
+      }
+      if (!res.ok) throw new Error("Download failed");
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `sageai-report-${id.toString().slice(0, 8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("PDF download failed.");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-emerald-50 font-sans selection:bg-emerald-500/30">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black z-0 pointer-events-none" />
@@ -143,13 +165,13 @@ export default function HistoryPage() {
                           </Badge>
                         )}
                         {scan.status === "completed" && (
-                          <a
-                            href={`/api/scan/${scan.id}/pdf`}
+                          <button
+                            onClick={(e) => downloadPdf(e, scan.id)}
                             className="text-zinc-500 hover:text-emerald-400 transition-colors"
                             title="Download PDF"
                           >
                             <Download className="w-4 h-4" />
-                          </a>
+                          </button>
                         )}
                         <Link
                           href={`/history/${scan.id}`}

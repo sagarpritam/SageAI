@@ -77,12 +77,27 @@ export function OrgSettings() {
         </div>
       )}
 
-      {/* Upgrade CTA */}
-      {plan?.plan !== "pro" && (
+      {/* Upgrade CTA / Billing */}
+      {plan?.plan !== "pro" && plan?.plan !== "enterprise" ? (
         <a href="/pricing" className="block bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-xl p-5 text-center transition-all">
           <p className="text-lg font-black text-white">Upgrade to Pro</p>
-          <p className="text-sm text-emerald-200/80">Unlock unlimited scans, AI Copilot, Intel Hub, and Auto-Fix.</p>
+          <p className="text-sm text-emerald-200/80">Unlock unlimited scans, PDF Reports, Intel Hub, and Auto-Fix.</p>
         </a>
+      ) : (
+        <button 
+          onClick={async () => {
+             const res = await fetch('/api/billing/portal', { method: 'POST' });
+             if (res.ok) {
+                const data = await res.json();
+                if (data.portal_url) window.location.href = data.portal_url;
+             } else {
+                alert("Failed to open billing portal. Contact support.");
+             }
+          }}
+          className="w-full mt-4 block bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-4 text-center transition-all font-bold text-white shadow-sm"
+        >
+          Manage Billing (Stripe Portal)
+        </button>
       )}
     </div>
   );

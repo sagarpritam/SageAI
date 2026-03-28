@@ -73,6 +73,12 @@ export default function ScanDetailPage() {
     setDownloading("pdf");
     try {
       const res = await fetch(`/api/scan/${id}/pdf`);
+      if (res.status === 402) {
+        alert("🔒 PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade.");
+        return;
+      }
+      if (!res.ok) throw new Error("Download failed");
+      
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
