@@ -60,6 +60,13 @@ export default function Home() {
         alert("Please sign in to scan.");
         return;
       }
+      if (e.response?.status === 402) {
+        setScanState("idle");
+        const msg = e.response?.data?.error || "Monthly scan limit reached. Upgrade to Pro for unlimited scans.";
+        alert("🔒 " + msg);
+        window.location.assign("/pricing");
+        return;
+      }
       if (e.response?.status === 403 && e.response?.data?.limitReached) {
         setScanState("idle");
         alert("Free limit reached! Redirecting to setup Founder Mode.");

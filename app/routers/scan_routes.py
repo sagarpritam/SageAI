@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from uuid import UUID
+from datetime import datetime, timezone
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -17,7 +18,7 @@ from app.schemas.scan import (
 )
 from app.services.scanner_service import run_all_scans
 from app.services.risk_engine import calculate_risk
-from app.services.subscription import check_scan_limit
+from app.services.subscription import check_scan_limit, get_plan
 from app.core.rate_limit import limiter
 from app.agents.analyzer import analyze_findings
 
@@ -41,20 +42,27 @@ async def create_scan(
             detail="Target must be a valid URL starting with http:// or https://",
         )
 
-    # Check scan limit based on org's plan
+    # Check scan limit based on org's plan (current calendar month only)
     org_result = await db.execute(
         select(Organization).where(Organization.id == current_user["org"])
     )
     org = org_result.scalar_one_or_none()
     if org:
+        now = datetime.now(timezone.utc)
+        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         scan_count = await db.execute(
-            select(func.count(Scan.id)).where(Scan.organization_id == org.id)
+            select(func.count(Scan.id)).where(
+                Scan.organization_id == org.id,
+                Scan.created_at >= month_start,
+            )
         )
         current_scans = scan_count.scalar() or 0
         if not check_scan_limit(org.plan, current_scans):
+            plan_limits = get_plan(org.plan)
+            max_scans = plan_limits["max_scans_per_month"]
             raise HTTPException(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
-                detail="You found real vulnerabilities.\n\nUnlock full exploit analysis with Pro.",
+                detail=f"Monthly scan limit reached ({current_scans}/{max_scans}). Upgrade to Pro for unlimited scans.",
             )
 
     # Create scan record

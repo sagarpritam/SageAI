@@ -13,6 +13,7 @@ try {
 }
 
 export async function POST(req: Request) {
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
   
@@ -30,27 +31,19 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { target } = body;
 
-  let limitReached = false;
-
+  // Optional Redis-based rate limiting (fast pre-check)
   if (redis) {
     const isPro = await redis.get(`is_pro:${userId}`);
     if (!isPro) {
       const scanCount = await redis.incr(`scan_count:${userId}`);
       if (scanCount > 3) {
-        limitReached = true;
+        return NextResponse.json({ error: "Free limit reached.", limitReached: true }, { status: 403 });
       }
     }
-  } else {
-    // Mock limit for dev without redis
-    console.log("No redis, skipping rate limit check");
-  }
-
-  if (limitReached) {
-    return NextResponse.json({ error: "Free limit reached.", limitReached: true }, { status: 403 });
   }
 
   try {
-    const backendRes = await fetch("http://localhost:8000/scan", {
+    const backendRes = await fetch(`${backendUrl}/scan`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -58,6 +51,16 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({ target })
     });
+
+    // Relay 402 Payment Required from backend
+    if (backendRes.status === 402) {
+      const err = await backendRes.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: err.detail || "Scan limit reached.", limitReached: true },
+        { status: 402 }
+      );
+    }
+
     const data = await backendRes.json();
     return NextResponse.json(data);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,3 +68,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ scan_id: "mock-" + Date.now() });
   }
 }
+
