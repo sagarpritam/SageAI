@@ -1,19 +1,22 @@
 """API Key management routes."""
 
 import secrets
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import require_role
 from app.models.api_key import APIKey
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/api-keys", tags=["API Keys"])
 
 
 @router.post("")
+@limiter.limit("10/minute")
 async def create_api_key(
+    request: Request,
     name: str,
     current_user: dict = Depends(require_role("admin")),
     db: AsyncSession = Depends(get_db),
@@ -39,7 +42,9 @@ async def create_api_key(
 
 
 @router.get("")
+@limiter.limit("60/minute")
 async def list_api_keys(
+    request: Request,
     current_user: dict = Depends(require_role("admin")),
     db: AsyncSession = Depends(get_db),
 ):
@@ -63,7 +68,9 @@ async def list_api_keys(
 
 
 @router.delete("/{key_id}")
+@limiter.limit("30/minute")
 async def revoke_api_key(
+    request: Request,
     key_id: str,
     current_user: dict = Depends(require_role("admin")),
     db: AsyncSession = Depends(get_db),

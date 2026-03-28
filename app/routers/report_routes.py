@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -13,6 +13,7 @@ from app.services.report_generator import (
     generate_pdf_report,
     generate_hackerone_report,
 )
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
@@ -31,7 +32,9 @@ async def _check_export_plan(current_user: dict, db: AsyncSession):
 
 
 @router.get("/{scan_id}")
+@limiter.limit("30/minute")
 async def get_report_json(
+    request: Request,
     scan_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -51,7 +54,9 @@ async def get_report_json(
 
 
 @router.get("/{scan_id}/pdf")
+@limiter.limit("10/minute")
 async def get_report_pdf(
+    request: Request,
     scan_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -81,7 +86,9 @@ async def get_report_pdf(
 
 
 @router.get("/{scan_id}/hackerone")
+@limiter.limit("10/minute")
 async def get_hackerone_report(
+    request: Request,
     scan_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

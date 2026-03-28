@@ -1,20 +1,28 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { userId } = await auth();
-  if (!userId) {
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  const cookieStore = await cookies();
+  const token = cookieStore.get("sageai_jwt")?.value;
+
+  if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
 
   try {
-    const backendRes = await fetch(`http://localhost:8000/scan/${id}`, {
+    const backendRes = await fetch(`${backendUrl}/scan/${id}`, {
       headers: {
-        "Authorization": `Bearer ${process.env.INTERNAL_SERVICE_KEY || "dev-internal-key-123"}`
+        "Authorization": `Bearer ${token}`
       }
     });
+
+    if (backendRes.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await backendRes.json();
     return NextResponse.json(data);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

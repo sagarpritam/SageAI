@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
@@ -9,12 +9,15 @@ from app.models.organization import Organization
 from app.models.scan import Scan
 from app.schemas.user import UserOut
 from app.services.subscription import get_plan, PLAN_LIMITS
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/org", tags=["Organization & SaaS"])
 
 
 @router.get("/plan")
+@limiter.limit("60/minute")
 async def get_current_plan(
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -52,13 +55,16 @@ async def get_current_plan(
 
 
 @router.get("/plans")
-async def list_plans():
+@limiter.limit("120/minute")
+async def list_plans(request: Request):
     """List all available subscription plans."""
     return PLAN_LIMITS
 
 
 @router.get("/users", response_model=list[UserOut])
+@limiter.limit("60/minute")
 async def list_org_users(
+    request: Request,
     current_user: dict = Depends(require_role("admin")),
     db: AsyncSession = Depends(get_db),
 ):
@@ -71,7 +77,9 @@ async def list_org_users(
 
 
 @router.patch("/users/{user_id}/role")
+@limiter.limit("30/minute")
 async def update_user_role(
+    request: Request,
     user_id: str,
     role: str,
     current_user: dict = Depends(require_role("admin")),
@@ -98,7 +106,9 @@ async def update_user_role(
 
 
 @router.get("/stats")
+@limiter.limit("60/minute")
 async def get_org_stats(
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

@@ -5,13 +5,14 @@ Exposes the multi-agent security team via REST endpoints.
 
 import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.models.user import User
 from app.core.security import get_current_user
+from app.core.rate_limit import limiter
 from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
 from app.services.knowledge_graph import SecurityKnowledgeGraph
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
@@ -34,7 +35,9 @@ class AssessmentRequest(BaseModel):
 
 
 @router.post("/assess", summary="Run Full Multi-Agent Security Assessment")
+@limiter.limit("10/minute")
 async def run_assessment(
+    request: Request,
     req: AssessmentRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
@@ -77,7 +80,9 @@ async def run_assessment(
 
 
 @router.post("/assess/async", summary="Start Async Assessment (Background)", response_model=AsyncAssessmentResponse)
+@limiter.limit("10/minute")
 async def run_assessment_async(
+    request: Request,
     req: AssessmentRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
@@ -100,7 +105,8 @@ async def run_assessment_async(
 
 
 @router.get("/status", summary="List Available Agents", response_model=AgentListResponse)
-async def list_agents(current_user: User = Depends(get_current_user)):
+@limiter.limit("60/minute")
+async def list_agents(request: Request, current_user: User = Depends(get_current_user)):
     """Returns the list of AI agents available in the system."""
     return {
         "agents": [
@@ -138,7 +144,9 @@ async def list_agents(current_user: User = Depends(get_current_user)):
 
 
 @router.get("/graph/paths", summary="Get Attack Paths from Knowledge Graph", response_model=AttackPathResponse)
+@limiter.limit("30/minute")
 async def get_attack_paths(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -153,7 +161,8 @@ async def get_attack_paths(
 
 
 @router.get("/plugins", summary="Plugin Marketplace Listing", response_model=PluginListingResponse)
-async def list_plugins(current_user: User = Depends(get_current_user)):
+@limiter.limit("60/minute")
+async def list_plugins(request: Request, current_user: User = Depends(get_current_user)):
     """Lists all available security plugins with metadata."""
     plugins = get_marketplace_listing()
     return {
@@ -169,7 +178,9 @@ class PluginRunRequest(BaseModel):
 
 
 @router.post("/plugins/run", summary="Run a Specific Plugin")
+@limiter.limit("20/minute")
 async def run_plugin_endpoint(
+    request: Request,
     req: PluginRunRequest,
     current_user: User = Depends(get_current_user),
 ):
@@ -185,7 +196,9 @@ async def run_plugin_endpoint(
 
 
 @router.post("/plugins/run-all", summary="Run All Plugins Against a Target", response_model=PluginRunAllResponse)
+@limiter.limit("5/minute")
 async def run_all_plugins_endpoint(
+    request: Request,
     target: str,
     category: Optional[str] = None,
     current_user: User = Depends(get_current_user),

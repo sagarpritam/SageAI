@@ -1,28 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  
-  if (!userId) {
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  const cookieStore = await cookies();
+  const token = cookieStore.get("sageai_jwt")?.value;
+
+  if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
-  const serviceKey = process.env.INTERNAL_SERVICE_KEY || "";
 
   try {
     const res = await fetch(`${backendUrl}/scan/${id}/pdf`, {
       headers: {
-        Authorization: `Bearer ${serviceKey}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (!res.ok) {
+      if (res.status === 402) {
+         const err = await res.json().catch(() => ({}));
+         return NextResponse.json({ error: err.detail || "Upgrade required" }, { status: 402 });
+      }
       return NextResponse.json(
         { error: "PDF generation failed" },
         { status: res.status }
@@ -46,3 +50,4 @@ export async function GET(
     );
   }
 }
+
