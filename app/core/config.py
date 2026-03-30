@@ -1,6 +1,6 @@
 import os
 import logging
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -167,9 +167,7 @@ class Settings(BaseSettings):
                 errors.append("WARNING: DEBUG=True in production")
         return errors
 
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 settings = Settings()

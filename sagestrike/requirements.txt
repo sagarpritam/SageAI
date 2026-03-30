@@ -1,0 +1,22 @@
+# SageStrike Python Dependencies
+
+# Async HTTP
+aiohttp==3.9.1
+aiofiles==23.2.1
+
+# Kafka
+kafka-python==2.0.2
+
+# Redis
+redis==5.0.1
+
+# Cryptography
+PyJWT==2.8.0
+cryptography==41.0.7
+
+# Data processing
+pydantic==2.5.2
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1

@@ -4,6 +4,7 @@ Free tier: Uses crt.sh certificate transparency + custom TLS scanning.
 If CENSYS_API_ID and CENSYS_API_SECRET are set, uses the Censys Search API.
 """
 
+import datetime
 import logging
 import os
 import ssl
@@ -68,8 +69,6 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                     )
 
                 # Check for expired or soon-expiring certs
-                import datetime
-
                 for cert in certs[:5]:  # pyre-ignore[16, 58]
                     not_after = cert.get("not_after", "")
                     if not_after:
@@ -77,7 +76,7 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                             expiry = datetime.datetime.fromisoformat(
                                 not_after.replace("T", " ").split(".")[0]
                             )
-                            days_left = (expiry - datetime.datetime.utcnow()).days
+                            days_left = (expiry - datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)).days
                             if days_left < 0:
                                 findings.append(
                                     {

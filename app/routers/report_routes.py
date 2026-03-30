@@ -13,6 +13,7 @@ from app.services.report_generator import (
     generate_pdf_report,
     generate_hackerone_report,
 )
+from app.services.sarif_generator import generate_sarif_bytes
 from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -135,3 +136,35 @@ async def _get_scan(scan_id: str, current_user: dict, db: AsyncSession) -> Scan:
         )
 
     return scan
+
+
+@router.get("/{scan_id}/sarif")
+@limiter.limit("10/minute")
+async def get_report_sarif(
+    request: Request,
+    scan_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Download a SARIF 2.1.0 report for CI/CD ingestion (GitHub, GitLab, Azure DevOps)."""
+    await _check_export_plan(current_user, db)
+    scan = await _get_scan(scan_id, current_user, db)
+
+    sarif_bytes = generate_sarif_bytes(
+        {
+            "id": scan.id,
+            "target": scan.target,
+            "risk_score": scan.risk_score,
+            "risk_level": scan.risk_level,
+            "findings": scan.get_findings(),
+            "created_at": str(scan.created_at),
+        }
+    )
+
+    return StreamingResponse(
+        io.BytesIO(sarif_bytes),
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f"attachment; filename=SageAI_sarif_{scan_id[:8]}.sarif.json"
+        },
+    )

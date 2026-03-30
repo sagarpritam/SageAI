@@ -5,7 +5,7 @@ SageAI 2.0 — Asset Pydantic Schemas
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.models.asset import AssetType, AssetStatus
 
 
@@ -33,8 +33,7 @@ class AssetOut(BaseModel):
     last_scanned: Optional[datetime] = None
     discovered_in_scan: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AssetSummary(BaseModel):

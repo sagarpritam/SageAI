@@ -2,11 +2,14 @@
 """Intelligence Hub router."""
 
 # ────────────────────── Standard library ──────────────────────
+import logging
 from typing import List
 
 # ────────────────────── Third‑party ──────────────────────
 from fastapi import APIRouter, Depends, HTTPException, status
 import httpx
+
+logger = logging.getLogger(__name__)
 
 # ────────────────────── Local imports ──────────────────────
 from app.schemas.intelligence import (
