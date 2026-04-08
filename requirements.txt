@@ -64,5 +64,5 @@ resend
 ruff==0.15.5
 pytest==8.0.0
 pytest-asyncio==0.23.5
-bandit==1.7.7
+bandit==1.9.4
 
