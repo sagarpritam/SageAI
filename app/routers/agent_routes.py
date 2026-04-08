@@ -5,24 +5,25 @@ Exposes the multi-agent security team via REST endpoints.
 
 import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.models.user import User
-from app.core.security import get_current_user
 from app.core.rate_limit import limiter
-from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
-from app.services.knowledge_graph import SecurityKnowledgeGraph
+from app.core.security import get_current_user
+from app.models.user import User
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
 from app.schemas.responses import (
-    AsyncAssessmentResponse,
     AgentListResponse,
+    AsyncAssessmentResponse,
     AttackPathResponse,
     PluginListingResponse,
     PluginRunAllResponse,
 )
+from app.services.agent.multi_agent_orchestrator import MultiAgentOrchestrator
+from app.services.knowledge_graph import SecurityKnowledgeGraph
 
 router = APIRouter(prefix="/agents", tags=["Multi-Agent AI"])
 logger = logging.getLogger("SageAI.agent_routes")

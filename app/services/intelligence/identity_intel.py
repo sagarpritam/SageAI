@@ -6,7 +6,6 @@ If SOCIAL_LINKS_API_KEY is set, uses the Social Links enterprise API.
 """
 
 import logging
-import os
 
 import httpx
 

@@ -1,7 +1,8 @@
 """Third-party integrations — Slack and Jira."""
 
-import os
 import logging
+import os
+
 import httpx
 
 logger = logging.getLogger("sageai.integrations")

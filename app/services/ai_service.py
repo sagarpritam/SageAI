@@ -1,7 +1,7 @@
-import logging
 import json
-import os
-from typing import Type, TypeVar, Any
+import logging
+from typing import Type, TypeVar
+
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -18,11 +18,12 @@ def call_llm(
     Routes intelligently to NVIDIA's OpenAI-compatible NIM APIs.
     Requires NVIDIA_API_KEY to be set in environment or config.
     """
-    from app.core.config import Settings
     import openai
-    
+
+    from app.core.config import Settings
+
     settings = Settings()
-    
+
     # Priority 1: NVIDIA NeMo / LLaMA-based NIMs
     if settings.NVIDIA_API_KEY:
         client = openai.OpenAI(
@@ -38,7 +39,7 @@ def call_llm(
         raise ValueError("No AI Provider configured. Please set NVIDIA_API_KEY or OPENAI_API_KEY.")
 
     schema = response_model.model_json_schema()
-    
+
     # Instruct the LLM specifically to output the correct JSON
     full_system_prompt = (
         f"{system_prompt}\n\n"
@@ -48,7 +49,7 @@ def call_llm(
     )
 
     logger.info(f"Calling AI Engine ({model}) for {response_model.__name__}...")
-    
+
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -58,12 +59,12 @@ def call_llm(
         temperature=0.2,
         max_tokens=2048,
         response_format={"type": "json_object"} if "llama3" not in model else None
-        # Note: Some NVIDIA endpoints do not fully support robust JSON mode, 
+        # Note: Some NVIDIA endpoints do not fully support robust JSON mode,
         # so relying on prompt engineering via the schema is the safest cross-provider option.
     )
 
     content = response.choices[0].message.content.strip()
-    
+
     # Clean up markdown if the LLM hallucinated it despite instructions
     if content.startswith("```json"):
         content = content.replace("```json", "", 1)

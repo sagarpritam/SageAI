@@ -6,6 +6,7 @@ react-force-graph or vis.js.
 """
 
 import logging
+
 from app.utils.hash import deterministic_sha256
 
 logger = logging.getLogger("sageai.intelligence.link_analysis")

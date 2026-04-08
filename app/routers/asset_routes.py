@@ -5,16 +5,16 @@ REST API for Attack Surface Management.
 
 import json
 import logging
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
-from sqlalchemy import select, and_, desc
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.asset import Asset, AssetType, AssetStatus
+from app.models.asset import Asset, AssetStatus, AssetType
 from app.models.user import User
 from app.schemas.asset import DiscoveryRequest
 from app.services.asset_inventory.asset_discovery_service import discover_assets
@@ -100,7 +100,7 @@ async def get_asset_summary(
     result = await db.execute(select(Asset).where(Asset.organization_id == org_id))
     assets = result.scalars().all()
 
-    from datetime import timezone, timedelta
+    from datetime import timedelta, timezone
 
     now = datetime.now(timezone.utc)
     yesterday = now - timedelta(hours=24)
@@ -181,7 +181,7 @@ async def get_new_assets(
     current_user: User = Depends(get_current_user),
 ):
     """Assets discovered in the last N hours."""
-    from datetime import timezone, timedelta
+    from datetime import timedelta, timezone
 
     org_id = current_user["org"]
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)

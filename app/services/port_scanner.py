@@ -1,7 +1,7 @@
 """Port scanner — checks common service ports."""
 
-import socket
 import logging
+import socket
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger("sageai.port_scanner")

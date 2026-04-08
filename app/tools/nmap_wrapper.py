@@ -5,13 +5,13 @@ structured host / port / service data.  Falls back to deterministic mock
 data when the binary is not installed.
 """
 
+import logging
 import os
 import re
-import time
 import subprocess
-import logging
+import time
 import xml.etree.ElementTree as ET
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 

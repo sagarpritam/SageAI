@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.asm_event import ASMEvent
@@ -23,7 +24,7 @@ async def get_asm_events(
     )
     res = await db.execute(stmt)
     events = res.scalars().all()
-    
+
     return [
         {
             "id": evt.id,
@@ -55,7 +56,7 @@ async def get_asset_asm_events(
     )
     res = await db.execute(stmt)
     events = res.scalars().all()
-    
+
     return [
         {
             "id": evt.id,

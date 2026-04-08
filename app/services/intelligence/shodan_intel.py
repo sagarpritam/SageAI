@@ -6,7 +6,6 @@ for richer data including banners, screenshots, and historical records.
 """
 
 import logging
-import os
 import socket
 
 import httpx

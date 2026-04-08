@@ -16,7 +16,7 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const res = await fetch(`${backendUrl}/scan/${id}/pdf`, {
+    const res = await fetch(`${backendUrl}/reports/${id}/pdf`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -6,8 +6,8 @@ Enforces strict rules to prevent catastrophic changes from AI patches:
 - Prompt injection protection (strip dangerous patterns)
 """
 
-import re
 import logging
+import re
 from typing import List
 
 logger = logging.getLogger("SageAI.guardrails")

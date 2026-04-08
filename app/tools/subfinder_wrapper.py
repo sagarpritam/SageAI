@@ -5,14 +5,14 @@ discovered subdomains.  Falls back to a deterministic mock when the
 binary is not installed (demo / CI environments).
 """
 
-import os
-import re
-import time
-import subprocess
 import json
 import logging
-from typing import List
+import os
+import re
+import subprocess
+import time
 from dataclasses import dataclass, field
+from typing import List
 
 logger = logging.getLogger(__name__)
 

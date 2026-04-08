@@ -1,10 +1,13 @@
 """NVIDIA Build LLM Client Implementation."""
 
-import httpx
 import logging
-from .base import BaseLLM
+
+import httpx
+
 from app.core.config import settings
 from app.services.ai_resilience import CircuitBreaker
+
+from .base import BaseLLM
 
 logger = logging.getLogger("SageAI.llm.nvidia")
 nvidia_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)

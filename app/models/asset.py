@@ -3,19 +3,22 @@ SageAI 2.0 — Asset Model
 Stores discovered attack surface assets per organization.
 """
 
+import enum
 import uuid
 from datetime import datetime
+
 from sqlalchemy import (
     Column,
-    String,
-    Integer,
-    Float,
     DateTime,
-    Text,
-    Enum as SAEnum,
+    Float,
     ForeignKey,
+    Integer,
+    String,
+    Text,
 )
-import enum
+from sqlalchemy import (
+    Enum as SAEnum,
+)
 
 from app.core.database import Base
 

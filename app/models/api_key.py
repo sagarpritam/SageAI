@@ -1,6 +1,7 @@
 """API Key model for external integrations."""
 
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
 

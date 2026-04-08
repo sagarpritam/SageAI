@@ -4,6 +4,7 @@ import logging
 from typing import List
 
 from pydantic import BaseModel, Field
+
 from api.services.ai_service import call_llm
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ def generate_plan(target: str) -> ScanPlan:
         return ScanPlan(steps=[
             f"Run subfinder for subdomain enumeration on {target}",
             f"Run nmap top-100 port scan on {target} and discovered subdomains",
-            f"Run nuclei vulnerability scan (medium/high/critical) on all targets",
+            "Run nuclei vulnerability scan (medium/high/critical) on all targets",
             "Analyze and correlate findings across all targets",
             "Generate executive report with risk scoring",
         ])

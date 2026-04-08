@@ -15,7 +15,7 @@ import logging
 import pkgutil
 from typing import Dict, List, Optional
 
-from app.plugins.base import SecurityPlugin, PluginResult
+from app.plugins.base import PluginResult, SecurityPlugin
 
 logger = logging.getLogger("SageAI.plugin_registry")
 

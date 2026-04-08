@@ -19,6 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app/ ./app/
 COPY gunicorn.conf.py .
+COPY alembic.ini .
+COPY alembic/ ./alembic/
 
 # Create non-root user
 RUN addgroup --system sageai && adduser --system --group sageai

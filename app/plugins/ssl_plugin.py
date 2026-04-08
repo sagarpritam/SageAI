@@ -1,6 +1,6 @@
 """SageAI Plugin: SSL/TLS Scanner"""
 
-from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
+from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
 from app.services.ssl_scanner import scan_ssl
 
 

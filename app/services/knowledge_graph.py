@@ -16,9 +16,9 @@ import json
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Column, String, Text, DateTime, Float, select
+from sqlalchemy import Column, DateTime, Float, String, Text, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import Base

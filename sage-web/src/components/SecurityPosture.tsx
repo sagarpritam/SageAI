@@ -32,6 +32,7 @@ interface PostureScore {
   scan_id?: string;
   target?: string;
   scanned_at?: string;
+  total_findings?: number;
 }
 
 interface TrendPoint {
@@ -435,7 +436,7 @@ export function SecurityPosture() {
                             : "bg-zinc-600"
                         }`}
                         style={{
-                          width: `${Math.min(100, (count / Math.max(posture.total_findings, 1)) * 100)}%`,
+                          width: `${Math.min(100, (count / Math.max(posture.total_findings || 0, 1)) * 100)}%`,
                         }}
                       />
                     </div>

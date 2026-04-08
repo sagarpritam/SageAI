@@ -1,7 +1,7 @@
 """DNS scanner — enumerates DNS records and checks for misconfigurations."""
 
-import socket
 import logging
+import socket
 
 logger = logging.getLogger("sageai.dns_scanner")
 

@@ -1,7 +1,8 @@
-import os
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+
 from nemo_microservices import NeMoMicroservices
+
 from app.core.config import settings
 
 logger = logging.getLogger("SageAI.redteam")
@@ -24,10 +25,10 @@ class NeMoAuditor:
             self._client = None
 
     def create_target(
-        self, 
-        name: str, 
-        model: str, 
-        uri: str, 
+        self,
+        name: str,
+        model: str,
+        uri: str,
         target_type: str = "openai.OpenAIGenerator",
         namespace: str = "default",
         options: Optional[Dict[str, Any]] = None
@@ -45,7 +46,7 @@ class NeMoAuditor:
                 "seed": 42
             }
         }
-        
+
         try:
             target = self._client.beta.audit.targets.create(
                 namespace=namespace,
@@ -65,7 +66,7 @@ class NeMoAuditor:
         """
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
-            
+
         try:
             targets = self._client.beta.audit.targets.list(namespace=namespace)
             return [t.model_dump() for t in targets]
@@ -74,8 +75,8 @@ class NeMoAuditor:
             raise
 
     def start_audit(
-        self, 
-        target_name: str, 
+        self,
+        target_name: str,
         namespace: str = "default",
         probes: Optional[List[str]] = None
     ) -> Dict[str, Any]:
@@ -84,7 +85,7 @@ class NeMoAuditor:
         """
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
-            
+
         try:
             # Typical probes include 'jailbreak', 'pii_leakage', 'offensive_content'
             job = self._client.beta.audit.jobs.create(
@@ -103,7 +104,7 @@ class NeMoAuditor:
         """
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
-            
+
         try:
             results = self._client.beta.audit.jobs.get(namespace=namespace, name=job_id)
             return results.model_dump()

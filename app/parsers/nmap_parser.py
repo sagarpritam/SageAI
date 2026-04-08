@@ -1,6 +1,7 @@
 """Nmap output parser — converts nmap dict output into typed Pydantic models."""
 
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

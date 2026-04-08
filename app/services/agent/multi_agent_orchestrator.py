@@ -21,12 +21,12 @@ The orchestrator manages the workflow, error recovery, and aggregation.
 
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Any, Dict
 
-from app.services.agent.recon_agent import ReconAgent
-from app.services.agent.scanner_agent import ScannerAgent
 from app.services.agent.exploit_agent import ExploitAgent
+from app.services.agent.recon_agent import ReconAgent
 from app.services.agent.report_agent import ReportAgent
+from app.services.agent.scanner_agent import ScannerAgent
 
 logger = logging.getLogger("SageAI.multi_agent")
 

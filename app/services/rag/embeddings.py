@@ -1,6 +1,7 @@
 """OpenAI Embeddings Client for RAG."""
 
 import httpx
+
 from app.core.config import settings
 
 

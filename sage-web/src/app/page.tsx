@@ -1780,7 +1780,7 @@ const SignIn = () => {
           <p className="text-zinc-500 text-sm font-mono mt-2 uppercase tracking-widest">Secure Terminal Login</p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); window.location.href = '/dashboard'; }}>
           <div className="space-y-1.5">
             <label className="text-[10px] font-mono text-zinc-500 uppercase ml-1">Identity_ID</label>
             <div className="relative">
@@ -1888,7 +1888,7 @@ const Payment = () => {
           </div>
 
           <div className="glass p-8 rounded-3xl border-white/10">
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
+            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); window.location.href = '/dashboard'; }}>
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-mono text-zinc-500 uppercase ml-1">Card_Holder</label>

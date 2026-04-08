@@ -4,20 +4,20 @@ Provides TOTP setup, QR code generation, verification, and backup codes.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.schemas.responses import MFASetupResponse, MFAStateResponse
 from app.services.mfa_service import (
+    generate_backup_codes,
+    generate_qr_code,
     generate_totp_secret,
     get_totp_uri,
-    generate_qr_code,
     verify_totp,
-    generate_backup_codes,
 )
-from app.schemas.responses import MFASetupResponse, MFAStateResponse
 
 router = APIRouter(prefix="/auth/mfa", tags=["Multi-Factor Auth"])
 

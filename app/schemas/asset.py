@@ -3,10 +3,13 @@ SageAI 2.0 — Asset Pydantic Schemas
 """
 
 from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict
-from app.models.asset import AssetType, AssetStatus
+
+from app.models.asset import AssetStatus, AssetType
 
 
 class AssetBase(BaseModel):

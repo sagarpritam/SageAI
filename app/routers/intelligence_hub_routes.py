@@ -3,24 +3,18 @@
 
 # ────────────────────── Standard library ──────────────────────
 import logging
-from typing import List
 
 # ────────────────────── Third‑party ──────────────────────
-from fastapi import APIRouter, Depends, HTTPException, status
-import httpx
+from fastapi import APIRouter, Depends, HTTPException
 
 logger = logging.getLogger(__name__)
 
 # ────────────────────── Local imports ──────────────────────
+from app.core.security import get_current_user
 from app.schemas.intelligence import (
     IntelligenceSweepRequest,
-    IntelligenceSweepResponse,
-    LinkAnalysisResponse,
-    ModuleListResponse,
     ModuleScanRequest,
-    ModuleScanResponse,
 )
-from app.core.security import get_current_user
 
 router = APIRouter()
 

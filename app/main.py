@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -9,33 +10,34 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import (
-    auth_routes,
-    scan_routes,
-    report_routes,
-    explain_routes,
-    org_routes,
-    apikey_routes,
-    webhook_routes,
-    billing_routes,
-    schedule_routes,
-    mfa_routes,
-    password_routes,
-    ws_routes,
-    ai_chat_routes,
-    ai_command_routes,
-    integration_routes,
-    autofix_routes,
-    asset_routes,
-    agent_routes,
-    intelligence_hub_routes,
-    asm_routes,
-    redteam_routes,
-    payment_routes,
-    posture_routes,
-)
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
+from app.routers import (
+    agent_routes,
+    ai_chat_routes,
+    ai_command_routes,
+    apikey_routes,
+    asm_routes,
+    asset_routes,
+    auth_routes,
+    autofix_routes,
+    billing_routes,
+    explain_routes,
+    integration_routes,
+    intelligence_hub_routes,
+    mfa_routes,
+    org_routes,
+    password_routes,
+    payment_routes,
+    posture_routes,
+    redteam_routes,
+    report_routes,
+    scan_routes,
+    schedule_routes,
+    webhook_routes,
+    ws_routes,
+)
+from app.services.warroom_service import warroom_manager
 
 # ---------------------
 # Sentry (Error Tracking)
@@ -84,6 +86,11 @@ async def lifespan(app: FastAPI):
 
     await init_db()
     logger.info("✅ Database tables created (v2.0)")
+
+    # Start War Room Manager
+    asyncio.create_task(warroom_manager.start())
+    logger.info("📡 War Room Manager started (background)")
+
     yield
     logger.info("👋 Shutting down SageAI v2.0")
 
@@ -181,6 +188,7 @@ async def health_check():
     db_ok = True
     try:
         from sqlalchemy import text
+
         from app.core.database import AsyncSessionLocal
 
         async with AsyncSessionLocal() as session:

@@ -30,10 +30,10 @@ class AttackSurfaceDiff(Base):
     # Diffs (stored as JSON encoded strings)
     # e.g. {"added": [8080], "removed": [80]}
     ports_diff = Column(Text, default='{"added": [], "removed": []}')
-    
+
     # e.g. {"new_cves": ["CVE-2024-1234"], "resolved_cves": ["CVE-2023-4567"]}
     vulnerabilities_diff = Column(Text, default='{"new_cves": [], "resolved_cves": []}')
-    
+
     # e.g. {"added": ["dev.example.com"], "removed": []}
     subdomains_diff = Column(Text, default='{"added": [], "removed": []}')
 

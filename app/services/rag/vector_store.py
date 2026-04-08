@@ -1,10 +1,10 @@
 """Lightweight In-Memory Vector Store for RAG."""
 
 import json
-import math
 import logging
+import math
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from .embeddings import get_embedding
 

@@ -1,6 +1,7 @@
-import httpx
-import logging
 import base64
+import logging
+
+import httpx
 
 logger = logging.getLogger("SageAI.github_service")
 

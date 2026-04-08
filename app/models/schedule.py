@@ -1,6 +1,7 @@
 """Scheduled scan model."""
 
-from sqlalchemy import Column, String, Boolean, DateTime, Integer, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
 

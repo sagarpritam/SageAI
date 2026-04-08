@@ -5,9 +5,7 @@ and AI-powered analysis via OpenAI GPT models when configured.
 Falls back to comprehensive static explanations when OPENAI_API_KEY is not set.
 """
 
-import os
 import logging
-import httpx
 
 logger = logging.getLogger("sageai.ai")
 
@@ -172,8 +170,8 @@ REMEDIATION = {
 # OpenAI / NVIDIA Integration
 # ---------------------
 async def ai_explain_finding(
-    finding_type: str, 
-    context: str = "", 
+    finding_type: str,
+    context: str = "",
     org_id: str = "",
     provider: str = None
 ) -> dict | None:
@@ -182,13 +180,12 @@ async def ai_explain_finding(
     Protected by circuit breaker + prompt injection sanitization + token tracking.
     Returns None if no LLM configured or call fails.
     """
-    from app.services.llm.gateway import llm_gateway
-    from app.services.ai_resilience import sanitize_for_llm
-
     # Choose provider (prefer NVIDIA if key exists and not specified)
     from app.core.config import settings
+    from app.services.ai_resilience import sanitize_for_llm
+    from app.services.llm.gateway import llm_gateway
     llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
-    
+
     # Sanitize inputs
     safe_type = sanitize_for_llm(finding_type, max_length=200)
     safe_context = sanitize_for_llm(context, max_length=1000)
@@ -213,10 +210,10 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
             temperature=0.3,
             response_format={"type": "json_object"} if llm_provider == "openai" else None
         )
-        
+
         if not raw_content:
             return None
-            
+
         import json
         return json.loads(raw_content)
 
@@ -226,13 +223,13 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
 
 async def ai_analyze_scan(
-    findings: list[dict], 
+    findings: list[dict],
     org_id: str = "",
     provider: str = None
 ) -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
-    from app.services.llm.gateway import llm_gateway
     from app.services.ai_resilience import sanitize_findings_for_llm
+    from app.services.llm.gateway import llm_gateway
 
     if not findings:
         return None
@@ -266,10 +263,10 @@ Provide a JSON response with:
             temperature=0.3,
             response_format={"type": "json_object"} if llm_provider == "openai" else None
         )
-        
+
         if not raw_content:
             return None
-            
+
         import json
         return json.loads(raw_content)
     except Exception as e:

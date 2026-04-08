@@ -8,7 +8,7 @@ Calculates a composite security posture score with:
 """
 
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 logger = logging.getLogger("sageai.posture")

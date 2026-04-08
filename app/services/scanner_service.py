@@ -1,5 +1,6 @@
-import httpx
 import logging
+
+import httpx
 
 logger = logging.getLogger("sageai.scanner")
 
@@ -134,22 +135,23 @@ async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
     """
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
-    from app.services.ssl_scanner import scan_ssl
-    from app.services.port_scanner import scan_ports
-    from app.services.dns_scanner import scan_dns
-    from app.services.shodan_client import lookup_ip
+
     from app.services.crtsh_client import search_certificates
-    from app.services.observatory_client import analyze_site
-    from app.services.virustotal_client import check_url_reputation
-    from app.services.nvd_client import check_server_cves
-    from app.services.intelligence.censys_intel import censys_scan
-    from app.services.intelligence.phishstats_intel import phishstats_scan
+    from app.services.dns_scanner import scan_dns
     from app.services.intelligence.breach_intel import breach_scan
+    from app.services.intelligence.censys_intel import censys_scan
+    from app.services.intelligence.darkweb_intel import darkweb_search
+    from app.services.intelligence.intelx_intel import intelx_search
+    from app.services.intelligence.phishstats_intel import phishstats_scan
     from app.services.intelligence.recon_ng_intel import recon_ng_scan
     from app.services.intelligence.spiderfoot_intel import spiderfoot_scan
     from app.services.intelligence.urlhaus_intel import urlhaus_scan
-    from app.services.intelligence.intelx_intel import intelx_search
-    from app.services.intelligence.darkweb_intel import darkweb_search
+    from app.services.nvd_client import check_server_cves
+    from app.services.observatory_client import analyze_site
+    from app.services.port_scanner import scan_ports
+    from app.services.shodan_client import lookup_ip
+    from app.services.ssl_scanner import scan_ssl
+    from app.services.virustotal_client import check_url_reputation
 
     hostname = target.replace("http://", "").replace("https://", "").split("/")[0]
     loop = asyncio.get_event_loop()

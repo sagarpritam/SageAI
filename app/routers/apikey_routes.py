@@ -1,14 +1,15 @@
 """API Key management routes."""
 
 import secrets
+
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.core.security import require_role
 from app.models.api_key import APIKey
-from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/api-keys", tags=["API Keys"])
 

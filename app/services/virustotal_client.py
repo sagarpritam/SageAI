@@ -4,9 +4,8 @@ Checks if a URL has been flagged as malicious by 70+ security vendors.
 Requires free API key (500 requests/day): https://www.virustotal.com/gui/join-us
 """
 
-import os
-import logging
 import base64
+import logging
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential

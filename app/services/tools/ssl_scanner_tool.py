@@ -2,8 +2,10 @@
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from .base import BaseTool
+
 from app.services.ssl_scanner import scan_ssl
+
+from .base import BaseTool
 
 
 class SslScannerTool(BaseTool):

@@ -4,11 +4,11 @@ Wraps OpenAI calls with retry + exponential backoff, sanitizes scanner
 outputs before they reach the LLM, and tracks token usage per organization.
 """
 
+import logging
 import re
 import time
-import logging
-from dataclasses import dataclass, field
 from collections import defaultdict
+from dataclasses import dataclass, field
 
 logger = logging.getLogger("SageAI.ai_resilience")
 

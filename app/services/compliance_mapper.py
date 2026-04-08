@@ -13,7 +13,6 @@ Calculates per-framework compliance scores.
 
 import logging
 
-
 logger = logging.getLogger("sageai.compliance")
 
 

@@ -4,7 +4,6 @@ Computes differences between historical asset states or scans to detect drifts,
 new open ports, new vulnerabilities, and newly discovered subdomains.
 """
 import json
-from datetime import datetime
 from typing import Any, Dict
 
 from sqlalchemy import desc, select
@@ -28,7 +27,7 @@ def compute_list_diff(prev_list: list, curr_list: list) -> Dict[str, list]:
 
 def compute_asset_diff(prev_asset: Asset, curr_asset: Asset) -> Dict[str, Any]:
     """Compute the difference between two asset states."""
-    
+
     # Safely load JSON strings into lists/dicts
     try:
         prev_ports = json.loads(prev_asset.open_ports) if prev_asset.open_ports else []
@@ -53,7 +52,7 @@ def compute_asset_diff(prev_asset: Asset, curr_asset: Asset) -> Dict[str, Any]:
         risk_shift = "increased"
     elif curr_asset.risk_score < prev_asset.risk_score:
         risk_shift = "decreased"
-        
+
     diffs["overall_risk_shift"] = risk_shift
 
     return diffs
@@ -66,14 +65,14 @@ async def generate_scan_diff(
     Finds the most recent prior scan for an asset, compares it against the current scan,
     and stores the diff in the database to track Attack Surface Drift.
     """
-    
+
     # 1. Extract the current scan
     stmt_curr_scan = select(Scan).where(Scan.id == current_scan_id)
     curr_scan_res = await db.execute(stmt_curr_scan)
     curr_scan = curr_scan_res.scalars().first()
     if not curr_scan:
         return None
-        
+
     # 2. Extract the current asset (if exists)
     stmt_curr = select(Asset).where(
         Asset.org_id == org_id,
@@ -81,7 +80,7 @@ async def generate_scan_diff(
     )
     curr_res = await db.execute(stmt_curr)
     curr_asset = curr_res.scalars().first()
-    
+
     # 3. Find the immediate previous scan for this target
     stmt_prev = (
         select(Scan)
@@ -96,7 +95,7 @@ async def generate_scan_diff(
     )
     prev_res = await db.execute(stmt_prev)
     prev_scan = prev_res.scalars().first()
-    
+
     # If no previous baseline exists, we can't diff vulnerabilities reliably
     if not prev_scan:
         return None
@@ -107,7 +106,7 @@ async def generate_scan_diff(
     )
     curr_find_res = await db.execute(stmt_curr_findings)
     curr_findings = curr_find_res.scalars().all()
-    
+
     stmt_prev_findings = select(Finding).where(
         Finding.scan_id == prev_scan.id, Finding.target == asset_value
     )
@@ -116,7 +115,7 @@ async def generate_scan_diff(
 
     prev_cves = {f.title for f in prev_findings if "CVE" in f.title.upper()}
     curr_cves = {f.title for f in curr_findings if "CVE" in f.title.upper()}
-    
+
     vuln_diff = {
         "new_cves": list(curr_cves - prev_cves),
         "resolved_cves": list(prev_cves - curr_cves),
@@ -141,5 +140,5 @@ async def generate_scan_diff(
     db.add(diff_record)
     await db.commit()
     await db.refresh(diff_record)
-    
+
     return diff_record

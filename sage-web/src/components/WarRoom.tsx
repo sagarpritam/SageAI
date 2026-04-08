@@ -1,0 +1,390 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { 
+  ComposableMap, 
+  Geographies, 
+  Geography, 
+  Graticule, 
+  Marker 
+} from "react-simple-maps";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Shield, 
+  Zap, 
+  AlertTriangle, 
+  Target, 
+  Activity, 
+  Info,
+  Maximize2,
+  Minimize2,
+  Terminal,
+  Globe,
+  Wifi,
+  CloudLightning,
+  Loader2,
+  CheckCircle,
+  XCircle
+} from "lucide-react";
+import axios from "axios";
+
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+/* ──────────────────────────────────────── Types ──── */
+
+interface GeoCoord {
+  lat: number;
+  lng: number;
+  city?: string;
+  country?: string;
+}
+
+interface WarRoomEvent {
+  id: string;
+  type: string;
+  source: string;
+  timestamp: string;
+  priority: number;
+  payload: {
+    geo?: GeoCoord;
+    message?: string;
+    description?: string;
+    [key: string]: any;
+  };
+  target?: string;
+}
+
+/* ──────────────────────────────────────── Helpers ──── */
+
+const getPriorityColor = (p: number) => {
+  switch (p) {
+    case 4: return "text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+    case 3: return "text-orange-500";
+    case 2: return "text-blue-500";
+    default: return "text-zinc-500";
+  }
+};
+
+const getEventIcon = (type: string) => {
+  switch (type) {
+    case "exploit.success": return <Zap className="w-4 h-4 text-amber-500" />;
+    case "exploit.attempt": return <Target className="w-4 h-4 text-red-500/70" />;
+    case "finding.discovered": return <AlertTriangle className="w-4 h-4 text-orange-400" />;
+    case "scan.started": return <Wifi className="w-4 h-4 text-blue-400" />;
+    case "scan.completed": return <Shield className="w-4 h-4 text-emerald-400" />;
+    default: return <Info className="w-4 h-4 text-zinc-500" />;
+  }
+};
+
+/* ──────────────────────────────────────── Main Component ──── */
+
+export function WarRoom() {
+  const [events, setEvents] = useState<WarRoomEvent[]>([]);
+  const [pulses, setPulses] = useState<{ from: [number, number], to: [number, number], id: string }[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [healingEvents, setHealingEvents] = useState<Record<string, 'running' | 'success' | 'error'>>({});
+  const wsRef = useRef<WebSocket | null>(null);
+  const tickerRef = useRef<HTMLDivElement>(null);
+
+  const handleHealNow = async (event: WarRoomEvent) => {
+    if (!event.target) return;
+    setHealingEvents(prev => ({ ...prev, [event.id]: 'running' }));
+    try {
+      await axios.post("/api/autofix", {
+        repository: event.target,
+        branch: "main",
+        max_fixes: 1,
+      });
+      setHealingEvents(prev => ({ ...prev, [event.id]: 'success' }));
+    } catch {
+      setHealingEvents(prev => ({ ...prev, [event.id]: 'error' }));
+    }
+  };
+
+  const handleNewEvent = (event: WarRoomEvent) => {
+    setEvents(prev => [event, ...prev].slice(0, 50));
+
+    // If it's an exploit or critical finding, pulse it on the map
+    if (event.payload.geo) {
+      const newPulse = {
+        from: [0, 0] as [number, number], // Assume source is central or fixed for now
+        to: [event.payload.geo.lng, event.payload.geo.lat] as [number, number],
+        id: Math.random().toString(36).substring(7)
+      };
+      setPulses(prev => [...prev, newPulse]);
+      setTimeout(() => {
+        setPulses(prev => prev.filter(p => p.id !== newPulse.id));
+      }, 5000);
+    }
+  };
+
+  // WebSocket Connection
+  useEffect(() => {
+    const connect = () => {
+      const url = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/warroom`;
+      const ws = new WebSocket(url);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        console.log("WarRoom connected");
+      };
+
+      ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        
+        if (data.type === "rehydration") {
+          setEvents(data.data.slice(-50));
+        } else {
+          handleNewEvent(data);
+        }
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        setTimeout(connect, 3000); // Reconnect
+      };
+    };
+
+    connect();
+    return () => wsRef.current?.close();
+  }, []);
+
+  return (
+    <div className={`relative flex flex-col bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden transition-all duration-500 ${isFullScreen ? "fixed inset-4 z-50 shadow-2xl" : "h-[600px]"}`}>
+      
+      {/* Header Bar */}
+      <div className="flex items-center justify-between px-6 py-4 bg-zinc-900/50 border-b border-zinc-800">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+             <Globe className={`w-5 h-5 ${isConnected ? "text-emerald-500" : "text-red-500"}`} />
+             {isConnected && (
+               <motion.span 
+                 className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full"
+                 animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                 transition={{ repeat: Infinity, duration: 2 }}
+               />
+             )}
+          </div>
+          <div>
+            <h2 className="text-lg font-black text-white tracking-tight uppercase flex items-center gap-2">
+              War Room: Global Telemetry
+            </h2>
+            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest leading-none">
+              {isConnected ? "Secure Channel [TX/RX]" : "Connecting to EventBus..."}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex gap-6">
+            <Metric title="PULSES" value={pulses.length} icon={<CloudLightning className="w-3 h-3 text-amber-500" />} />
+            <Metric title="TOTAL" value={events.length} icon={<Activity className="w-3 h-3 text-blue-500" />} />
+          </div>
+          <button 
+            onClick={() => setIsFullScreen(!isFullScreen)}
+            className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 transition-colors"
+          >
+            {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        {/* Main Map Area */}
+        <div className="flex-[3] relative bg-[#09090b] overflow-hidden">
+          {/* Legend Overlay */}
+          <div className="absolute top-6 left-6 p-4 bg-black/60 backdrop-blur-md rounded-xl border border-zinc-800 z-10 space-y-2">
+             <LegendItem label="Exploit Success" color="bg-amber-500" />
+             <LegendItem label="Critical Discovery" color="bg-red-500" />
+             <LegendItem label="Active Scanning" color="bg-blue-500" />
+          </div>
+
+          {/* Grid Background */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none grid-bg" />
+
+          <ComposableMap 
+            projectionConfig={{ rotate: [-10, 0, 0], scale: 147 }} 
+            className="w-full h-full"
+          >
+            <Graticule stroke="#18181b" strokeWidth={0.5} />
+            <Geographies geography={geoUrl}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#18181b"
+                    stroke="#27272a"
+                    strokeWidth={0.5}
+                    style={{
+                      default: { outline: "none" },
+                      hover: { fill: "#27272a", outline: "none" },
+                      pressed: { outline: "none" },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+
+            {/* Attack Arcs */}
+            {pulses.map((pulse) => (
+              <React.Fragment key={pulse.id}>
+                <motion.path
+                  d={`M ${pulse.from[0]} ${pulse.from[1]} Q ${(pulse.from[0] + pulse.to[0])/2} -50 ${pulse.to[0]} ${pulse.to[1]}`}
+                  fill="none"
+                  stroke="rgba(245, 158, 11, 0.4)"
+                  strokeWidth="1"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                />
+                <Marker coordinates={pulse.to}>
+                  <circle r={2} fill="#ef4444" />
+                  <motion.circle
+                    r={6}
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth={1}
+                    initial={{ scale: 0.5, opacity: 1 }}
+                    animate={{ scale: 2.5, opacity: 0 }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  />
+                </Marker>
+              </React.Fragment>
+            ))}
+
+            {/* Static Active Markers from Events */}
+            {events.filter(e => e.payload.geo).slice(0, 10).map((event) => (
+                <Marker key={event.id} coordinates={[event.payload.geo!.lng, event.payload.geo!.lat]}>
+                    <circle r={1.5} fill={event.priority >= 3 ? "#ef4444" : "#3b82f6"} />
+                </Marker>
+            ))}
+          </ComposableMap>
+        </div>
+
+        {/* Sidebar Ticker Area */}
+        <div className="flex-1 min-w-[320px] bg-zinc-900/30 border-l border-zinc-800 flex flex-col">
+          <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+              <Terminal className="w-3 h-3" /> Event Ticker
+            </span>
+            <span className="text-[10px] text-zinc-600 font-mono">LIVE_FEED_v2.0</span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" ref={tickerRef}>
+            <AnimatePresence mode="popLayout">
+              {events.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-20">
+                   <Activity className="w-12 h-12 mb-4" />
+                   <p className="text-xs font-mono">Awaiting incoming signals...</p>
+                </div>
+              ) : (
+                events.map((event) => (
+                  <motion.div
+                    key={event.id}
+                    layout
+                    initial={{ opacity: 0, x: -20, height: 0 }}
+                    animate={{ opacity: 1, x: 0, height: "auto" }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="p-3 bg-zinc-900/60 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors group"
+                  >
+                    <div className="flex items-start gap-3">
+                       <div className="p-2 rounded-lg bg-black/40 group-hover:bg-black/60 transition-colors">
+                          {getEventIcon(event.type)}
+                       </div>
+                       <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                             <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                                {event.source}
+                             </span>
+                             <span className="text-[9px] text-zinc-600 font-mono">
+                                {new Date(event.timestamp).toLocaleTimeString([], { hour12: false })}
+                             </span>
+                          </div>
+                          <p className={`text-xs font-bold leading-tight line-clamp-2 ${getPriorityColor(event.priority)}`}>
+                             {event.payload.message || event.type.replace(/\./g, ' ').toUpperCase()}
+                          </p>
+                          {event.target && (
+                             <div className="mt-2 flex items-center justify-between">
+                               <p className="text-[10px] text-zinc-500 flex items-center gap-1 font-mono">
+                                  <Target className="w-2 h-2" /> {event.target}
+                               </p>
+                               {event.type === "finding.discovered" && (
+                                 <button
+                                   onClick={() => handleHealNow(event)}
+                                   disabled={healingEvents[event.id] === 'running' || healingEvents[event.id] === 'success'}
+                                   className={`text-[9px] px-2 py-1 rounded uppercase font-bold tracking-widest transition-colors flex items-center gap-1
+                                     ${healingEvents[event.id] === 'success' ? 'bg-emerald-500/20 text-emerald-400' 
+                                     : healingEvents[event.id] === 'error' ? 'bg-red-500/20 text-red-400'
+                                     : healingEvents[event.id] === 'running' ? 'bg-zinc-800 text-zinc-500'
+                                     : 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 border border-emerald-500/30'}`}
+                                 >
+                                   {healingEvents[event.id] === 'running' ? (
+                                     <><Loader2 className="w-2 h-2 animate-spin" /> Healing</>
+                                   ) : healingEvents[event.id] === 'success' ? (
+                                     <><CheckCircle className="w-2 h-2" /> Healed</>
+                                   ) : healingEvents[event.id] === 'error' ? (
+                                     <><XCircle className="w-2 h-2" /> Failed</>
+                                   ) : (
+                                     <><Shield className="w-2 h-2" /> Heal Now</>
+                                   )}
+                                 </button>
+                               )}
+                             </div>
+                          )}
+                       </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #27272a;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #3f3f46;
+        }
+        .grid-bg {
+          background-image: radial-gradient(#fff 1px, transparent 1px);
+          background-size: 32px 32px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function Metric({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="text-[9px] text-zinc-500 font-bold tracking-tighter flex items-center gap-1">
+        {icon} {title}
+      </span>
+      <span className="text-sm font-black text-white leading-none mt-0.5">{value}</span>
+    </div>
+  );
+}
+
+function LegendItem({ label, color }: { label: string, color: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`w-1.5 h-1.5 rounded-full ${color}`} />
+      <span className="text-[10px] text-zinc-400 font-mono font-bold uppercase tracking-tight">{label}</span>
+    </div>
+  );
+}

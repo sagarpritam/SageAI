@@ -4,13 +4,13 @@ Responsible for all reconnaissance: subdomain enumeration, DNS resolution,
 asset fingerprinting, and building the initial attack surface map.
 """
 
-import logging
 import asyncio
+import logging
 import socket
-from typing import Dict, Any
+from typing import Any, Dict
 
-from app.services.llm.gateway import llm_gateway
 from app.services import crtsh_client, dns_scanner, shodan_client
+from app.services.llm.gateway import llm_gateway
 
 logger = logging.getLogger("SageAI.recon_agent")
 

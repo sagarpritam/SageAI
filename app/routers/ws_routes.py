@@ -6,12 +6,15 @@ Clients connect to /ws/scan/{scan_id} and receive JSON messages:
   {"phase": "done", "status": "complete", "progress": 11, "total": 11, "risk_score": 72}
 """
 
-import json
 import asyncio
+import json
 import logging
 from collections import defaultdict
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from uuid import UUID
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
+from app.services.warroom_service import warroom_manager
 
 logger = logging.getLogger("SageAI.ws")
 
@@ -58,3 +61,19 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
         if not _channels[scan_id_str]:
             del _channels[scan_id_str]
         logger.info(f"WS disconnected for scan {scan_id_str}")
+
+@router.websocket("/ws/warroom")
+async def warroom_ws(websocket: WebSocket):
+    """Global WebSocket endpoint for real-time attack visualization."""
+    await warroom_manager.connect(websocket)
+
+    try:
+        while True:
+            # We don't expect messages from client, but keep alive
+            await asyncio.wait_for(websocket.receive_text(), timeout=300)
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        logger.error(f"WarRoom WS error: {e}")
+    finally:
+        warroom_manager.disconnect(websocket)

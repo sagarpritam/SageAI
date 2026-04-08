@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.encryption import encrypt
 from app.core.security import get_current_user
 from app.models.organization import Organization
 from app.schemas.integration import GitHubTokenRequest, IntegrationStatusResponse
-from app.core.encryption import encrypt
 
 router = APIRouter(prefix="/integrations", tags=["Integrations"])
 

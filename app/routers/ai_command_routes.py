@@ -1,9 +1,10 @@
 """AI Agent Command endpoint (NLP -> Tool Execution)."""
 
+import logging
+from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from typing import Any, Dict
-import logging
 
 from app.core.security import get_current_user
 from app.models.user import User

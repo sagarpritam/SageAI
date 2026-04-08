@@ -1,9 +1,11 @@
+import logging
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
+
 from app.core.security import get_current_user
 from app.services.redteam.nemo_auditor import nemo_auditor
-import logging
 
 logger = logging.getLogger("SageAI.redteam")
 

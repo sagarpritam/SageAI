@@ -1,0 +1,24 @@
+﻿docker : unable to get 
+image 'sageai-backend': 
+error during connect: Get "
+http://%2F%2F.%2Fpipe%2Fdoc
+kerDesktopLinuxEngine/v1.51
+/images/sageai-backend/json
+": open //./pipe/dockerDesk
+topLinuxEngine: The system 
+cannot find the file 
+specified.
+At line:1 char:1
++ docker compose up -d 
+--build > docker_out.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (una  
+  ble to get i...file sp   
+ ecified.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 

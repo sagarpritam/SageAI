@@ -4,7 +4,6 @@ Utility wrapper around httpx.AsyncClient that enforces TLS verification.
 SSL certificate verification is ALWAYS enabled to prevent man-in-the-middle attacks.
 """
 
-import os
 import httpx
 
 

@@ -1,7 +1,8 @@
 """Email service — transactional emails via Resend."""
 
-import os
 import logging
+import os
+
 import resend
 
 from app.core.config import settings

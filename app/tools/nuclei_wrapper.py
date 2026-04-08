@@ -5,13 +5,13 @@ JSON-lines findings.  Falls back to deterministic mock data when the
 binary is not installed.
 """
 
-import os
-import re
-import time
-import subprocess
 import json
 import logging
-from typing import List, Dict, Any, Optional
+import os
+import re
+import subprocess
+import time
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

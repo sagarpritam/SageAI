@@ -7,14 +7,14 @@ verifies the patch with a re-scan, and triggers a Pull Request.
 
 import json
 import logging
-import tempfile
 import os
 import subprocess
-from typing import Dict, Any, Optional
+import tempfile
+from typing import Any, Dict, Optional
 
-from app.services.llm.gateway import llm_gateway
+from app.services.agent.guardrails import sanitize_code_for_prompt, validate_patch
 from app.services.integrations.github_service import GitHubService
-from app.services.agent.guardrails import validate_patch, sanitize_code_for_prompt
+from app.services.llm.gateway import llm_gateway
 
 logger = logging.getLogger("SageAI.developer_agent")
 

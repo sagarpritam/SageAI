@@ -1,7 +1,8 @@
-import os
 import logging
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
+
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
@@ -81,7 +82,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "SageAI Security Scanner"
     ENV: str = "development"
     DEBUG: bool = True
-    
+
     # LLM Keys
     INTERNAL_SERVICE_KEY: str = ""
     OPENAI_API_KEY: str = ""
@@ -101,6 +102,10 @@ class Settings(BaseSettings):
     SHODAN_API_KEY: str = ""
     CENSYS_API_ID: str = ""
     CENSYS_API_SECRET: str = ""
+
+    # War Room / Distributed Events
+    KAFKA_BROKERS: str = "localhost:9092"
+    REDIS_URL: str = "redis://localhost:6379/1"
 
     # LLM Configuration
     LLM_MODEL: str = "gpt-4o-mini"
@@ -129,7 +134,7 @@ class Settings(BaseSettings):
     # CORS — comma-separated origins
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
     FRONTEND_URL: str = "http://localhost:3000"
-    
+
     # Payments
     STRIPE_SECRET_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""

@@ -6,23 +6,22 @@ Generates professional security scan reports as PDF files using ReportLab.
 import io
 from datetime import datetime, timezone
 
+from reportlab.graphics.charts.piecharts import Pie
+from reportlab.graphics.shapes import Drawing, Rect, String
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    HRFlowable,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    HRFlowable,
 )
-from reportlab.graphics.shapes import Drawing, Rect, String
-from reportlab.graphics.charts.piecharts import Pie
 
 from app.services.ai_explainer import OWASP_MAP, REMEDIATION
-
 
 # ---------------------
 # Color palette

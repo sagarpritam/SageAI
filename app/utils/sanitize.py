@@ -3,8 +3,8 @@
 Prevents XSS and injection attacks by sanitizing user input.
 """
 
-import re
 import html
+import re
 
 
 def sanitize_html(text: str) -> str:

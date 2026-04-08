@@ -10,10 +10,9 @@ Detects API security vulnerabilities:
 """
 
 import asyncio
-import httpx
-from app.utils.http_client import get_http_client
-from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
+from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
+from app.utils.http_client import get_http_client
 
 API_DOC_PATHS = [
     "/swagger",

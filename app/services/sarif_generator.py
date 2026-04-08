@@ -12,7 +12,6 @@ import json
 import logging
 from datetime import datetime, timezone
 
-
 logger = logging.getLogger("sageai.sarif")
 
 # SARIF schema version

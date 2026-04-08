@@ -1,6 +1,7 @@
 """Subfinder output parser — normalizes subdomain enumeration results."""
 
-from typing import List, Optional
+from typing import List
+
 from pydantic import BaseModel, Field
 
 

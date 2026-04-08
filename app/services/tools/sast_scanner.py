@@ -6,10 +6,10 @@ using Bandit (Python). Returns structured findings with exact file/line info.
 
 import json
 import logging
-import tempfile
+import os
 import shutil
 import subprocess
-import os
+import tempfile
 from typing import Any, Dict
 
 from app.services.tools.base import BaseTool

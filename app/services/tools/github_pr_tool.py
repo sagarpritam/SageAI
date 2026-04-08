@@ -7,12 +7,12 @@ Orchestrates the full self-healing code workflow:
 """
 
 import logging
-from app.utils.hash import deterministic_sha256
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from app.services.tools.base import BaseTool
-from app.services.integrations.github_service import GitHubService
 from app.services.agent.developer_agent import DeveloperAgent
+from app.services.integrations.github_service import GitHubService
+from app.services.tools.base import BaseTool
+from app.utils.hash import deterministic_sha256
 
 logger = logging.getLogger("SageAI.github_pr_tool")
 

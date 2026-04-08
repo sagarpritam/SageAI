@@ -4,24 +4,24 @@ Runs tool wrappers concurrently, feeds parsed findings through AI agents,
 and produces a full security report with attack-graph visualization.
 """
 
+import concurrent.futures
 import enum
 import json
 import logging
 import sys
 import time
 import uuid
-import concurrent.futures
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
-from app.tools.subfinder_wrapper import run_subfinder
+from app.agents.analyzer import analyze_findings
+from app.agents.decision_engine import decide_next_steps
+from app.agents.planner import generate_plan
+from app.agents.reporter import create_report
+from app.parsers.nuclei_parser import parse_nuclei_findings
 from app.tools.nmap_wrapper import run_nmap
 from app.tools.nuclei_wrapper import run_nuclei
-from app.parsers.nuclei_parser import parse_nuclei_findings
-from app.agents.analyzer import analyze_findings
-from app.agents.reporter import create_report
-from app.agents.planner import generate_plan
-from app.agents.decision_engine import decide_next_steps
+from app.tools.subfinder_wrapper import run_subfinder
 from app.utils.graph_generator import generate_attack_graph
 
 logging.basicConfig(

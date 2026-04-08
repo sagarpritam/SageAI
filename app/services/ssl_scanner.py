@@ -3,9 +3,9 @@
 Checks certificate validity, expiration, protocol versions, and cipher suites.
 """
 
-import ssl
-import socket
 import logging
+import socket
+import ssl
 from datetime import datetime, timezone
 
 logger = logging.getLogger("sageai.ssl_scanner")

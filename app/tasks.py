@@ -5,9 +5,10 @@ Usage:
   - Start beat (scheduled): celery -A app.tasks.celery_app beat --loglevel=info
 """
 
-import os
 import asyncio
 import logging
+import os
+
 from celery import Celery
 from celery.schedules import crontab
 
@@ -63,14 +64,15 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
 
     Updates the Scan DB record with results on completion or failure.
     """
-    from app.services.scanner_service import run_all_scans
     from app.services.risk_engine import calculate_risk
+    from app.services.scanner_service import run_all_scans
 
     async def _execute():
-        from app.core.database import AsyncSessionLocal
-        from app.models.scan import Scan
-        from app.models.finding import Finding
         from sqlalchemy import select
+
+        from app.core.database import AsyncSessionLocal
+        from app.models.finding import Finding
+        from app.models.scan import Scan
 
         async with AsyncSessionLocal() as db:
             try:
@@ -140,9 +142,10 @@ def cleanup_old_scans(days: int = 90):
     from datetime import datetime, timedelta, timezone
 
     async def _cleanup():
+        from sqlalchemy import delete
+
         from app.core.database import AsyncSessionLocal
         from app.models.scan import Scan
-        from sqlalchemy import select, delete
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)
         async with AsyncSessionLocal() as db:

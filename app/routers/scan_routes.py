@@ -1,26 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, desc
-from uuid import UUID
 from datetime import datetime, timezone
 
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy import desc, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.agents.analyzer import analyze_findings
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.models.scan import Scan
-from app.models.organization import Organization
 from app.models.finding import Finding
+from app.models.organization import Organization
+from app.models.scan import Scan
 from app.schemas.scan import (
+    RiskSummary,
+    ScanListItem,
     ScanRequest,
     ScanResponse,
-    ScanListItem,
     Vulnerability,
-    RiskSummary,
 )
-from app.services.scanner_service import run_all_scans
 from app.services.risk_engine import calculate_risk
+from app.services.scanner_service import run_all_scans
 from app.services.subscription import check_scan_limit, get_plan
-from app.core.rate_limit import limiter
-from app.agents.analyzer import analyze_findings
 
 router = APIRouter(prefix="/scan", tags=["Scanning"])
 
@@ -80,10 +80,10 @@ async def create_scan(
     formatted_findings = []
     try:
         raw_findings = await run_all_scans(target_url, scan_id=scan.id, db=db)
-        
+
         # Pass raw reconnaissance data to the AI agent to determine actual exploitability
         findings_data = analyze_findings(raw_findings)
-        
+
         risk = calculate_risk(findings_data)
 
         # Legacy JSON compliance
@@ -163,14 +163,14 @@ async def get_scan(
                 "critical_issues": [],
                 "recommendations": []
             }
-        
+
         nodes = [{"id": "target", "name": scan.target, "val": 20, "type": "domain", "color": "#10b981"}]
         links = []
         for i, f in enumerate(findings):
             node_id = f"finding_{i}"
             f_module = f.get("module", "")
             f_type = f.get("type", "Finding")
-            
+
             if f_module == "breach_intel":
                 ntype = "breach"
                 color = "#dc2626"
@@ -197,10 +197,10 @@ async def get_scan(
                 color = "#ef4444" if f.get("severity", "Low").lower() in ["high", "critical"] else "#eab308"
 
             nodes.append({
-                "id": node_id, 
-                "name": f_type, 
-                "val": 10, 
-                "type": ntype, 
+                "id": node_id,
+                "name": f_type,
+                "val": 10,
+                "type": ntype,
                 "color": color,
                 "data": f if isinstance(f, dict) else dict(f)
             })
@@ -344,67 +344,6 @@ async def list_scans(
     ]
 
 
-@router.get("/{scan_id}/pdf")
-@limiter.limit("10/minute")
-async def download_pdf_report(
-    request: Request,
-    scan_id: UUID,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Generate and download a professional PDF security report."""
-    from fastapi.responses import Response
-    from app.services.report_generator import generate_pdf_report
-
-    scan = await db.get(Scan, scan_id)
-    if not scan:
-        raise HTTPException(status_code=404, detail="Scan not found")
-    
-    # Service key bypasses org check because the Next.js proxy already validated the user session
-    is_service = current_user.get("sub") == "clerk-proxy"
-    if not is_service and str(scan.organization_id) != current_user["org"]:
-        raise HTTPException(status_code=403, detail="Access denied")
-
-    org = await db.get(Organization, scan.organization_id)
-    if org and org.plan == "free":
-        raise HTTPException(
-            status_code=402,
-            detail="PDF Export requires a Pro or Enterprise plan.",
-        )
-
-    # Fetch findings
-    finding_rows = await db.execute(
-        select(Finding).where(Finding.scan_id == scan_id)
-    )
-    findings = [
-        {
-            "type": f.finding_type,
-            "severity": f.severity,
-            "description": f.description,
-            "cvss": getattr(f, "cvss_score", "N/A"),
-        }
-        for f in finding_rows.scalars().all()
-    ]
-
-    scan_data = {
-        "id": str(scan.id),
-        "target": scan.target,
-        "risk_score": scan.risk_score or 0,
-        "risk_level": scan.risk_level or "Low",
-        "findings": findings,
-        "created_at": str(scan.created_at),
-    }
-
-    pdf_bytes = generate_pdf_report(scan_data)
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'attachment; filename="sageai-report-{scan_id}.pdf"'
-        },
-    )
-
 @router.post("/{scan_id}/share")
 @limiter.limit("10/minute")
 async def generate_share_link(
@@ -419,11 +358,11 @@ async def generate_share_link(
     scan = result.scalar_one_or_none()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
-    
+
     if not scan.share_token:
         scan.share_token = str(uuid.uuid4())
         await db.commit()
-    
+
     return {"share_token": scan.share_token}
 
 @router.get("/public/{share_token}")
@@ -436,13 +375,13 @@ async def get_public_scan(
     """Fetch a scan's results publicly using its share token."""
     result = await db.execute(select(Scan).where(Scan.share_token == share_token))
     scan = result.scalar_one_or_none()
-    
+
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found or share link is invalid.")
-        
+
     findings = scan.get_findings()
     risk = {"risk_score": scan.risk_score, "risk_level": scan.risk_level}
-    
+
     # We only expose safe data publicly.
     return {
         "id": scan.id,

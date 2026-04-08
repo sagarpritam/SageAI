@@ -2,8 +2,10 @@
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from .base import BaseTool
+
 from app.services.dns_scanner import scan_dns
+
+from .base import BaseTool
 
 
 class DnsScannerTool(BaseTool):

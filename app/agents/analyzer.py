@@ -2,9 +2,10 @@
 
 import json
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
+
 from app.services.ai_service import call_llm
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ def _fallback_analysis(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any
     for i, f in enumerate(raw_findings):
         name = f.get("name", f.get("type", "Unknown"))
         sev = f.get("severity", "info").lower()
-        
+
         # Merge directly into a copy of the original finding
         merged = dict(f)
         merged.update({
@@ -69,10 +70,10 @@ def analyze_findings(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     # Process in batches to avoid token limits
     for i in range(0, len(raw_findings), _BATCH_SIZE):
         batch = raw_findings[i : i + _BATCH_SIZE]
-        
+
         # Inject index into batch
         indexed_batch = [{"index": idx, **f} for idx, f in enumerate(batch)]
-        
+
         user_prompt = (
             f"Analyze these raw scan findings (batch {i // _BATCH_SIZE + 1}):\n\n"
             f"{json.dumps(indexed_batch, indent=2)}\n\n"
@@ -96,7 +97,7 @@ def analyze_findings(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]
                         "name": analysis.name
                     })
                     all_analyzed.append(merged)
-            
+
             logger.info(
                 "AI Analyzer processed batch %d — %d finding(s)",
                 i // _BATCH_SIZE + 1, len(response.findings),

@@ -2,9 +2,10 @@
 
 import json
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
+
 from app.services.ai_service import call_llm
 
 logger = logging.getLogger(__name__)

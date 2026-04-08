@@ -1,5 +1,5 @@
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -51,16 +51,16 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
-    except ValueError as e:
+    except ValueError:
         return {"error": "Invalid payload"}
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error.SignatureVerificationError:
         return {"error": "Invalid signature"}
 
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         org_id = session.get('metadata', {}).get('org_id')
-        
+
         if org_id:
             # Upgrade org plan to pro
             result = await db.execute(select(Organization).where(Organization.id == org_id))

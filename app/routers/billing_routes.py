@@ -1,9 +1,10 @@
 """Stripe billing service — subscriptions and checkout."""
 
 import logging
-from fastapi import APIRouter, HTTPException, Request, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -71,7 +72,7 @@ async def create_checkout_session(
         }
         if customer_id:
             session_params["customer"] = customer_id
-            
+
         session = stripe.checkout.Session.create(**session_params)
         return {"checkout_url": session.url, "session_id": session.id}
     except Exception as e:
@@ -86,7 +87,7 @@ async def stripe_webhook(
 ):
     """Handle Stripe webhook events asynchronously."""
     stripe = get_stripe()
-    
+
     if not settings.STRIPE_WEBHOOK_SECRET:
         raise HTTPException(status_code=500, detail="Webhook secret not configured")
 
@@ -102,7 +103,7 @@ async def stripe_webhook(
         raise HTTPException(status_code=400, detail="Invalid webhook signature")
 
     event_type = event["type"]
-    
+
     try:
         if event_type == "checkout.session.completed":
             session = event["data"]["object"]
@@ -126,7 +127,7 @@ async def stripe_webhook(
         elif event_type == "customer.subscription.deleted":
             subscription = event["data"]["object"]
             sub_id = subscription.get("id")
-            
+
             logger.info(f"Subscription canceled: {sub_id} — downgrading to free")
             result = await db.execute(
                 select(Organization).where(Organization.stripe_subscription_id == sub_id)
@@ -138,12 +139,12 @@ async def stripe_webhook(
                 await db.commit()
             else:
                 logger.warning(f"Could not find org with subscription ID {sub_id} to downgrade")
-                
+
         elif event_type == "customer.subscription.updated":
             subscription = event["data"]["object"]
             sub_id = subscription.get("id")
             status = subscription.get("status")
-            
+
             # If payment fails and subscription becomes past_due or unpaid, we could downgrade or suspend here
             logger.info(f"Subscription updated: {sub_id} status is now {status}")
             if status in ["past_due", "unpaid", "canceled"]:
@@ -173,17 +174,17 @@ async def create_portal_session(
 ):
     """Create a Stripe customer portal session for managing subscription."""
     stripe = get_stripe()
-    
+
     org_id = current_user.get("org")
     result = await db.execute(select(Organization).where(Organization.id == org_id))
     org = result.scalar_one_or_none()
-    
+
     if not org or not org.stripe_customer_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="No active subscription found to manage"
         )
-        
+
     try:
         session = stripe.billing_portal.Session.create(
             customer=org.stripe_customer_id,

@@ -1,9 +1,11 @@
 """OpenAI LLM Client Implementation."""
 
 import httpx
-from .base import BaseLLM
+
 from app.core.config import settings
 from app.services.ai_resilience import CircuitBreaker
+
+from .base import BaseLLM
 
 # Reuse the existing circuit breaker
 openai_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)

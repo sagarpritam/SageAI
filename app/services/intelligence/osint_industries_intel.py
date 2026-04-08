@@ -6,7 +6,6 @@ instant 1500+ platform correlation.
 """
 
 import logging
-import os
 import re
 
 import httpx

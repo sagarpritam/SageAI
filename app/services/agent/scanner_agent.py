@@ -4,9 +4,9 @@ Runs the vulnerability scanning pipeline against discovered hosts.
 Orchestrates all security tools and returns structured findings.
 """
 
-import logging
 import asyncio
-from typing import Dict, Any, List
+import logging
+from typing import Any, Dict, List
 
 from app.services.llm.gateway import llm_gateway
 from app.services.tools import get_all_tools

@@ -7,7 +7,7 @@ Supports: Executive Summary, Technical Deep-dive, HackerOne format, PDF metadata
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from app.services.llm.gateway import llm_gateway
 

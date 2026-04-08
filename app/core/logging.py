@@ -4,8 +4,8 @@ Replaces basic logging with JSON-formatted output suitable for
 log aggregation (ELK, Datadog, CloudWatch, etc.).
 """
 
-import logging
 import json
+import logging
 import sys
 from datetime import datetime, timezone
 

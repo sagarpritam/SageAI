@@ -1,17 +1,17 @@
 """Password reset routes — request + confirm reset via token."""
 
 import secrets
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import hash_password
 from app.models.user import User
-from app.services.email_service import email_service
 from app.schemas.responses import MessageResponse
+from app.services.email_service import email_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 

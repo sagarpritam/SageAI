@@ -1,5 +1,7 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List
+
+from pydantic import BaseModel
+
 
 class IntelligenceSweepRequest(BaseModel):
     target: str

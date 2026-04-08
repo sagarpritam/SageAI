@@ -6,7 +6,6 @@ If BABELX_API_KEY is set, uses the Babel Street API instead.
 """
 
 import logging
-import os
 
 import httpx
 

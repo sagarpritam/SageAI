@@ -1,11 +1,12 @@
 """HTTP Vulnerability Scanner Tool Wrapper."""
 
 import asyncio
-from .base import BaseTool
 
 # We need to import the individual check functions from scanner_service
 # To avoid circular imports, we import them directly here.
-from app.services.scanner_service import check_security_headers, test_xss, test_sqli
+from app.services.scanner_service import check_security_headers, test_sqli, test_xss
+
+from .base import BaseTool
 
 
 class HttpVulnScannerTool(BaseTool):

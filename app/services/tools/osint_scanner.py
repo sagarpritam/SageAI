@@ -1,14 +1,16 @@
 """OSINT Scanner Tool Wrapper."""
 
 import asyncio
-import httpx
-from .base import BaseTool
 
-from app.services.shodan_client import lookup_ip
+import httpx
+
 from app.services.crtsh_client import search_certificates
-from app.services.observatory_client import analyze_site
-from app.services.virustotal_client import check_url_reputation
 from app.services.nvd_client import check_server_cves
+from app.services.observatory_client import analyze_site
+from app.services.shodan_client import lookup_ip
+from app.services.virustotal_client import check_url_reputation
+
+from .base import BaseTool
 
 
 class OsintScannerTool(BaseTool):

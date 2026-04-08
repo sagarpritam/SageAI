@@ -11,8 +11,8 @@ from app.core.database import get_db
 from app.core.encryption import decrypt
 from app.core.security import get_current_user
 from app.models.organization import Organization
-from app.services.tools.sast_scanner import SASTScanner
 from app.services.tools.github_pr_tool import GitHubPRTool
+from app.services.tools.sast_scanner import SASTScanner
 
 router = APIRouter(prefix="/autofix", tags=["Self-Healing Code"])
 

@@ -6,7 +6,6 @@ breach data, paste archives, and dark web content.
 """
 
 import logging
-import os
 
 import httpx
 

@@ -3,11 +3,12 @@
 Provides Google Authenticator compatible TOTP setup, QR codes, and verification.
 """
 
+import base64
+import io
+import secrets
+
 import pyotp
 import qrcode
-import io
-import base64
-import secrets
 
 
 def generate_totp_secret() -> str:

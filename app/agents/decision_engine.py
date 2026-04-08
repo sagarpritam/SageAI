@@ -1,7 +1,9 @@
 import json
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
+
 from api.services.ai_service import call_llm
 
 logger = logging.getLogger(__name__)
@@ -20,7 +22,7 @@ def decide_next_steps(analyzed_findings: List[Dict[str, Any]], previous_targets:
     Avoids repeating scans on already investigated targets unless necessary.
     """
     logger.info("Starting AI Decision Engine...")
-    
+
     if not analyzed_findings:
         logger.info("No findings provided to decision engine. Halting.")
         return []
@@ -53,11 +55,11 @@ def decide_next_steps(analyzed_findings: List[Dict[str, Any]], previous_targets:
         return response.actions
     except Exception as e:
         logger.warning(f"Decision engine failed: {e}. Using fallback strategy.")
-        
+
         # Fallback: if we haven't done nuclei or nmap yet, trigger default rule-based action
         actions: List[Action] = []
         # Basic heuristic
         if not any("nuclei" in t for t in previous_targets):
             actions.append(Action(tool="nuclei", target="All Discovered Services", reason="Fallback strategy: general vulnerability check"))
-            
+
         return actions

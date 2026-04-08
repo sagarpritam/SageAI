@@ -5,9 +5,9 @@ and leaked credentials across the dark web mapping to a specific domain or email
 """
 import asyncio
 import logging
-import os
+from typing import Any, Dict
+
 import httpx
-from typing import Dict, Any
 
 logger = logging.getLogger("sageai.intel.breach")
 
@@ -50,14 +50,14 @@ async def breach_scan(target: str, target_type: str = "domain") -> Dict[str, Any
         #         res = await client.get(f"https://api.example.local/v3/breachedaccount/{target}", headers=headers)
         #     else:
         #         res = await client.get(f"https://api.example.local/v3/breacheddomain/{target}", headers=headers)
-        #     
+        #
         #     if res.status_code == 200:
         #         results["compromised_accounts"] = res.json()
         #         results["total_breaches"] = len(results["compromised_accounts"])
-        
+
         # Fallback to simulated data since real OSINT APIs require paid licenses
         return _get_mock_breach_data(target, target_type)
-        
+
     except httpx.RequestError as e:
         logger.error(f"Breach API request failed: {e}")
         return {"status": "error", "error": str(e), "target": target}
@@ -68,7 +68,7 @@ async def breach_scan(target: str, target_type: str = "domain") -> Dict[str, Any
 
 def _get_mock_breach_data(target: str, target_type: str) -> Dict[str, Any]:
     """Generates realistic-looking breach hits for demonstration purposes."""
-    
+
     if target_type == "email":
         return {
             "status": "success",
@@ -92,7 +92,7 @@ def _get_mock_breach_data(target: str, target_type: str) -> Dict[str, Any]:
                 }
             ]
         }
-    
+
     # Domain-level breach sweep simulation
     base_domain = target.replace("www.", "")
     return {

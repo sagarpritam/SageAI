@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 
@@ -48,8 +48,8 @@ async def get_db():
 async def init_db():
     """Create all tables. Used on app startup."""
     async with engine.begin() as conn:
-        from app.models import Organization, User, Scan  # noqa: F401
+        from app.models import Organization, Scan, User  # noqa: F401
         from app.models.asset import Asset  # noqa: F401
-        from app.services.knowledge_graph import GraphNode, GraphEdge  # noqa: F401
+        from app.services.knowledge_graph import GraphEdge, GraphNode  # noqa: F401
 
         await conn.run_sync(Base.metadata.create_all)

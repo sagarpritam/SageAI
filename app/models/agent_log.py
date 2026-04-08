@@ -6,7 +6,7 @@ Stores reasoning trail for the multi-agent system execution.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base

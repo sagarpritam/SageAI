@@ -2,8 +2,10 @@
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from .base import BaseTool
+
 from app.services.port_scanner import scan_ports
+
+from .base import BaseTool
 
 
 class NmapScannerTool(BaseTool):

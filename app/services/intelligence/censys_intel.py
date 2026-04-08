@@ -6,9 +6,8 @@ If CENSYS_API_ID and CENSYS_API_SECRET are set, uses the Censys Search API.
 
 import datetime
 import logging
-import os
-import ssl
 import socket
+import ssl
 
 import httpx  # pyre-ignore[21]
 
@@ -19,6 +18,7 @@ CRTSH_API = "https://crt.sh"
 
 
 from app.core.config import settings  # pyre-ignore[21]
+
 
 async def censys_scan(target: str) -> list[dict]:
     """Run Censys-style intelligence scan."""

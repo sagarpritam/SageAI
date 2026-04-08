@@ -1,13 +1,13 @@
 """Tool Abstraction Layer and Registry."""
 
 from .base import BaseTool
-from .nmap_scanner import NmapScannerTool
-from .ssl_scanner_tool import SslScannerTool
 from .dns_scanner_tool import DnsScannerTool
+from .github_pr_tool import GitHubPRTool
 from .http_vuln_scanner import HttpVulnScannerTool
+from .nmap_scanner import NmapScannerTool
 from .osint_scanner import OsintScannerTool
 from .sast_scanner import SASTScanner
-from .github_pr_tool import GitHubPRTool
+from .ssl_scanner_tool import SslScannerTool
 
 # Instantiate tools
 TOOLS = [

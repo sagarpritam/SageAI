@@ -5,10 +5,9 @@ No cloud credentials required — passive HTTP/DNS checks only.
 """
 
 import asyncio
-import httpx
-from app.utils.http_client import get_http_client
-from app.plugins.base import SecurityPlugin, PluginResult, PluginMetadata
 
+from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
+from app.utils.http_client import get_http_client
 
 # Public cloud storage bucket naming patterns
 S3_PATTERNS = [

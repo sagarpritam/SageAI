@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import hash_password, verify_password, create_access_token
-from app.services.mfa_service import verify_totp
-from app.models.user import User
-from app.models.organization import Organization
-from app.schemas.auth import UserCreate, UserLogin, TokenResponse
 from app.core.rate_limit import limiter
+from app.core.security import create_access_token, hash_password, verify_password
+from app.models.organization import Organization
+from app.models.user import User
+from app.schemas.auth import TokenResponse, UserCreate, UserLogin
+from app.services.mfa_service import verify_totp
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 

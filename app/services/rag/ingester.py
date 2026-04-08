@@ -1,6 +1,7 @@
 """Knowledge Base Ingestion Scripts."""
 
 import asyncio
+
 from .vector_store import vector_store
 
 OWASP_TOP_10 = [

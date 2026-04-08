@@ -9,25 +9,25 @@ Endpoints:
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
 
 from app.core.database import get_db
-from app.core.security import get_current_user
 from app.core.rate_limit import limiter
+from app.core.security import get_current_user
 from app.models.scan import Scan
+from app.services.compliance_mapper import (
+    calculate_all_compliance,
+    calculate_framework_compliance,
+)
 from app.services.posture_engine import (
     calculate_posture,
     calculate_posture_trends,
     posture_delta,
 )
-from app.services.compliance_mapper import (
-    calculate_framework_compliance,
-    calculate_all_compliance,
-)
 from app.services.remediation_engine import (
-    prioritize_remediations,
     get_quick_wins,
+    prioritize_remediations,
 )
 
 router = APIRouter(prefix="/posture", tags=["Security Posture"])

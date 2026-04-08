@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard, Clock, Activity, GitBranch, Shield, Sparkles, Radar, ShieldAlert, FileCheck, HeartPulse, Rss } from "lucide-react";
+import { LayoutDashboard, Clock, Activity, GitBranch, Shield, Sparkles, Radar, ShieldAlert, FileCheck, HeartPulse, Rss, Globe } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
 import { ASMTimeline } from "@/components/ASMTimeline";
@@ -12,9 +12,12 @@ import { RedTeamPanel } from "@/components/RedTeamPanel";
 import { ComplianceCenter } from "@/components/ComplianceCenter";
 import { SystemHealth } from "@/components/SystemHealth";
 import { ThreatFeed } from "@/components/ThreatFeed";
+import { SecurityPosture } from "@/components/SecurityPosture";
+import { WarRoom } from "@/components/WarRoom";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "posture", label: "Security Shield", icon: Shield },
   { id: "copilot", label: "AI Copilot", icon: Sparkles },
   { id: "intel", label: "Intel Hub", icon: Radar },
   { id: "redteam", label: "Red Team", icon: ShieldAlert },
@@ -24,6 +27,7 @@ const tabs = [
   { id: "compliance", label: "Compliance", icon: FileCheck },
   { id: "health", label: "Health", icon: HeartPulse },
   { id: "threats", label: "Threats", icon: Rss },
+  { id: "warroom", label: "War Room", icon: Globe },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -71,6 +75,7 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "posture" && <SecurityPosture />}
           {activeTab === "copilot" && <AICopilot />}
           {activeTab === "intel" && <IntelligenceHub />}
           {activeTab === "redteam" && <RedTeamPanel />}
@@ -80,6 +85,7 @@ export default function DashboardPage() {
           {activeTab === "compliance" && <ComplianceCenter />}
           {activeTab === "health" && <SystemHealth />}
           {activeTab === "threats" && <ThreatFeed />}
+          {activeTab === "warroom" && <WarRoom />}
         </div>
       </div>
     </main>

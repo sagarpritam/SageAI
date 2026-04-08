@@ -36,16 +36,17 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
     dict with keys per module containing their findings list.
     """
     import asyncio
-    from app.services.intelligence.shodan_intel import shodan_scan
+
     from app.services.intelligence.censys_intel import censys_scan
-    from app.services.intelligence.intelx_intel import intelx_search
-    from app.services.intelligence.osint_industries_intel import osint_industries_lookup
-    from app.services.intelligence.spiderfoot_intel import spiderfoot_scan
-    from app.services.intelligence.recon_ng_intel import recon_ng_scan
     from app.services.intelligence.darkweb_intel import darkweb_search
     from app.services.intelligence.identity_intel import identity_resolve
+    from app.services.intelligence.intelx_intel import intelx_search
     from app.services.intelligence.link_analysis import build_link_graph
+    from app.services.intelligence.osint_industries_intel import osint_industries_lookup
     from app.services.intelligence.phishstats_intel import phishstats_scan
+    from app.services.intelligence.recon_ng_intel import recon_ng_scan
+    from app.services.intelligence.shodan_intel import shodan_scan
+    from app.services.intelligence.spiderfoot_intel import spiderfoot_scan
     from app.services.intelligence.urlhaus_intel import urlhaus_scan
 
     results = {}

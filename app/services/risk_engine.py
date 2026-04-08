@@ -89,7 +89,7 @@ def calculate_risk(findings: list[dict]) -> dict:
 
 
 async def calculate_risk_ai(
-    findings: list[dict], 
+    findings: list[dict],
     org_id: str = "system",
     provider: str = None
 ) -> dict:
@@ -101,8 +101,8 @@ async def calculate_risk_ai(
     if not findings:
         return {"risk_score": 0, "risk_level": "Low", "total_findings": 0}
 
-    from app.services.llm.gateway import llm_gateway
     from app.core.config import settings
+    from app.services.llm.gateway import llm_gateway
     llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     findings_summary = "\n".join(
@@ -131,17 +131,17 @@ Respond in JSON format with:
             org_id=org_id,
             temperature=0.2
         )
-        
+
         if not raw_response:
             # Fallback to algorithmic
             return calculate_risk(findings)
-            
+
         import json
         ai_data = json.loads(raw_response)
         return {
             **ai_data,
             "total_findings": len(findings),
-            "engine": ("AI-Powered (NVIDIA)" if llm_provider == "nvidia" 
+            "engine": ("AI-Powered (NVIDIA)" if llm_provider == "nvidia"
                       else "AI-Powered")
         }
     except Exception:

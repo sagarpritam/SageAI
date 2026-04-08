@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.core.security import get_current_user, require_role
-from app.models.user import User
 from app.models.organization import Organization
 from app.models.scan import Scan
+from app.models.user import User
 from app.schemas.user import UserOut
-from app.services.subscription import get_plan, PLAN_LIMITS
-from app.core.rate_limit import limiter
+from app.services.subscription import PLAN_LIMITS, get_plan
 
 router = APIRouter(prefix="/org", tags=["Organization & SaaS"])
 

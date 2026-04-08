@@ -1,16 +1,17 @@
+import logging
+from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_current_user
 from app.core.database import get_db
-from app.models.scan import Scan
+from app.core.security import get_current_user
 from app.models.finding import Finding
+from app.models.scan import Scan
 from app.services.llm.gateway import llm_gateway
 from app.services.rag.vector_store import vector_store
-import logging
 
 logger = logging.getLogger("SageAI.chat")
 
@@ -98,10 +99,10 @@ async def ai_security_chat(
         org_id = current_user.get("org", "system")
         from app.core.config import settings
         chat_provider = payload.provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
-        
+
         reply = await llm_gateway.generate(
-            prompt=user_msg, 
-            system_message=system_prompt, 
+            prompt=user_msg,
+            system_message=system_prompt,
             org_id=str(org_id),
             provider=chat_provider
         )
