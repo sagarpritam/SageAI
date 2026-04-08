@@ -55,6 +55,7 @@ asgi-correlation-id
 structlog
 colorama==0.4.6
 python-dotenv
+sentry-sdk[fastapi]
 
 # === Resilience ===
 tenacity==9.1.4
