@@ -17,13 +17,6 @@ from app.main import app
 TEST_DB_URL = "sqlite+aiosqlite:///./test_sageai.db"
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest_asyncio.fixture(scope="session")
 async def engine():
     engine = create_async_engine(TEST_DB_URL, echo=False)

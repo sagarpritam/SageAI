@@ -117,8 +117,8 @@ async def test_censys_free_scan(httpx_mock, mock_dns_resolve, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_censys_api_scan(httpx_mock, mock_dns_resolve, monkeypatch):
-    monkeypatch.setenv("CENSYS_API_ID", "test_id")
-    monkeypatch.setenv("CENSYS_API_SECRET", "test_secret")
+    monkeypatch.setattr("app.core.config.settings.CENSYS_API_ID", "test_id")
+    monkeypatch.setattr("app.core.config.settings.CENSYS_API_SECRET", "test_secret")
     
     httpx_mock.add_response(
         url="https://search.censys.io/api/v2/hosts/search?q=example.com&per_page=25",
@@ -141,7 +141,7 @@ async def test_censys_api_scan(httpx_mock, mock_dns_resolve, monkeypatch):
     )
     
     findings = await censys_scan("example.com")
-    
+            
     svc_finding = next((f for f in findings if f["type"] == "exposed_service"), None)
     assert svc_finding is not None
     assert svc_finding["data"]["port"] == 80

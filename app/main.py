@@ -36,6 +36,7 @@ from app.routers import (
     schedule_routes,
     webhook_routes,
     ws_routes,
+    email_report_routes,
 )
 from app.services.warroom_service import warroom_manager
 
@@ -177,6 +178,7 @@ app.include_router(asm_routes.router)
 app.include_router(redteam_routes.router)
 app.include_router(payment_routes.router)
 app.include_router(posture_routes.router)
+app.include_router(email_report_routes.router)
 
 
 # ---------------------

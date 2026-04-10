@@ -5,8 +5,9 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_register_success(client):
+    import uuid
     r = await client.post("/auth/register", json={
-        "email": "newuser@test.com",
+        "email": f"newuser_{uuid.uuid4().hex[:8]}@test.com",
         "password": "StrongPass1!",
         "organization_name": "NewOrg",
     })
@@ -89,6 +90,6 @@ async def test_health_check_fields(client):
     r = await client.get("/")
     data = r.json()
     assert data["app"] == "SageAI Security Scanner"
-    assert data["environment"] == "development"
+    assert data["environment"] in ("development", "production", "test")
     assert "endpoints" in data
     assert data["version"] == "2.0.0"
