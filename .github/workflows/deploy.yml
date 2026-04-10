@@ -48,11 +48,10 @@ jobs:
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
 
       - name: Deploy Frontend to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: sageai-frontend
-          image: gcr.io/${{ env.PROJECT_ID }}/sageai-frontend:${{ github.sha }}
-          region: ${{ env.REGION }}
-          env_vars: |
-            NODE_ENV=production
-            BACKEND_URL=https://sageai-backend-[YOUR-GCP-HASH].a.run.app
+        run: |
+          BACKEND_URL=$(gcloud run services describe sageai-backend --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "Frontend will connect to Backend URL: $BACKEND_URL"
+          gcloud run deploy sageai-frontend \
+            --image gcr.io/${{ env.PROJECT_ID }}/sageai-frontend:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL
