@@ -10,10 +10,12 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
+from app.core.database import get_db, AsyncSessionLocal
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.models.user import User
+from app.models.scan import Scan
+from app.routers.ws_routes import broadcast_scan_progress
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
 from app.schemas.responses import (
     AgentListResponse,
@@ -60,22 +62,59 @@ async def run_assessment(
         else None
     )
 
+    scan = Scan(
+        organization_id=org_id,
+        user_id=current_user.id,
+        target=target,
+        status="running"
+    )
+    db.add(scan)
+    await db.commit()
+    await db.refresh(scan)
+
     if req.mode == "quick":
         try:
+            await broadcast_scan_progress(scan.id, {"phase": "started", "status": "running"})
             result = await orchestrator.run_targeted(target, mode="quick")
-            return result
+            scan.status = "completed"
+            
+            # Use 'verified_findings' if available, otherwise fallback to 'findings'
+            findings_to_save = result.get("verified_findings", result.get("findings", []))
+            if isinstance(findings_to_save, list):
+                scan.set_findings(findings_to_save)
+            
+            scan.risk_score = result.get("risk_score", 0)
+            scan.risk_level = result.get("risk_level", "Unknown")
+            
+            await db.commit()
+            await broadcast_scan_progress(scan.id, {"phase": "done", "status": "complete"})
+            return {"scan_id": scan.id, "result": result}
         except Exception as e:
+            scan.status = "failed"
+            await db.commit()
+            await broadcast_scan_progress(scan.id, {"phase": "done", "status": "failed"})
             raise HTTPException(status_code=500, detail=str(e))
 
     # Full assessment (can be slow for large targets)
     try:
+        await broadcast_scan_progress(scan.id, {"phase": "started", "status": "running"})
         result = await orchestrator.run_full_assessment(
             target=target,
             scan_context=f"{req.mode} security assessment",
             knowledge_graph=kg,
         )
-        return result
+        scan.status = "completed"
+        scan.set_findings(result.get("verified_findings", []))
+        scan.risk_score = result.get("risk_score", 0)
+        scan.risk_level = result.get("risk_level", "Unknown")
+        
+        await db.commit()
+        await broadcast_scan_progress(scan.id, {"phase": "done", "status": "complete"})
+        return {"scan_id": scan.id, "result": result}
     except Exception as e:
+        scan.status = "failed"
+        await db.commit()
+        await broadcast_scan_progress(scan.id, {"phase": "done", "status": "failed"})
         logger.error(f"Multi-agent assessment failed for {target}: {e}")
         raise HTTPException(status_code=500, detail=f"Assessment failed: {str(e)}")
 
@@ -93,14 +132,50 @@ async def run_assessment_async(
     org_id = str(current_user["org"])
     target = req.target.replace("https://", "").replace("http://", "").split("/")[0]
 
+    scan = Scan(
+        organization_id=org_id,
+        user_id=current_user.id,
+        target=target,
+        status="running"
+    )
+    db.add(scan)
+    await db.commit()
+    await db.refresh(scan)
+    
+    scan_id = scan.id
+
     async def _run():
-        orchestrator = MultiAgentOrchestrator(org_id=org_id)
-        await orchestrator.run_full_assessment(target=target)
+        async with AsyncSessionLocal() as session:
+            try:
+                await broadcast_scan_progress(scan_id, {"phase": "started", "status": "running"})
+                orchestrator = MultiAgentOrchestrator(org_id=org_id)
+                # Need to run orchestrator. Note: no KnowledgeGraph injected here currently based on previous implementation
+                kg = SecurityKnowledgeGraph(org_id=org_id, db=session) if req.use_knowledge_graph else None
+                result = await orchestrator.run_full_assessment(target=target, knowledge_graph=kg)
+                
+                # Fetch scan in new session
+                db_scan = await session.get(Scan, scan_id)
+                if db_scan:
+                    db_scan.status = "completed"
+                    db_scan.set_findings(result.get("verified_findings", []))
+                    db_scan.risk_score = result.get("risk_score", 0)
+                    db_scan.risk_level = result.get("risk_level", "Unknown")
+                    await session.commit()
+                    
+                await broadcast_scan_progress(scan_id, {"phase": "done", "status": "complete"})
+            except Exception as e:
+                logger.error(f"Background assessment failed for {target}: {e}")
+                db_scan = await session.get(Scan, scan_id)
+                if db_scan:
+                    db_scan.status = "failed"
+                    await session.commit()
+                await broadcast_scan_progress(scan_id, {"phase": "done", "status": "failed"})
 
     background_tasks.add_task(_run)
     return {
         "status": "started",
         "target": target,
+        "scan_id": scan_id,
         "message": "Multi-agent assessment running in background.",
     }
 
