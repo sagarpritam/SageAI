@@ -64,7 +64,7 @@ async def run_assessment(
 
     scan = Scan(
         organization_id=org_id,
-        user_id=current_user.id,
+        user_id=current_user.get("sub"),
         target=target,
         status="running"
     )
@@ -134,7 +134,7 @@ async def run_assessment_async(
 
     scan = Scan(
         organization_id=org_id,
-        user_id=current_user.id,
+        user_id=current_user.get("sub"),
         target=target,
         status="running"
     )

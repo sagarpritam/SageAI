@@ -1,0 +1,27 @@
+# ============================================
+# SageAI — Caddy Configuration
+# Handles routing, reverse proxy, and automatic TLS (HTTPS)
+# ============================================
+
+# Frontend routing (e.g., example.com)
+{$DOMAIN} {
+    reverse_proxy frontend:3000
+    
+    # Optional security headers
+    header {
+        Strict-Transport-Security "max-age=31536000;"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+    }
+}
+
+# Backend routing (e.g., api.example.com)
+api.{$DOMAIN} {
+    reverse_proxy backend:8000
+    
+    # Optional security headers
+    header {
+        Strict-Transport-Security "max-age=31536000;"
+        X-Content-Type-Options nosniff
+    }
+}

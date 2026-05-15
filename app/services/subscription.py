@@ -10,19 +10,35 @@ PLAN_LIMITS = {
         "max_users": 2,
         "features": ["basic_scanning", "json_reports"],
         "price_monthly": 0,
+        "scan_credits_per_month": 3,
     },
-    "pro": {
-        "display_name": "Pro",
-        "max_scans_per_month": -1,  # unlimited for Pro to encourage upgrade
-        "max_users": 10,
+    "starter": {
+        "display_name": "Starter",
+        "max_scans_per_month": 20,
+        "max_users": 5,
         "features": [
             "basic_scanning",
             "json_reports",
             "pdf_reports",
             "ai_explanations",
+        ],
+        "price_monthly": 199,
+        "scan_credits_per_month": 20,
+    },
+    "pro": {
+        "display_name": "Pro",
+        "max_scans_per_month": 100,
+        "max_users": 15,
+        "features": [
+            "basic_scanning",
+            "json_reports",
+            "pdf_reports",
+            "ai_explanations",
+            "deep_search",
             "priority_support",
         ],
-        "price_monthly": 49,
+        "price_monthly": 499,
+        "scan_credits_per_month": 100,
     },
     "enterprise": {
         "display_name": "Enterprise",
@@ -33,12 +49,16 @@ PLAN_LIMITS = {
             "json_reports",
             "pdf_reports",
             "ai_explanations",
+            "deep_search",
+            "continuous_monitoring",
             "priority_support",
             "api_access",
+            "sso",
             "custom_integrations",
             "sla",
         ],
-        "price_monthly": 199,
+        "price_monthly": 2000,
+        "scan_credits_per_month": 10000,  # effectively unlimited for normal use
     },
 }
 

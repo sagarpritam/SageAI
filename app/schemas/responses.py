@@ -33,6 +33,7 @@ class AgentListResponse(BaseModel):
 class AsyncAssessmentResponse(BaseModel):
     status: str
     target: str
+    scan_id: str
     message: str
 
 

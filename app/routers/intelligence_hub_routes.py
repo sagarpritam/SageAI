@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # ────────────────────── Local imports ──────────────────────
 from app.core.security import get_current_user
 from app.schemas.intelligence import (
+    DeepSearchRequest,
     IntelligenceSweepRequest,
     ModuleScanRequest,
 )
@@ -146,6 +147,43 @@ async def build_relationship_graph(
         "meta": results.get("_meta", {}),
     }
 
+# ── Deep Search ───────────────────────────────────
+
+
+@router.post("/deep-search")
+async def run_deep_search(req: DeepSearchRequest, user=Depends(get_current_user)):
+    """10 // DEEP SEARCH: THE ABYSS — Autonomous recursive OSINT.
+
+    Performs multi-layer intelligence gathering by pivoting on discovered
+    entities. Returns a discovery graph, timeline, and AI briefing.
+    """
+    valid_types = ("domain", "ip", "email", "username", "phone")
+    if req.target_type not in valid_types:
+        raise HTTPException(
+            status_code=400, detail=f"target_type must be one of: {valid_types}"
+        )
+
+    # Clamp depth and entity limits for safety
+    max_depth = min(req.max_depth, 5)
+    max_entities = min(req.max_entities, 50)
+
+    try:
+        from app.services.agent.deep_search_agent import DeepSearchAgent
+
+        agent = DeepSearchAgent(org_id=getattr(user, "org_id", "system"))
+        result = await agent.run(
+            target=req.target,
+            target_type=req.target_type,
+            max_depth=max_depth,
+            max_entities=max_entities,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Deep search failed: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Deep search failed: {str(e)}"
+        )
+
 
 # ── Status ────────────────────────────────────────
 
@@ -229,5 +267,14 @@ async def list_intelligence_modules(user=Depends(get_current_user)):
                 "tier": "pro" if os.getenv("OSINT_INDUSTRIES_API_KEY") else "free",
                 "available": True,
             },
+            {
+                "id": "deep_search",
+                "name": "DEEP SEARCH: The Abyss",
+                "number": "10",
+                "description": "Autonomous recursive OSINT — AI-driven multi-layer pivoting",
+                "tier": "free",
+                "available": True,
+            },
         ]
     }
+

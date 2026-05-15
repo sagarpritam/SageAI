@@ -83,8 +83,11 @@ class Settings(BaseSettings):
     ENV: str = "development"
     DEBUG: bool = True
 
+    # Internal service communication
+    INTERNAL_SERVICE_KEY: str = ""  # Shared secret for Next.js → FastAPI service JWTs
+    INTERNAL_ALLOWED_IPS: str = ""  # Comma-separated IPs/CIDRs for internal service allowlist (empty = default private ranges)
+
     # LLM Keys
-    INTERNAL_SERVICE_KEY: str = ""
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     NVIDIA_API_KEY: str = ""
@@ -138,6 +141,9 @@ class Settings(BaseSettings):
     # Payments
     STRIPE_SECRET_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
+    STRIPE_STARTER_PRICE_ID: str = ""
+    STRIPE_PRO_PRICE_ID: str = ""
+    STRIPE_ENTERPRISE_PRICE_ID: str = ""
 
     # Database connection pool (PostgreSQL only)
     DB_POOL_SIZE: int = 5
@@ -166,6 +172,12 @@ class Settings(BaseSettings):
                 errors.append("CRITICAL: SECRET_KEY must be changed for production")
             if self.CORS_ORIGINS == "*":
                 errors.append("WARNING: CORS_ORIGINS='*' is unsafe for production")
+            if not self.INTERNAL_SERVICE_KEY or len(self.INTERNAL_SERVICE_KEY) < 32:
+                errors.append(
+                    "CRITICAL: INTERNAL_SERVICE_KEY must be set to a strong secret (>=32 chars) for production"
+                )
+            if "localhost" in self.FRONTEND_URL:
+                errors.append("WARNING: FRONTEND_URL contains 'localhost' — should be production URL")
             if not self.DEBUG:
                 pass  # Good
             else:

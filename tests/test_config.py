@@ -37,6 +37,8 @@ class TestProductionValidation:
             SECRET_KEY="a-real-secret-key-for-production-use",
             CORS_ORIGINS="https://app.sageai.io",
             DEBUG=False,
+            INTERNAL_SERVICE_KEY="this-is-a-super-secret-internal-service-key-for-prod",
+            FRONTEND_URL="https://app.sageai.io",
         )
         errors = s.validate_production()
         critical = [e for e in errors if "CRITICAL" in e]

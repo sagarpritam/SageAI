@@ -22,6 +22,18 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── Redis (for Celery and Caching) ──
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # ── Backend (FastAPI) ──
   backend:
     build:
@@ -44,11 +56,33 @@ services:
       SHODAN_API_KEY: ${SHODAN_API_KEY:-}
       CENSYS_API_ID: ${CENSYS_API_ID:-}
       CENSYS_API_SECRET: ${CENSYS_API_SECRET:-}
+      REDIS_URL: redis://redis:6379/1
+      INTERNAL_SERVICE_KEY: ${INTERNAL_SERVICE_KEY:-change-this-super-secret-key-for-service-auth}
+      INTERNAL_ALLOWED_IPS: "172.16.0.0/12,192.168.0.0/16,10.0.0.0/8" # Docker networks
+      CORS_ORIGINS: "http://localhost:3000,http://frontend:3000"
+      FRONTEND_URL: "http://localhost:3000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+  # ── Celery Worker ──
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.worker", "worker", "--loglevel=info"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sageai:${POSTGRES_PASSWORD:-changeme}@postgres:5432/sageai
+      REDIS_URL: redis://redis:6379/1
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
 
   # ── Frontend (Next.js) ──
   frontend:

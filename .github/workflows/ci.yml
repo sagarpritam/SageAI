@@ -19,8 +19,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - run: pip install ruff bandit
+      - run: pip install ruff bandit mypy safety
       - run: ruff check app/ tests/
+      - run: mypy app/ --ignore-missing-imports
+      - run: safety check --full-report || true # Don't fail yet, just report
       - run: bandit -r app/ -f json -o bandit-report.json --severity-level medium || true
       - run: bandit -r app/ --severity-level high
       - uses: actions/upload-artifact@v4
@@ -67,7 +69,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-asyncio httpx
+      - run: pip install pytest pytest-asyncio pytest-cov httpx
 
       - name: Alembic migration check
         run: |
@@ -76,7 +78,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql+asyncpg://sageai:test_password@localhost:5432/sageai_test"
 
-      - run: pytest tests/ -v --tb=short
+      - run: pytest tests/ -v --tb=short --cov=app --cov-fail-under=40
         env:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           SECRET_KEY: "test-secret-key-for-ci"
@@ -92,9 +94,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install & Build Next.js
+      - name: Install, Lint & Build Next.js
         working-directory: sage-web
-        run: npm ci && npm run build
+        run: |
+          npm ci
+          npm run lint
+          npm run build
 
   # ––– Docker Build + Security Scan –––
   docker:

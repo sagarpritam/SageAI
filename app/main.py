@@ -41,27 +41,11 @@ from app.routers import (
 from app.services.warroom_service import warroom_manager
 
 # ---------------------
-# Sentry (Error Tracking)
+# Observability
 # ---------------------
-SENTRY_DSN = os.getenv("SENTRY_DSN")
-if SENTRY_DSN:
-    import sentry_sdk
+from app.core.observability import setup_sentry, logger
 
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        traces_sample_rate=0.2,
-        profiles_sample_rate=0.1,
-        environment=os.getenv("ENV", "development"),
-    )
-
-# ---------------------
-# Logging
-# ---------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-)
-logger = logging.getLogger("SageAI")
+setup_sentry()
 
 # ---------------------
 # Rate Limiter
@@ -205,8 +189,8 @@ async def health_check():
         "environment": settings.ENV,
         "database": "connected" if db_ok else "unreachable",
         "scanners": 11,
-        "intelligence_modules": 9,
-        "endpoints": 64,
+        "intelligence_modules": 10,
+        "endpoints": 65,
         "new_in_v2": [
             "Asset Inventory",
             "Attack Surface Management",
@@ -226,5 +210,6 @@ async def health_check():
             "Recon-ng Framework",
             "Censys Global Radar",
             "OSINT Industries Interceptor",
+            "Deep Search: The Abyss",
         ],
     }

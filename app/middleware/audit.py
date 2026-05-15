@@ -34,9 +34,17 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         auth_header = request.headers.get("authorization", "")
         if auth_header.startswith("Bearer "):
             try:
-                from app.core.security import verify_token
+                from jose import jwt as jose_jwt
 
-                payload = verify_token(auth_header.split(" ")[1])
+                from app.core.config import settings
+
+                token = auth_header.split(" ", 1)[1]
+                payload = jose_jwt.decode(
+                    token,
+                    settings.SECRET_KEY,
+                    algorithms=[settings.ALGORITHM],
+                    options={"verify_aud": False, "verify_iss": False, "verify_exp": False},
+                )
                 user_id = payload.get("sub", "unknown")
                 org_id = payload.get("org", "unknown")
             except Exception:

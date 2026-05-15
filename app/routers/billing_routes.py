@@ -16,12 +16,13 @@ router = APIRouter(prefix="/billing", tags=["Billing"])
 
 from app.core.rate_limit import limiter
 
-FRONTEND_URL = "http://localhost:5173"  # Could come from settings
+from app.core.rate_limit import limiter
 
 # Hardcoded for now, or from env vars
 PLAN_PRICES = {
-    "pro": "price_pro_placeholder",
-    "enterprise": "price_enterprise_placeholder",
+    "starter": settings.STRIPE_STARTER_PRICE_ID,
+    "pro": settings.STRIPE_PRO_PRICE_ID,
+    "enterprise": settings.STRIPE_ENTERPRISE_PRICE_ID,
 }
 
 
@@ -65,8 +66,8 @@ async def create_checkout_session(
             "payment_method_types": ["card"],
             "line_items": [{"price": PLAN_PRICES[plan], "quantity": 1}],
             "mode": "subscription",
-            "success_url": FRONTEND_URL + "/plan?success=true",
-            "cancel_url": FRONTEND_URL + "/plan?canceled=true",
+            "success_url": settings.FRONTEND_URL + "/plan?success=true",
+            "cancel_url": settings.FRONTEND_URL + "/plan?canceled=true",
             "client_reference_id": org_id,  # Link session to internal org
             "metadata": {"org_id": org_id, "plan": plan},
         }
@@ -188,7 +189,7 @@ async def create_portal_session(
     try:
         session = stripe.billing_portal.Session.create(
             customer=org.stripe_customer_id,
-            return_url=FRONTEND_URL + "/plan",
+            return_url=settings.FRONTEND_URL + "/plan",
         )
         return {"portal_url": session.url}
     except Exception as e:

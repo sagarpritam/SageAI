@@ -77,3 +77,54 @@ async def warroom_ws(websocket: WebSocket):
         logger.error(f"WarRoom WS error: {e}")
     finally:
         warroom_manager.disconnect(websocket)
+
+
+# ── Deep Search WebSocket ─────────────────────────
+
+
+_deep_search_channels: dict[str, set[WebSocket]] = defaultdict(set)
+
+
+async def broadcast_deep_search_progress(session_id: str, data: dict):
+    """Send deep search progress to all clients watching a session."""
+    message = json.dumps(data)
+    dead = set()
+    for ws in _deep_search_channels.get(session_id, set()):
+        try:
+            await ws.send_text(message)
+        except Exception:
+            dead.add(ws)
+    _deep_search_channels[session_id] -= dead
+
+
+@router.websocket("/ws/deep-search/{session_id}")
+async def deep_search_ws(websocket: WebSocket, session_id: str):
+    """WebSocket endpoint for real-time deep search progress.
+
+    Clients receive JSON messages:
+      {"event": "entity_search_started", "entity": "example.com", "depth": 0}
+      {"event": "entity_search_complete", "entity": "example.com", "findings_count": 12}
+      {"event": "pivots_discovered", "parent": "example.com", "pivots": [...]}
+      {"event": "session_complete", "total_entities": 8, "total_findings": 45}
+    """
+    await websocket.accept()
+    _deep_search_channels[session_id].add(websocket)
+    logger.info(
+        f"WS connected for deep search {session_id} "
+        f"({len(_deep_search_channels[session_id])} clients)"
+    )
+
+    try:
+        while True:
+            try:
+                await asyncio.wait_for(websocket.receive_text(), timeout=600)
+            except asyncio.TimeoutError:
+                await websocket.send_json({"type": "ping"})
+    except WebSocketDisconnect:
+        pass
+    finally:
+        _deep_search_channels[session_id].discard(websocket)
+        if not _deep_search_channels[session_id]:
+            del _deep_search_channels[session_id]
+        logger.info(f"WS disconnected for deep search {session_id}")
+

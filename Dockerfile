@@ -21,6 +21,8 @@ COPY app/ ./app/
 COPY gunicorn.conf.py .
 COPY alembic.ini .
 COPY alembic/ ./alembic/
+COPY docker-entrypoint.sh .
+RUN chmod +x docker-entrypoint.sh
 
 # Create non-root user
 RUN addgroup --system sageai && adduser --system --group sageai
@@ -32,4 +34,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD curl -f http://localhost:8000/ || exit 1
 
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["gunicorn", "app.main:app", "-c", "gunicorn.conf.py"]
