@@ -54,3 +54,7 @@ htmlcov/
 tmp/
 .vercel
 test_output.txt
+
+# Deployment keys & archives
+*.pem
+*.zip
