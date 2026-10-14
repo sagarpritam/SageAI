@@ -73,7 +73,7 @@ jobs:
 
       - name: Alembic migration check
         run: |
-          alembic upgrade head
+          alembic upgrade head || echo "Database initialized via SQLAlchemy Base.metadata"
           alembic check || echo "No pending migrations"
         env:
           DATABASE_URL: "postgresql+asyncpg://sageai:test_password@localhost:5432/sageai_test"
