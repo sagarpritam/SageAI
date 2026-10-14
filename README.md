@@ -2,7 +2,7 @@
 
 > **SageAI** is a YC-grade AI cybersecurity platform built for Attack Surface Management, automated penetration testing, Bug Bounty, and **Advanced OSINT Intelligence** — powered by FastAPI, React, and a Multi-Agent AI architecture with 9 integrated intelligence modules.
 
-[![Tests](https://img.shields.io/badge/tests-45%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-152%20passing-brightgreen)](tests/)
 [![Audit](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/nightly-audit.yml)
 [![Deploy](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sagarpritam/SageAI/actions/workflows/deploy.yml)
 ![Version](https://img.shields.io/badge/version-latest-blueviolet)
@@ -363,10 +363,10 @@ See [`.env.example`](.env.example) for the full list.
 ```text
 SageAI/
 ├── app/
-│   ├── core/              # Config, database, security, JWT
-│   ├── models/            # SQLAlchemy models (Scan, Finding, Asset, AgentLog...)
-│   ├── routers/           # 19 API router modules
-│   ├── schemas/           # Pydantic validators
+│   ├── core/              # Config, database engine, security, JWT, rate limiting
+│   ├── models/            # 13 SQLAlchemy models (Scan, Finding, Asset, KnowledgeGraph, ASMEvent...)
+│   ├── routers/           # 25 API router modules (Auth, Scans, ASM, Intelligence, Billing...)
+│   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
 │   │   ├── scanner_service.py       # 11-scanner pipeline orchestrator
 │   │   ├── intelligence/            # 🆕 9 OSINT intelligence modules
@@ -379,26 +379,23 @@ SageAI/
 │   │   │   ├── recon_ng_intel.py    #   07: Recon-ng — The Framework
 │   │   │   ├── censys_intel.py      #   08: Censys — The Global Radar
 │   │   │   └── osint_industries_intel.py  # 09: OSINT Ind. — The Interceptor
-│   │   ├── asset_inventory/         # Attack surface discovery
-│   │   ├── agent/                   # Multi-agent AI system
-│   │   ├── llm/                     # LLM Gateway + circuit breaker
-│   │   ├── rag/                     # RAG vector store
-│   │   ├── report_generator.py      # PDF + HackerOne Markdown
+│   │   ├── integrations/            # Third-party integrations (Slack, Jira, GitHub)
+│   │   ├── asset_inventory/         # Attack surface discovery & inventory
+│   │   ├── agent/                   # Multi-agent AI autonomous system
+│   │   ├── llm/                     # NVIDIA NIM / OpenAI gateway + circuit breaker
+│   │   ├── rag/                     # RAG vector store & knowledge base
+│   │   ├── report_generator.py      # PDF + HackerOne Markdown export
 │   │   └── risk_engine.py           # CVSS-weighted risk scoring
 │   ├── plugins/           # Plugin marketplace registry
-│   └── middleware/        # Audit logging, security headers
-├── sage-web/src/
-│   ├── app/               # Next.js App Router
-│   │   ├── scan/page.tsx          # Animated stats + threat gauge
-│   │   ├── intelligence/page.tsx  # 🆕 9-module OSINT interface + graph
-│   │   ├── team/page.tsx          # Team & RBAC Management
-│   │   ├── history/page.tsx       # Past Scans
-│   │   └── ...
-│   └── components/        # React Components
-├── alembic/               # Database migrations
-├── tests/                 # 45 tests across 6 files
-├── docker/                # Dockerfiles + Compose
-└── .github/               # CI/CD workflows + Dependabot
+│   └── middleware/        # Audit logging, security headers, rate limiting
+├── sage-web/src/          # Next.js 15 Production SSR Frontend
+│   ├── app/               # App Router pages (Dashboard, Scans, Intel, ASM, Settings...)
+│   └── components/        # Tailwind & Lucide React UI Components
+├── scripts/               # Automation, deployment, seed data, and audit utilities
+├── alembic/               # Database migrations & revision history
+├── tests/                 # 152 tests across 26 test suites
+├── docker/                # Dockerfiles + multi-service Compose configs
+└── .github/               # CI/CD workflows, nightly security audits, and Dependabot
 ```
 
 ---
