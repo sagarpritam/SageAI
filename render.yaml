@@ -1,4 +1,4 @@
-﻿# ================================
+# ================================
 # SageAI — Render Blueprint
 # https://render.com/docs/blueprint-spec
 # ================================
@@ -19,6 +19,8 @@ services:
           name: SageAI-db
           property: connectionString
       - key: SECRET_KEY
+        generateValue: true
+      - key: INTERNAL_SERVICE_KEY
         generateValue: true
       - key: ALGORITHM
         value: HS256
