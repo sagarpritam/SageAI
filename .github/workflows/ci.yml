@@ -69,7 +69,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-asyncio pytest-cov httpx
+      - run: pip install pytest pytest-asyncio pytest-cov httpx aiosqlite
 
       - name: Alembic migration check
         run: |
