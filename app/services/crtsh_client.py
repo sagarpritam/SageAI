@@ -15,7 +15,11 @@ logger = logging.getLogger("sageai.crtsh")
 CRTSH_API = "https://crt.sh"
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True,
+)
 async def search_certificates(domain: str) -> list[dict]:
     """Search Certificate Transparency logs for all certs issued for a domain."""
     findings = []

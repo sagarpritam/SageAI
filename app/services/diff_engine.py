@@ -3,6 +3,7 @@ SageAI Enterprise — Attack Surface Diff Engine
 Computes differences between historical asset states or scans to detect drifts,
 new open ports, new vulnerabilities, and newly discovered subdomains.
 """
+
 import json
 from typing import Any, Dict
 
@@ -36,8 +37,12 @@ def compute_asset_diff(prev_asset: Asset, curr_asset: Asset) -> Dict[str, Any]:
         prev_ports, curr_ports = [], []
 
     try:
-        prev_tech = json.loads(prev_asset.technologies) if prev_asset.technologies else []
-        curr_tech = json.loads(curr_asset.technologies) if curr_asset.technologies else []
+        prev_tech = (
+            json.loads(prev_asset.technologies) if prev_asset.technologies else []
+        )
+        curr_tech = (
+            json.loads(curr_asset.technologies) if curr_asset.technologies else []
+        )
     except json.JSONDecodeError:
         prev_tech, curr_tech = [], []
 
@@ -88,7 +93,7 @@ async def generate_scan_diff(
             Scan.organization_id == org_id,
             Scan.target == asset_value,
             Scan.id != current_scan_id,
-            Scan.status == "completed"
+            Scan.status == "completed",
         )
         .order_by(desc(Scan.ended_at))
         .limit(1)
@@ -134,7 +139,7 @@ async def generate_scan_diff(
         vulnerabilities_diff=json.dumps(vuln_diff),
         technologies_diff=json.dumps(empty_diff),
         subdomains_diff=json.dumps(empty_diff),
-        overall_risk_shift="nc"
+        overall_risk_shift="nc",
     )
 
     db.add(diff_record)

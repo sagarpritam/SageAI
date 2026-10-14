@@ -3,7 +3,7 @@ import os
 import sys
 
 import structlog
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter
 
 # --- Custom Metrics ---
 # Request duration is usually handled by prometheus-fastapi-instrumentator,
@@ -18,11 +18,13 @@ LLM_TOKEN_USAGE_TOTAL = Counter(
     ["provider", "model"],
 )
 
+
 # --- Sentry Setup ---
 def setup_sentry():
     SENTRY_DSN = os.getenv("SENTRY_DSN")
     if SENTRY_DSN:
         import sentry_sdk
+
         sentry_sdk.init(
             dsn=SENTRY_DSN,
             traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.2")),
@@ -31,6 +33,7 @@ def setup_sentry():
         )
         return True
     return False
+
 
 # --- Structured Logging Setup ---
 def setup_logging():
@@ -67,6 +70,7 @@ def setup_logging():
     )
 
     return structlog.get_logger("SageAI")
+
 
 # Initialize global logger
 logger = setup_logging()

@@ -1,6 +1,5 @@
 """Configuration and security tests."""
 
-import pytest
 from app.core.config import Settings
 
 
@@ -16,7 +15,11 @@ class TestProductionValidation:
         assert any("SQLite" in e for e in errors)
 
     def test_production_rejects_default_secret(self):
-        s = Settings(ENV="production", DATABASE_URL="postgresql+asyncpg://x:x@localhost/db", SECRET_KEY="change-me-in-production-use-a-real-secret-key")
+        s = Settings(
+            ENV="production",
+            DATABASE_URL="postgresql+asyncpg://x:x@localhost/db",
+            SECRET_KEY="change-me-in-production-use-a-real-secret-key",
+        )
         errors = s.validate_production()
         assert any("SECRET_KEY" in e for e in errors)
 

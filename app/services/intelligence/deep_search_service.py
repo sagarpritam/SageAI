@@ -175,7 +175,7 @@ class DeepSearchService:
         -------
         dict with full session results, discovery graph, and AI briefing.
         """
-        session_id = hashlib.md5(
+        session_id = hashlib.sha256(
             f"{target}:{target_type}:{time.time()}".encode()
         ).hexdigest()[:12]
 
@@ -193,13 +193,16 @@ class DeepSearchService:
             f"(type={target_type}, depth={max_depth}, max={max_entities})"
         )
 
-        await self._emit(on_progress, {
-            "event": "session_started",
-            "session_id": session_id,
-            "target": target,
-            "target_type": target_type,
-            "max_depth": max_depth,
-        })
+        await self._emit(
+            on_progress,
+            {
+                "event": "session_started",
+                "session_id": session_id,
+                "target": target,
+                "target_type": target_type,
+                "max_depth": max_depth,
+            },
+        )
 
         # Seed the initial entity
         initial = DiscoveredEntity(
@@ -221,10 +224,13 @@ class DeepSearchService:
 
         # Generate AI briefing
         session.status = "generating_briefing"
-        await self._emit(on_progress, {
-            "event": "generating_briefing",
-            "session_id": session_id,
-        })
+        await self._emit(
+            on_progress,
+            {
+                "event": "generating_briefing",
+                "session_id": session_id,
+            },
+        )
 
         try:
             session.ai_briefing = await self._generate_briefing(session)
@@ -237,13 +243,16 @@ class DeepSearchService:
 
         result = self._build_result(session, total_duration)
 
-        await self._emit(on_progress, {
-            "event": "session_complete",
-            "session_id": session_id,
-            "total_entities": len(session.nodes),
-            "total_findings": result["stats"]["total_findings"],
-            "duration_s": round(total_duration, 2),
-        })
+        await self._emit(
+            on_progress,
+            {
+                "event": "session_complete",
+                "session_id": session_id,
+                "total_entities": len(session.nodes),
+                "total_findings": result["stats"]["total_findings"],
+                "duration_s": round(total_duration, 2),
+            },
+        )
 
         logger.info(
             f"[DeepSearch] Session {session_id} complete: "
@@ -288,20 +297,25 @@ class DeepSearchService:
         # Add edge from parent
         if entity.discovered_from:
             parent_key = entity.discovered_from
-            session.edges.append({
-                "from": parent_key,
-                "to": entity_key,
-                "source": entity.source,
-                "reason": entity.reason,
-            })
+            session.edges.append(
+                {
+                    "from": parent_key,
+                    "to": entity_key,
+                    "source": entity.source,
+                    "reason": entity.reason,
+                }
+            )
 
-        await self._emit(on_progress, {
-            "event": "entity_search_started",
-            "entity": entity.entity,
-            "entity_type": entity.entity_type,
-            "depth": entity.depth,
-            "total_searched": len(session.visited),
-        })
+        await self._emit(
+            on_progress,
+            {
+                "event": "entity_search_started",
+                "entity": entity.entity,
+                "entity_type": entity.entity_type,
+                "depth": entity.depth,
+                "total_searched": len(session.visited),
+            },
+        )
 
         # Run OSINT modules
         t0 = time.time()
@@ -317,39 +331,54 @@ class DeepSearchService:
             node.duration_s = time.time() - t0
             return
 
-        session.timeline.append({
-            "entity": entity.entity,
-            "entity_type": entity.entity_type,
-            "depth": entity.depth,
-            "findings_count": len(findings),
-            "duration_s": round(node.duration_s, 2),
-        })
+        session.timeline.append(
+            {
+                "entity": entity.entity,
+                "entity_type": entity.entity_type,
+                "depth": entity.depth,
+                "findings_count": len(findings),
+                "duration_s": round(node.duration_s, 2),
+            }
+        )
 
-        await self._emit(on_progress, {
-            "event": "entity_search_complete",
-            "entity": entity.entity,
-            "entity_type": entity.entity_type,
-            "depth": entity.depth,
-            "findings_count": len(findings),
-            "duration_s": round(node.duration_s, 2),
-        })
+        await self._emit(
+            on_progress,
+            {
+                "event": "entity_search_complete",
+                "entity": entity.entity,
+                "entity_type": entity.entity_type,
+                "depth": entity.depth,
+                "findings_count": len(findings),
+                "duration_s": round(node.duration_s, 2),
+            },
+        )
 
         # If we haven't hit max depth, extract pivots and recurse
-        if entity.depth < session.max_depth and len(session.visited) < session.max_entities:
+        if (
+            entity.depth < session.max_depth
+            and len(session.visited) < session.max_entities
+        ):
             pivots = await self._extract_pivots(
                 entity.entity, entity.entity_type, findings
             )
 
             node.pivots_found = [f"{p.entity_type}:{p.entity}" for p in pivots]
 
-            await self._emit(on_progress, {
-                "event": "pivots_discovered",
-                "parent": entity.entity,
-                "pivots": [
-                    {"entity": p.entity, "type": p.entity_type, "confidence": p.confidence}
-                    for p in pivots
-                ],
-            })
+            await self._emit(
+                on_progress,
+                {
+                    "event": "pivots_discovered",
+                    "parent": entity.entity,
+                    "pivots": [
+                        {
+                            "entity": p.entity,
+                            "type": p.entity_type,
+                            "confidence": p.confidence,
+                        }
+                        for p in pivots
+                    ],
+                },
+            )
 
             # Search pivots concurrently with a semaphore
             sem = asyncio.Semaphore(CONCURRENCY_LIMIT)
@@ -379,7 +408,9 @@ class DeepSearchService:
         from app.services.intelligence.darkweb_intel import darkweb_search
         from app.services.intelligence.identity_intel import identity_resolve
         from app.services.intelligence.intelx_intel import intelx_search
-        from app.services.intelligence.osint_industries_intel import osint_industries_lookup
+        from app.services.intelligence.osint_industries_intel import (
+            osint_industries_lookup,
+        )
         from app.services.intelligence.phishstats_intel import phishstats_scan
         from app.services.intelligence.recon_ng_intel import recon_ng_scan
         from app.services.intelligence.shodan_intel import shodan_scan
@@ -463,19 +494,27 @@ class DeepSearchService:
                 if p.get("entity", "").lower() == target.lower():
                     continue
                 # Validate entity type
-                if p.get("entity_type") not in ("domain", "ip", "email", "username", "phone"):
+                if p.get("entity_type") not in (
+                    "domain",
+                    "ip",
+                    "email",
+                    "username",
+                    "phone",
+                ):
                     continue
                 # Confidence filter
                 if p.get("confidence", 0) < 0.5:
                     continue
 
-                pivots.append(DiscoveredEntity(
-                    entity=p["entity"],
-                    entity_type=p["entity_type"],
-                    confidence=p.get("confidence", 0.7),
-                    source=p.get("source", "ai_extraction"),
-                    reason=p.get("reason", "Discovered in findings"),
-                ))
+                pivots.append(
+                    DiscoveredEntity(
+                        entity=p["entity"],
+                        entity_type=p["entity_type"],
+                        confidence=p.get("confidence", 0.7),
+                        source=p.get("source", "ai_extraction"),
+                        reason=p.get("reason", "Discovered in findings"),
+                    )
+                )
 
             logger.info(f"[DeepSearch] Extracted {len(pivots)} pivots from {target}")
             return pivots[:8]  # Cap pivots per entity
@@ -495,7 +534,7 @@ class DeepSearchService:
             )
 
         key_findings = []
-        for key, node in list(session.nodes.items())[:15]:
+        for _key, node in list(session.nodes.items())[:15]:
             if node.findings:
                 key_findings.append(
                     f"  [{node.entity_type}] {node.entity}: "
@@ -521,33 +560,37 @@ class DeepSearchService:
 
     # ── Result builder ─────────────────────────────────────────────────────
 
-    def _build_result(self, session: DeepSearchSession, total_duration: float) -> Dict[str, Any]:
+    def _build_result(
+        self, session: DeepSearchSession, total_duration: float
+    ) -> Dict[str, Any]:
         """Build the final result dictionary."""
         total_findings = sum(len(n.findings) for n in session.nodes.values())
-        max_depth_reached = max(
-            (n.depth for n in session.nodes.values()), default=0
-        )
+        max_depth_reached = max((n.depth for n in session.nodes.values()), default=0)
 
         # Build graph for visualization
         graph_nodes = []
         for key, node in session.nodes.items():
-            graph_nodes.append({
-                "id": key,
-                "label": node.entity,
-                "type": node.entity_type,
-                "depth": node.depth,
-                "findings_count": len(node.findings),
-                "status": node.status,
-            })
+            graph_nodes.append(
+                {
+                    "id": key,
+                    "label": node.entity,
+                    "type": node.entity_type,
+                    "depth": node.depth,
+                    "findings_count": len(node.findings),
+                    "status": node.status,
+                }
+            )
 
         graph_edges = []
         for edge in session.edges:
-            graph_edges.append({
-                "source": edge["from"],
-                "target": edge["to"],
-                "label": edge["source"],
-                "reason": edge["reason"],
-            })
+            graph_edges.append(
+                {
+                    "source": edge["from"],
+                    "target": edge["to"],
+                    "label": edge["source"],
+                    "reason": edge["reason"],
+                }
+            )
 
         return {
             "session_id": session.session_id,

@@ -13,7 +13,10 @@ class Scan(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
 
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
     user_id = Column(
@@ -32,8 +35,12 @@ class Scan(Base):
     # Relationships
     organization = relationship("Organization", back_populates="scans")
     user = relationship("User", back_populates="scans")
-    db_findings = relationship("Finding", back_populates="scan", cascade="all, delete-orphan")
-    agent_logs = relationship("AgentLog", back_populates="scan", cascade="all, delete-orphan")
+    db_findings = relationship(
+        "Finding", back_populates="scan", cascade="all, delete-orphan"
+    )
+    agent_logs = relationship(
+        "AgentLog", back_populates="scan", cascade="all, delete-orphan"
+    )
     asm_events = relationship("ASMEvent", back_populates="scan")
 
     def set_findings(self, data: list):

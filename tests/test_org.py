@@ -54,14 +54,20 @@ async def test_list_api_keys(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_create_webhook(client, auth_headers):
-    r = await client.post("/webhooks?url=https://example.com/hook&event=scan.completed", headers=auth_headers)
+    r = await client.post(
+        "/webhooks?url=https://example.com/hook&event=scan.completed",
+        headers=auth_headers,
+    )
     assert r.status_code == 200
     assert r.json()["event"] == "scan.completed"
 
 
 @pytest.mark.asyncio
 async def test_list_webhooks(client, auth_headers):
-    await client.post("/webhooks?url=https://example.com/hook2&event=scan.completed", headers=auth_headers)
+    await client.post(
+        "/webhooks?url=https://example.com/hook2&event=scan.completed",
+        headers=auth_headers,
+    )
     r = await client.get("/webhooks", headers=auth_headers)
     assert r.status_code == 200
     assert len(r.json()) >= 1

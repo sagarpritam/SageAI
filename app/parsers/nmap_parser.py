@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 class NmapService(BaseModel):
     """Service detected on a port."""
+
     name: str = Field(default="unknown")
     product: Optional[str] = None
     version: Optional[str] = None
@@ -15,6 +16,7 @@ class NmapService(BaseModel):
 
 class NmapPort(BaseModel):
     """An open port found by nmap."""
+
     portid: str
     protocol: str = "tcp"
     state: str = "open"
@@ -24,6 +26,7 @@ class NmapPort(BaseModel):
 
 class NmapHost(BaseModel):
     """A host scanned by nmap."""
+
     addresses: List[Dict[str, str]] = Field(default_factory=list)
     hostnames: List[Dict[str, str]] = Field(default_factory=list)
     ports: List[NmapPort] = Field(default_factory=list)
@@ -48,6 +51,7 @@ class NmapHost(BaseModel):
 
 class NmapResult(BaseModel):
     """Structured result from nmap scan."""
+
     hosts: List[NmapHost] = Field(default_factory=list)
     elapsed_seconds: float = 0.0
     is_mock: bool = False
@@ -71,19 +75,25 @@ def parse_nmap_results(raw: Dict[str, Any]) -> NmapResult:
         for p in host_data.get("ports", []):
             svc = None
             if p.get("service"):
-                svc = NmapService(**{k: v for k, v in p["service"].items() if v is not None})
-            ports.append(NmapPort(
-                portid=p.get("portid", "0"),
-                protocol=p.get("protocol", "tcp"),
-                state=p.get("state", "open"),
-                reason=p.get("reason"),
-                service=svc,
-            ))
-        hosts.append(NmapHost(
-            addresses=host_data.get("addresses", []),
-            hostnames=host_data.get("hostnames", []),
-            ports=ports,
-        ))
+                svc = NmapService(
+                    **{k: v for k, v in p["service"].items() if v is not None}
+                )
+            ports.append(
+                NmapPort(
+                    portid=p.get("portid", "0"),
+                    protocol=p.get("protocol", "tcp"),
+                    state=p.get("state", "open"),
+                    reason=p.get("reason"),
+                    service=svc,
+                )
+            )
+        hosts.append(
+            NmapHost(
+                addresses=host_data.get("addresses", []),
+                hostnames=host_data.get("hostnames", []),
+                ports=ports,
+            )
+        )
 
     return NmapResult(
         hosts=hosts,

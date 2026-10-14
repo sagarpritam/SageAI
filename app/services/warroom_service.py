@@ -46,10 +46,12 @@ except ImportError:
                 "timestamp": self.timestamp.isoformat(),
                 "priority": self.priority.value,
                 "payload": self.payload,
-                "target": self.target
+                "target": self.target,
             }
 
+
 logger = logging.getLogger("SageAI.warroom")
+
 
 class WarRoomManager:
     """Manages real-time attack visualization state and WebSocket distribution."""
@@ -78,7 +80,7 @@ class WarRoomManager:
             self.bus = EventBus(
                 kafka_brokers=settings.KAFKA_BROKERS.split(","),
                 redis_url=settings.REDIS_URL,
-                service_name="warroom-manager"
+                service_name="warroom-manager",
             )
             # Subscribe to all events
             await self.bus.subscribe("*", self.handle_bus_event)
@@ -97,7 +99,9 @@ class WarRoomManager:
 
         # Add geo-simulation if missing (for the globe)
         if not event_dict["payload"].get("geo"):
-            event_dict["payload"]["geo"] = self._simulate_geo(event_dict.get("target", ""))
+            event_dict["payload"]["geo"] = self._simulate_geo(
+                event_dict.get("target", "")
+            )
 
         # Update history
         self.event_history.append(event_dict)
@@ -129,12 +133,13 @@ class WarRoomManager:
     def _simulate_geo(self, target: str) -> Dict:
         """Simulate geo-coordinates for visual flair if real data isn't available."""
         import random
+
         # In a real app, this would use a Geo-IP database
         return {
             "lat": random.uniform(-60, 80),
             "lng": random.uniform(-180, 180),
             "city": "Unknown",
-            "country": "CyberSpace"
+            "country": "CyberSpace",
         }
 
     async def connect(self, websocket: WebSocket):
@@ -144,17 +149,20 @@ class WarRoomManager:
 
         # Send history for "rehydration"
         if self.event_history:
-            await websocket.send_json({
-                "type": "rehydration",
-                "data": self.event_history
-            })
+            await websocket.send_json(
+                {"type": "rehydration", "data": self.event_history}
+            )
 
-        logger.info(f"🔌 WarRoom client connected. Total: {len(self.active_connections)}")
+        logger.info(
+            f"🔌 WarRoom client connected. Total: {len(self.active_connections)}"
+        )
 
     def disconnect(self, websocket: WebSocket):
         """Unregister a WebSocket connection."""
         self.active_connections.discard(websocket)
-        logger.info(f"🔌 WarRoom client disconnected. Total: {len(self.active_connections)}")
+        logger.info(
+            f"🔌 WarRoom client disconnected. Total: {len(self.active_connections)}"
+        )
 
     async def broadcast(self, data: Dict):
         """Send data to all active WebSocket clients."""
@@ -172,5 +180,6 @@ class WarRoomManager:
 
         for ws in dead:
             self.disconnect(ws)
+
 
 warroom_manager = WarRoomManager()

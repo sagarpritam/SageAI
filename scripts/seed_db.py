@@ -2,6 +2,7 @@
 Database Seeding Script for SageAI.
 Populates the database with a test admin user, demo organization, and mock assets.
 """
+
 import asyncio
 import logging
 import os
@@ -76,7 +77,7 @@ async def seed():
                 asset_type=AssetType.subdomain,
                 value="api.sageai.com",
                 ip_address="192.168.1.100",
-                open_ports='[80, 443]',
+                open_ports="[80, 443]",
                 risk_level="Medium",
                 risk_score=5.0,
                 status=AssetStatus.active,
@@ -86,7 +87,7 @@ async def seed():
                 asset_type=AssetType.server,
                 value="dev-server-01",
                 ip_address="10.0.0.50",
-                open_ports='[22, 8080]',
+                open_ports="[22, 8080]",
                 risk_level="High",
                 risk_score=8.5,
                 status=AssetStatus.stale,

@@ -1,4 +1,4 @@
-﻿"""Gunicorn production config for SageAI."""
+"""Gunicorn production config for SageAI."""
 
 import multiprocessing
 

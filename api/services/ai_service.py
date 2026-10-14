@@ -7,18 +7,18 @@ Wraps OpenAI API calls with:
 - Structured output via Pydantic response models
 """
 
-import os
 import logging
+import os
 from typing import Any, Optional, Type
 
-from pydantic import BaseModel
 import openai
+from pydantic import BaseModel
 from tenacity import (
+    before_sleep_log,
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
-    before_sleep_log,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,12 +38,14 @@ client = openai.OpenAI(
 @retry(
     stop=stop_after_attempt(LLM_MAX_RETRIES),
     wait=wait_exponential(multiplier=1, min=2, max=30),
-    retry=retry_if_exception_type((
-        openai.APITimeoutError,
-        openai.RateLimitError,
-        openai.APIConnectionError,
-        openai.InternalServerError,
-    )),
+    retry=retry_if_exception_type(
+        (
+            openai.APITimeoutError,
+            openai.RateLimitError,
+            openai.APIConnectionError,
+            openai.InternalServerError,
+        )
+    ),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     reraise=True,
 )
@@ -80,7 +82,9 @@ def call_llm(
 
         logger.info(
             "Calling LLM model=%s  structured=%s  max_tokens=%d",
-            LLM_MODEL, response_model is not None, max_tokens,
+            LLM_MODEL,
+            response_model is not None,
+            max_tokens,
         )
 
         if response_model:
@@ -116,7 +120,12 @@ def call_llm(
                 )
             return response.choices[0].message.content
 
-    except (openai.APITimeoutError, openai.RateLimitError, openai.APIConnectionError, openai.InternalServerError):
+    except (
+        openai.APITimeoutError,
+        openai.RateLimitError,
+        openai.APIConnectionError,
+        openai.InternalServerError,
+    ):
         # Let tenacity handle the retry
         raise
 

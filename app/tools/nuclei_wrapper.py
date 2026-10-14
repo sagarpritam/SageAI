@@ -26,9 +26,14 @@ VALID_SEVERITIES = {"info", "low", "medium", "high", "critical"}
 
 # Template categories
 VALID_CATEGORIES = {
-    "cves", "misconfigurations", "exposures",
-    "vulnerabilities", "default-logins", "fuzzing",
-    "technologies", "token-spray",
+    "cves",
+    "misconfigurations",
+    "exposures",
+    "vulnerabilities",
+    "default-logins",
+    "fuzzing",
+    "technologies",
+    "token-spray",
 }
 
 
@@ -41,7 +46,7 @@ def _sanitize_target(target: str) -> str:
     bare = target
     for prefix in ("https://", "http://"):
         if bare.startswith(prefix):
-            bare = bare[len(prefix):]
+            bare = bare[len(prefix) :]
     bare = bare.split("/")[0]
     if not _SAFE_TARGET_RE.match(bare):
         raise ValueError(f"Invalid target format: '{target}'")
@@ -71,15 +76,19 @@ def run_nuclei(
     requested = {s.strip().lower() for s in severity.split(",")}
     invalid = requested - VALID_SEVERITIES
     if invalid:
-        raise ValueError(f"Invalid severity levels: {invalid}. Valid: {VALID_SEVERITIES}")
+        raise ValueError(
+            f"Invalid severity levels: {invalid}. Valid: {VALID_SEVERITIES}"
+        )
 
     try:
         cmd = [
             NUCLEI_BIN,
-            "-u", target,
-            "-jsonl",           # JSON-lines output to stdout
+            "-u",
+            target,
+            "-jsonl",  # JSON-lines output to stdout
             "-silent",
-            "-severity", severity,
+            "-severity",
+            severity,
         ]
 
         if categories:
@@ -89,7 +98,9 @@ def run_nuclei(
 
         logger.info(
             "Running nuclei: target=%s  severity=%s  timeout=%ds",
-            target, severity, NUCLEI_TIMEOUT,
+            target,
+            severity,
+            NUCLEI_TIMEOUT,
         )
 
         # nuclei may return non-zero if vulns are found → check=False
@@ -112,27 +123,35 @@ def run_nuclei(
 
         elapsed = round(time.monotonic() - start, 2)
         logger.info(
-            "Nuclei completed in %.2fs — %d finding(s)", elapsed, len(findings),
+            "Nuclei completed in %.2fs — %d finding(s)",
+            elapsed,
+            len(findings),
         )
         return findings
 
     except FileNotFoundError:
         elapsed = round(time.monotonic() - start, 2)
-        logger.warning("Nuclei binary not found at '%s'. Using MOCK MODE for %s.", NUCLEI_BIN, target)
-        return [{
-            "template-id": "grafana-directory-traversal",
-            "info": {
-                "name": "Grafana Directory Traversal (CVE-2021-43798)",
-                "severity": "critical",
-                "description": "The admin panel allows reading local files via path traversal.",
-                "tags": ["cve", "grafana", "lfi"],
-            },
-            "type": "http",
-            "host": target,
-            "matched-at": f"http://{target}:8443/public/plugins/alertlist/..%2f..%2f..%2fetc/passwd",
-            "extracted-results": ["root:x:0:0:root:/root:/bin/bash"],
-            "is_mock": True,
-        }]
+        logger.warning(
+            "Nuclei binary not found at '%s'. Using MOCK MODE for %s.",
+            NUCLEI_BIN,
+            target,
+        )
+        return [
+            {
+                "template-id": "grafana-directory-traversal",
+                "info": {
+                    "name": "Grafana Directory Traversal (CVE-2021-43798)",
+                    "severity": "critical",
+                    "description": "The admin panel allows reading local files via path traversal.",
+                    "tags": ["cve", "grafana", "lfi"],
+                },
+                "type": "http",
+                "host": target,
+                "matched-at": f"http://{target}:8443/public/plugins/alertlist/..%2f..%2f..%2fetc/passwd",
+                "extracted-results": ["root:x:0:0:root:/root:/bin/bash"],
+                "is_mock": True,
+            }
+        ]
 
     except subprocess.TimeoutExpired:
         elapsed = round(time.monotonic() - start, 2)

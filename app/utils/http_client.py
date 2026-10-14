@@ -7,7 +7,9 @@ SSL certificate verification is ALWAYS enabled to prevent man-in-the-middle atta
 import httpx
 
 
-def get_http_client(*, follow_redirects: bool = True, timeout: int = 10) -> httpx.AsyncClient:
+def get_http_client(
+    *, follow_redirects: bool = True, timeout: int = 10
+) -> httpx.AsyncClient:
     """
     Return an AsyncClient with proper TLS verification enabled.
 

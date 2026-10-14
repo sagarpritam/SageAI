@@ -169,7 +169,7 @@ class GitHubPRTool(BaseTool):
             # 3. Commit the patched file
             commit_message = f"fix: resolve {vuln_type} in {file_path}\n\nAuto-fixed by SageAI Developer Agent."
             try:
-                commit_url = await github.commit_file(
+                await github.commit_file(
                     owner,
                     repo,
                     branch_name,

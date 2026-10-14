@@ -14,7 +14,14 @@ exclude = [
     ".ruff_cache",
     ".venv",
     "venv",
+    "venv2",
     "__pypackages__",
+    "node_modules",
+    "frontend",
+    "sage-web",
+    "sagestrike",
+    "sageai---autonomous-pentesting",
+    "alembic",
 ]
 
 [tool.ruff.lint]
@@ -26,11 +33,12 @@ select = [
     "C4",  # flake8-comprehensions
     "B",  # flake8-bugbear
 ]
-ignore = ["E501", "B008"]
+ignore = ["E501", "B008", "B904", "B905", "E402", "B017"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q --asyncio-mode=auto"
+pythonpath = ["."]
 testpaths = [
     "tests",
 ]

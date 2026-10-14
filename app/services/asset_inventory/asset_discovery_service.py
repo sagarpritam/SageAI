@@ -238,7 +238,7 @@ async def discover_assets(
 
     # ── Step 4: Persist to DB (upsert) ────────────────────────────────────
     now = datetime.now(timezone.utc)
-    yesterday = now - timedelta(hours=24)
+    now - timedelta(hours=24)
 
     for item in enriched:
         if isinstance(item, Exception):
@@ -288,7 +288,9 @@ async def discover_assets(
                         severity=ASMEventSeverity.medium,
                         title=f"New open ports discovered on {item['value']}",
                         description=f"Detected new ports: {', '.join(map(str, new_ports))}",
-                        details=json.dumps({"new_ports": new_ports, "all_ports": curr_ports})
+                        details=json.dumps(
+                            {"new_ports": new_ports, "all_ports": curr_ports}
+                        ),
                     )
                     db.add(evt)
         else:
@@ -313,12 +315,16 @@ async def discover_assets(
             )
             db.add(new_asset)
             new_assets.append(item["value"])
-            await db.flush() # ensure new_asset.id is populated
+            await db.flush()  # ensure new_asset.id is populated
 
             # Emit ASM new asset record event
-            evt_type = (ASMEventType.new_subdomain if item["asset_type"] == AssetType.subdomain
-                        else ASMEventType.new_ip if item["asset_type"] == AssetType.ip
-                        else ASMEventType.new_service)
+            evt_type = (
+                ASMEventType.new_subdomain
+                if item["asset_type"] == AssetType.subdomain
+                else ASMEventType.new_ip
+                if item["asset_type"] == AssetType.ip
+                else ASMEventType.new_service
+            )
 
             evt_title = f"New {item['asset_type'].value} discovered: {item['value']}"
 
@@ -330,11 +336,13 @@ async def discover_assets(
                 severity=ASMEventSeverity.info,
                 title=evt_title,
                 description=f"A new {item['asset_type'].value} was found during continuous enumeration.",
-                details=json.dumps({
-                    "value": item["value"],
-                    "ip": item.get("ip_address"),
-                    "ports": item.get("open_ports", [])
-                })
+                details=json.dumps(
+                    {
+                        "value": item["value"],
+                        "ip": item.get("ip_address"),
+                        "ports": item.get("open_ports", []),
+                    }
+                ),
             )
             db.add(evt)
 

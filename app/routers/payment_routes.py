@@ -12,29 +12,32 @@ router = APIRouter(prefix="/payments", tags=["Payments"])
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 @router.post("/checkout")
-async def create_checkout_session(
-    current_user: dict = Depends(get_current_user)
-):
+async def create_checkout_session(current_user: dict = Depends(get_current_user)):
     if not settings.STRIPE_SECRET_KEY:
-        raise HTTPException(status_code=500, detail="Stripe integration is not configured")
+        raise HTTPException(
+            status_code=500, detail="Stripe integration is not configured"
+        )
 
     try:
         session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': 'SageAI Pro',
-                        'description': 'Unlimited Scans & Autonomous Response Engine',
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "SageAI Pro",
+                            "description": "Unlimited Scans & Autonomous Response Engine",
+                        },
+                        "unit_amount": 4900,  # $49.00
                     },
-                    'unit_amount': 4900, # $49.00
-                },
-                'quantity': 1,
-            }],
-            mode='payment',
-            metadata={'org_id': current_user.get("org")},
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
+            metadata={"org_id": current_user.get("org")},
             success_url=f"{settings.FRONTEND_URL}/history?payment=success",
             cancel_url=f"{settings.FRONTEND_URL}/pricing?payment=cancelled",
         )
@@ -42,10 +45,11 @@ async def create_checkout_session(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/webhook")
 async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     payload = await request.body()
-    sig_header = request.headers.get('stripe-signature')
+    sig_header = request.headers.get("stripe-signature")
 
     try:
         event = stripe.Webhook.construct_event(
@@ -57,13 +61,15 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         return {"error": "Invalid signature"}
 
     # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        org_id = session.get('metadata', {}).get('org_id')
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        org_id = session.get("metadata", {}).get("org_id")
 
         if org_id:
             # Upgrade org plan to pro
-            result = await db.execute(select(Organization).where(Organization.id == org_id))
+            result = await db.execute(
+                select(Organization).where(Organization.id == org_id)
+            )
             org = result.scalar_one_or_none()
             if org:
                 org.plan = "pro"

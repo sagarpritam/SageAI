@@ -43,7 +43,10 @@ class Asset(Base):
 
     id = Column(String, primary_key=True, default=generate_uuid)
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
 
@@ -86,5 +89,9 @@ class Asset(Base):
 
     # Relationships
     organization = relationship("Organization", back_populates="assets")
-    asm_events = relationship("ASMEvent", back_populates="asset", cascade="all, delete-orphan")
-    diffs = relationship("AttackSurfaceDiff", back_populates="asset", cascade="all, delete-orphan")
+    asm_events = relationship(
+        "ASMEvent", back_populates="asset", cascade="all, delete-orphan"
+    )
+    diffs = relationship(
+        "AttackSurfaceDiff", back_populates="asset", cascade="all, delete-orphan"
+    )

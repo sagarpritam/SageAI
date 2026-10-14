@@ -106,7 +106,7 @@ class APISecurityPlugin(SecurityPlugin):
                         "query",
                     ]
                 ):
-                    path = (
+                    (
                         url.split("//", 1)[-1].split("/", 1)[-1]
                         if "/" in url.split("//", 1)[-1]
                         else ""

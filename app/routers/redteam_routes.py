@@ -11,6 +11,7 @@ logger = logging.getLogger("SageAI.redteam")
 
 router = APIRouter(prefix="/redteam", tags=["AI Red Teaming"])
 
+
 class TargetCreateRequest(BaseModel):
     name: str
     model: str
@@ -19,15 +20,16 @@ class TargetCreateRequest(BaseModel):
     namespace: str = "default"
     options: Optional[Dict[str, Any]] = None
 
+
 class AuditJobRequest(BaseModel):
     target_name: str
     namespace: str = "default"
     probes: List[str] = ["jailbreak"]
 
+
 @router.post("/targets")
 async def create_audit_target(
-    payload: TargetCreateRequest,
-    current_user: dict = Depends(get_current_user)
+    payload: TargetCreateRequest, current_user: dict = Depends(get_current_user)
 ):
     """
     Register a new LLM target for security auditing.
@@ -39,17 +41,17 @@ async def create_audit_target(
             uri=payload.uri,
             target_type=payload.type,
             namespace=payload.namespace,
-            options=payload.options
+            options=payload.options,
         )
         return {"status": "success", "target": target}
     except Exception as e:
         logger.error(f"Failed to create target: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/targets")
 async def list_audit_targets(
-    namespace: str = "default",
-    current_user: dict = Depends(get_current_user)
+    namespace: str = "default", current_user: dict = Depends(get_current_user)
 ):
     """
     List all configured audit targets.
@@ -61,10 +63,10 @@ async def list_audit_targets(
         logger.error(f"Failed to list targets: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/audit")
 async def start_redteam_audit(
-    payload: AuditJobRequest,
-    current_user: dict = Depends(get_current_user)
+    payload: AuditJobRequest, current_user: dict = Depends(get_current_user)
 ):
     """
     Start an automated red team audit on the specified target.
@@ -73,18 +75,19 @@ async def start_redteam_audit(
         job = nemo_auditor.start_audit(
             target_name=payload.target_name,
             namespace=payload.namespace,
-            probes=payload.probes
+            probes=payload.probes,
         )
         return {"status": "success", "job": job}
     except Exception as e:
         logger.error(f"Failed to start audit job: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/results/{job_id}")
 async def get_audit_results(
     job_id: str,
     namespace: str = "default",
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Retrieve the results of a red teaming audit job.

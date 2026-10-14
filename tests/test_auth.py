@@ -6,11 +6,15 @@ import pytest
 @pytest.mark.asyncio
 async def test_register_success(client):
     import uuid
-    r = await client.post("/auth/register", json={
-        "email": f"newuser_{uuid.uuid4().hex[:8]}@test.com",
-        "password": "StrongPass1!",
-        "organization_name": "NewOrg",
-    })
+
+    r = await client.post(
+        "/auth/register",
+        json={
+            "email": f"newuser_{uuid.uuid4().hex[:8]}@test.com",
+            "password": "StrongPass1!",
+            "organization_name": "NewOrg",
+        },
+    )
     assert r.status_code == 201
     data = r.json()
     assert "access_token" in data
@@ -19,7 +23,11 @@ async def test_register_success(client):
 
 @pytest.mark.asyncio
 async def test_register_duplicate_email(client):
-    payload = {"email": "dup@test.com", "password": "Pass123!", "organization_name": "Org1"}
+    payload = {
+        "email": "dup@test.com",
+        "password": "Pass123!",
+        "organization_name": "Org1",
+    }
     await client.post("/auth/register", json=payload)
     r = await client.post("/auth/register", json=payload)
     assert r.status_code in (400, 409, 422, 500)
@@ -27,12 +35,20 @@ async def test_register_duplicate_email(client):
 
 @pytest.mark.asyncio
 async def test_register_weak_password(client):
-    payload = {"email": "weak@test.com", "password": "weak", "organization_name": "OrgWeak"}
+    payload = {
+        "email": "weak@test.com",
+        "password": "weak",
+        "organization_name": "OrgWeak",
+    }
     r = await client.post("/auth/register", json=payload)
     assert r.status_code == 422
     assert "Password must be at least 8 characters long" in r.text
 
-    payload2 = {"email": "weak2@test.com", "password": "onlylowercase!", "organization_name": "OrgWeak"}
+    payload2 = {
+        "email": "weak2@test.com",
+        "password": "onlylowercase!",
+        "organization_name": "OrgWeak",
+    }
     r2 = await client.post("/auth/register", json=payload2)
     assert r2.status_code == 422
     assert "Password must contain at least one uppercase letter" in r2.text
@@ -40,30 +56,42 @@ async def test_register_weak_password(client):
 
 @pytest.mark.asyncio
 async def test_login_success(client):
-    await client.post("/auth/register", json={
-        "email": "login@test.com",
-        "password": "Pass123!",
-        "organization_name": "LoginOrg",
-    })
-    r = await client.post("/auth/login", json={
-        "email": "login@test.com",
-        "password": "Pass123!",
-    })
+    await client.post(
+        "/auth/register",
+        json={
+            "email": "login@test.com",
+            "password": "Pass123!",
+            "organization_name": "LoginOrg",
+        },
+    )
+    r = await client.post(
+        "/auth/login",
+        json={
+            "email": "login@test.com",
+            "password": "Pass123!",
+        },
+    )
     assert r.status_code == 200
     assert "access_token" in r.json()
 
 
 @pytest.mark.asyncio
 async def test_login_wrong_password(client):
-    await client.post("/auth/register", json={
-        "email": "wrong@test.com",
-        "password": "Pass123!",
-        "organization_name": "WrongOrg",
-    })
-    r = await client.post("/auth/login", json={
-        "email": "wrong@test.com",
-        "password": "BadPassword!",
-    })
+    await client.post(
+        "/auth/register",
+        json={
+            "email": "wrong@test.com",
+            "password": "Pass123!",
+            "organization_name": "WrongOrg",
+        },
+    )
+    r = await client.post(
+        "/auth/login",
+        json={
+            "email": "wrong@test.com",
+            "password": "BadPassword!",
+        },
+    )
     assert r.status_code == 401
 
 

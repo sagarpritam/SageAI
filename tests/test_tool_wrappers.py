@@ -1,12 +1,13 @@
 """Tests for hardened tool wrappers — input validation, mock mode, and timeouts."""
 
 import pytest
-from app.tools.subfinder_wrapper import run_subfinder, _validate_domain
-from app.tools.nmap_wrapper import run_nmap, _sanitize_target
-from app.tools.nuclei_wrapper import run_nuclei
 
+from app.tools.nmap_wrapper import _sanitize_target, run_nmap
+from app.tools.nuclei_wrapper import run_nuclei
+from app.tools.subfinder_wrapper import _validate_domain, run_subfinder
 
 # ── Subfinder Tests ──────────────────────────────────────────────
+
 
 class TestSubfinderValidation:
     def test_valid_domain(self):
@@ -44,6 +45,7 @@ class TestSubfinderMockMode:
 
 # ── Nmap Tests ───────────────────────────────────────────────────
 
+
 class TestNmapValidation:
     def test_valid_target(self):
         assert _sanitize_target("example.com") == "example.com"
@@ -76,6 +78,7 @@ class TestNmapMockMode:
 
 
 # ── Nuclei Tests ─────────────────────────────────────────────────
+
 
 class TestNucleiValidation:
     def test_rejects_invalid_severity(self):

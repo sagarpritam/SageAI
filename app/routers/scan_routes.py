@@ -155,16 +155,25 @@ async def get_scan(
 
     if scan.status == "completed":
         from app.agents.reporter import create_report
+
         try:
             report_data = create_report(findings)
         except Exception:
             report_data = {
                 "summary": "Report generation failed or not available.",
                 "critical_issues": [],
-                "recommendations": []
+                "recommendations": [],
             }
 
-        nodes = [{"id": "target", "name": scan.target, "val": 20, "type": "domain", "color": "#10b981"}]
+        nodes = [
+            {
+                "id": "target",
+                "name": scan.target,
+                "val": 20,
+                "type": "domain",
+                "color": "#10b981",
+            }
+        ]
         links = []
         for i, f in enumerate(findings):
             node_id = f"finding_{i}"
@@ -194,16 +203,22 @@ async def get_scan(
                 color = "#4f46e5"
             else:
                 ntype = "vuln"
-                color = "#ef4444" if f.get("severity", "Low").lower() in ["high", "critical"] else "#eab308"
+                color = (
+                    "#ef4444"
+                    if f.get("severity", "Low").lower() in ["high", "critical"]
+                    else "#eab308"
+                )
 
-            nodes.append({
-                "id": node_id,
-                "name": f_type,
-                "val": 10,
-                "type": ntype,
-                "color": color,
-                "data": f if isinstance(f, dict) else dict(f)
-            })
+            nodes.append(
+                {
+                    "id": node_id,
+                    "name": f_type,
+                    "val": 10,
+                    "type": ntype,
+                    "color": color,
+                    "data": f if isinstance(f, dict) else dict(f),
+                }
+            )
             links.append({"source": "target", "target": node_id})
         graph_data = {"nodes": nodes, "links": links}
 
@@ -213,10 +228,10 @@ async def get_scan(
         status=scan.status,
         timestamp=scan.created_at,
         findings=[Vulnerability(**f) for f in findings],
-        analyzed_findings=[f for f in findings],
+        analyzed_findings=list(findings),
         risk_summary=RiskSummary(**risk),
         report=report_data,
-        graph=graph_data
+        graph=graph_data,
     )
 
 
@@ -257,7 +272,9 @@ async def get_scan_report(
             "report": {
                 "summary": "No findings to report.",
                 "critical_issues": [],
-                "recommendations": ["Target appears clean. Schedule periodic re-scans."],
+                "recommendations": [
+                    "Target appears clean. Schedule periodic re-scans."
+                ],
             },
         }
 
@@ -354,7 +371,12 @@ async def generate_share_link(
 ):
     """Generate a unique public share token for a scan."""
     import uuid
-    result = await db.execute(select(Scan).where(Scan.id == scan_id, Scan.organization_id == current_user["org"]))
+
+    result = await db.execute(
+        select(Scan).where(
+            Scan.id == scan_id, Scan.organization_id == current_user["org"]
+        )
+    )
     scan = result.scalar_one_or_none()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
@@ -364,6 +386,7 @@ async def generate_share_link(
         await db.commit()
 
     return {"share_token": scan.share_token}
+
 
 @router.get("/public/{share_token}")
 @limiter.limit("30/minute")
@@ -377,7 +400,9 @@ async def get_public_scan(
     scan = result.scalar_one_or_none()
 
     if not scan:
-        raise HTTPException(status_code=404, detail="Scan not found or share link is invalid.")
+        raise HTTPException(
+            status_code=404, detail="Scan not found or share link is invalid."
+        )
 
     findings = scan.get_findings()
     risk = {"risk_score": scan.risk_score, "risk_level": scan.risk_level}
@@ -389,5 +414,5 @@ async def get_public_scan(
         "status": scan.status,
         "timestamp": scan.created_at,
         "risk_summary": risk,
-        "findings": findings
+        "findings": findings,
     }

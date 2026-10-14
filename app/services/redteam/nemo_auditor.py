@@ -7,10 +7,11 @@ from app.core.config import settings
 
 logger = logging.getLogger("SageAI.redteam")
 
+
 class NeMoAuditor:
     """
     NVIDIA NeMo Auditor Service for AI Red Teaming.
-    
+
     This service allows SafeAI to audit LLM targets (like OpenAI, Anthropic, etc.)
     for security and safety guardrail violations.
     """
@@ -31,7 +32,7 @@ class NeMoAuditor:
         uri: str,
         target_type: str = "openai.OpenAIGenerator",
         namespace: str = "default",
-        options: Optional[Dict[str, Any]] = None
+        options: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Creates an audit target for the NeMo Auditor.
@@ -39,13 +40,7 @@ class NeMoAuditor:
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
-        default_options = {
-            "openai": {
-                "uri": uri,
-                "max_tokens": 1024,
-                "seed": 42
-            }
-        }
+        default_options = {"openai": {"uri": uri, "max_tokens": 1024, "seed": 42}}
 
         try:
             target = self._client.beta.audit.targets.create(
@@ -53,7 +48,7 @@ class NeMoAuditor:
                 name=name,
                 type=target_type,
                 model=model,
-                options=options or default_options
+                options=options or default_options,
             )
             return target.model_dump()
         except Exception as e:
@@ -78,7 +73,7 @@ class NeMoAuditor:
         self,
         target_name: str,
         namespace: str = "default",
-        probes: Optional[List[str]] = None
+        probes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Starts an automated audit (red teaming) job on a specific target.
@@ -91,14 +86,16 @@ class NeMoAuditor:
             job = self._client.beta.audit.jobs.create(
                 namespace=namespace,
                 target_name=target_name,
-                probes=probes or ["jailbreak"]
+                probes=probes or ["jailbreak"],
             )
             return job.model_dump()
         except Exception as e:
             logger.error(f"Failed to start audit job: {e}")
             raise
 
-    def get_job_results(self, job_id: str, namespace: str = "default") -> Dict[str, Any]:
+    def get_job_results(
+        self, job_id: str, namespace: str = "default"
+    ) -> Dict[str, Any]:
         """
         Retrieves the results/findings of an completed audit job.
         """
@@ -111,6 +108,7 @@ class NeMoAuditor:
         except Exception as e:
             logger.error(f"Failed to get audit results: {e}")
             raise
+
 
 # Global singleton
 nemo_auditor = NeMoAuditor()

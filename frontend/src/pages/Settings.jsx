@@ -395,7 +395,7 @@ function GitHubSection() {
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <div style={{ position: 'relative', flex: 1 }}>
                                         <input className="input" type={showToken ? 'text' : 'password'}
-                                            placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                            placeholder="Enter GitHub Personal Access Token"
                                             value={token} onChange={e => setToken(e.target.value)}
                                             style={{ paddingRight: '2.5rem', fontFamily: 'Fira Code, monospace', fontSize: '0.8rem' }} />
                                         <button onClick={() => setShowToken(!showToken)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '0.75rem' }}>

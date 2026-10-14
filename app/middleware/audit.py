@@ -43,7 +43,11 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                     token,
                     settings.SECRET_KEY,
                     algorithms=[settings.ALGORITHM],
-                    options={"verify_aud": False, "verify_iss": False, "verify_exp": False},
+                    options={
+                        "verify_aud": False,
+                        "verify_iss": False,
+                        "verify_exp": False,
+                    },
                 )
                 user_id = payload.get("sub", "unknown")
                 org_id = payload.get("org", "unknown")

@@ -1,12 +1,20 @@
 """Tests for pipeline state tracking and context serialization."""
 
-import pytest
-from app.pipeline import ScanStatus, PipelineContext
+from app.pipeline import PipelineContext, ScanStatus
 
 
 class TestScanStatus:
     def test_all_statuses(self):
-        expected = {"queued", "planning", "enumerating", "scanning", "analyzing", "reporting", "completed", "failed"}
+        expected = {
+            "queued",
+            "planning",
+            "enumerating",
+            "scanning",
+            "analyzing",
+            "reporting",
+            "completed",
+            "failed",
+        }
         assert {s.value for s in ScanStatus} == expected
 
     def test_string_comparison(self):

@@ -14,7 +14,10 @@ class APIKey(Base):
     key = Column(String, unique=True, nullable=False, index=True)
     name = Column(String, nullable=False)
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
     created_by = Column(

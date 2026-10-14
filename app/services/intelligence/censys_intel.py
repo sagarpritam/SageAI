@@ -76,7 +76,12 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                             expiry = datetime.datetime.fromisoformat(
                                 not_after.replace("T", " ").split(".")[0]
                             )
-                            days_left = (expiry - datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)).days
+                            days_left = (
+                                expiry
+                                - datetime.datetime.now(datetime.timezone.utc).replace(
+                                    tzinfo=None
+                                )
+                            ).days
                             if days_left < 0:
                                 findings.append(
                                     {

@@ -16,10 +16,10 @@ logger = logging.getLogger("sageai.remediation")
 # ──────────────────────────────────────────────
 # Effort levels (minutes)
 # ──────────────────────────────────────────────
-EFFORT_QUICK = 15       # < 15 min
-EFFORT_MODERATE = 60    # < 1 hour
+EFFORT_QUICK = 15  # < 15 min
+EFFORT_MODERATE = 60  # < 1 hour
 EFFORT_SIGNIFICANT = 240  # < 4 hours
-EFFORT_MAJOR = 480      # < 1 day
+EFFORT_MAJOR = 480  # < 1 day
 
 
 # ──────────────────────────────────────────────
@@ -52,14 +52,14 @@ REMEDIATION_DB: dict[str, dict] = {
             "Add Referrer-Policy: strict-origin-when-cross-origin",
         ],
         "code_snippets": {
-            "nginx": '''# /etc/nginx/conf.d/security-headers.conf
+            "nginx": """# /etc/nginx/conf.d/security-headers.conf
 add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 add_header X-Frame-Options "DENY" always;
 add_header X-Content-Type-Options "nosniff" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;''',
-            "python_fastapi": '''from fastapi import FastAPI, Request
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;""",
+            "python_fastapi": """from fastapi import FastAPI, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -73,8 +73,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 app = FastAPI()
-app.add_middleware(SecurityHeadersMiddleware)''',
-            "nodejs_express": '''const helmet = require("helmet");
+app.add_middleware(SecurityHeadersMiddleware)""",
+            "nodejs_express": """const helmet = require("helmet");
 
 // Add this near the top of your Express app
 app.use(helmet());
@@ -84,7 +84,7 @@ app.use(helmet.contentSecurityPolicy({
   directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"] }
 }));
 app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }));
-app.use(helmet.frameguard({ action: "deny" }));''',
+app.use(helmet.frameguard({ action: "deny" }));""",
             "apache": '''# .htaccess or httpd.conf
 Header always set Content-Security-Policy "default-src 'self'"
 Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -97,7 +97,6 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"''',
             "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
         ],
     },
-
     "Reflected XSS": {
         "title": "Fix Cross-Site Scripting (XSS)",
         "effort_minutes": EFFORT_MODERATE,
@@ -112,27 +111,26 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"''',
             "Use HTTPOnly and Secure flags on session cookies",
         ],
         "code_snippets": {
-            "python_fastapi": '''from markupsafe import escape
+            "python_fastapi": """from markupsafe import escape
 
 # Always escape user input before rendering
 @app.get("/search")
 async def search(q: str = ""):
     safe_query = escape(q)  # HTML-encodes special characters
-    return {"results": f"Results for: {safe_query}"}''',
-            "nodejs_express": '''const xss = require("xss");
+    return {"results": f"Results for: {safe_query}"}""",
+            "nodejs_express": """const xss = require("xss");
 
 // Sanitize user input
 app.get("/search", (req, res) => {
   const safeQuery = xss(req.query.q || "");
   res.json({ results: `Results for: ${safeQuery}` });
-});''',
+});""",
         },
         "references": [
             "https://owasp.org/www-community/attacks/xss/",
             "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
         ],
     },
-
     "SQL Injection": {
         "title": "Eliminate SQL Injection",
         "effort_minutes": EFFORT_SIGNIFICANT,
@@ -147,7 +145,7 @@ app.get("/search", (req, res) => {
             "Enable query logging to detect exploitation attempts",
         ],
         "code_snippets": {
-            "python_fastapi": '''# BAD — vulnerable to SQL injection
+            "python_fastapi": """# BAD — vulnerable to SQL injection
 query = f"SELECT * FROM users WHERE id = '{user_input}'"
 
 # GOOD — parameterized query with SQLAlchemy
@@ -155,22 +153,21 @@ from sqlalchemy import text
 result = await session.execute(
     text("SELECT * FROM users WHERE id = :user_id"),
     {"user_id": user_input}
-)''',
-            "nodejs_express": '''// BAD — vulnerable
+)""",
+            "nodejs_express": """// BAD — vulnerable
 const query = `SELECT * FROM users WHERE id = '${userId}'`;
 
 // GOOD — parameterized query
 const result = await pool.query(
   "SELECT * FROM users WHERE id = $1",
   [userId]
-);''',
+);""",
         },
         "references": [
             "https://owasp.org/www-community/attacks/SQL_Injection",
             "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
         ],
     },
-
     "ssl_expired": {
         "title": "Renew Expired SSL Certificate",
         "effort_minutes": EFFORT_QUICK,
@@ -183,15 +180,14 @@ const result = await pool.query(
             "Configure certificate monitoring alerts",
         ],
         "code_snippets": {
-            "bash": '''# Install certbot and auto-renew
+            "bash": """# Install certbot and auto-renew
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d yourdomain.com
 # Auto-renewal is set up automatically via systemd timer
-sudo certbot renew --dry-run''',
+sudo certbot renew --dry-run""",
         },
         "references": ["https://letsencrypt.org/getting-started/"],
     },
-
     "ssl_expiring_soon": {
         "title": "Renew SSL Certificate Before Expiry",
         "effort_minutes": EFFORT_QUICK,
@@ -204,15 +200,14 @@ sudo certbot renew --dry-run''',
             "Add monitoring for certificate expiry (e.g., UptimeRobot, Datadog)",
         ],
         "code_snippets": {
-            "bash": '''# Check current cert expiry
+            "bash": """# Check current cert expiry
 echo | openssl s_client -servername yourdomain.com -connect yourdomain.com:443 2>/dev/null | openssl x509 -noout -enddate
 
 # Force renewal
-sudo certbot renew --force-renewal''',
+sudo certbot renew --force-renewal""",
         },
         "references": ["https://letsencrypt.org/docs/"],
     },
-
     "ssl_weak_protocol": {
         "title": "Disable Weak TLS Protocols",
         "effort_minutes": EFFORT_QUICK,
@@ -225,17 +220,16 @@ sudo certbot renew --force-renewal''',
             "Enable TLS 1.3 for modern clients",
         ],
         "code_snippets": {
-            "nginx": '''# /etc/nginx/nginx.conf
+            "nginx": """# /etc/nginx/nginx.conf
 ssl_protocols TLSv1.2 TLSv1.3;
 ssl_prefer_server_ciphers on;
-ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384;''',
-            "apache": '''# httpd-ssl.conf
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384;""",
+            "apache": """# httpd-ssl.conf
 SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
-SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256''',
+SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256""",
         },
         "references": ["https://wiki.mozilla.org/Security/Server_Side_TLS"],
     },
-
     "ssl_weak_cipher": {
         "title": "Remove Weak Cipher Suites",
         "effort_minutes": EFFORT_QUICK,
@@ -248,13 +242,12 @@ SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256''',
             "Test with SSL Labs after changes",
         ],
         "code_snippets": {
-            "nginx": '''# Use Mozilla's modern configuration
+            "nginx": """# Use Mozilla's modern configuration
 ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
-ssl_prefer_server_ciphers off;''',
+ssl_prefer_server_ciphers off;""",
         },
         "references": ["https://ssl-config.mozilla.org/"],
     },
-
     "ssl_invalid_cert": {
         "title": "Fix Invalid SSL Certificate",
         "effort_minutes": EFFORT_MODERATE,
@@ -275,7 +268,6 @@ curl -vI https://yourdomain.com 2>&1 | grep -i "ssl\\|cert"''',
         },
         "references": ["https://www.ssllabs.com/ssltest/"],
     },
-
     "port_open": {
         "title": "Close Unnecessary Open Ports",
         "effort_minutes": EFFORT_MODERATE,
@@ -289,7 +281,7 @@ curl -vI https://yourdomain.com 2>&1 | grep -i "ssl\\|cert"''',
             "Use VPN or SSH tunnels for remote admin access",
         ],
         "code_snippets": {
-            "bash": '''# UFW: deny all incoming, allow only needed ports
+            "bash": """# UFW: deny all incoming, allow only needed ports
 sudo ufw default deny incoming
 sudo ufw allow 80/tcp    # HTTP
 sudo ufw allow 443/tcp   # HTTPS
@@ -297,11 +289,10 @@ sudo ufw allow 22/tcp    # SSH
 sudo ufw enable
 
 # AWS Security Group (via CLI)
-aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 3306 --cidr 0.0.0.0/0''',
+aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 3306 --cidr 0.0.0.0/0""",
         },
         "references": ["https://owasp.org/www-project-web-security-testing-guide/"],
     },
-
     "dns_risky_subdomains": {
         "title": "Secure Risky DNS Subdomains",
         "effort_minutes": EFFORT_MODERATE,
@@ -316,7 +307,6 @@ aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 33
         "code_snippets": {},
         "references": ["https://owasp.org/www-project-web-security-testing-guide/"],
     },
-
     "virustotal_malicious": {
         "title": "Investigate Malicious URL Detection",
         "effort_minutes": EFFORT_SIGNIFICANT,
@@ -333,7 +323,6 @@ aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 33
         "code_snippets": {},
         "references": ["https://www.virustotal.com/"],
     },
-
     "shodan_vulns": {
         "title": "Address Shodan-Detected Vulnerabilities",
         "effort_minutes": EFFORT_SIGNIFICANT,
@@ -349,7 +338,6 @@ aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 33
         "code_snippets": {},
         "references": ["https://www.shodan.io/"],
     },
-
     "nvd_cve": {
         "title": "Patch Known CVE Vulnerabilities",
         "effort_minutes": EFFORT_MAJOR,
@@ -363,7 +351,7 @@ aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol tcp --port 33
             "Use a dependency scanner (Dependabot, Snyk) for ongoing monitoring",
         ],
         "code_snippets": {
-            "bash": '''# Check installed package versions
+            "bash": """# Check installed package versions
 dpkg -l | grep <package_name>
 
 # Update specific package
@@ -371,11 +359,10 @@ sudo apt update && sudo apt install --only-upgrade <package_name>
 
 # For Python dependencies
 pip install --upgrade <package_name>
-pip audit  # Check for known vulnerabilities''',
+pip audit  # Check for known vulnerabilities""",
         },
         "references": ["https://nvd.nist.gov/"],
     },
-
     "Identity Breach Intelligence": {
         "title": "Respond to Data Breach Exposure",
         "effort_minutes": EFFORT_SIGNIFICANT,
@@ -392,7 +379,6 @@ pip audit  # Check for known vulnerabilities''',
         "code_snippets": {},
         "references": ["https://haveibeenpwned.com/"],
     },
-
     "observatory_grade": {
         "title": "Improve Mozilla Observatory Score",
         "effort_minutes": EFFORT_MODERATE,
@@ -408,7 +394,6 @@ pip audit  # Check for known vulnerabilities''',
         "code_snippets": {},
         "references": ["https://observatory.mozilla.org/"],
     },
-
     "crtsh_sensitive_subdomains": {
         "title": "Review Exposed Certificate Transparency Subdomains",
         "effort_minutes": EFFORT_QUICK,
@@ -468,12 +453,14 @@ def prioritize_remediations(findings: list[dict]) -> list[dict]:
         # Priority score: impact / normalized_effort (higher = fix first)
         priority_score = round((impact * 100) / max(effort, 1), 2)
 
-        items.append({
-            "finding_type": ftype,
-            "severity": finding.get("severity", "Info"),
-            "priority_score": priority_score,
-            **remediation,
-        })
+        items.append(
+            {
+                "finding_type": ftype,
+                "severity": finding.get("severity", "Info"),
+                "priority_score": priority_score,
+                **remediation,
+            }
+        )
 
     # Sort by priority descending
     items.sort(key=lambda x: x["priority_score"], reverse=True)
@@ -489,6 +476,7 @@ def get_quick_wins(findings: list[dict], max_items: int = 5) -> list[dict]:
     """Return the top quick-win remediations (high impact, low effort)."""
     all_items = prioritize_remediations(findings)
     return [
-        item for item in all_items
+        item
+        for item in all_items
         if item.get("auto_fixable") or item.get("effort_minutes", 999) <= EFFORT_QUICK
     ][:max_items]

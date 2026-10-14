@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 TModel = TypeVar("TModel", bound=BaseModel)
 
+
 def call_llm(
     prompt: str,
     system_prompt: str,
@@ -28,7 +29,7 @@ def call_llm(
     if settings.NVIDIA_API_KEY:
         client = openai.OpenAI(
             api_key=settings.NVIDIA_API_KEY,
-            base_url="https://integrate.api.nvidia.com/v1"
+            base_url="https://integrate.api.nvidia.com/v1",
         )
         model = "meta/llama3-70b-instruct"
     # Priority 2: Standard OpenAI (Fallback)
@@ -36,7 +37,9 @@ def call_llm(
         client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
         model = "gpt-4o-mini"
     else:
-        raise ValueError("No AI Provider configured. Please set NVIDIA_API_KEY or OPENAI_API_KEY.")
+        raise ValueError(
+            "No AI Provider configured. Please set NVIDIA_API_KEY or OPENAI_API_KEY."
+        )
 
     schema = response_model.model_json_schema()
 
@@ -54,11 +57,11 @@ def call_llm(
         model=model,
         messages=[
             {"role": "system", "content": full_system_prompt},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ],
         temperature=0.2,
         max_tokens=2048,
-        response_format={"type": "json_object"} if "llama3" not in model else None
+        response_format={"type": "json_object"} if "llama3" not in model else None,
         # Note: Some NVIDIA endpoints do not fully support robust JSON mode,
         # so relying on prompt engineering via the schema is the safest cross-provider option.
     )
@@ -71,7 +74,7 @@ def call_llm(
     if content.startswith("```"):
         content = content.replace("```", "", 1)
     if content.endswith("```"):
-        content = content[:content.rfind("```")]
+        content = content[: content.rfind("```")]
 
     try:
         return response_model.model_validate_json(content)

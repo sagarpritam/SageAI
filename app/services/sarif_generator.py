@@ -22,22 +22,46 @@ SARIF_SCHEMA = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schem
 # Finding type → CWE mapping (extends ai_explainer)
 # ──────────────────────────────────────────────
 CWE_MAP = {
-    "Missing Security Headers": {"id": "CWE-693", "name": "Protection Mechanism Failure"},
-    "Reflected XSS": {"id": "CWE-79", "name": "Improper Neutralization of Input During Web Page Generation"},
+    "Missing Security Headers": {
+        "id": "CWE-693",
+        "name": "Protection Mechanism Failure",
+    },
+    "Reflected XSS": {
+        "id": "CWE-79",
+        "name": "Improper Neutralization of Input During Web Page Generation",
+    },
     "SQL Injection": {"id": "CWE-89", "name": "SQL Injection"},
     "ssl_expired": {"id": "CWE-295", "name": "Improper Certificate Validation"},
     "ssl_expiring_soon": {"id": "CWE-295", "name": "Improper Certificate Validation"},
     "ssl_weak_protocol": {"id": "CWE-326", "name": "Inadequate Encryption Strength"},
-    "ssl_weak_cipher": {"id": "CWE-327", "name": "Use of Broken or Risky Cryptographic Algorithm"},
+    "ssl_weak_cipher": {
+        "id": "CWE-327",
+        "name": "Use of Broken or Risky Cryptographic Algorithm",
+    },
     "ssl_invalid_cert": {"id": "CWE-295", "name": "Improper Certificate Validation"},
     "port_open": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-    "dns_risky_subdomains": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-    "virustotal_malicious": {"id": "CWE-829", "name": "Inclusion of Functionality from Untrusted Control Sphere"},
-    "shodan_vulns": {"id": "CWE-1104", "name": "Use of Unmaintained Third-Party Components"},
+    "dns_risky_subdomains": {
+        "id": "CWE-200",
+        "name": "Exposure of Sensitive Information",
+    },
+    "virustotal_malicious": {
+        "id": "CWE-829",
+        "name": "Inclusion of Functionality from Untrusted Control Sphere",
+    },
+    "shodan_vulns": {
+        "id": "CWE-1104",
+        "name": "Use of Unmaintained Third-Party Components",
+    },
     "nvd_cve": {"id": "CWE-1104", "name": "Use of Unmaintained Third-Party Components"},
     "observatory_grade": {"id": "CWE-16", "name": "Configuration"},
-    "crtsh_sensitive_subdomains": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-    "Identity Breach Intelligence": {"id": "CWE-521", "name": "Weak Password Requirements"},
+    "crtsh_sensitive_subdomains": {
+        "id": "CWE-200",
+        "name": "Exposure of Sensitive Information",
+    },
+    "Identity Breach Intelligence": {
+        "id": "CWE-521",
+        "name": "Weak Password Requirements",
+    },
 }
 
 # Severity → SARIF level mapping
@@ -188,7 +212,9 @@ def generate_sarif(scan_data: dict) -> dict:
                 "invocations": [
                     {
                         "executionSuccessful": True,
-                        "startTimeUtc": created if isinstance(created, str) else created.isoformat(),
+                        "startTimeUtc": created
+                        if isinstance(created, str)
+                        else created.isoformat(),
                     }
                 ],
                 "automationDetails": {

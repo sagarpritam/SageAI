@@ -1,22 +1,21 @@
 """GDPR and Data Privacy compliance routes."""
 
-import json
-from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.user import User
 from app.models.organization import Organization
 from app.models.scan import Scan
+from app.models.user import User
 
 router = APIRouter(prefix="/gdpr", tags=["Compliance"])
 
+
 @router.get("/export")
 async def export_data(
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     GDPR Article 20: Right to Data Portability.
@@ -28,7 +27,7 @@ async def export_data(
     # Fetch User
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -39,20 +38,22 @@ async def export_data(
             "created_at": user.created_at.isoformat() if user.created_at else None,
         },
         "organization": None,
-        "scans": []
+        "scans": [],
     }
 
     # Fetch Org and Scans if present
     if org_id:
-        org_result = await db.execute(select(Organization).where(Organization.id == org_id))
+        org_result = await db.execute(
+            select(Organization).where(Organization.id == org_id)
+        )
         org = org_result.scalar_one_or_none()
         if org:
             export_data["organization"] = {
                 "id": str(org.id),
                 "name": org.name,
-                "plan": org.plan
+                "plan": org.plan,
             }
-        
+
         scans_result = await db.execute(select(Scan).where(Scan.org_id == org_id))
         scans = scans_result.scalars().all()
         export_data["scans"] = [
@@ -60,7 +61,7 @@ async def export_data(
                 "id": str(scan.id),
                 "target": scan.target,
                 "status": scan.status,
-                "created_at": scan.created_at.isoformat() if scan.created_at else None
+                "created_at": scan.created_at.isoformat() if scan.created_at else None,
             }
             for scan in scans
         ]
@@ -72,7 +73,7 @@ async def export_data(
 async def delete_account(
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     GDPR Article 17: Right to Erasure (Right to be Forgotten).
@@ -80,20 +81,23 @@ async def delete_account(
     """
     user_id = current_user.get("sub")
     org_id = current_user.get("org")
-    
+
     # In a real app, you would:
     # 1. Cancel active Stripe subscriptions
     # 2. Add to a "pending deletion" queue (30-day grace period)
     # 3. Use background tasks to scrub S3 buckets and databases
-    
+
     # For the scope of this implementation, we simulate the deletion
     async def scrub_data(u_id: str, o_id: str):
         # Soft or hard delete logic here
         pass
-        
+
     background_tasks.add_task(scrub_data, user_id, org_id)
-    
-    return {"message": "Account scheduled for deletion. All data will be purged within 30 days."}
+
+    return {
+        "message": "Account scheduled for deletion. All data will be purged within 30 days."
+    }
+
 
 @router.get("/retention")
 async def retention_policy():
@@ -101,5 +105,5 @@ async def retention_policy():
     return {
         "policy": "Data is retained for the lifetime of the account.",
         "deletion_sla_days": 30,
-        "contact": "privacy@sageai.com"
+        "contact": "privacy@sageai.com",
     }

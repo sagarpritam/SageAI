@@ -15,7 +15,7 @@ logger = logging.getLogger("SageAI.llm")
 PROVIDERS = {
     "openai": OpenAIClient(),
     "anthropic": AnthropicClient(),
-    "nvidia": NvidiaClient()
+    "nvidia": NvidiaClient(),
 }
 
 
@@ -30,8 +30,8 @@ class LLMGateway:
         # Circuit breaker state
         self.failover_chain = ["openai", "anthropic", "nvidia"]
         self.max_retries_per_provider = 2
-        self.error_counts = {provider: 0 for provider in self.failover_chain}
-        self.circuit_open = {provider: False for provider in self.failover_chain}
+        self.error_counts = dict.fromkeys(self.failover_chain, 0)
+        self.circuit_open = dict.fromkeys(self.failover_chain, False)
 
     def get_client(self, provider_name: str) -> BaseLLM:
         client = PROVIDERS.get(provider_name)
@@ -60,25 +60,27 @@ class LLMGateway:
         Includes circuit breaker and failover logic.
         """
         initial_provider = provider or self.default_provider
-        
+
         # Determine the order of providers to try
         try_order = [initial_provider]
         for p in self.failover_chain:
             if p != initial_provider:
                 try_order.append(p)
-                
+
         last_error = None
-        
+
         for current_provider in try_order:
             if self.circuit_open.get(current_provider, False):
                 logger.warning(f"Circuit open for {current_provider}, skipping...")
                 continue
-                
+
             client = self.get_client(current_provider)
-            
+
             for attempt in range(self.max_retries_per_provider):
                 try:
-                    result = await client.generate(prompt, system_message, model, **kwargs)
+                    result = await client.generate(
+                        prompt, system_message, model, **kwargs
+                    )
                     content = result.get("content", "")
                     usage = result.get("usage", {})
 
@@ -96,14 +98,18 @@ class LLMGateway:
 
                 except Exception as e:
                     last_error = e
-                    logger.warning(f"LLM {client.provider} attempt {attempt + 1} failed: {str(e)}")
-            
+                    logger.warning(
+                        f"LLM {client.provider} attempt {attempt + 1} failed: {str(e)}"
+                    )
+
             # If all attempts for this provider fail, open the circuit
-            logger.error(f"Provider {current_provider} failed {self.max_retries_per_provider} times. Opening circuit.")
+            logger.error(
+                f"Provider {current_provider} failed {self.max_retries_per_provider} times. Opening circuit."
+            )
             self.error_counts[current_provider] = self.max_retries_per_provider
             self.circuit_open[current_provider] = True
 
-        logger.error(f"All LLM providers in failover chain failed.")
+        logger.error("All LLM providers in failover chain failed.")
         raise last_error or Exception("LLM Generation failed across all providers")
 
 

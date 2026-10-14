@@ -23,7 +23,7 @@ class UserCreate(BaseModel):
             raise ValueError("Password must contain at least one lowercase letter")
         if not re.search(r"\d", v):
             raise ValueError("Password must contain at least one digit")
-        if not re.search(r'[^a-zA-Z0-9]', v):
+        if not re.search(r"[^a-zA-Z0-9]", v):
             raise ValueError("Password must contain at least one special character")
         return v
 

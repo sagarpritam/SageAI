@@ -1,12 +1,11 @@
 """Tests for parsers — nuclei, nmap, and subfinder output parsing."""
 
-import pytest
-from app.parsers.nuclei_parser import parse_nuclei_findings, NucleiFinding
-from app.parsers.nmap_parser import parse_nmap_results, NmapResult
+from app.parsers.nmap_parser import NmapResult, parse_nmap_results
+from app.parsers.nuclei_parser import NucleiFinding, parse_nuclei_findings
 from app.parsers.subfinder_parser import parse_subfinder_results
 
-
 # ── Nuclei Parser Tests ──────────────────────────────────────────
+
 
 class TestNucleiParser:
     SAMPLE_FINDINGS = [
@@ -63,22 +62,33 @@ class TestNucleiParser:
 
 # ── Nmap Parser Tests ────────────────────────────────────────────
 
+
 class TestNmapParser:
     SAMPLE_RAW = {
-        "hosts": [{
-            "addresses": [{"addr": "93.184.216.34", "addrtype": "ipv4"}],
-            "hostnames": [{"name": "example.com", "type": "user"}],
-            "ports": [
-                {
-                    "portid": "80", "protocol": "tcp", "state": "open",
-                    "service": {"name": "http", "product": "nginx", "version": "1.21"},
-                },
-                {
-                    "portid": "443", "protocol": "tcp", "state": "open",
-                    "service": {"name": "https"},
-                },
-            ],
-        }],
+        "hosts": [
+            {
+                "addresses": [{"addr": "93.184.216.34", "addrtype": "ipv4"}],
+                "hostnames": [{"name": "example.com", "type": "user"}],
+                "ports": [
+                    {
+                        "portid": "80",
+                        "protocol": "tcp",
+                        "state": "open",
+                        "service": {
+                            "name": "http",
+                            "product": "nginx",
+                            "version": "1.21",
+                        },
+                    },
+                    {
+                        "portid": "443",
+                        "protocol": "tcp",
+                        "state": "open",
+                        "service": {"name": "https"},
+                    },
+                ],
+            }
+        ],
         "elapsed_seconds": 3.5,
     }
 
@@ -112,6 +122,7 @@ class TestNmapParser:
 
 
 # ── Subfinder Parser Tests ───────────────────────────────────────
+
 
 class TestSubfinderParser:
     def test_basic_parsing(self):

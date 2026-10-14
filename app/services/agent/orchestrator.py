@@ -25,6 +25,7 @@ class AgentOrchestrator:
     def __init__(self, org_id: str = "system", provider: str = None):
         self.org_id = org_id
         from app.core.config import settings
+
         self.provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     async def _planner_phase(self, user_prompt: str, target: str) -> List[str]:
@@ -61,7 +62,6 @@ class AgentOrchestrator:
     ) -> Dict[str, Any]:
         """Execute selected tools concurrently."""
         results = {}
-        tasks = []
         valid_tools = []
 
         for name in selected_tools:

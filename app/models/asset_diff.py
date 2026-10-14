@@ -12,11 +12,15 @@ from app.utils.helpers import generate_uuid, utc_now
 
 class AttackSurfaceDiff(Base):
     """Tracks incremental changes (diffs) to an asset's attack surface over time."""
+
     __tablename__ = "attack_surface_diffs"
 
     id = Column(String, primary_key=True, default=generate_uuid)
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
     asset_id = Column(
@@ -24,8 +28,12 @@ class AttackSurfaceDiff(Base):
     )
 
     # Store IDs of compared scans
-    previous_scan_id = Column(String, ForeignKey("scans.id", ondelete="SET NULL"), nullable=True)
-    current_scan_id = Column(String, ForeignKey("scans.id", ondelete="CASCADE"), nullable=False)
+    previous_scan_id = Column(
+        String, ForeignKey("scans.id", ondelete="SET NULL"), nullable=True
+    )
+    current_scan_id = Column(
+        String, ForeignKey("scans.id", ondelete="CASCADE"), nullable=False
+    )
 
     # Diffs (stored as JSON encoded strings)
     # e.g. {"added": [8080], "removed": [80]}
@@ -39,7 +47,9 @@ class AttackSurfaceDiff(Base):
 
     # Generic schema diffs (technologies, DNS records passing, etc)
     technologies_diff = Column(Text, default='{"added": [], "removed": []}')
-    overall_risk_shift = Column(String, default="nc")  # "increased", "decreased", "nc" (no change)
+    overall_risk_shift = Column(
+        String, default="nc"
+    )  # "increased", "decreased", "nc" (no change)
 
     # Metadata
     created_at = Column(DateTime(timezone=True), default=utc_now)

@@ -29,6 +29,7 @@ _DOMAIN_RE = re.compile(
 @dataclass
 class SubfinderResult:
     """Structured result from a subfinder run."""
+
     domain: str
     subdomains: List[str] = field(default_factory=list)
     elapsed_seconds: float = 0.0
@@ -43,7 +44,7 @@ def _validate_domain(domain: str) -> str:
     # Strip protocol / path if accidentally provided
     for prefix in ("https://", "http://"):
         if domain.startswith(prefix):
-            domain = domain[len(prefix):]
+            domain = domain[len(prefix) :]
     domain = domain.split("/")[0]
     if not _DOMAIN_RE.match(domain):
         raise ValueError(
@@ -64,7 +65,9 @@ def run_subfinder(domain: str) -> SubfinderResult:
 
     try:
         cmd = [SUBFINDER_BIN, "-d", domain, "-silent", "-json"]
-        logger.info("Running subfinder for domain=%s  timeout=%ds", domain, SUBFINDER_TIMEOUT)
+        logger.info(
+            "Running subfinder for domain=%s  timeout=%ds", domain, SUBFINDER_TIMEOUT
+        )
 
         result = subprocess.run(
             cmd,
@@ -95,7 +98,9 @@ def run_subfinder(domain: str) -> SubfinderResult:
 
     except FileNotFoundError:
         elapsed = round(time.monotonic() - start, 2)
-        logger.warning("Subfinder binary not found at '%s'. Using MOCK MODE.", SUBFINDER_BIN)
+        logger.warning(
+            "Subfinder binary not found at '%s'. Using MOCK MODE.", SUBFINDER_BIN
+        )
         mock_subs = [f"api.{domain}", f"staging.{domain}", f"admin.{domain}"]
         return SubfinderResult(
             domain=domain,
@@ -106,12 +111,16 @@ def run_subfinder(domain: str) -> SubfinderResult:
 
     except subprocess.TimeoutExpired:
         elapsed = round(time.monotonic() - start, 2)
-        logger.error("Subfinder timed out after %ds for domain=%s", SUBFINDER_TIMEOUT, domain)
+        logger.error(
+            "Subfinder timed out after %ds for domain=%s", SUBFINDER_TIMEOUT, domain
+        )
         raise RuntimeError(
             f"Subfinder scan timed out after {SUBFINDER_TIMEOUT}s for {domain}"
         )
 
     except subprocess.CalledProcessError as exc:
         elapsed = round(time.monotonic() - start, 2)
-        logger.error("Subfinder failed for domain=%s: %s", domain, exc.stderr or str(exc))
+        logger.error(
+            "Subfinder failed for domain=%s: %s", domain, exc.stderr or str(exc)
+        )
         raise RuntimeError(f"Subfinder scan failed: {exc.stderr or str(exc)}")

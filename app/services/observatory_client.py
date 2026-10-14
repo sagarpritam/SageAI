@@ -15,7 +15,11 @@ logger = logging.getLogger("sageai.observatory")
 OBSERVATORY_API = "https://observatory.mozilla.org/api/v2"
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True,
+)
 async def analyze_site(hostname: str) -> list[dict]:
     """Analyze a site using Mozilla HTTP Observatory."""
     findings = []

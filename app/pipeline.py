@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 # ── Status Tracking ──────────────────────────────────────────────
 class ScanStatus(str, enum.Enum):
     """Lifecycle states of a pipeline run."""
+
     QUEUED = "queued"
     PLANNING = "planning"
     ENUMERATING = "enumerating"
@@ -106,7 +107,8 @@ def scan_target(target: str) -> dict:
             results["nuclei"] = [f.model_dump() for f in parsed_nuclei]
             logger.info(
                 "[+] Nuclei completed for %s — %d significant issue(s)",
-                target, len(results["nuclei"]),
+                target,
+                len(results["nuclei"]),
             )
         except Exception as exc:
             logger.error("[-] Nuclei failed for %s: %s", target, exc)
@@ -139,7 +141,9 @@ def run_pipeline(
                 pass
 
     try:
-        logger.info("🚀 Starting Autonomous AI Pipeline for %s (ID: %s)", domain, ctx.scan_id)
+        logger.info(
+            "🚀 Starting Autonomous AI Pipeline for %s (ID: %s)", domain, ctx.scan_id
+        )
 
         # ── 1. Planning ──────────────────────────
         _emit(ScanStatus.PLANNING, "AI Planner generating strategy", 5)
@@ -197,7 +201,9 @@ def run_pipeline(
 
                         for finding in target_result.get("nuclei", []):
                             if "error" not in finding:
-                                finding["discovered_on_target"] = target_result["target"]
+                                finding["discovered_on_target"] = target_result[
+                                    "target"
+                                ]
                                 all_raw_nuclei.append(finding)
                     except Exception as exc:
                         logger.error("Target %s raised: %s", target_name, exc)
@@ -207,7 +213,11 @@ def run_pipeline(
 
             # AI Decision Engine (skip on final iteration)
             if iteration < max_iterations and all_raw_nuclei:
-                _emit(ScanStatus.ANALYZING, "AI Decision Engine deciding next steps", pct + 5)
+                _emit(
+                    ScanStatus.ANALYZING,
+                    "AI Decision Engine deciding next steps",
+                    pct + 5,
+                )
                 analyzed_batch = analyze_findings(all_raw_nuclei)
                 decisions = decide_next_steps(analyzed_batch, ctx.scanned_targets)
 
@@ -215,7 +225,9 @@ def run_pipeline(
                 for action in decisions:
                     t = action.target
                     if t not in scanned_targets and t not in next_targets:
-                        logger.warning("💡 AI Pivot: %s → %s (%s)", action.reason, t, action.tool)
+                        logger.warning(
+                            "💡 AI Pivot: %s → %s (%s)", action.reason, t, action.tool
+                        )
                         next_targets.append(t)
                         iteration_results["actions_taken"].append(action.model_dump())
 
@@ -231,7 +243,9 @@ def run_pipeline(
 
         ctx.elapsed_seconds = round(time.time() - ctx.started_at, 2)
         _emit(ScanStatus.COMPLETED, "Pipeline finished", 100)
-        logger.info("🚀 Pipeline completed for ID: %s (%.2fs)", ctx.scan_id, ctx.elapsed_seconds)
+        logger.info(
+            "🚀 Pipeline completed for ID: %s (%.2fs)", ctx.scan_id, ctx.elapsed_seconds
+        )
 
     except Exception as exc:
         ctx.error = str(exc)

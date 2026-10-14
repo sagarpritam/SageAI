@@ -17,7 +17,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
 )
 @limiter.limit("5/minute")
-async def register(request: Request, payload: UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(
+    request: Request, payload: UserCreate, db: AsyncSession = Depends(get_db)
+):
     """Register a new user and organization."""
 
     # Check if email already exists
@@ -59,7 +61,9 @@ async def register(request: Request, payload: UserCreate, db: AsyncSession = Dep
 
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit("10/minute")
-async def login(request: Request, payload: UserLogin, db: AsyncSession = Depends(get_db)):
+async def login(
+    request: Request, payload: UserLogin, db: AsyncSession = Depends(get_db)
+):
     """Authenticate and return a JWT token."""
 
     result = await db.execute(select(User).where(User.email == payload.email))

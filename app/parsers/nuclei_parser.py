@@ -10,14 +10,20 @@ VALID_SEVERITIES = {"info", "low", "medium", "high", "critical"}
 class NucleiFinding(BaseModel):
     """Structured representation of a single nuclei finding."""
 
-    template_id: str = Field(default="unknown", description="Nuclei template identifier")
+    template_id: str = Field(
+        default="unknown", description="Nuclei template identifier"
+    )
     name: str = Field(default="Unknown Vulnerability")
     severity: str = Field(default="info")
     description: str = Field(default="")
     host: str = Field(default="unknown")
     matched_at: str = Field(default="")
-    type: str = Field(default="unknown", description="Protocol type (http, tcp, dns, etc.)")
-    cve_id: Optional[str] = Field(default=None, description="CVE identifier if applicable")
+    type: str = Field(
+        default="unknown", description="Protocol type (http, tcp, dns, etc.)"
+    )
+    cve_id: Optional[str] = Field(
+        default=None, description="CVE identifier if applicable"
+    )
     tags: List[str] = Field(default_factory=list)
 
 
@@ -52,7 +58,11 @@ def parse_nuclei_findings(
         severity = _normalize_severity(info.get("severity", "info"))
 
         # Extract CVE from tags if present
-        cve_id = info.get("classification", {}).get("cve-id") if isinstance(info.get("classification"), dict) else None
+        cve_id = (
+            info.get("classification", {}).get("cve-id")
+            if isinstance(info.get("classification"), dict)
+            else None
+        )
         if not cve_id:
             for tag in tags_raw:
                 if tag.upper().startswith("CVE-"):
@@ -73,8 +83,16 @@ def parse_nuclei_findings(
 
         # Apply severity filter
         if min_severity:
-            min_idx = severity_order.index(min_severity.lower()) if min_severity.lower() in severity_order else 0
-            curr_idx = severity_order.index(item.severity) if item.severity in severity_order else 0
+            min_idx = (
+                severity_order.index(min_severity.lower())
+                if min_severity.lower() in severity_order
+                else 0
+            )
+            curr_idx = (
+                severity_order.index(item.severity)
+                if item.severity in severity_order
+                else 0
+            )
             if curr_idx < min_idx:
                 continue
 

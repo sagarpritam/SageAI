@@ -1,8 +1,11 @@
-from pydantic import BaseModel, HttpUrl
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
+
 
 class ScanRequest(BaseModel):
     target: str
+
 
 class ScanResponse(BaseModel):
     scan_id: str

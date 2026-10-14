@@ -13,6 +13,7 @@ from app.services.asset_inventory.asset_discovery_service import discover_assets
 
 logger = logging.getLogger("sageai.asm")
 
+
 async def run_asm_diff():
     """
     Orchestrates the periodic Continuous ASM recon.
@@ -29,22 +30,29 @@ async def run_asm_diff():
                 # Find root domains for the organization
                 asset_result = await db.execute(
                     select(Asset).where(
-                        Asset.org_id == org.id,
-                        Asset.asset_type == AssetType.domain
+                        Asset.org_id == org.id, Asset.asset_type == AssetType.domain
                     )
                 )
                 domains = asset_result.scalars().all()
                 if not domains:
-                    logger.info(f"[ASM] No root domains found for organization {org.name}")
+                    logger.info(
+                        f"[ASM] No root domains found for organization {org.name}"
+                    )
                     continue
 
                 for domain in domains:
                     try:
-                        logger.info(f"[ASM] Dispatching scheduled recon on {domain.value} (org: {org.name})")
+                        logger.info(
+                            f"[ASM] Dispatching scheduled recon on {domain.value} (org: {org.name})"
+                        )
                         await discover_assets(org.id, domain.value, db)
                     except Exception as e:
-                        logger.error(f"[ASM] Error conducting recon for {domain.value}: {e}")
+                        logger.error(
+                            f"[ASM] Error conducting recon for {domain.value}: {e}"
+                        )
 
-            logger.info(f"[ASM] Scheduled recon finished for {len(orgs)} organizations.")
+            logger.info(
+                f"[ASM] Scheduled recon finished for {len(orgs)} organizations."
+            )
     except Exception as e:
         logger.error(f"[ASM] Fatal error in scheduled recon: {e}")

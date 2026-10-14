@@ -34,6 +34,7 @@ async def osint_industries_lookup(
 ) -> list[dict]:
     """Look up an email or phone number across platforms."""
     from app.core.config import settings
+
     api_key = settings.OSINT_INDUSTRIES_API_KEY
 
     if api_key:
@@ -61,7 +62,7 @@ async def _check_email(email: str) -> list[dict]:
     # 1. Email format & domain analysis
     if "@" in email:
         domain = email.split("@")[1]
-        username = email.split("@")[0]
+        email.split("@")[0]
 
         # Check if it's a disposable email
         disposable_domains = [
@@ -120,7 +121,9 @@ async def _check_email(email: str) -> list[dict]:
         try:
             import hashlib
 
-            email_hash = hashlib.md5(email.lower().strip().encode()).hexdigest()
+            email_hash = hashlib.md5(  # nosec B324
+                email.lower().strip().encode(), usedforsecurity=False
+            ).hexdigest()
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(f"https://en.gravatar.com/{email_hash}.json")
                 if resp.status_code == 200:

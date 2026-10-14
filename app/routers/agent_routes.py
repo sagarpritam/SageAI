@@ -10,13 +10,13 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db, AsyncSessionLocal
+from app.core.database import AsyncSessionLocal, get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.models.user import User
 from app.models.scan import Scan
-from app.routers.ws_routes import broadcast_scan_progress
+from app.models.user import User
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
+from app.routers.ws_routes import broadcast_scan_progress
 from app.schemas.responses import (
     AgentListResponse,
     AsyncAssessmentResponse,
@@ -66,7 +66,7 @@ async def run_assessment(
         organization_id=org_id,
         user_id=current_user.get("sub"),
         target=target,
-        status="running"
+        status="running",
     )
     db.add(scan)
     await db.commit()
@@ -74,30 +74,40 @@ async def run_assessment(
 
     if req.mode == "quick":
         try:
-            await broadcast_scan_progress(scan.id, {"phase": "started", "status": "running"})
+            await broadcast_scan_progress(
+                scan.id, {"phase": "started", "status": "running"}
+            )
             result = await orchestrator.run_targeted(target, mode="quick")
             scan.status = "completed"
-            
+
             # Use 'verified_findings' if available, otherwise fallback to 'findings'
-            findings_to_save = result.get("verified_findings", result.get("findings", []))
+            findings_to_save = result.get(
+                "verified_findings", result.get("findings", [])
+            )
             if isinstance(findings_to_save, list):
                 scan.set_findings(findings_to_save)
-            
+
             scan.risk_score = result.get("risk_score", 0)
             scan.risk_level = result.get("risk_level", "Unknown")
-            
+
             await db.commit()
-            await broadcast_scan_progress(scan.id, {"phase": "done", "status": "complete"})
+            await broadcast_scan_progress(
+                scan.id, {"phase": "done", "status": "complete"}
+            )
             return {"scan_id": scan.id, "result": result}
         except Exception as e:
             scan.status = "failed"
             await db.commit()
-            await broadcast_scan_progress(scan.id, {"phase": "done", "status": "failed"})
+            await broadcast_scan_progress(
+                scan.id, {"phase": "done", "status": "failed"}
+            )
             raise HTTPException(status_code=500, detail=str(e))
 
     # Full assessment (can be slow for large targets)
     try:
-        await broadcast_scan_progress(scan.id, {"phase": "started", "status": "running"})
+        await broadcast_scan_progress(
+            scan.id, {"phase": "started", "status": "running"}
+        )
         result = await orchestrator.run_full_assessment(
             target=target,
             scan_context=f"{req.mode} security assessment",
@@ -107,7 +117,7 @@ async def run_assessment(
         scan.set_findings(result.get("verified_findings", []))
         scan.risk_score = result.get("risk_score", 0)
         scan.risk_level = result.get("risk_level", "Unknown")
-        
+
         await db.commit()
         await broadcast_scan_progress(scan.id, {"phase": "done", "status": "complete"})
         return {"scan_id": scan.id, "result": result}
@@ -119,7 +129,11 @@ async def run_assessment(
         raise HTTPException(status_code=500, detail=f"Assessment failed: {str(e)}")
 
 
-@router.post("/assess/async", summary="Start Async Assessment (Background)", response_model=AsyncAssessmentResponse)
+@router.post(
+    "/assess/async",
+    summary="Start Async Assessment (Background)",
+    response_model=AsyncAssessmentResponse,
+)
 @limiter.limit("10/minute")
 async def run_assessment_async(
     request: Request,
@@ -136,23 +150,31 @@ async def run_assessment_async(
         organization_id=org_id,
         user_id=current_user.get("sub"),
         target=target,
-        status="running"
+        status="running",
     )
     db.add(scan)
     await db.commit()
     await db.refresh(scan)
-    
+
     scan_id = scan.id
 
     async def _run():
         async with AsyncSessionLocal() as session:
             try:
-                await broadcast_scan_progress(scan_id, {"phase": "started", "status": "running"})
+                await broadcast_scan_progress(
+                    scan_id, {"phase": "started", "status": "running"}
+                )
                 orchestrator = MultiAgentOrchestrator(org_id=org_id)
                 # Need to run orchestrator. Note: no KnowledgeGraph injected here currently based on previous implementation
-                kg = SecurityKnowledgeGraph(org_id=org_id, db=session) if req.use_knowledge_graph else None
-                result = await orchestrator.run_full_assessment(target=target, knowledge_graph=kg)
-                
+                kg = (
+                    SecurityKnowledgeGraph(org_id=org_id, db=session)
+                    if req.use_knowledge_graph
+                    else None
+                )
+                result = await orchestrator.run_full_assessment(
+                    target=target, knowledge_graph=kg
+                )
+
                 # Fetch scan in new session
                 db_scan = await session.get(Scan, scan_id)
                 if db_scan:
@@ -161,15 +183,19 @@ async def run_assessment_async(
                     db_scan.risk_score = result.get("risk_score", 0)
                     db_scan.risk_level = result.get("risk_level", "Unknown")
                     await session.commit()
-                    
-                await broadcast_scan_progress(scan_id, {"phase": "done", "status": "complete"})
+
+                await broadcast_scan_progress(
+                    scan_id, {"phase": "done", "status": "complete"}
+                )
             except Exception as e:
                 logger.error(f"Background assessment failed for {target}: {e}")
                 db_scan = await session.get(Scan, scan_id)
                 if db_scan:
                     db_scan.status = "failed"
                     await session.commit()
-                await broadcast_scan_progress(scan_id, {"phase": "done", "status": "failed"})
+                await broadcast_scan_progress(
+                    scan_id, {"phase": "done", "status": "failed"}
+                )
 
     background_tasks.add_task(_run)
     return {
@@ -180,7 +206,9 @@ async def run_assessment_async(
     }
 
 
-@router.get("/status", summary="List Available Agents", response_model=AgentListResponse)
+@router.get(
+    "/status", summary="List Available Agents", response_model=AgentListResponse
+)
 @limiter.limit("60/minute")
 async def list_agents(request: Request, current_user: User = Depends(get_current_user)):
     """Returns the list of AI agents available in the system."""
@@ -219,7 +247,11 @@ async def list_agents(request: Request, current_user: User = Depends(get_current
 # ── Knowledge Graph Routes ─────────────────────────────────────────
 
 
-@router.get("/graph/paths", summary="Get Attack Paths from Knowledge Graph", response_model=AttackPathResponse)
+@router.get(
+    "/graph/paths",
+    summary="Get Attack Paths from Knowledge Graph",
+    response_model=AttackPathResponse,
+)
 @limiter.limit("30/minute")
 async def get_attack_paths(
     request: Request,
@@ -236,9 +268,15 @@ async def get_attack_paths(
 # ── Plugin Marketplace Routes ──────────────────────────────────────
 
 
-@router.get("/plugins", summary="Plugin Marketplace Listing", response_model=PluginListingResponse)
+@router.get(
+    "/plugins",
+    summary="Plugin Marketplace Listing",
+    response_model=PluginListingResponse,
+)
 @limiter.limit("60/minute")
-async def list_plugins(request: Request, current_user: User = Depends(get_current_user)):
+async def list_plugins(
+    request: Request, current_user: User = Depends(get_current_user)
+):
     """Lists all available security plugins with metadata."""
     plugins = get_marketplace_listing()
     return {
@@ -271,7 +309,11 @@ async def run_plugin_endpoint(
     return result.to_dict()
 
 
-@router.post("/plugins/run-all", summary="Run All Plugins Against a Target", response_model=PluginRunAllResponse)
+@router.post(
+    "/plugins/run-all",
+    summary="Run All Plugins Against a Target",
+    response_model=PluginRunAllResponse,
+)
 @limiter.limit("5/minute")
 async def run_all_plugins_endpoint(
     request: Request,

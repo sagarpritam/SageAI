@@ -1,18 +1,17 @@
 """Pytest configuration and fixtures for SageAI tests."""
+
 import uuid
+
 from app.core.rate_limit import limiter
 
 limiter.enabled = False
 
-import asyncio
-import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.database import Base, get_db
 from app.main import app
-
 
 TEST_DB_URL = "sqlite+aiosqlite:///./test_sageai.db"
 
@@ -39,6 +38,7 @@ async def db_session(engine):
 @pytest_asyncio.fixture
 async def client(db_session):
     """HTTP client with test database injected."""
+
     async def override_get_db():
         yield db_session
 
@@ -54,14 +54,20 @@ async def auth_headers(client):
     """Register a user and return auth headers."""
     test_id = str(uuid.uuid4())[:8]
     email = f"test_{test_id}@sageai.com"
-    await client.post("/auth/register", json={
-        "email": email,
-        "password": "TestPass123!",
-        "organization_name": f"TestOrg_{test_id}",
-    })
-    r = await client.post("/auth/login", json={
-        "email": email,
-        "password": "TestPass123!",
-    })
+    await client.post(
+        "/auth/register",
+        json={
+            "email": email,
+            "password": "TestPass123!",
+            "organization_name": f"TestOrg_{test_id}",
+        },
+    )
+    r = await client.post(
+        "/auth/login",
+        json={
+            "email": email,
+            "password": "TestPass123!",
+        },
+    )
     token = r.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}

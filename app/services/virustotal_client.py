@@ -15,11 +15,16 @@ logger = logging.getLogger("sageai.virustotal")
 VT_API = "https://www.virustotal.com/api/v3"
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True,
+)
 async def check_url_reputation(url: str) -> list[dict]:
     """Check a URL's reputation on VirusTotal (70+ security vendors)."""
     findings = []
     from app.core.config import settings
+
     api_key = settings.VIRUSTOTAL_API_KEY
 
     if not api_key:

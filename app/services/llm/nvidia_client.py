@@ -12,6 +12,7 @@ from .base import BaseLLM
 logger = logging.getLogger("SageAI.llm.nvidia")
 nvidia_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)
 
+
 class NvidiaClient(BaseLLM):
     """
     NVIDIA Build API Client (OpenAI-compatible).
@@ -31,7 +32,9 @@ class NvidiaClient(BaseLLM):
         self, prompt: str, system_message: str = "", model: str = None, **kwargs
     ) -> dict:
         if nvidia_breaker.is_open():
-            raise RuntimeError("NVIDIA Build API is currently unavailable (Circuit Open)")
+            raise RuntimeError(
+                "NVIDIA Build API is currently unavailable (Circuit Open)"
+            )
 
         api_key = settings.NVIDIA_API_KEY
         if not api_key:

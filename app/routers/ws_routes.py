@@ -62,6 +62,7 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
             del _channels[scan_id_str]
         logger.info(f"WS disconnected for scan {scan_id_str}")
 
+
 @router.websocket("/ws/warroom")
 async def warroom_ws(websocket: WebSocket):
     """Global WebSocket endpoint for real-time attack visualization."""
@@ -127,4 +128,3 @@ async def deep_search_ws(websocket: WebSocket, session_id: str):
         if not _deep_search_channels[session_id]:
             del _deep_search_channels[session_id]
         logger.info(f"WS disconnected for deep search {session_id}")
-

@@ -177,7 +177,9 @@ class Settings(BaseSettings):
                     "CRITICAL: INTERNAL_SERVICE_KEY must be set to a strong secret (>=32 chars) for production"
                 )
             if "localhost" in self.FRONTEND_URL:
-                errors.append("WARNING: FRONTEND_URL contains 'localhost' — should be production URL")
+                errors.append(
+                    "WARNING: FRONTEND_URL contains 'localhost' — should be production URL"
+                )
             if not self.DEBUG:
                 pass  # Good
             else:

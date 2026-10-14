@@ -10,8 +10,12 @@ import os
 import re
 import subprocess
 import time
-import xml.etree.ElementTree as ET
 from typing import Any, Dict, List
+
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET  # nosec B405
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +28,9 @@ _SAFE_TARGET_RE = re.compile(r"^[A-Za-z0-9.\-:/]+$")
 
 # Pre-defined scan profiles
 SCAN_PROFILES = {
-    "quick": ["-F"],                     # top-100 ports
-    "standard": ["--top-ports", "1000"], # top-1000
-    "deep": ["-p-"],                     # all 65535
+    "quick": ["-F"],  # top-100 ports
+    "standard": ["--top-ports", "1000"],  # top-1000
+    "deep": ["-p-"],  # all 65535
 }
 
 
@@ -38,7 +42,7 @@ def _sanitize_target(target: str) -> str:
     # Strip protocol if provided
     for prefix in ("https://", "http://"):
         if target.startswith(prefix):
-            target = target[len(prefix):]
+            target = target[len(prefix) :]
     target = target.split("/")[0]
     if not _SAFE_TARGET_RE.match(target):
         raise ValueError(
@@ -83,7 +87,9 @@ def run_nmap(
 
         logger.info(
             "Running nmap: target=%s  profile=%s  timeout=%ds",
-            target, profile, NMAP_TIMEOUT,
+            target,
+            profile,
+            NMAP_TIMEOUT,
         )
         result = subprocess.run(
             cmd,
@@ -95,23 +101,46 @@ def run_nmap(
 
         parsed = parse_nmap_xml(result.stdout)
         elapsed = round(time.monotonic() - start, 2)
-        logger.info("Nmap completed in %.2fs — %d host(s) found", elapsed, len(parsed.get("hosts", [])))
+        logger.info(
+            "Nmap completed in %.2fs — %d host(s) found",
+            elapsed,
+            len(parsed.get("hosts", [])),
+        )
         parsed["elapsed_seconds"] = elapsed
         return parsed
 
     except FileNotFoundError:
         elapsed = round(time.monotonic() - start, 2)
-        logger.warning("Nmap binary not found at '%s'. Using MOCK MODE for %s.", NMAP_BIN, target)
+        logger.warning(
+            "Nmap binary not found at '%s'. Using MOCK MODE for %s.", NMAP_BIN, target
+        )
         return {
-            "hosts": [{
-                "addresses": [{"addr": "127.0.0.1", "addrtype": "ipv4"}],
-                "hostnames": [{"name": target, "type": "user"}],
-                "ports": [
-                    {"portid": "80", "protocol": "tcp", "state": "open", "service": {"name": "http"}},
-                    {"portid": "443", "protocol": "tcp", "state": "open", "service": {"name": "https"}},
-                    {"portid": "8443", "protocol": "tcp", "state": "open", "service": {"name": "https-alt"}},
-                ],
-            }],
+            "hosts": [
+                {
+                    "addresses": [{"addr": "127.0.0.1", "addrtype": "ipv4"}],
+                    "hostnames": [{"name": target, "type": "user"}],
+                    "ports": [
+                        {
+                            "portid": "80",
+                            "protocol": "tcp",
+                            "state": "open",
+                            "service": {"name": "http"},
+                        },
+                        {
+                            "portid": "443",
+                            "protocol": "tcp",
+                            "state": "open",
+                            "service": {"name": "https"},
+                        },
+                        {
+                            "portid": "8443",
+                            "protocol": "tcp",
+                            "state": "open",
+                            "service": {"name": "https-alt"},
+                        },
+                    ],
+                }
+            ],
             "elapsed_seconds": elapsed,
             "is_mock": True,
         }
@@ -132,7 +161,7 @@ def run_nmap(
 
 def parse_nmap_xml(xml_content: str) -> Dict[str, Any]:
     """Parse nmap XML output into a structured dictionary."""
-    root = ET.fromstring(xml_content)
+    root = ET.fromstring(xml_content)  # nosec B314
 
     hosts: List[Dict[str, Any]] = []
     for host in root.findall("host"):
@@ -143,18 +172,22 @@ def parse_nmap_xml(xml_content: str) -> Dict[str, Any]:
         }
 
         for address in host.findall("address"):
-            host_info["addresses"].append({
-                "addr": address.get("addr"),
-                "addrtype": address.get("addrtype"),
-            })
+            host_info["addresses"].append(
+                {
+                    "addr": address.get("addr"),
+                    "addrtype": address.get("addrtype"),
+                }
+            )
 
         hostnames_el = host.find("hostnames")
         if hostnames_el is not None:
             for hn in hostnames_el.findall("hostname"):
-                host_info["hostnames"].append({
-                    "name": hn.get("name"),
-                    "type": hn.get("type"),
-                })
+                host_info["hostnames"].append(
+                    {
+                        "name": hn.get("name"),
+                        "type": hn.get("type"),
+                    }
+                )
 
         ports_el = host.find("ports")
         if ports_el is not None:

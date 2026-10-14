@@ -166,7 +166,12 @@ async def get_high_risk_assets(
     org_id = current_user["org"]
     result = await db.execute(
         select(Asset)
-        .where(and_(Asset.organization_id == org_id, Asset.risk_level.in_(["Critical", "High"])))
+        .where(
+            and_(
+                Asset.organization_id == org_id,
+                Asset.risk_level.in_(["Critical", "High"]),
+            )
+        )
         .order_by(desc(Asset.risk_score))
         .limit(50)
     )

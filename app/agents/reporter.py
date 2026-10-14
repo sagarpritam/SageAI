@@ -12,14 +12,22 @@ logger = logging.getLogger(__name__)
 
 
 class ReporterResponse(BaseModel):
-    summary: str = Field(description="Executive summary of the overall security posture.")
-    critical_issues: List[str] = Field(description="Bullet points highlighting the most severe issues.")
-    recommendations: List[str] = Field(description="Prioritized actionable recommendations.")
+    summary: str = Field(
+        description="Executive summary of the overall security posture."
+    )
+    critical_issues: List[str] = Field(
+        description="Bullet points highlighting the most severe issues."
+    )
+    recommendations: List[str] = Field(
+        description="Prioritized actionable recommendations."
+    )
 
 
 def _fallback_report(analyzed_findings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Generate a template report when the LLM is unavailable."""
-    critical = [f for f in analyzed_findings if f.get("severity", "").lower() == "critical"]
+    critical = [
+        f for f in analyzed_findings if f.get("severity", "").lower() == "critical"
+    ]
     high = [f for f in analyzed_findings if f.get("severity", "").lower() == "high"]
 
     critical_issues = [

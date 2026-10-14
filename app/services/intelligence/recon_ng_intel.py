@@ -46,7 +46,11 @@ async def _subdomain_enum(hostname: str) -> list[dict]:
                 f"{HACKERTARGET_API}/hostsearch/", params={"q": hostname}
             )
             if resp.status_code == 200 and "error" not in resp.text.lower():
-                lines = [l.strip() for l in resp.text.strip().split("\n") if l.strip()]
+                lines = [
+                    line.strip()
+                    for line in resp.text.strip().split("\n")
+                    if line.strip()
+                ]
                 subdomains = []
                 for line in lines:
                     parts = line.split(",")
@@ -79,7 +83,9 @@ async def _reverse_dns(hostname: str) -> list[dict]:
             resp = await client.get(f"{HACKERTARGET_API}/reversedns/", params={"q": ip})
             if resp.status_code == 200 and "error" not in resp.text.lower():
                 records = [
-                    l.strip() for l in resp.text.strip().split("\n") if l.strip()
+                    line.strip()
+                    for line in resp.text.strip().split("\n")
+                    if line.strip()
                 ]
                 if records:
                     findings.append(
@@ -184,7 +190,7 @@ async def _page_links(hostname: str) -> list[dict]:
         # Extract links
         links = re.findall(r'href=["\']([^"\']+)["\']', resp.text)
         external_links = [
-            l for l in links if l.startswith("http") and hostname not in l
+            link for link in links if link.startswith("http") and hostname not in link
         ]
 
         if external_links:

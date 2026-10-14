@@ -42,10 +42,12 @@ def generate_plan(target: str) -> ScanPlan:
         return response
     except Exception as exc:
         logger.warning("Planner LLM failed: %s — using default plan", exc)
-        return ScanPlan(steps=[
-            f"Run subfinder for subdomain enumeration on {target}",
-            f"Run nmap top-100 port scan on {target} and discovered subdomains",
-            "Run nuclei vulnerability scan (medium/high/critical) on all targets",
-            "Analyze and correlate findings across all targets",
-            "Generate executive report with risk scoring",
-        ])
+        return ScanPlan(
+            steps=[
+                f"Run subfinder for subdomain enumeration on {target}",
+                f"Run nmap top-100 port scan on {target} and discovered subdomains",
+                "Run nuclei vulnerability scan (medium/high/critical) on all targets",
+                "Analyze and correlate findings across all targets",
+                "Generate executive report with risk scoring",
+            ]
+        )

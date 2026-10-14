@@ -101,7 +101,7 @@ async def fire_webhook(event: str, org_id: str, payload: dict, db: AsyncSession)
         select(Webhook).where(
             Webhook.organization_id == org_id,
             Webhook.event == event,
-            Webhook.is_active == True,
+            Webhook.is_active,
         )
     )
     webhooks = result.scalars().all()

@@ -73,7 +73,11 @@ def _parse_allowed_networks() -> list[ipaddress.IPv4Network | ipaddress.IPv6Netw
     Falls back to DEFAULT_INTERNAL_IPS (loopback + private ranges).
     """
     raw = getattr(settings, "INTERNAL_ALLOWED_IPS", "")
-    entries = [e.strip() for e in raw.split(",") if e.strip()] if raw else DEFAULT_INTERNAL_IPS
+    entries = (
+        [e.strip() for e in raw.split(",") if e.strip()]
+        if raw
+        else DEFAULT_INTERNAL_IPS
+    )
 
     networks = []
     for entry in entries:
@@ -110,12 +114,14 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    to_encode.update({
-        "exp": expire,
-        "iss": JWT_ISSUER,
-        "aud": JWT_AUDIENCE,
-        "iat": datetime.now(timezone.utc),
-    })
+    to_encode.update(
+        {
+            "exp": expire,
+            "iss": JWT_ISSUER,
+            "aud": JWT_AUDIENCE,
+            "iat": datetime.now(timezone.utc),
+        }
+    )
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
@@ -174,7 +180,11 @@ def _verify_service_token(token: str) -> dict | None:
             issued_at = datetime.fromtimestamp(iat, tz=timezone.utc)
             age = (datetime.now(timezone.utc) - issued_at).total_seconds()
             if age > SERVICE_TOKEN_MAX_AGE_SECONDS:
-                logger.warning("Service token too old: %ds (max %ds)", age, SERVICE_TOKEN_MAX_AGE_SECONDS)
+                logger.warning(
+                    "Service token too old: %ds (max %ds)",
+                    age,
+                    SERVICE_TOKEN_MAX_AGE_SECONDS,
+                )
                 return None
 
         return payload

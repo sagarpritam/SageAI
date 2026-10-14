@@ -16,7 +16,10 @@ class Webhook(Base):
         String, nullable=False, default="scan.completed"
     )  # scan.completed, scan.failed
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
     secret = Column(String, nullable=False)  # For HMAC signature verification

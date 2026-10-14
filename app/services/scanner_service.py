@@ -47,6 +47,7 @@ async def test_xss(target: str) -> dict | None:
     ]
 
     import logging
+
     logger = logging.getLogger("sageai.scanner")
 
     try:
@@ -95,6 +96,7 @@ async def test_sqli(target: str) -> dict | None:
     ]
 
     import logging
+
     logger = logging.getLogger("sageai.scanner")
 
     try:
@@ -255,13 +257,17 @@ async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
             findings.extend(result)
         elif isinstance(result, dict):
             if result.get("status") == "success":
-                findings.append({
-                    "type": "Identity Breach Intelligence",
-                    "description": f"Target appeared in {result.get('total_breaches', 0)} breaches/leaks.",
-                    "severity": "High" if result.get("total_breaches", 0) > 0 else "Info",
-                    "module": "breach_intel",
-                    "data": result,
-                })
+                findings.append(
+                    {
+                        "type": "Identity Breach Intelligence",
+                        "description": f"Target appeared in {result.get('total_breaches', 0)} breaches/leaks.",
+                        "severity": "High"
+                        if result.get("total_breaches", 0) > 0
+                        else "Info",
+                        "module": "breach_intel",
+                        "data": result,
+                    }
+                )
 
     await _progress("done", 16, len(findings), status="complete")
 

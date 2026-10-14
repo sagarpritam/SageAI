@@ -20,7 +20,10 @@ class User(Base):
     mfa_backup_codes = Column(String, nullable=True)
 
     organization_id = Column(
-        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     org_id = synonym("organization_id")
 
@@ -29,5 +32,9 @@ class User(Base):
     # Relationships
     organization = relationship("Organization", back_populates="users")
     scans = relationship("Scan", back_populates="user", cascade="all, delete-orphan")
-    api_keys = relationship("APIKey", back_populates="creator", cascade="all, delete-orphan")
-    schedules = relationship("ScanSchedule", back_populates="creator", cascade="all, delete-orphan")
+    api_keys = relationship(
+        "APIKey", back_populates="creator", cascade="all, delete-orphan"
+    )
+    schedules = relationship(
+        "ScanSchedule", back_populates="creator", cascade="all, delete-orphan"
+    )

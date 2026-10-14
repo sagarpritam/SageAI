@@ -1,6 +1,4 @@
 import asyncio
-import logging
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -10,6 +8,11 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import init_db
+
+# ---------------------
+# Observability
+# ---------------------
+from app.core.observability import logger, setup_sentry
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import (
@@ -22,6 +25,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     billing_routes,
+    email_report_routes,
     explain_routes,
     integration_routes,
     intelligence_hub_routes,
@@ -36,14 +40,8 @@ from app.routers import (
     schedule_routes,
     webhook_routes,
     ws_routes,
-    email_report_routes,
 )
 from app.services.warroom_service import warroom_manager
-
-# ---------------------
-# Observability
-# ---------------------
-from app.core.observability import setup_sentry, logger
 
 setup_sentry()
 

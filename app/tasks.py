@@ -52,6 +52,7 @@ def _run_async(coro):
 
     if loop and loop.is_running():
         import concurrent.futures
+
         with concurrent.futures.ThreadPoolExecutor() as pool:
             return pool.submit(asyncio.run, coro).result()
     else:
@@ -105,7 +106,9 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
                         db.add(finding)
 
                     await db.commit()
-                    logger.info("Task %s: completed with %d findings", scan_id, len(findings))
+                    logger.info(
+                        "Task %s: completed with %d findings", scan_id, len(findings)
+                    )
 
                 return {
                     "scan_id": scan_id,
@@ -149,11 +152,11 @@ def cleanup_old_scans(days: int = 90):
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)
         async with AsyncSessionLocal() as db:
-            result = await db.execute(
-                delete(Scan).where(Scan.created_at < cutoff)
-            )
+            result = await db.execute(delete(Scan).where(Scan.created_at < cutoff))
             await db.commit()
-            logger.info("Cleaned up %d old scan(s) older than %d days", result.rowcount, days)
+            logger.info(
+                "Cleaned up %d old scan(s) older than %d days", result.rowcount, days
+            )
 
     _run_async(_cleanup())
 

@@ -7,12 +7,16 @@ from pydantic import BaseModel, Field
 
 class SubdomainEntry(BaseModel):
     """A single discovered subdomain."""
+
     subdomain: str
-    source: str = Field(default="subfinder", description="Tool that discovered this subdomain")
+    source: str = Field(
+        default="subfinder", description="Tool that discovered this subdomain"
+    )
 
 
 class SubdomainResult(BaseModel):
     """Structured result from subdomain enumeration."""
+
     domain: str
     entries: List[SubdomainEntry] = Field(default_factory=list)
     total: int = 0

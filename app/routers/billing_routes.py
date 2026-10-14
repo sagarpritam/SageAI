@@ -16,8 +16,6 @@ router = APIRouter(prefix="/billing", tags=["Billing"])
 
 from app.core.rate_limit import limiter
 
-from app.core.rate_limit import limiter
-
 # Hardcoded for now, or from env vars
 PLAN_PRICES = {
     "starter": settings.STRIPE_STARTER_PRICE_ID,
@@ -29,8 +27,11 @@ PLAN_PRICES = {
 def get_stripe():
     """Lazy import stripe to avoid errors when not configured."""
     if not settings.STRIPE_SECRET_KEY:
-        raise HTTPException(status_code=503, detail="Billing not configured. Stripe keys missing.")
+        raise HTTPException(
+            status_code=503, detail="Billing not configured. Stripe keys missing."
+        )
     import stripe
+
     stripe.api_key = settings.STRIPE_SECRET_KEY
     return stripe
 
@@ -108,14 +109,20 @@ async def stripe_webhook(
     try:
         if event_type == "checkout.session.completed":
             session = event["data"]["object"]
-            org_id = session.get("client_reference_id") or session.get("metadata", {}).get("org_id")
+            org_id = session.get("client_reference_id") or session.get(
+                "metadata", {}
+            ).get("org_id")
             customer_id = session.get("customer")
             subscription_id = session.get("subscription")
             plan_name = session.get("metadata", {}).get("plan", "pro")
 
             if org_id:
-                logger.info(f"Payment succeeded for org {org_id}: upgrading to {plan_name}")
-                result = await db.execute(select(Organization).where(Organization.id == org_id))
+                logger.info(
+                    f"Payment succeeded for org {org_id}: upgrading to {plan_name}"
+                )
+                result = await db.execute(
+                    select(Organization).where(Organization.id == org_id)
+                )
                 org = result.scalar_one_or_none()
                 if org:
                     org.plan = plan_name
@@ -131,7 +138,9 @@ async def stripe_webhook(
 
             logger.info(f"Subscription canceled: {sub_id} — downgrading to free")
             result = await db.execute(
-                select(Organization).where(Organization.stripe_subscription_id == sub_id)
+                select(Organization).where(
+                    Organization.stripe_subscription_id == sub_id
+                )
             )
             org = result.scalar_one_or_none()
             if org:
@@ -139,7 +148,9 @@ async def stripe_webhook(
                 org.stripe_subscription_id = None
                 await db.commit()
             else:
-                logger.warning(f"Could not find org with subscription ID {sub_id} to downgrade")
+                logger.warning(
+                    f"Could not find org with subscription ID {sub_id} to downgrade"
+                )
 
         elif event_type == "customer.subscription.updated":
             subscription = event["data"]["object"]
@@ -150,7 +161,9 @@ async def stripe_webhook(
             logger.info(f"Subscription updated: {sub_id} status is now {status}")
             if status in ["past_due", "unpaid", "canceled"]:
                 result = await db.execute(
-                    select(Organization).where(Organization.stripe_subscription_id == sub_id)
+                    select(Organization).where(
+                        Organization.stripe_subscription_id == sub_id
+                    )
                 )
                 org = result.scalar_one_or_none()
                 if org:
@@ -183,7 +196,7 @@ async def create_portal_session(
     if not org or not org.stripe_customer_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No active subscription found to manage"
+            detail="No active subscription found to manage",
         )
 
     try:

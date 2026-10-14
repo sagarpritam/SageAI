@@ -170,10 +170,7 @@ REMEDIATION = {
 # OpenAI / NVIDIA Integration
 # ---------------------
 async def ai_explain_finding(
-    finding_type: str,
-    context: str = "",
-    org_id: str = "",
-    provider: str = None
+    finding_type: str, context: str = "", org_id: str = "", provider: str = None
 ) -> dict | None:
     """Use AI to generate a detailed vulnerability explanation.
 
@@ -184,6 +181,7 @@ async def ai_explain_finding(
     from app.core.config import settings
     from app.services.ai_resilience import sanitize_for_llm
     from app.services.llm.gateway import llm_gateway
+
     llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     # Sanitize inputs
@@ -208,13 +206,16 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
             provider=llm_provider,
             org_id=org_id,
             temperature=0.3,
-            response_format={"type": "json_object"} if llm_provider == "openai" else None
+            response_format={"type": "json_object"}
+            if llm_provider == "openai"
+            else None,
         )
 
         if not raw_content:
             return None
 
         import json
+
         return json.loads(raw_content)
 
     except Exception as e:
@@ -223,9 +224,7 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
 
 async def ai_analyze_scan(
-    findings: list[dict],
-    org_id: str = "",
-    provider: str = None
+    findings: list[dict], org_id: str = "", provider: str = None
 ) -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
     from app.services.ai_resilience import sanitize_findings_for_llm
@@ -235,6 +234,7 @@ async def ai_analyze_scan(
         return None
 
     from app.core.config import settings
+
     llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     # Sanitize findings before sending to LLM
@@ -261,13 +261,16 @@ Provide a JSON response with:
             provider=llm_provider,
             org_id=org_id,
             temperature=0.3,
-            response_format={"type": "json_object"} if llm_provider == "openai" else None
+            response_format={"type": "json_object"}
+            if llm_provider == "openai"
+            else None,
         )
 
         if not raw_content:
             return None
 
         import json
+
         return json.loads(raw_content)
     except Exception as e:
         logger.error(f"AI scan analysis failed: {e}")

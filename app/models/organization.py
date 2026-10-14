@@ -20,11 +20,27 @@ class Organization(Base):
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships
-    users = relationship("User", back_populates="organization", cascade="all, delete-orphan")
-    scans = relationship("Scan", back_populates="organization", cascade="all, delete-orphan")
-    assets = relationship("Asset", back_populates="organization", cascade="all, delete-orphan")
-    asm_events = relationship("ASMEvent", back_populates="organization", cascade="all, delete-orphan")
-    attack_surface_diffs = relationship("AttackSurfaceDiff", back_populates="organization", cascade="all, delete-orphan")
-    api_keys = relationship("APIKey", back_populates="organization", cascade="all, delete-orphan")
-    webhooks = relationship("Webhook", back_populates="organization", cascade="all, delete-orphan")
-    schedules = relationship("ScanSchedule", back_populates="organization", cascade="all, delete-orphan")
+    users = relationship(
+        "User", back_populates="organization", cascade="all, delete-orphan"
+    )
+    scans = relationship(
+        "Scan", back_populates="organization", cascade="all, delete-orphan"
+    )
+    assets = relationship(
+        "Asset", back_populates="organization", cascade="all, delete-orphan"
+    )
+    asm_events = relationship(
+        "ASMEvent", back_populates="organization", cascade="all, delete-orphan"
+    )
+    attack_surface_diffs = relationship(
+        "AttackSurfaceDiff", back_populates="organization", cascade="all, delete-orphan"
+    )
+    api_keys = relationship(
+        "APIKey", back_populates="organization", cascade="all, delete-orphan"
+    )
+    webhooks = relationship(
+        "Webhook", back_populates="organization", cascade="all, delete-orphan"
+    )
+    schedules = relationship(
+        "ScanSchedule", back_populates="organization", cascade="all, delete-orphan"
+    )

@@ -6,9 +6,10 @@ import httpx
 
 logger = logging.getLogger("sageai.intelligence.phishstats")
 
+
 async def phishstats_scan(target: str) -> list[dict]:
     """Check a domain or IP against PhishStats for active phishing campaigns.
-    
+
     PhishStats is a free API, no key required.
     """
     findings = []
@@ -28,14 +29,16 @@ async def phishstats_scan(target: str) -> list[dict]:
 
             if isinstance(records, list) and len(records) > 0:
                 for record in records[:5]:  # Take top 5 recent hits
-                    findings.append({
-                        "source": "PhishStats",
-                        "type": "malicious_activity",
-                        "title": f"Phishing Activity Detected: {record.get('title', 'Unknown Campaign')}",
-                        "description": f"Target was found in PhishStats database. URL: {record.get('url')} (Score: {record.get('score', 0)})",
-                        "severity": "high",
-                        "raw_data": record
-                    })
+                    findings.append(
+                        {
+                            "source": "PhishStats",
+                            "type": "malicious_activity",
+                            "title": f"Phishing Activity Detected: {record.get('title', 'Unknown Campaign')}",
+                            "description": f"Target was found in PhishStats database. URL: {record.get('url')} (Score: {record.get('score', 0)})",
+                            "severity": "high",
+                            "raw_data": record,
+                        }
+                    )
 
         except httpx.HTTPStatusError as e:
             # 400 or 404 generally means no records or bad query, ignore gracefully

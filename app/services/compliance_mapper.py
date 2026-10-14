@@ -23,87 +23,223 @@ COMPLIANCE_MAP: dict[str, dict] = {
     "Missing Security Headers": {
         "owasp": {"id": "A05:2021", "name": "Security Misconfiguration"},
         "cwe": {"id": "CWE-693", "name": "Protection Mechanism Failure"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-2", "desc": "Data-in-transit is protected"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-2",
+            "desc": "Data-in-transit is protected",
+        },
         "pci_dss": {"req": "6.5.10", "desc": "Broken access control"},
         "soc2": {"criteria": "CC6.1", "desc": "Logical and physical access controls"},
-        "iso27001": {"control": "A.14.1.2", "desc": "Securing application services on public networks"},
+        "iso27001": {
+            "control": "A.14.1.2",
+            "desc": "Securing application services on public networks",
+        },
     },
     "Reflected XSS": {
         "owasp": {"id": "A03:2021", "name": "Injection"},
-        "cwe": {"id": "CWE-79", "name": "Improper Neutralization of Input During Web Page Generation"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-5", "desc": "Protections against data leaks"},
-        "pci_dss": {"req": "6.2.4", "desc": "Software engineering techniques to prevent injection attacks"},
-        "soc2": {"criteria": "CC6.6", "desc": "Restricting access to system boundaries"},
-        "iso27001": {"control": "A.14.2.5", "desc": "Secure system engineering principles"},
+        "cwe": {
+            "id": "CWE-79",
+            "name": "Improper Neutralization of Input During Web Page Generation",
+        },
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-5",
+            "desc": "Protections against data leaks",
+        },
+        "pci_dss": {
+            "req": "6.2.4",
+            "desc": "Software engineering techniques to prevent injection attacks",
+        },
+        "soc2": {
+            "criteria": "CC6.6",
+            "desc": "Restricting access to system boundaries",
+        },
+        "iso27001": {
+            "control": "A.14.2.5",
+            "desc": "Secure system engineering principles",
+        },
     },
     "SQL Injection": {
         "owasp": {"id": "A03:2021", "name": "Injection"},
         "cwe": {"id": "CWE-89", "name": "SQL Injection"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-5", "desc": "Protections against data leaks"},
-        "pci_dss": {"req": "6.2.4", "desc": "Software engineering techniques to prevent injection attacks"},
-        "soc2": {"criteria": "CC6.6", "desc": "Restricting access to system boundaries"},
-        "iso27001": {"control": "A.14.2.5", "desc": "Secure system engineering principles"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-5",
+            "desc": "Protections against data leaks",
+        },
+        "pci_dss": {
+            "req": "6.2.4",
+            "desc": "Software engineering techniques to prevent injection attacks",
+        },
+        "soc2": {
+            "criteria": "CC6.6",
+            "desc": "Restricting access to system boundaries",
+        },
+        "iso27001": {
+            "control": "A.14.2.5",
+            "desc": "Secure system engineering principles",
+        },
     },
     "ssl_expired": {
         "owasp": {"id": "A02:2021", "name": "Cryptographic Failures"},
         "cwe": {"id": "CWE-295", "name": "Improper Certificate Validation"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-2", "desc": "Data-in-transit is protected"},
-        "pci_dss": {"req": "4.2.1", "desc": "Strong cryptography for transmission of cardholder data"},
-        "soc2": {"criteria": "CC6.7", "desc": "Restricting transmission, movement, and removal of information"},
-        "iso27001": {"control": "A.10.1.1", "desc": "Policy on the use of cryptographic controls"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-2",
+            "desc": "Data-in-transit is protected",
+        },
+        "pci_dss": {
+            "req": "4.2.1",
+            "desc": "Strong cryptography for transmission of cardholder data",
+        },
+        "soc2": {
+            "criteria": "CC6.7",
+            "desc": "Restricting transmission, movement, and removal of information",
+        },
+        "iso27001": {
+            "control": "A.10.1.1",
+            "desc": "Policy on the use of cryptographic controls",
+        },
     },
     "ssl_expiring_soon": {
         "owasp": {"id": "A02:2021", "name": "Cryptographic Failures"},
         "cwe": {"id": "CWE-295", "name": "Improper Certificate Validation"},
-        "nist": {"function": "Identify", "category": "ID.RA", "control": "ID.RA-1", "desc": "Asset vulnerabilities identified"},
-        "pci_dss": {"req": "4.2.1", "desc": "Strong cryptography for transmission of cardholder data"},
-        "soc2": {"criteria": "CC7.1", "desc": "Monitoring of infrastructure and software"},
-        "iso27001": {"control": "A.10.1.1", "desc": "Policy on the use of cryptographic controls"},
+        "nist": {
+            "function": "Identify",
+            "category": "ID.RA",
+            "control": "ID.RA-1",
+            "desc": "Asset vulnerabilities identified",
+        },
+        "pci_dss": {
+            "req": "4.2.1",
+            "desc": "Strong cryptography for transmission of cardholder data",
+        },
+        "soc2": {
+            "criteria": "CC7.1",
+            "desc": "Monitoring of infrastructure and software",
+        },
+        "iso27001": {
+            "control": "A.10.1.1",
+            "desc": "Policy on the use of cryptographic controls",
+        },
     },
     "ssl_weak_protocol": {
         "owasp": {"id": "A02:2021", "name": "Cryptographic Failures"},
         "cwe": {"id": "CWE-326", "name": "Inadequate Encryption Strength"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-2", "desc": "Data-in-transit is protected"},
-        "pci_dss": {"req": "4.2.1", "desc": "Strong cryptography for transmission of cardholder data"},
-        "soc2": {"criteria": "CC6.7", "desc": "Restricting transmission, movement, and removal of information"},
-        "iso27001": {"control": "A.10.1.1", "desc": "Policy on the use of cryptographic controls"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-2",
+            "desc": "Data-in-transit is protected",
+        },
+        "pci_dss": {
+            "req": "4.2.1",
+            "desc": "Strong cryptography for transmission of cardholder data",
+        },
+        "soc2": {
+            "criteria": "CC6.7",
+            "desc": "Restricting transmission, movement, and removal of information",
+        },
+        "iso27001": {
+            "control": "A.10.1.1",
+            "desc": "Policy on the use of cryptographic controls",
+        },
     },
     "ssl_weak_cipher": {
         "owasp": {"id": "A02:2021", "name": "Cryptographic Failures"},
-        "cwe": {"id": "CWE-327", "name": "Use of Broken or Risky Cryptographic Algorithm"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-2", "desc": "Data-in-transit is protected"},
-        "pci_dss": {"req": "4.2.1", "desc": "Strong cryptography for transmission of cardholder data"},
-        "soc2": {"criteria": "CC6.7", "desc": "Restricting transmission, movement, and removal of information"},
-        "iso27001": {"control": "A.10.1.1", "desc": "Policy on the use of cryptographic controls"},
+        "cwe": {
+            "id": "CWE-327",
+            "name": "Use of Broken or Risky Cryptographic Algorithm",
+        },
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-2",
+            "desc": "Data-in-transit is protected",
+        },
+        "pci_dss": {
+            "req": "4.2.1",
+            "desc": "Strong cryptography for transmission of cardholder data",
+        },
+        "soc2": {
+            "criteria": "CC6.7",
+            "desc": "Restricting transmission, movement, and removal of information",
+        },
+        "iso27001": {
+            "control": "A.10.1.1",
+            "desc": "Policy on the use of cryptographic controls",
+        },
     },
     "ssl_invalid_cert": {
         "owasp": {"id": "A02:2021", "name": "Cryptographic Failures"},
         "cwe": {"id": "CWE-295", "name": "Improper Certificate Validation"},
-        "nist": {"function": "Protect", "category": "PR.DS", "control": "PR.DS-2", "desc": "Data-in-transit is protected"},
-        "pci_dss": {"req": "4.2.1", "desc": "Strong cryptography for transmission of cardholder data"},
-        "soc2": {"criteria": "CC6.7", "desc": "Restricting transmission, movement, and removal of information"},
-        "iso27001": {"control": "A.10.1.1", "desc": "Policy on the use of cryptographic controls"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.DS",
+            "control": "PR.DS-2",
+            "desc": "Data-in-transit is protected",
+        },
+        "pci_dss": {
+            "req": "4.2.1",
+            "desc": "Strong cryptography for transmission of cardholder data",
+        },
+        "soc2": {
+            "criteria": "CC6.7",
+            "desc": "Restricting transmission, movement, and removal of information",
+        },
+        "iso27001": {
+            "control": "A.10.1.1",
+            "desc": "Policy on the use of cryptographic controls",
+        },
     },
     "port_open": {
         "owasp": {"id": "A05:2021", "name": "Security Misconfiguration"},
         "cwe": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-        "nist": {"function": "Protect", "category": "PR.AC", "control": "PR.AC-5", "desc": "Network integrity protected"},
-        "pci_dss": {"req": "1.3.1", "desc": "Restrict inbound traffic to required protocols"},
-        "soc2": {"criteria": "CC6.6", "desc": "Restricting access to system boundaries"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.AC",
+            "control": "PR.AC-5",
+            "desc": "Network integrity protected",
+        },
+        "pci_dss": {
+            "req": "1.3.1",
+            "desc": "Restrict inbound traffic to required protocols",
+        },
+        "soc2": {
+            "criteria": "CC6.6",
+            "desc": "Restricting access to system boundaries",
+        },
         "iso27001": {"control": "A.13.1.1", "desc": "Network controls"},
     },
     "dns_risky_subdomains": {
         "owasp": {"id": "A05:2021", "name": "Security Misconfiguration"},
         "cwe": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-        "nist": {"function": "Identify", "category": "ID.AM", "control": "ID.AM-2", "desc": "Software platforms and applications identified"},
+        "nist": {
+            "function": "Identify",
+            "category": "ID.AM",
+            "control": "ID.AM-2",
+            "desc": "Software platforms and applications identified",
+        },
         "pci_dss": {"req": "2.1", "desc": "Change vendor-supplied defaults"},
         "soc2": {"criteria": "CC6.1", "desc": "Logical and physical access controls"},
         "iso27001": {"control": "A.8.1.1", "desc": "Inventory of assets"},
     },
     "virustotal_malicious": {
         "owasp": {"id": "A09:2021", "name": "Security Logging and Monitoring Failures"},
-        "cwe": {"id": "CWE-829", "name": "Inclusion of Functionality from Untrusted Control Sphere"},
-        "nist": {"function": "Detect", "category": "DE.CM", "control": "DE.CM-4", "desc": "Malicious code detected"},
+        "cwe": {
+            "id": "CWE-829",
+            "name": "Inclusion of Functionality from Untrusted Control Sphere",
+        },
+        "nist": {
+            "function": "Detect",
+            "category": "DE.CM",
+            "control": "DE.CM-4",
+            "desc": "Malicious code detected",
+        },
         "pci_dss": {"req": "5.2", "desc": "Anti-malware mechanisms and procedures"},
         "soc2": {"criteria": "CC7.2", "desc": "Identification of security incidents"},
         "iso27001": {"control": "A.12.2.1", "desc": "Controls against malware"},
@@ -111,42 +247,100 @@ COMPLIANCE_MAP: dict[str, dict] = {
     "shodan_vulns": {
         "owasp": {"id": "A06:2021", "name": "Vulnerable and Outdated Components"},
         "cwe": {"id": "CWE-1104", "name": "Use of Unmaintained Third-Party Components"},
-        "nist": {"function": "Identify", "category": "ID.RA", "control": "ID.RA-1", "desc": "Asset vulnerabilities identified"},
-        "pci_dss": {"req": "6.3.3", "desc": "Security patches installed within one month"},
-        "soc2": {"criteria": "CC7.1", "desc": "Monitoring of infrastructure and software"},
-        "iso27001": {"control": "A.12.6.1", "desc": "Management of technical vulnerabilities"},
+        "nist": {
+            "function": "Identify",
+            "category": "ID.RA",
+            "control": "ID.RA-1",
+            "desc": "Asset vulnerabilities identified",
+        },
+        "pci_dss": {
+            "req": "6.3.3",
+            "desc": "Security patches installed within one month",
+        },
+        "soc2": {
+            "criteria": "CC7.1",
+            "desc": "Monitoring of infrastructure and software",
+        },
+        "iso27001": {
+            "control": "A.12.6.1",
+            "desc": "Management of technical vulnerabilities",
+        },
     },
     "nvd_cve": {
         "owasp": {"id": "A06:2021", "name": "Vulnerable and Outdated Components"},
         "cwe": {"id": "CWE-1104", "name": "Use of Unmaintained Third-Party Components"},
-        "nist": {"function": "Identify", "category": "ID.RA", "control": "ID.RA-1", "desc": "Asset vulnerabilities identified"},
-        "pci_dss": {"req": "6.3.3", "desc": "Security patches installed within one month"},
-        "soc2": {"criteria": "CC7.1", "desc": "Monitoring of infrastructure and software"},
-        "iso27001": {"control": "A.12.6.1", "desc": "Management of technical vulnerabilities"},
+        "nist": {
+            "function": "Identify",
+            "category": "ID.RA",
+            "control": "ID.RA-1",
+            "desc": "Asset vulnerabilities identified",
+        },
+        "pci_dss": {
+            "req": "6.3.3",
+            "desc": "Security patches installed within one month",
+        },
+        "soc2": {
+            "criteria": "CC7.1",
+            "desc": "Monitoring of infrastructure and software",
+        },
+        "iso27001": {
+            "control": "A.12.6.1",
+            "desc": "Management of technical vulnerabilities",
+        },
     },
     "observatory_grade": {
         "owasp": {"id": "A05:2021", "name": "Security Misconfiguration"},
         "cwe": {"id": "CWE-16", "name": "Configuration"},
-        "nist": {"function": "Protect", "category": "PR.IP", "control": "PR.IP-1", "desc": "Security configuration baselines"},
-        "pci_dss": {"req": "2.2", "desc": "Configuration standards for all system components"},
+        "nist": {
+            "function": "Protect",
+            "category": "PR.IP",
+            "control": "PR.IP-1",
+            "desc": "Security configuration baselines",
+        },
+        "pci_dss": {
+            "req": "2.2",
+            "desc": "Configuration standards for all system components",
+        },
         "soc2": {"criteria": "CC6.1", "desc": "Logical and physical access controls"},
-        "iso27001": {"control": "A.14.1.1", "desc": "Information security requirements analysis"},
+        "iso27001": {
+            "control": "A.14.1.1",
+            "desc": "Information security requirements analysis",
+        },
     },
     "crtsh_sensitive_subdomains": {
         "owasp": {"id": "A01:2021", "name": "Broken Access Control"},
         "cwe": {"id": "CWE-200", "name": "Exposure of Sensitive Information"},
-        "nist": {"function": "Identify", "category": "ID.AM", "control": "ID.AM-2", "desc": "Software platforms and applications identified"},
+        "nist": {
+            "function": "Identify",
+            "category": "ID.AM",
+            "control": "ID.AM-2",
+            "desc": "Software platforms and applications identified",
+        },
         "pci_dss": {"req": "2.4", "desc": "Inventory of system components in scope"},
         "soc2": {"criteria": "CC6.1", "desc": "Logical and physical access controls"},
         "iso27001": {"control": "A.8.1.1", "desc": "Inventory of assets"},
     },
     "Identity Breach Intelligence": {
-        "owasp": {"id": "A07:2021", "name": "Identification and Authentication Failures"},
+        "owasp": {
+            "id": "A07:2021",
+            "name": "Identification and Authentication Failures",
+        },
         "cwe": {"id": "CWE-521", "name": "Weak Password Requirements"},
-        "nist": {"function": "Respond", "category": "RS.MI", "control": "RS.MI-1", "desc": "Incidents are contained"},
+        "nist": {
+            "function": "Respond",
+            "category": "RS.MI",
+            "control": "RS.MI-1",
+            "desc": "Incidents are contained",
+        },
         "pci_dss": {"req": "12.10.1", "desc": "Incident response plan"},
-        "soc2": {"criteria": "CC7.3", "desc": "Response to identified security incidents"},
-        "iso27001": {"control": "A.16.1.5", "desc": "Response to information security incidents"},
+        "soc2": {
+            "criteria": "CC7.3",
+            "desc": "Response to identified security incidents",
+        },
+        "iso27001": {
+            "control": "A.16.1.5",
+            "desc": "Response to information security incidents",
+        },
     },
 }
 
@@ -154,10 +348,10 @@ COMPLIANCE_MAP: dict[str, dict] = {
 # Total controls per framework (for scoring)
 # ──────────────────────────────────────────────
 FRAMEWORK_TOTAL_CONTROLS = {
-    "owasp": 10,     # OWASP Top 10
-    "pci_dss": 12,   # PCI-DSS major requirements
-    "soc2": 9,       # SOC2 CC criteria
-    "nist": 5,       # NIST CSF functions
+    "owasp": 10,  # OWASP Top 10
+    "pci_dss": 12,  # PCI-DSS major requirements
+    "soc2": 9,  # SOC2 CC criteria
+    "nist": 5,  # NIST CSF functions
     "iso27001": 14,  # ISO 27001 Annex A domains
 }
 
@@ -192,10 +386,12 @@ def enrich_findings_with_compliance(findings: list[dict]) -> list[dict]:
     for finding in findings:
         ftype = finding.get("type", "")
         mapping = map_finding_to_frameworks(ftype)
-        enriched.append({
-            **finding,
-            "compliance": mapping["frameworks"] if mapping["mapped"] else {},
-        })
+        enriched.append(
+            {
+                **finding,
+                "compliance": mapping["frameworks"] if mapping["mapped"] else {},
+            }
+        )
     return enriched
 
 
@@ -248,12 +444,14 @@ def calculate_framework_compliance(
                 violated_controls.add(ctrl_id)
                 desc = fw_mapping.get("desc", fw_mapping.get("name", ""))
                 gaps.append(f"[{ctrl_id}] {desc} — triggered by {ftype} ({severity})")
-                violations.append({
-                    "control_id": ctrl_id,
-                    "description": desc,
-                    "triggered_by": ftype,
-                    "severity": finding.get("severity", "Info"),
-                })
+                violations.append(
+                    {
+                        "control_id": ctrl_id,
+                        "description": desc,
+                        "triggered_by": ftype,
+                        "severity": finding.get("severity", "Info"),
+                    }
+                )
 
     controls_passed = max(0, total - len(violated_controls))
     score = round((controls_passed / total) * 100) if total > 0 else 100
@@ -294,6 +492,10 @@ def calculate_all_compliance(findings: list[dict]) -> dict:
 
     return {
         "overall_score": avg_score,
-        "overall_status": "compliant" if avg_score >= 90 else "partial" if avg_score >= 70 else "non-compliant",
+        "overall_status": "compliant"
+        if avg_score >= 90
+        else "partial"
+        if avg_score >= 70
+        else "non-compliant",
         "frameworks": results,
     }

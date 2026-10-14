@@ -3,6 +3,7 @@
 Provides integration to search historical breach databases, paste sites,
 and leaked credentials across the dark web mapping to a specific domain or email.
 """
+
 import asyncio
 import logging
 from typing import Any, Dict
@@ -28,19 +29,15 @@ async def breach_scan(target: str, target_type: str = "domain") -> Dict[str, Any
     await asyncio.sleep(2)
 
     from app.core.config import settings
+
     api_key = settings.BREACH_API_KEY
     if not api_key:
-        logger.warning("No BREACH_API_KEY set. Returning generic simulated OSINT results for demonstration.")
+        logger.warning(
+            "No BREACH_API_KEY set. Returning generic simulated OSINT results for demonstration."
+        )
         return _get_mock_breach_data(target, target_type)
 
     # In a real environment, this connects to HIBP Workspace / Dehashed API
-    results = {
-        "status": "success",
-        "target": target,
-        "mode": "live",
-        "total_breaches": 0,
-        "compromised_accounts": [],
-    }
 
     try:
         # Example API Request Structure (HIBP Enterprise / Dehashed)
@@ -81,16 +78,16 @@ def _get_mock_breach_data(target: str, target_type: str) -> Dict[str, Any]:
                     "date": "2012-05-05",
                     "data_classes": ["Email addresses", "Passwords"],
                     "is_verified": True,
-                    "password_hash_type": "SHA-1"
+                    "password_hash_type": "SHA-1",
                 },
                 {
                     "breach_name": "Generic SaaS Dump (2020)",
                     "date": "2020-08-14",
                     "data_classes": ["Email addresses", "Names", "Phone numbers"],
                     "is_verified": False,
-                    "password_hash_type": "bcrypt"
-                }
-            ]
+                    "password_hash_type": "bcrypt",
+                },
+            ],
         }
 
     # Domain-level breach sweep simulation
@@ -105,25 +102,25 @@ def _get_mock_breach_data(target: str, target_type: str) -> Dict[str, Any]:
             {
                 "email": f"ceo@{base_domain}",
                 "breaches": ["Apollo (2018)", "ZoomInfo Leak (2021)"],
-                "data_classes": ["Email addresses", "Passwords", "Job titles"]
+                "data_classes": ["Email addresses", "Passwords", "Job titles"],
             },
             {
                 "email": f"dev-ops@{base_domain}",
                 "breaches": ["Docker Hub (2019)"],
-                "data_classes": ["Email addresses", "Passwords", "Source code"]
+                "data_classes": ["Email addresses", "Passwords", "Source code"],
             },
             {
                 "email": f"admin@{base_domain}",
                 "breaches": ["Collection #1 (2019)", "Cit0day (2020)"],
-                "data_classes": ["Email addresses", "Passwords"]
-            }
+                "data_classes": ["Email addresses", "Passwords"],
+            },
         ],
         "paste_hits": [
             {
                 "id": "A7xTb92",
                 "source": "Pastebin",
                 "date": "2023-11-02",
-                "title": f"Internal VPN Configs - {base_domain}"
+                "title": f"Internal VPN Configs - {base_domain}",
             }
-        ]
+        ],
     }

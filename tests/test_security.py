@@ -1,8 +1,7 @@
 """Tests for the security module: JWT, service tokens, IP allowlisting, role hierarchy."""
 
-import ipaddress
 from datetime import datetime, timedelta, timezone
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from jose import jwt
@@ -23,7 +22,6 @@ from app.core.security import (
     require_role,
     verify_password,
 )
-
 
 # ── Password Hashing ──────────────────────────────
 
@@ -326,7 +324,7 @@ class TestRoleHierarchy:
         """Admin should pass a check that requires 'member' role."""
         checker = require_role("member")
         # Extract the inner function
-        inner = checker.__wrapped__ if hasattr(checker, "__wrapped__") else None
+        checker.__wrapped__ if hasattr(checker, "__wrapped__") else None
 
         # Simulate the role check logic directly
         from app.core.security import ROLE_HIERARCHY

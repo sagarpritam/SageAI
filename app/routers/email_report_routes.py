@@ -1,14 +1,16 @@
 import json
 import logging
-import redis.asyncio as redis
-from typing import Dict, Any
+from typing import Any, Dict
 
+import redis.asyncio as redis
 from fastapi import APIRouter, Depends, HTTPException, status
+
 from app.core.config import settings
 from app.core.security import get_current_user
 
 router = APIRouter(prefix="/email-reports", tags=["Email"])
 logger = logging.getLogger(__name__)
+
 
 async def get_redis_client():
     client = None
@@ -25,10 +27,11 @@ async def get_redis_client():
             except Exception:
                 pass
 
+
 @router.get("/config")
 async def get_email_config(
     current_user: dict = Depends(get_current_user),
-    redis_client=Depends(get_redis_client)
+    redis_client=Depends(get_redis_client),
 ):
     if not redis_client:
         return {"recipients": [], "frequency": "weekly", "enabled": False}
@@ -43,16 +46,17 @@ async def get_email_config(
 
     return {"recipients": [], "frequency": "weekly", "enabled": False}
 
+
 @router.post("/config")
 async def save_email_config(
     data: Dict[str, Any],
     current_user: dict = Depends(get_current_user),
-    redis_client=Depends(get_redis_client)
+    redis_client=Depends(get_redis_client),
 ):
     if not redis_client:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Settings service unavailable"
+            detail="Settings service unavailable",
         )
 
     user_id = current_user.get("sub")
@@ -62,7 +66,7 @@ async def save_email_config(
         logger.error(f"Error saving email config to Redis: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to save configuration"
+            detail="Failed to save configuration",
         )
 
     return data

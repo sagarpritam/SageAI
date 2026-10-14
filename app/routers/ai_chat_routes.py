@@ -37,7 +37,7 @@ async def ai_security_chat(
 ):
     """
     Chat endpoint for the AI Security Assistant.
-    Retrieves relevant cybersecurity knowledge via RAG, 
+    Retrieves relevant cybersecurity knowledge via RAG,
     and optionally injects live scan context.
     """
     user_msg = payload.message.strip()
@@ -98,13 +98,16 @@ async def ai_security_chat(
         # Call LLM Gateway
         org_id = current_user.get("org", "system")
         from app.core.config import settings
-        chat_provider = payload.provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
+
+        chat_provider = payload.provider or (
+            "nvidia" if settings.NVIDIA_API_KEY else "openai"
+        )
 
         reply = await llm_gateway.generate(
             prompt=user_msg,
             system_message=system_prompt,
             org_id=str(org_id),
-            provider=chat_provider
+            provider=chat_provider,
         )
 
         return ChatResponse(reply=reply, sources=sources)

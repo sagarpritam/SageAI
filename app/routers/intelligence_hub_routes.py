@@ -1,4 +1,3 @@
-
 """Intelligence Hub router."""
 
 # ────────────────────── Standard library ──────────────────────
@@ -147,6 +146,7 @@ async def build_relationship_graph(
         "meta": results.get("_meta", {}),
     }
 
+
 # ── Deep Search ───────────────────────────────────
 
 
@@ -180,9 +180,7 @@ async def run_deep_search(req: DeepSearchRequest, user=Depends(get_current_user)
         return result
     except Exception as e:
         logger.error(f"Deep search failed: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Deep search failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Deep search failed: {str(e)}")
 
 
 # ── Status ────────────────────────────────────────
@@ -277,4 +275,3 @@ async def list_intelligence_modules(user=Depends(get_current_user)):
             },
         ]
     }
-

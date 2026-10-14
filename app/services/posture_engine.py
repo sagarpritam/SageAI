@@ -120,12 +120,12 @@ def _category_penalty(findings: list[dict], max_penalty: float = 25.0) -> float:
     if not findings:
         return 0.0
     raw = sum(
-        SEVERITY_WEIGHT.get(f.get("severity", "info").lower(), 0.0)
-        for f in findings
+        SEVERITY_WEIGHT.get(f.get("severity", "info").lower(), 0.0) for f in findings
     )
     # Diminishing returns: first few findings hurt more
     # penalty = max_penalty * (1 - e^(-raw/20))
     import math
+
     return round(max_penalty * (1 - math.exp(-raw / 20)), 2)
 
 
@@ -142,12 +142,21 @@ def calculate_posture(findings: list[dict]) -> dict:
             "grade": "A+",
             "grade_color": "#22C55E",
             "categories": {
-                cat: {"score": 100, "label": CATEGORY_LABELS[cat], "findings": 0, "penalty": 0}
+                cat: {
+                    "score": 100,
+                    "label": CATEGORY_LABELS[cat],
+                    "findings": 0,
+                    "penalty": 0,
+                }
                 for cat in CATEGORY_LABELS
             },
             "total_findings": 0,
             "severity_distribution": {
-                "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0,
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+                "info": 0,
             },
         }
 
@@ -224,12 +233,14 @@ def calculate_posture_trends(
         findings = scan.get("findings", [])
         posture = calculate_posture(findings)
 
-        trend_points.append({
-            "date": created.strftime("%Y-%m-%d"),
-            "posture_score": posture["posture_score"],
-            "grade": posture["grade"],
-            "total_findings": posture["total_findings"],
-        })
+        trend_points.append(
+            {
+                "date": created.strftime("%Y-%m-%d"),
+                "posture_score": posture["posture_score"],
+                "grade": posture["grade"],
+                "total_findings": posture["total_findings"],
+            }
+        )
 
     # Sort chronologically
     trend_points.sort(key=lambda p: p["date"])

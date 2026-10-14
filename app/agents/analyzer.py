@@ -15,10 +15,14 @@ _BATCH_SIZE = 25
 
 
 class AnalyzedFinding(BaseModel):
-    index: int = Field(description="The exact integer index (0-based) of the finding from the input batch")
+    index: int = Field(
+        description="The exact integer index (0-based) of the finding from the input batch"
+    )
     name: str = Field(description="The name of the vulnerability")
     severity: str = Field(description="Severity level (Low, Medium, High, Critical)")
-    priority: int = Field(description="Priority score 1-10 based on exploitability and impact")
+    priority: int = Field(
+        description="Priority score 1-10 based on exploitability and impact"
+    )
     reason: str = Field(description="Reasoning on exploitability vs false positive")
 
 
@@ -30,18 +34,20 @@ def _fallback_analysis(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any
     """Generate a basic analysis when the LLM is unavailable."""
     severity_scores = {"critical": 9, "high": 7, "medium": 5, "low": 3, "info": 1}
     results = []
-    for i, f in enumerate(raw_findings):
+    for _i, f in enumerate(raw_findings):
         name = f.get("name", f.get("type", "Unknown"))
         sev = f.get("severity", "info").lower()
 
         # Merge directly into a copy of the original finding
         merged = dict(f)
-        merged.update({
-            "priority": severity_scores.get(sev, 1),
-            "reason": f"Auto-scored based on reported severity ({sev}). Manual review recommended.",
-            "name": name,
-            "severity": sev.capitalize()
-        })
+        merged.update(
+            {
+                "priority": severity_scores.get(sev, 1),
+                "reason": f"Auto-scored based on reported severity ({sev}). Manual review recommended.",
+                "name": name,
+                "severity": sev.capitalize(),
+            }
+        )
         results.append(merged)
     return results
 
@@ -55,7 +61,9 @@ def analyze_findings(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     if not raw_findings:
         return []
 
-    logger.info("Starting AI Analyzer Agent — %d finding(s) to process", len(raw_findings))
+    logger.info(
+        "Starting AI Analyzer Agent — %d finding(s) to process", len(raw_findings)
+    )
 
     system_prompt = (
         "You are an elite cybersecurity analyst and threat intelligence expert.\n"
@@ -90,20 +98,27 @@ def analyze_findings(raw_findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]
             for analysis in response.findings:
                 if 0 <= analysis.index < len(batch):
                     merged = dict(batch[analysis.index])
-                    merged.update({
-                        "priority": analysis.priority,
-                        "reason": analysis.reason,
-                        "severity": analysis.severity,
-                        "name": analysis.name
-                    })
+                    merged.update(
+                        {
+                            "priority": analysis.priority,
+                            "reason": analysis.reason,
+                            "severity": analysis.severity,
+                            "name": analysis.name,
+                        }
+                    )
                     all_analyzed.append(merged)
 
             logger.info(
                 "AI Analyzer processed batch %d — %d finding(s)",
-                i // _BATCH_SIZE + 1, len(response.findings),
+                i // _BATCH_SIZE + 1,
+                len(response.findings),
             )
         except Exception as exc:
-            logger.warning("Analyzer LLM failed on batch %d: %s — using fallback", i // _BATCH_SIZE + 1, exc)
+            logger.warning(
+                "Analyzer LLM failed on batch %d: %s — using fallback",
+                i // _BATCH_SIZE + 1,
+                exc,
+            )
             all_analyzed.extend(_fallback_analysis(batch))
 
     logger.info("AI Analyzer finished — %d total finding(s)", len(all_analyzed))

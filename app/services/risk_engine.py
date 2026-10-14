@@ -89,12 +89,10 @@ def calculate_risk(findings: list[dict]) -> dict:
 
 
 async def calculate_risk_ai(
-    findings: list[dict],
-    org_id: str = "system",
-    provider: str = None
+    findings: list[dict], org_id: str = "system", provider: str = None
 ) -> dict:
     """Use AI to calculate a context-aware risk score.
-    
+
     This analyzes finding interactions (e.g., exposed DB + SQLi) which
     standard algorithmic scoring might miss.
     """
@@ -103,6 +101,7 @@ async def calculate_risk_ai(
 
     from app.core.config import settings
     from app.services.llm.gateway import llm_gateway
+
     llm_provider = provider or ("nvidia" if settings.NVIDIA_API_KEY else "openai")
 
     findings_summary = "\n".join(
@@ -126,10 +125,7 @@ Respond in JSON format with:
 
     try:
         raw_response = await llm_gateway.generate(
-            prompt=prompt,
-            provider=llm_provider,
-            org_id=org_id,
-            temperature=0.2
+            prompt=prompt, provider=llm_provider, org_id=org_id, temperature=0.2
         )
 
         if not raw_response:
@@ -137,12 +133,14 @@ Respond in JSON format with:
             return calculate_risk(findings)
 
         import json
+
         ai_data = json.loads(raw_response)
         return {
             **ai_data,
             "total_findings": len(findings),
-            "engine": ("AI-Powered (NVIDIA)" if llm_provider == "nvidia"
-                      else "AI-Powered")
+            "engine": (
+                "AI-Powered (NVIDIA)" if llm_provider == "nvidia" else "AI-Powered"
+            ),
         }
     except Exception:
         # Fallback to algorithmic

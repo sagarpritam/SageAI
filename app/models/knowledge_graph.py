@@ -3,7 +3,6 @@ SageAI 2.0 — Security Knowledge Graph Models
 Defines graph nodes and edges for attack path analysis.
 """
 
-
 from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.orm import synonym
 
@@ -17,7 +16,12 @@ class GraphNode(Base):
     __tablename__ = "kg_nodes"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    org_id = Column(String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    org_id = Column(
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     organization_id = synonym("org_id")
 
     node_type = Column(
@@ -40,7 +44,12 @@ class GraphEdge(Base):
     __tablename__ = "kg_edges"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    org_id = Column(String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    org_id = Column(
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     organization_id = synonym("org_id")
 
     source_id = Column(String, nullable=False, index=True)  # FK to kg_nodes.id

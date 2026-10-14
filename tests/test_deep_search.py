@@ -9,8 +9,7 @@ Covers:
   - Depth and entity caps
 """
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -53,7 +52,9 @@ class TestDeepSearchService:
 
     @pytest.mark.asyncio
     @patch("app.services.intelligence.deep_search_service.llm_gateway")
-    async def test_basic_search_returns_result(self, mock_llm, mock_llm_no_pivots, mock_findings):
+    async def test_basic_search_returns_result(
+        self, mock_llm, mock_llm_no_pivots, mock_findings
+    ):
         """A basic deep search should return a valid result structure."""
         mock_llm.generate = AsyncMock(return_value=mock_llm_no_pivots)
 
@@ -83,7 +84,9 @@ class TestDeepSearchService:
 
     @pytest.mark.asyncio
     @patch("app.services.intelligence.deep_search_service.llm_gateway")
-    async def test_recursive_pivoting(self, mock_llm, mock_llm_pivots, mock_llm_no_pivots, mock_findings):
+    async def test_recursive_pivoting(
+        self, mock_llm, mock_llm_pivots, mock_llm_no_pivots, mock_findings
+    ):
         """Deep search should discover pivots and recursively search them."""
         # First call returns pivots, subsequent calls return no pivots
         call_count = 0
@@ -93,7 +96,10 @@ class TestDeepSearchService:
             call_count += 1
             if call_count == 1:
                 return mock_llm_pivots  # First entity: return pivots
-            elif "briefing" in str(args).lower() or "intelligence" in str(kwargs.get("system_message", "")).lower():
+            elif (
+                "briefing" in str(args).lower()
+                or "intelligence" in str(kwargs.get("system_message", "")).lower()
+            ):
                 return "## Briefing\nTest briefing content."
             return mock_llm_no_pivots  # Subsequent: no more pivots
 
@@ -235,7 +241,9 @@ class TestDeepSearchAgent:
 
     @pytest.mark.asyncio
     @patch("app.services.intelligence.deep_search_service.llm_gateway")
-    async def test_agent_returns_structured_output(self, mock_llm, mock_llm_no_pivots, mock_findings):
+    async def test_agent_returns_structured_output(
+        self, mock_llm, mock_llm_no_pivots, mock_findings
+    ):
         """Agent should return output with agent name and all expected fields."""
         mock_llm.generate = AsyncMock(return_value=mock_llm_no_pivots)
 
