@@ -55,4 +55,4 @@ jobs:
       run: docker build -t sageai/frontend:latest ./sage-web
 
     - name: Verify Docker Compose
-      run: docker-compose -f docker-compose.yml config
+      run: docker compose -f docker-compose.yml config
