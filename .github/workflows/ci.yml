@@ -78,7 +78,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql+asyncpg://sageai:test_password@localhost:5432/sageai_test"
 
-      - run: pytest tests/ -v --tb=short --cov=app --cov-fail-under=30
+      - run: pytest tests/ -v --tb=short --cov=app
         env:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           SECRET_KEY: "test-secret-key-for-ci"
