@@ -1,7 +1,11 @@
-image: python:3.11-slim
+image: python:3.13-slim
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+  SECRET_KEY: "test-secret-key-for-ci"
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "60"
 
 cache:
   paths:
@@ -12,16 +16,12 @@ stages:
   - test
   - security
 
-before_script:
-  # Virtualenvs add unnecessary overhead in CI; use the image's system python.
-  - pip install --upgrade pip
-  - pip install -r requirements-dev.txt
-
 lint:
   stage: lint
   script:
-    - ruff check .
-    - ruff format --check .
+    - pip install ruff==0.15.5
+    - ruff check app/ tests/
+    - ruff format --check app/ tests/
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -29,8 +29,8 @@ lint:
 test:
   stage: test
   script:
-    - pip install -r requirements.txt
-    - pytest tests/ -v
+    - pip install -r requirements.txt -r requirements-dev.txt
+    - pytest tests/ -v --tb=short
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -44,4 +44,3 @@ security:
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
