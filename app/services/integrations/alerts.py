@@ -1,11 +1,11 @@
-"""Third-party integrations — Slack and Jira."""
+"""Third-party notifications — Slack and Jira integrations."""
 
 import logging
 import os
 
 import httpx
 
-logger = logging.getLogger("sageai.integrations")
+logger = logging.getLogger("sageai.integrations.alerts")
 
 
 async def send_slack_alert(

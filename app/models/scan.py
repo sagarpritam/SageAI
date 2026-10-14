@@ -1,20 +1,24 @@
 import json
-import uuid
-from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from app.core.database import Base
+from app.utils.helpers import generate_uuid, utc_now
 
 
 class Scan(Base):
     __tablename__ = "scans"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
 
-    organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    organization_id = Column(
+        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    org_id = synonym("organization_id")
+    user_id = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     target = Column(String, nullable=False)
     findings = Column(Text, default="[]")  # JSON stored as text for SQLite compat
@@ -23,13 +27,14 @@ class Scan(Base):
     status = Column(String, default="pending")  # pending / running / completed / failed
     share_token = Column(String, unique=True, nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships
     organization = relationship("Organization", back_populates="scans")
     user = relationship("User", back_populates="scans")
+    db_findings = relationship("Finding", back_populates="scan", cascade="all, delete-orphan")
+    agent_logs = relationship("AgentLog", back_populates="scan", cascade="all, delete-orphan")
+    asm_events = relationship("ASMEvent", back_populates="scan")
 
     def set_findings(self, data: list):
         """Serialize findings list to JSON string."""

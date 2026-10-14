@@ -3,22 +3,22 @@ SageAI 2.0 — Attack Surface Diff Model
 Stores historical changes between two scans or states for an asset.
 """
 
-import uuid
-from datetime import datetime
-
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
+from sqlalchemy.orm import relationship, synonym
 
 from app.core.database import Base
+from app.utils.helpers import generate_uuid, utc_now
 
 
 class AttackSurfaceDiff(Base):
     """Tracks incremental changes (diffs) to an asset's attack surface over time."""
     __tablename__ = "attack_surface_diffs"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     organization_id = Column(
         String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    org_id = synonym("organization_id")
     asset_id = Column(
         String, ForeignKey("assets.id", ondelete="CASCADE"), nullable=True, index=True
     )
@@ -42,4 +42,10 @@ class AttackSurfaceDiff(Base):
     overall_risk_shift = Column(String, default="nc")  # "increased", "decreased", "nc" (no change)
 
     # Metadata
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+    # Relationships
+    organization = relationship("Organization", back_populates="attack_surface_diffs")
+    asset = relationship("Asset", back_populates="diffs")
+    current_scan = relationship("Scan", foreign_keys=[current_scan_id])
+    previous_scan = relationship("Scan", foreign_keys=[previous_scan_id])

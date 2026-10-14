@@ -17,6 +17,7 @@ build/
 
 # Database
 *.db
+*.sqlite
 *.sqlite3
 
 # IDE
@@ -33,21 +34,38 @@ Thumbs.db
 node_modules/
 frontend/dist/
 frontend/.env
+sage-web/.next/
+sage-web/build*.txt
+sage-web/build*.log
+sage-web/err*.txt
+sage-web/lint*.json
+*.tsbuildinfo
 
 # Docker
 docker/*.log
 
-# Testing
-bandit_high*.txt
+# Testing & Audit Logs
+bandit*.txt
+bandit*.json
 bandit*.log
-bandit-report.json
-flake8.log
-git_diff.txt
-pytest_errors.log
-test_out.txt
+flake8*.log
+pytest*.log
+test_out*.txt
+test_out*.log
+test_results*.txt
+*_results*.txt
+*_results*.json
+out*.txt
+docker_out*.txt
+syntax_check.txt
+built.txt
+deptry*.txt
+import_check.txt
+git_diff*.txt
 htmlcov/
 .coverage
 .pytest_cache/
+.ruff_cache/
 
 # Misc
 *.log

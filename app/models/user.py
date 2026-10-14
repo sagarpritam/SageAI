@@ -1,17 +1,15 @@
-import uuid
-from datetime import datetime, timezone
-
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from app.core.database import Base
 from app.models.role import RoleEnum
+from app.utils.helpers import generate_uuid, utc_now
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     email = Column(String, unique=True, nullable=False, index=True)
     password_hash = Column(String, nullable=False)
     role = Column(String, default=RoleEnum.MEMBER.value)
@@ -21,11 +19,15 @@ class User(Base):
     mfa_enabled = Column(Boolean, default=False)
     mfa_backup_codes = Column(String, nullable=True)
 
-    organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    organization_id = Column(
+        String, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    org_id = synonym("organization_id")
+
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships
     organization = relationship("Organization", back_populates="users")
-    scans = relationship("Scan", back_populates="user")
+    scans = relationship("Scan", back_populates="user", cascade="all, delete-orphan")
+    api_keys = relationship("APIKey", back_populates="creator", cascade="all, delete-orphan")
+    schedules = relationship("ScanSchedule", back_populates="creator", cascade="all, delete-orphan")

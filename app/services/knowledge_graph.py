@@ -14,56 +14,15 @@ No Neo4j required — PostgreSQL's JSONB gives us graph-like queries.
 
 import json
 import logging
-import uuid
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Column, DateTime, Float, String, Text, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import Base
+from app.models.knowledge_graph import GraphEdge, GraphNode  # noqa: F401
 from app.services.llm.gateway import llm_gateway
 
 logger = logging.getLogger("SageAI.knowledge_graph")
-
-
-# ── DB Model ──────────────────────────────────────────────────────────
-class GraphNode(Base):
-    """Represents a node in the security knowledge graph."""
-
-    __tablename__ = "kg_nodes"
-
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    org_id = Column(String, nullable=False)
-    node_type = Column(
-        String, nullable=False
-    )  # asset | technology | vulnerability | cve | network_zone
-    label = Column(String, nullable=False)  # human-readable name
-    properties = Column(Text, default="{}")  # JSON blob
-    risk_score = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(
-        DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
-
-
-class GraphEdge(Base):
-    """Represents a directed edge between two graph nodes."""
-
-    __tablename__ = "kg_edges"
-
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    org_id = Column(String, nullable=False)
-    source_id = Column(String, nullable=False)  # FK to kg_nodes.id
-    target_id = Column(String, nullable=False)  # FK to kg_nodes.id
-    edge_type = Column(
-        String, nullable=False
-    )  # HOSTS | RUNS | HAS_VULN | LEADS_TO | EXPOSES
-    weight = Column(Float, default=1.0)  # higher = more dangerous path
-    properties = Column(Text, default="{}")
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ── Knowledge Graph Service ───────────────────────────────────────────

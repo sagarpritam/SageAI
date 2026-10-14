@@ -4,14 +4,13 @@ Stores individual vulnerability findings linked to scans.
 """
 
 import enum
-import uuid
-from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Text
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
+from app.utils.helpers import generate_uuid, utc_now
 
 
 class FindingSeverity(str, enum.Enum):
@@ -25,7 +24,7 @@ class FindingSeverity(str, enum.Enum):
 class Finding(Base):
     __tablename__ = "findings"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     scan_id = Column(
         String, ForeignKey("scans.id", ondelete="CASCADE"), nullable=False, index=True
     )
@@ -46,9 +45,7 @@ class Finding(Base):
     evidence = Column(Text, nullable=True)  # Raw request/response snippet
 
     # Timestamps
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationship
-    scan = relationship("Scan", backref="db_findings")
+    scan = relationship("Scan", back_populates="db_findings")

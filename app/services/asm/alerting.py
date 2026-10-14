@@ -28,7 +28,7 @@ async def dispatch_unnotified_events():
 
         for evt in events:
             # Look for webhooks connected to this org
-            hooks_res = await db.execute(select(Webhook).where(Webhook.organization_id == evt.org_id))
+            hooks_res = await db.execute(select(Webhook).where(Webhook.organization_id == evt.organization_id))
             webhooks = hooks_res.scalars().all()
 
             for hook in webhooks:

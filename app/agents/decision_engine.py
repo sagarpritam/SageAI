@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
-from api.services.ai_service import call_llm
+from app.services.ai_service import call_llm
 
 logger = logging.getLogger(__name__)
 
