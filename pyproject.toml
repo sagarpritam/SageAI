@@ -45,3 +45,8 @@ testpaths = [
     "tests",
 ]
 python_files = ["test_*.py"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+extraPaths = ["."]
