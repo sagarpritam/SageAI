@@ -1,5 +1,15 @@
 image: python:3.13-slim
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "api"
+
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   DATABASE_URL: "sqlite+aiosqlite:///./test.db"
@@ -22,18 +32,12 @@ lint:
     - pip install ruff==0.15.5
     - ruff check app/ tests/
     - ruff format --check app/ tests/
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 test:
   stage: test
   script:
     - pip install -r requirements.txt -r requirements-dev.txt
     - pytest tests/ -v --tb=short
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 security:
   stage: security
@@ -41,6 +45,4 @@ security:
     - pip install bandit
     - bandit -r app/ -ll
   allow_failure: false
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+

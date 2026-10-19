@@ -33,91 +33,145 @@ async def censys_scan(target: str) -> list[dict]:
         return await _censys_free_scan(hostname)
 
 
+CERTSPOTTER_API = "https://api.certspotter.com/v1/issuances"
+
+
 async def _censys_free_scan(hostname: str) -> list[dict]:
-    """Free alternative: crt.sh certificate transparency + TLS inspection."""
+    """Free alternative: Certspotter + crt.sh certificate transparency + TLS inspection."""
     findings: list[dict] = []
 
-    # 1. Certificate Transparency via crt.sh
+    # 1. Certificate Transparency (crt.sh with Certspotter fallback)
+    certs: list[dict] = []
+    unique_domains: set[str] = set()
+    source_used = "crt.sh Certificate Transparency (free)"
+
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(f"{CRTSH_API}/?q=%25.{hostname}&output=json")
-            if resp.status_code == 200:
-                raw_certs = resp.json()
-                certs: list[dict] = raw_certs if isinstance(raw_certs, list) else []
-                unique_domains: set[str] = set()
-                for cert in certs:
-                    name = cert.get("name_value", "")
-                    for domain in name.split("\n"):
-                        domain = domain.strip().lower()
-                        if domain and "*" not in domain:
-                            unique_domains.add(domain)
+        async with httpx.AsyncClient(timeout=10) as client:
+            try:
+                resp = await client.get(f"{CRTSH_API}/?q=%25.{hostname}&output=json")
+                if resp.status_code == 200:
+                    raw = resp.json()
+                    if isinstance(raw, list) and raw:
+                        certs = raw
+                        for cert in certs:
+                            name = cert.get("name_value", "")
+                            for domain in name.split("\n"):
+                                domain = domain.strip().lower()
+                                if domain and "*" not in domain:
+                                    unique_domains.add(domain)
+            except Exception as e:
+                logger.warning(
+                    f"crt.sh request failed ({e}), trying Certspotter free API"
+                )
 
-                if unique_domains:
-                    findings.append(
-                        {
-                            "module": "censys",
-                            "type": "certificate_transparency",
-                            "severity": "info",
-                            "title": f"Censys Radar: {len(unique_domains)} Domains in Certificate Transparency",
-                            "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",  # pyre-ignore[16, 58]
-                            "data": {
-                                "domains": sorted(unique_domains),
-                                "total_certs": len(certs),
-                            },
-                            "source": "crt.sh Certificate Transparency (free)",
-                        }
+            # Fallback to Certspotter free API if crt.sh was down/empty
+            if not unique_domains:
+                try:
+                    cs_resp = await client.get(
+                        f"{CERTSPOTTER_API}?domain={hostname}&include_subdomains=true&expand=dns_names",
+                        timeout=10,
                     )
+                    if cs_resp.status_code == 200:
+                        cs_certs = cs_resp.json()
+                        if isinstance(cs_certs, list) and cs_certs:
+                            source_used = "Certspotter CT API (free, no key required)"
+                            for c in cs_certs:
+                                dns_names = c.get("dns_names", [])
+                                for d in dns_names:
+                                    d = d.strip().lower()
+                                    if d and "*" not in d:
+                                        unique_domains.add(d)
+                                # Map certspotter format for expiration checking
+                                certs.append(
+                                    {
+                                        "common_name": dns_names[0]
+                                        if dns_names
+                                        else hostname,
+                                        "not_after": c.get("not_after", ""),
+                                        "revoked": c.get("revoked", False),
+                                    }
+                                )
+                except Exception as e:
+                    logger.warning(f"Certspotter free API error: {e}")
 
-                # Check for expired or soon-expiring certs
-                for cert in certs[:5]:  # pyre-ignore[16, 58]
-                    not_after = cert.get("not_after", "")
-                    if not_after:
-                        try:
-                            expiry = datetime.datetime.fromisoformat(
-                                not_after.replace("T", " ").split(".")[0]
-                            )
-                            days_left = (
-                                expiry
-                                - datetime.datetime.now(datetime.timezone.utc).replace(
-                                    tzinfo=None
-                                )
-                            ).days
-                            if days_left < 0:
-                                findings.append(
-                                    {
-                                        "module": "censys",
-                                        "type": "expired_certificate",
-                                        "severity": "high",
-                                        "title": "Censys Radar: Expired Certificate Detected",
-                                        "detail": f"Certificate for {cert.get('common_name', hostname)} expired {abs(days_left)} days ago.",
-                                        "data": {
-                                            "common_name": cert.get("common_name"),
-                                            "expired_date": not_after,
-                                        },
-                                        "source": "crt.sh (free)",
-                                    }
-                                )
-                                break
-                            elif days_left < 30:
-                                findings.append(
-                                    {
-                                        "module": "censys",
-                                        "type": "expiring_certificate",
-                                        "severity": "medium",
-                                        "title": "Censys Radar: Certificate Expiring Soon",
-                                        "detail": f"Certificate for {cert.get('common_name', hostname)} expires in {days_left} days.",
-                                        "data": {
-                                            "common_name": cert.get("common_name"),
-                                            "expires_in_days": days_left,
-                                        },
-                                        "source": "crt.sh (free)",
-                                    }
-                                )
-                                break
-                        except Exception:
-                            pass
+        if unique_domains:
+            findings.append(
+                {
+                    "module": "censys",
+                    "type": "certificate_transparency",
+                    "severity": "info",
+                    "title": f"Censys Radar: {len(unique_domains)} Domains in Certificate Transparency",
+                    "detail": f"Discovered subdomains/domains: {', '.join(sorted(unique_domains)[:20])}",
+                    "data": {
+                        "domains": sorted(unique_domains),
+                        "total_certs": len(certs),
+                    },
+                    "source": source_used,
+                }
+            )
+
+        # Check for expired, expiring, or revoked certs
+        for cert in certs[:10]:
+            if cert.get("revoked"):
+                findings.append(
+                    {
+                        "module": "censys",
+                        "type": "revoked_certificate",
+                        "severity": "high",
+                        "title": "Censys Radar: Revoked Certificate Detected",
+                        "detail": f"Certificate for {cert.get('common_name', hostname)} is revoked.",
+                        "data": {"common_name": cert.get("common_name")},
+                        "source": source_used,
+                    }
+                )
+                break
+
+            not_after = cert.get("not_after", "")
+            if not_after:
+                try:
+                    expiry = datetime.datetime.fromisoformat(
+                        not_after.replace("Z", "+00:00").replace("T", " ").split(".")[0]
+                    )
+                    now_utc = datetime.datetime.now(datetime.timezone.utc).replace(
+                        tzinfo=None
+                    )
+                    days_left = (expiry.replace(tzinfo=None) - now_utc).days
+                    if days_left < 0:
+                        findings.append(
+                            {
+                                "module": "censys",
+                                "type": "expired_certificate",
+                                "severity": "high",
+                                "title": "Censys Radar: Expired Certificate Detected",
+                                "detail": f"Certificate for {cert.get('common_name', hostname)} expired {abs(days_left)} days ago.",
+                                "data": {
+                                    "common_name": cert.get("common_name"),
+                                    "expired_date": not_after,
+                                },
+                                "source": source_used,
+                            }
+                        )
+                        break
+                    elif days_left < 30:
+                        findings.append(
+                            {
+                                "module": "censys",
+                                "type": "expiring_certificate",
+                                "severity": "medium",
+                                "title": "Censys Radar: Certificate Expiring Soon",
+                                "detail": f"Certificate for {cert.get('common_name', hostname)} expires in {days_left} days.",
+                                "data": {
+                                    "common_name": cert.get("common_name"),
+                                    "expires_in_days": days_left,
+                                },
+                                "source": source_used,
+                            }
+                        )
+                        break
+                except Exception:
+                    pass
     except Exception as e:
-        logger.error(f"crt.sh scan error: {e}")
+        logger.error(f"Certificate Transparency scan error: {e}")
 
     # 2. TLS/SSL direct inspection
     try:

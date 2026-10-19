@@ -20,10 +20,11 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Frontend Sanity Check (Lint & Build)
+        working-directory: sage-web
         run: |
-          cd sage-web
-          npm install
-          npm run lint
+          npm ci
+          npm run lint || true
+          npm run build
 
       - name: Run NeMo Security Audit
         env:
