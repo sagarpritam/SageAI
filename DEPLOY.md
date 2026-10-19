@@ -18,55 +18,65 @@ docker compose exec backend alembic upgrade head
 ```
 
 **Services:**
-| Service  | URL                    | Description        |
-|----------|------------------------|--------------------|
-| Frontend | http://localhost:3000   | Next.js Dashboard  |
-| Backend  | http://localhost:8000   | FastAPI API         |
-| Postgres | localhost:5432          | Database            |
+
+| Service  | URL                     | Description       |
+| -------- | ----------------------- | ----------------- |
+| Frontend | `http://localhost:3000` | Next.js Dashboard |
+| Backend  | `http://localhost:8000` | FastAPI API       |
+| Postgres | `localhost:5432`        | Database          |
 
 ---
 
 ## Environment Variables
 
 ### Required
-| Variable                      | Description                          |
-|-------------------------------|--------------------------------------|
-| `SECRET_KEY`                  | JWT signing key (change in prod!)    |
-| `DATABASE_URL`                | Postgres URL (auto-set in compose)   |
-| `POSTGRES_PASSWORD`           | Database password                    |
-| `BACKEND_URL`                 | Backend URL for frontend proxy       |
+
+| Variable            | Description                        |
+| ------------------- | ---------------------------------- |
+| `SECRET_KEY`        | JWT signing key (change in prod!)  |
+| `DATABASE_URL`      | Postgres URL (auto-set in compose) |
+| `POSTGRES_PASSWORD` | Database password                  |
+| `BACKEND_URL`       | Backend URL for frontend proxy     |
 
 ### Payments
-| Variable                      | Description                          |
-|-------------------------------|--------------------------------------|
-| `STRIPE_SECRET_KEY`           | Stripe API secret                    |
-| `STRIPE_WEBHOOK_SECRET`       | Stripe webhook signing secret        |
+
+| Variable                | Description                   |
+| ----------------------- | ----------------------------- |
+| `STRIPE_SECRET_KEY`     | Stripe API secret             |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
 
 ### AI & OSINT (Pro Features)
-| Variable                      | Description                          |
-|-------------------------------|--------------------------------------|
-| `NVIDIA_API_KEY`              | NVIDIA NIM/NeMo API key              |
-| `SHODAN_API_KEY`              | Shodan OSINT API key                 |
-| `CENSYS_API_ID`               | Censys API ID                        |
-| `CENSYS_API_SECRET`           | Censys API secret                    |
+
+| Variable            | Description             |
+| ------------------- | ----------------------- |
+| `NVIDIA_API_KEY`    | NVIDIA NIM/NeMo API key |
+| `SHODAN_API_KEY`    | Shodan OSINT API key    |
+| `CENSYS_API_ID`     | Censys API ID           |
+| `CENSYS_API_SECRET` | Censys API secret       |
 
 ---
 
 ## Deploying to Production
 
 ### Option A: Railway / Render
-Both services can auto-detect the `Dockerfile` and `docker-compose.yml`. Set environment variables in your dashboard.
+
+Both services can auto-detect the `Dockerfile` and `docker-compose.yml`.
+Set environment variables in your dashboard.
 
 The project already includes:
+
 - `railway.toml` — Railway configuration
 - `render.yaml` — Render blueprint
 - `Procfile` — Heroku/Railway process file
 
 ### Option B: Vercel (Frontend) + Render (Backend)
-1. **Frontend**: Connect `sage-web/` to Vercel. Set `BACKEND_URL` to your Render URL.
+
+1. **Frontend**: Connect `sage-web/` to Vercel. Set `BACKEND_URL` to your
+   Render URL.
 2. **Backend**: Deploy the root repo to Render using the existing `render.yaml`.
 
 ### Option C: VPS / Self-Hosted
+
 ```bash
 # SSH into your server
 docker compose -f docker-compose.yml up -d --build
@@ -77,7 +87,8 @@ docker compose exec backend alembic upgrade head
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on push to `main` or `develop`:
+The GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on
+push to `main` or `develop`:
 
 1. **Lint & SAST**: Ruff code style + Bandit security scan
 2. **Dependency Scan**: Trivy vulnerability scan

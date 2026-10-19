@@ -7,7 +7,7 @@ import enum
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.orm import relationship, synonym
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
@@ -70,7 +70,7 @@ class ASMEvent(Base):
     # Stores precise change details depending on the event, e.g. {"port": 80, "service": "http"}
     details = Column(Text, default="{}")
 
-    is_alert_sent = Column(Boolean, default=False)
+    is_alert_sent: Mapped[bool] = mapped_column(Boolean, default=False)
 
     created_at = Column(DateTime(timezone=True), default=utc_now, index=True)
 

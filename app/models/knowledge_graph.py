@@ -4,7 +4,7 @@ Defines graph nodes and edges for attack path analysis.
 """
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Text
-from sqlalchemy.orm import synonym
+from sqlalchemy.orm import Mapped, mapped_column, synonym
 
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
@@ -28,7 +28,7 @@ class GraphNode(Base):
         String, nullable=False, index=True
     )  # asset | technology | vulnerability | cve | network_zone
     label = Column(String, nullable=False)  # human-readable name
-    properties = Column(Text, default="{}")  # JSON blob
+    properties: Mapped[str] = mapped_column(Text, default="{}")  # JSON blob
     risk_score = Column(Float, default=0.0)
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(
@@ -58,5 +58,5 @@ class GraphEdge(Base):
         String, nullable=False
     )  # HOSTS | RUNS | HAS_VULN | LEADS_TO | EXPOSES
     weight = Column(Float, default=1.0)  # higher = more dangerous path
-    properties = Column(Text, default="{}")
+    properties: Mapped[str] = mapped_column(Text, default="{}")
     created_at = Column(DateTime(timezone=True), default=utc_now)

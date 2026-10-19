@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
@@ -9,7 +11,7 @@ from app.core.config import settings
 # ---------------------
 # Use NullPool for SQLite (doesn't support connection pooling)
 # Use QueuePool (default) for PostgreSQL with configured pool size
-engine_kwargs = {"echo": settings.DEBUG}
+engine_kwargs: dict[str, Any] = {"echo": settings.DEBUG}
 
 if "sqlite" in settings.DATABASE_URL:
     engine_kwargs["poolclass"] = NullPool

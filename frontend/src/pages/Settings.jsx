@@ -177,7 +177,9 @@ function ApiKeysSection() {
             setNewKey(res.data.key);
             setName('');
             load();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to create API key:', err);
+        }
     };
 
     const handleCopy = () => {
@@ -428,7 +430,6 @@ function GitHubSection() {
 
 // ── Danger Zone ────────────────────────────────────
 function DangerSection() {
-    const [confirm, setConfirm] = useState('');
     return (
         <div>
             <div className="settings-section" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>

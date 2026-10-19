@@ -1,7 +1,7 @@
 import json
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship, synonym
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
@@ -24,7 +24,7 @@ class Scan(Base):
     )
 
     target = Column(String, nullable=False)
-    findings = Column(Text, default="[]")  # JSON stored as text for SQLite compat
+    findings: Mapped[str] = mapped_column(Text, default="[]")  # JSON stored as text for SQLite compat
     risk_score = Column(Integer, default=0)
     risk_level = Column(String, default="Low")
     status = Column(String, default="pending")  # pending / running / completed / failed

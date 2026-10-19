@@ -54,7 +54,7 @@ class NvidiaClient(BaseLLM):
         return NVIDIA_MODELS.get(model, model)
 
     async def generate(
-        self, prompt: str, system_message: str = "", model: str = None, **kwargs
+        self, prompt: str, system_message: str = "", model: str | None = None, **kwargs
     ) -> dict:
         if nvidia_breaker.is_open():
             raise RuntimeError(

@@ -19,7 +19,7 @@ async def dispatch_unnotified_events():
     """Find ASM events that haven't triggered alerts and send them."""
     async with AsyncSessionLocal() as db:
         # Fetch unsent events
-        stmt = select(ASMEvent).where(not ASMEvent.is_alert_sent)
+        stmt = select(ASMEvent).where(ASMEvent.is_alert_sent.is_(False))
         result = await db.execute(stmt)
         events = result.scalars().all()
 

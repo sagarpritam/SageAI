@@ -1,7 +1,7 @@
 """Webhook model for scan notifications."""
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
-from sqlalchemy.orm import relationship, synonym
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
@@ -11,7 +11,7 @@ class Webhook(Base):
     __tablename__ = "webhooks"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    url = Column(String, nullable=False)
+    url: Mapped[str] = mapped_column(String, nullable=False)
     event = Column(
         String, nullable=False, default="scan.completed"
     )  # scan.completed, scan.failed
