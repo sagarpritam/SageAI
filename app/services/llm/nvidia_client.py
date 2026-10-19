@@ -13,10 +13,30 @@ logger = logging.getLogger("SageAI.llm.nvidia")
 nvidia_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)
 
 
+# Curated NVIDIA NIM Model Catalog for Cybersecurity & Agentic Workflows
+NVIDIA_MODELS = {
+    # Default flagship: Best-in-class open model for security analysis & CVE remediation
+    "default": "meta/llama-3.3-70b-instruct",
+    "reasoning": "meta/llama-3.3-70b-instruct",
+    # NVIDIA Nemotron: Optimized for synthetic data, tool use, and complex agents
+    "nemotron": "nvidia/llama-3.1-nemotron-70b-instruct",
+    # Deep reasoning & mathematical vulnerability chaining
+    "deep_reasoning": "deepseek-ai/deepseek-r1",
+    # Low-latency model for quick inline classification and port banner parsing
+    "fast": "meta/llama-3.1-8b-instruct",
+    # AI Safety & Guardrails: Jailbreak, prompt injection & toxic output detection
+    "guardrail": "meta/llama-guard-3-8b",
+}
+
+
 class NvidiaClient(BaseLLM):
     """
     NVIDIA Build API Client (OpenAI-compatible).
-    Supports models like Mistral-8x7B, Llama-3-70B, etc.
+    Provides access to NVIDIA NIM models on build.nvidia.com:
+    - Meta Llama 3.3 70B Instruct (default)
+    - NVIDIA Llama 3.1 Nemotron 70B Instruct
+    - DeepSeek R1 / V3
+    - Meta Llama Guard 3 8B (Safety & Jailbreak detection)
     """
 
     @property
@@ -25,8 +45,13 @@ class NvidiaClient(BaseLLM):
 
     @property
     def default_model(self) -> str:
-        # Defaulting to Mixtral-8x7B (often referred to as 'autogen87' contextually)
-        return "mistralai/mixtral-8x7b-instruct-v0.1"
+        return NVIDIA_MODELS["default"]
+
+    def resolve_model(self, model: str | None) -> str:
+        """Resolve model alias or return exact model identifier."""
+        if not model:
+            return self.default_model
+        return NVIDIA_MODELS.get(model, model)
 
     async def generate(
         self, prompt: str, system_message: str = "", model: str = None, **kwargs
@@ -40,7 +65,7 @@ class NvidiaClient(BaseLLM):
         if not api_key:
             raise ValueError("NVIDIA_API_KEY environment variable is not set")
 
-        model_to_use = model or self.default_model
+        model_to_use = self.resolve_model(model)
 
         messages = []
         if system_message:
@@ -91,3 +116,19 @@ class NvidiaClient(BaseLLM):
                 nvidia_breaker.record_failure()
                 logger.error(f"NVIDIA completion failed: {e}")
                 raise
+
+    async def audit_safety(self, text: str) -> dict:
+        """Evaluate text using Meta Llama Guard 3 on NVIDIA NIM to detect prompt injection, jailbreaks, or policy violations."""
+        res = await self.generate(
+            prompt=text,
+            model="guardrail",
+            temperature=0.0,
+            max_tokens=100,
+        )
+        content = res.get("content", "").strip()
+        is_safe = content.lower().startswith("safe")
+        return {
+            "safe": is_safe,
+            "raw_output": content,
+            "violation": None if is_safe else content.replace("unsafe", "").strip(),
+        }

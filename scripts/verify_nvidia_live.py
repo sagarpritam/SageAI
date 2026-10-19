@@ -29,7 +29,7 @@ async def verify_nvidia():
         reply = await llm_gateway.generate(
             prompt=test_prompt,
             provider="nvidia",
-            model="mistralai/mixtral-8x7b-instruct-v0.1",  # Example model
+            model="meta/llama-3.3-70b-instruct",  # Flagship NVIDIA NIM Model
             org_id="test_org",
         )
 
