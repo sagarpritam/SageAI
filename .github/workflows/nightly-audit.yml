@@ -28,8 +28,8 @@ jobs:
 
       - name: Run NeMo Security Audit
         env:
-          NVIDIA_API_KEY: ${{ secrets['NVIDIA_API_KEY'] }}
-          AUDITOR_BASE_URL: ${{ secrets['AUDITOR_BASE_URL'] }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          AUDITOR_BASE_URL: ${{ secrets.AUDITOR_BASE_URL }}
         run: |
           # Trigger a scan of configured LLM targets
           python scripts/verify_nvidia_live.py
