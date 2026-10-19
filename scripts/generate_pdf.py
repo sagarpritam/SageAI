@@ -893,4 +893,20 @@ def create_sdlc_pdf(filename):
 
 
 if __name__ == "__main__":
-    create_sdlc_pdf("C:/Users/pc/Downloads/SageAI/SageAI_SDLC_Documentation.pdf")
+    import argparse
+    from pathlib import Path
+
+    default_output = (
+        Path(__file__).resolve().parent.parent / "SageAI_SDLC_Documentation.pdf"
+    )
+    parser = argparse.ArgumentParser(
+        description="Generate SageAI SDLC Documentation PDF"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=str(default_output),
+        help=f"Output PDF file path (default: {default_output})",
+    )
+    args = parser.parse_args()
+    create_sdlc_pdf(args.output)

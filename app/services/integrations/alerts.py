@@ -18,11 +18,11 @@ async def send_slack_alert(
         return
 
     color = {
-        "Critical": "#ef4444",
-        "High": "#f97316",
-        "Medium": "#eab308",
-        "Low": "#22c55e",
-    }.get(risk_level, "#6b7280")
+        "critical": "#ef4444",
+        "high": "#f97316",
+        "medium": "#eab308",
+        "low": "#22c55e",
+    }.get(risk_level.lower(), "#6b7280")
 
     payload = {
         "attachments": [
@@ -58,8 +58,13 @@ async def send_slack_alert(
 
     try:
         async with httpx.AsyncClient() as client:
-            await client.post(webhook_url, json=payload)
-        logger.info(f"Slack alert sent for {target}")
+            resp = await client.post(webhook_url, json=payload)
+            if resp.is_success:
+                logger.info(f"Slack alert sent for {target}")
+            else:
+                logger.error(
+                    f"Slack alert failed for {target} with status {resp.status_code}: {resp.text}"
+                )
     except Exception as e:
         logger.error(f"Slack alert failed: {e}")
 
@@ -76,13 +81,15 @@ async def create_jira_issue(target: str, risk_level: str, findings: list[dict]):
         return
 
     critical_findings = [
-        f for f in findings if f.get("severity") in ("critical", "high")
+        f
+        for f in findings
+        if str(f.get("severity", "")).strip().lower() in ("critical", "high")
     ]
     if not critical_findings:
         return
 
     finding_lines = "\n".join(
-        f"* [{f['severity'].upper()}] {f.get('type', 'unknown')}: {f.get('detail', '')}"
+        f"* [{str(f.get('severity', '')).upper()}] {f.get('type', 'unknown')}: {f.get('detail', '')}"
         for f in critical_findings[:10]
     )
 
@@ -92,18 +99,27 @@ async def create_jira_issue(target: str, risk_level: str, findings: list[dict]):
             "summary": f"[SageAI] {risk_level} risk — {target}",
             "description": f"SageAI security scan found {len(critical_findings)} critical/high findings:\n\n{finding_lines}",
             "issuetype": {"name": "Bug"},
-            "priority": {"name": "High" if risk_level == "Critical" else "Medium"},
+            "priority": {
+                "name": "High"
+                if str(risk_level).strip().lower() == "critical"
+                else "Medium"
+            },
         }
     }
 
     try:
         async with httpx.AsyncClient() as client:
-            await client.post(
+            resp = await client.post(
                 f"{jira_url}/rest/api/2/issue",
                 json=payload,
                 auth=(jira_email, jira_token),
                 headers={"Content-Type": "application/json"},
             )
-        logger.info(f"Jira issue created for {target}")
+            if resp.is_success:
+                logger.info(f"Jira issue created for {target}")
+            else:
+                logger.error(
+                    f"Jira issue creation failed for {target} with status {resp.status_code}: {resp.text}"
+                )
     except Exception as e:
         logger.error(f"Jira integration failed: {e}")
