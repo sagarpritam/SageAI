@@ -1,5 +1,7 @@
+from typing import Optional
+
 from sqlalchemy import Column, DateTime, String
-from sqlalchemy.orm import relationship, synonym
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
 from app.utils.helpers import generate_uuid, utc_now
@@ -12,7 +14,7 @@ class Organization(Base):
     org_id = synonym("id")
     name = Column(String, nullable=False)
     plan = Column(String, default="free")  # free / pro / enterprise
-    github_token_encrypted = Column(String, nullable=True)
+    github_token_encrypted: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Stripe Integration
     stripe_customer_id = Column(String, nullable=True, unique=True)

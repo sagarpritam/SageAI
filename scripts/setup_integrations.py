@@ -10,6 +10,7 @@ Usage:
 
 import argparse
 import asyncio
+import io
 import os
 import sys
 
@@ -30,7 +31,7 @@ from app.services.integrations.verifier import (
     verify_virustotal_key,
 )
 
-if sys.platform == "win32":
+if sys.platform == "win32" and isinstance(sys.stdout, io.TextIOWrapper):
     try:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:

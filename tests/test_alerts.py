@@ -18,6 +18,7 @@ async def test_send_slack_alert_success(monkeypatch):
         await send_slack_alert("example.com", "High", 75, 3)
 
         mock_post.assert_awaited_once()
+        assert mock_post.await_args is not None
         _, kwargs = mock_post.await_args
         payload = kwargs["json"]
         assert payload["attachments"][0]["color"] == "#f97316"
@@ -61,6 +62,7 @@ async def test_create_jira_issue_normalizes_severity(monkeypatch):
         await create_jira_issue("example.com", "Critical", findings)
 
         mock_post.assert_awaited_once()
+        assert mock_post.await_args is not None
         _, kwargs = mock_post.await_args
         payload = kwargs["json"]
         desc = payload["fields"]["description"]

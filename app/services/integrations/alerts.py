@@ -76,7 +76,7 @@ async def create_jira_issue(target: str, risk_level: str, findings: list[dict]):
     jira_token = os.getenv("JIRA_API_TOKEN")
     jira_project = os.getenv("JIRA_PROJECT_KEY")
 
-    if not all([jira_url, jira_email, jira_token, jira_project]):
+    if not jira_url or not jira_email or not jira_token or not jira_project:
         logger.debug("Jira not configured — skipping")
         return
 
@@ -100,9 +100,7 @@ async def create_jira_issue(target: str, risk_level: str, findings: list[dict]):
             "description": f"SageAI security scan found {len(critical_findings)} critical/high findings:\n\n{finding_lines}",
             "issuetype": {"name": "Bug"},
             "priority": {
-                "name": "High"
-                if str(risk_level).strip().lower() == "critical"
-                else "Medium"
+                "name": "High" if risk_level.strip().lower() == "critical" else "Medium"
             },
         }
     }
