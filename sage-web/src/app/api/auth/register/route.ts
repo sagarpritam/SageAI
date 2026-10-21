@@ -5,9 +5,15 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
     const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
+    const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip");
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (clientIp) {
+      headers["X-Forwarded-For"] = clientIp;
+    }
+
     const backendRes = await fetch(`${BACKEND_URL}/auth/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload)
     });
 
