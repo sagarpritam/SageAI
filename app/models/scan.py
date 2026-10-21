@@ -24,7 +24,9 @@ class Scan(Base):
     )
 
     target = Column(String, nullable=False)
-    findings: Mapped[str] = mapped_column(Text, default="[]")  # JSON stored as text for SQLite compat
+    findings: Mapped[str] = mapped_column(
+        Text, default="[]"
+    )  # JSON stored as text for SQLite compat
     risk_score = Column(Integer, default=0)
     risk_level = Column(String, default="Low")
     status = Column(String, default="pending")  # pending / running / completed / failed

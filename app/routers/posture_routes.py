@@ -31,6 +31,31 @@ from app.services.remediation_engine import (
 )
 
 router = APIRouter(prefix="/posture", tags=["Security Posture"])
+compliance_router = APIRouter(prefix="/compliance", tags=["Compliance"])
+
+
+@compliance_router.get("/report")
+@limiter.limit("30/minute")
+async def get_compliance_report(
+    request: Request,
+    framework: str = "soc2",
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Direct compliance report endpoint supporting ?framework= parameter."""
+    return await get_framework_compliance(request, framework, current_user, db)
+
+
+@router.get("/compliance/report")
+@limiter.limit("30/minute")
+async def get_compliance_report_alias(
+    request: Request,
+    framework: str = "soc2",
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Alias for /posture/compliance supporting ?framework= parameter."""
+    return await get_framework_compliance(request, framework, current_user, db)
 
 
 async def _get_org_scans(

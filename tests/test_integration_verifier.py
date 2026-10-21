@@ -14,7 +14,7 @@ async def test_get_all_integrations_status(client, auth_headers):
     assert "shodan" in data
     assert "virustotal" in data
     assert "github" in data
-    assert data["nvidia"]["model"] == "meta/llama-3.3-70b-instruct"
+    assert data["nvidia"]["model"] == "nvidia/llama-3.1-nemotron-70b-instruct"
 
 
 @pytest.mark.asyncio
@@ -27,8 +27,8 @@ async def test_verify_nvidia_key_success(client, auth_headers):
         mock_verify.return_value = {
             "valid": True,
             "provider": "nvidia",
-            "message": "NVIDIA NIM verified: Meta Llama 3.3 70B active",
-            "model": "meta/llama-3.3-70b-instruct",
+            "message": "NVIDIA NIM verified: Llama 3.1 Nemotron 70B active",
+            "model": "nvidia/llama-3.1-nemotron-70b-instruct",
             "latency_ms": 120,
         }
 
@@ -41,7 +41,7 @@ async def test_verify_nvidia_key_success(client, auth_headers):
         data = resp.json()
         assert data["valid"] is True
         assert data["provider"] == "nvidia"
-        assert "Meta Llama 3.3 70B" in data["message"]
+        assert "Nemotron 70B" in data["message"]
 
 
 @pytest.mark.asyncio

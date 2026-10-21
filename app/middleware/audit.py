@@ -39,18 +39,37 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                 from app.core.config import settings
 
                 token = auth_header.split(" ", 1)[1]
-                payload = jose_jwt.decode(
-                    token,
-                    settings.SECRET_KEY,
-                    algorithms=[settings.ALGORITHM],
-                    options={
-                        "verify_aud": False,
-                        "verify_iss": False,
-                        "verify_exp": False,
-                    },
-                )
-                user_id = payload.get("sub", "unknown")
-                org_id = payload.get("org", "unknown")
+                payload = None
+                try:
+                    payload = jose_jwt.decode(
+                        token,
+                        settings.SECRET_KEY,
+                        algorithms=[settings.ALGORITHM],
+                        options={
+                            "verify_aud": False,
+                            "verify_iss": False,
+                            "verify_exp": False,
+                        },
+                    )
+                except Exception:
+                    if getattr(settings, "INTERNAL_SERVICE_KEY", None):
+                        try:
+                            payload = jose_jwt.decode(
+                                token,
+                                settings.INTERNAL_SERVICE_KEY,
+                                algorithms=["HS256"],
+                                options={
+                                    "verify_aud": False,
+                                    "verify_iss": False,
+                                    "verify_exp": False,
+                                },
+                            )
+                        except Exception:
+                            payload = None
+
+                if payload:
+                    user_id = payload.get("sub", "unknown")
+                    org_id = payload.get("org", "unknown")
             except Exception:
                 pass
 

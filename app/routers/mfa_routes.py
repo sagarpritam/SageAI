@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.schemas.auth import MFACodeRequest
 from app.schemas.responses import MFASetupResponse, MFAStateResponse
 from app.services.mfa_service import (
     generate_backup_codes,
@@ -55,11 +56,16 @@ async def setup_mfa(
 
 @router.post("/verify", response_model=MFAStateResponse)
 async def verify_mfa(
-    code: str,
+    body: MFACodeRequest | None = None,
+    code: str | None = None,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Verify TOTP code and activate MFA."""
+    totp_code = (body.code if body else None) or code
+    if not totp_code:
+        raise HTTPException(status_code=400, detail="MFA code is required")
+
     result = await db.execute(select(User).where(User.id == current_user["sub"]))
     user = result.scalar_one_or_none()
     if not user or not user.mfa_secret:
@@ -67,7 +73,7 @@ async def verify_mfa(
             status_code=400, detail="MFA not set up — call /auth/mfa/setup first"
         )
 
-    if not verify_totp(user.mfa_secret, code):
+    if not verify_totp(user.mfa_secret, totp_code):
         raise HTTPException(status_code=401, detail="Invalid TOTP code")
 
     user.mfa_enabled = True
@@ -78,17 +84,22 @@ async def verify_mfa(
 
 @router.post("/disable", response_model=MFAStateResponse)
 async def disable_mfa(
-    code: str,
+    body: MFACodeRequest | None = None,
+    code: str | None = None,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Disable MFA (requires valid TOTP code)."""
+    totp_code = (body.code if body else None) or code
+    if not totp_code:
+        raise HTTPException(status_code=400, detail="MFA code is required")
+
     result = await db.execute(select(User).where(User.id == current_user["sub"]))
     user = result.scalar_one_or_none()
     if not user or not user.mfa_enabled:
         raise HTTPException(status_code=400, detail="MFA is not enabled")
 
-    if not verify_totp(user.mfa_secret, code):
+    if not verify_totp(user.mfa_secret, totp_code):
         raise HTTPException(status_code=401, detail="Invalid TOTP code")
 
     user.mfa_enabled = False

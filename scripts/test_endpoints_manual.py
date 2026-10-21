@@ -1,4 +1,8 @@
+import os
+import sys
 import uuid
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from fastapi.testclient import TestClient
 
@@ -56,7 +60,12 @@ def test_manual_endpoints():
                 "max_fixes": 2,
             }
 
-            routes = [route.path for route in app.routes]
+            routes = [
+                getattr(route, "path", "")
+                for route in app.routes
+                if getattr(route, "path", None)
+            ]
+
             # Target the run endpoint specifically
             autofix_route = next(
                 (r for r in routes if "autofix" in r and "run" in r), None

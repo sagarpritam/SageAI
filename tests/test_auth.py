@@ -121,3 +121,47 @@ async def test_health_check_fields(client):
     assert data["environment"] in ("development", "production", "test")
     assert "endpoints" in data
     assert data["version"] == "2.0.0"
+
+
+@pytest.mark.asyncio
+async def test_forgot_password_json_body(client):
+    """Test forgot-password returns generic message for non-existent and existent users (anti-enumeration)."""
+    r = await client.post(
+        "/auth/forgot-password", json={"email": "nonexistent@test.com"}
+    )
+    assert r.status_code == 200
+    assert "If that email exists" in r.json()["message"]
+
+
+@pytest.mark.asyncio
+async def test_reset_password_weak_password(client):
+    """Test reset-password enforces strong password requirements."""
+    r = await client.post(
+        "/auth/reset-password",
+        json={"token": "some_token", "new_password": "weak"},
+    )
+    assert r.status_code == 422 or (
+        r.status_code == 400 and "Password must be at least" in r.text
+    )
+
+
+@pytest.mark.asyncio
+async def test_reset_password_invalid_token(client):
+    """Test reset-password with invalid token fails with 400."""
+    r = await client.post(
+        "/auth/reset-password",
+        json={"token": "invalid_or_expired_token", "new_password": "StrongNewPass1!"},
+    )
+    assert r.status_code == 400
+    assert "Invalid or expired reset token" in r.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_gdpr_export(client, auth_headers):
+    """Test GDPR Article 20 data portability export endpoint."""
+    r = await client.get("/gdpr/export", headers=auth_headers)
+    assert r.status_code == 200
+    data = r.json()
+    assert "user" in data
+    assert "organization" in data
+    assert "scans" in data

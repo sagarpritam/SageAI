@@ -15,17 +15,19 @@ nvidia_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)
 
 # Curated NVIDIA NIM Model Catalog for Cybersecurity & Agentic Workflows
 NVIDIA_MODELS = {
-    # Default flagship: Best-in-class open model for security analysis & CVE remediation
-    "default": "meta/llama-3.3-70b-instruct",
-    "reasoning": "meta/llama-3.3-70b-instruct",
+    # Default flagship: Best-in-class model for security analysis & CVE remediation
+    "default": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "reasoning": "nvidia/llama-3.1-nemotron-70b-instruct",
     # NVIDIA Nemotron: Optimized for synthetic data, tool use, and complex agents
     "nemotron": "nvidia/llama-3.1-nemotron-70b-instruct",
     # Deep reasoning & mathematical vulnerability chaining
-    "deep_reasoning": "deepseek-ai/deepseek-r1",
+    "deep_reasoning": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
     # Low-latency model for quick inline classification and port banner parsing
-    "fast": "meta/llama-3.1-8b-instruct",
+    "fast": "nvidia/mistral-nemo-minitron-8b-8k-instruct",
+    # Multimodal Vision-Language for screenshot & visual UI inspection
+    "vision": "nvidia/nemotron-3.5-super-vl-120b-a12b",
     # AI Safety & Guardrails: Jailbreak, prompt injection & toxic output detection
-    "guardrail": "meta/llama-guard-3-8b",
+    "guardrail": "meta/llama-guard-4-12b",
 }
 
 
@@ -33,10 +35,9 @@ class NvidiaClient(BaseLLM):
     """
     NVIDIA Build API Client (OpenAI-compatible).
     Provides access to NVIDIA NIM models on build.nvidia.com:
-    - Meta Llama 3.3 70B Instruct (default)
-    - NVIDIA Llama 3.1 Nemotron 70B Instruct
-    - DeepSeek R1 / V3
-    - Meta Llama Guard 3 8B (Safety & Jailbreak detection)
+    - NVIDIA Llama 3.1 Nemotron 70B Instruct (default)
+    - NVIDIA Nemotron Reasoning
+    - Meta Llama Guard 4 12B (Safety & Jailbreak detection)
     """
 
     @property

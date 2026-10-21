@@ -27,6 +27,7 @@ from app.routers import (
     billing_routes,
     email_report_routes,
     explain_routes,
+    gdpr_routes,
     integration_routes,
     intelligence_hub_routes,
     mfa_routes,
@@ -156,10 +157,17 @@ app.include_router(autofix_routes.router)
 app.include_router(asset_routes.router)
 app.include_router(agent_routes.router)
 app.include_router(intelligence_hub_routes.router)
+app.include_router(intelligence_hub_routes.router, prefix="/intelligence")
+app.include_router(intelligence_hub_routes.router, prefix="/intel")
 app.include_router(asm_routes.router)
 app.include_router(redteam_routes.router)
 app.include_router(payment_routes.router)
 app.include_router(posture_routes.router)
+app.include_router(posture_routes.compliance_router)
+app.include_router(gdpr_routes.router)
+app.add_api_route(
+    "/export", gdpr_routes.export_data, methods=["GET", "POST"], tags=["Compliance"]
+)
 app.include_router(email_report_routes.router)
 
 
@@ -167,6 +175,7 @@ app.include_router(email_report_routes.router)
 # Health Check
 # ---------------------
 @app.get("/", tags=["Health"])
+@app.get("/health", tags=["Health"])
 async def health_check():
     """Production-grade health check with DB connectivity."""
     db_ok = True

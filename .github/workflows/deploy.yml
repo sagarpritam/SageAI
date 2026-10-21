@@ -40,11 +40,13 @@ jobs:
           service: sageai-backend
           image: gcr.io/${{ env.PROJECT_ID }}/sageai-backend:${{ github.sha }}
           region: ${{ env.REGION }}
+          flags: '--allow-unauthenticated'
           env_vars: |
             ENV=production
             DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
             SECRET_KEY=${{ secrets.PROD_SECRET_KEY }}
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
+            INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
 
       - name: Deploy Frontend to Cloud Run
         run: |
@@ -53,4 +55,7 @@ jobs:
           gcloud run deploy sageai-frontend \
             --image gcr.io/${{ env.PROJECT_ID }}/sageai-frontend:${{ github.sha }} \
             --region ${{ env.REGION }} \
-            --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL
+            --allow-unauthenticated \
+            --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL,INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
+
+

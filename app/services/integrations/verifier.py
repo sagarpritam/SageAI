@@ -26,7 +26,7 @@ def _mask_key(key: str | None) -> str:
 
 
 async def verify_nvidia_key(api_key: str) -> dict[str, Any]:
-    """Test NVIDIA API key against live chat completions endpoint with Llama 3.3 70B."""
+    """Test NVIDIA API key against live chat completions endpoint with Llama 3.1 Nemotron 70B."""
     api_key = api_key.strip()
     if not api_key:
         return {"valid": False, "error": "API key cannot be empty."}
@@ -41,7 +41,7 @@ async def verify_nvidia_key(api_key: str) -> dict[str, Any]:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "meta/llama-3.3-70b-instruct",
+                    "model": "nvidia/llama-3.1-nemotron-70b-instruct",
                     "messages": [{"role": "user", "content": "ping"}],
                     "max_tokens": 5,
                     "temperature": 0.1,
@@ -53,8 +53,8 @@ async def verify_nvidia_key(api_key: str) -> dict[str, Any]:
                 return {
                     "valid": True,
                     "provider": "nvidia",
-                    "message": "NVIDIA NIM verified: Meta Llama 3.3 70B active",
-                    "model": "meta/llama-3.3-70b-instruct",
+                    "message": "NVIDIA NIM verified: Llama 3.1 Nemotron 70B active",
+                    "model": "nvidia/llama-3.1-nemotron-70b-instruct",
                     "latency_ms": latency,
                 }
             elif resp.status_code in (401, 403):
@@ -274,7 +274,7 @@ def get_all_integrations_status() -> dict[str, Any]:
         "nvidia": {
             "configured": has_nvidia,
             "masked_key": _mask_key(settings.NVIDIA_API_KEY),
-            "model": "meta/llama-3.3-70b-instruct",
+            "model": "nvidia/llama-3.1-nemotron-70b-instruct",
             "tier": "NVIDIA NIM Cloud" if has_nvidia else "Not configured",
             "free_credits_url": "https://build.nvidia.com",
         },

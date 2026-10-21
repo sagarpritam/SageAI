@@ -45,6 +45,7 @@ sage-web/lint*.json
 docker/*.log
 
 # Testing & Audit Logs
+audit_report*.txt
 bandit*.txt
 bandit*.json
 bandit*.log

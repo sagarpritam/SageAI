@@ -38,3 +38,30 @@ async def test_cors_middleware(client: AsyncClient):
         200,
         400,
     ]  # Depending on if the origin is allowed in test settings
+
+
+@pytest.mark.asyncio
+async def test_webhook_ssrf_rejection(client: AsyncClient, auth_headers):
+    """Test that webhook registration blocks loopback and cloud metadata SSRF attempts."""
+    # Attempt to target internal loopback
+    r = await client.post(
+        "/webhooks?url=http://127.0.0.1:8000/api", headers=auth_headers
+    )
+
+    assert r.status_code == 400
+    assert "Invalid webhook URL" in r.json()["detail"]
+
+    # Attempt to target GCP/AWS cloud metadata IP
+    r2 = await client.post(
+        "/webhooks?url=http://169.254.169.254/latest/meta-data", headers=auth_headers
+    )
+    assert r2.status_code == 400
+    assert "Invalid webhook URL" in r2.json()["detail"]
+
+    # Attempt to target metadata.google.internal
+    r3 = await client.post(
+        "/webhooks?url=http://metadata.google.internal/computeMetadata/v1/",
+        headers=auth_headers,
+    )
+    assert r3.status_code == 400
+    assert "Invalid webhook URL" in r3.json()["detail"]

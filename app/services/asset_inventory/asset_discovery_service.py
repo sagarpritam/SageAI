@@ -18,7 +18,7 @@ import json
 import logging
 import socket
 from datetime import datetime, timedelta, timezone
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -167,7 +167,7 @@ async def discover_assets(
 
     # ── Step 2: DNS scanner for additional subdomains ─────────────────────
     try:
-        dns_findings = await dns_scanner.scan_dns(target)
+        dns_findings = await asyncio.to_thread(dns_scanner.scan_dns, target)
         for f in dns_findings:
             for sub in f.get("subdomains", []):
                 all_subdomains.add(sub)
@@ -180,9 +180,9 @@ async def discover_assets(
     # Process subdomains concurrently (max 10 at a time to be polite)
     semaphore = asyncio.Semaphore(10)
 
-    async def enrich_subdomain(sub: str):
+    async def enrich_subdomain(sub: str) -> dict[str, Any]:
         async with semaphore:
-            asset_data = {
+            asset_data: dict[str, Any] = {
                 "value": sub,
                 "asset_type": AssetType.domain
                 if sub == target
@@ -238,10 +238,9 @@ async def discover_assets(
 
     # ── Step 4: Persist to DB (upsert) ────────────────────────────────────
     now = datetime.now(timezone.utc)
-    now - timedelta(hours=24)
 
     for item in enriched:
-        if isinstance(item, Exception):
+        if not isinstance(item, dict):
             continue
 
         # Check existing
@@ -254,18 +253,63 @@ async def discover_assets(
 
         if existing:
             # Update existing asset
-            prev_ports = json.loads(existing.open_ports or "[]")
+            prev_ports = json.loads(str(existing.open_ports or "[]"))
             curr_ports = item.get("open_ports", [])
+            prev_ip = existing.ip_address
+            curr_ip = item.get("ip_address")
+            prev_tech = json.loads(str(existing.technologies or "[]"))
+            curr_tech = item.get("technologies", [])
+            prev_status = existing.http_status
+            curr_status = item.get("http_status")
+            prev_title = existing.http_title
+            curr_title = item.get("http_title")
+
+            # Parse Shodan CVEs
+            prev_shodan = {}
+            try:
+                prev_shodan = json.loads(str(existing.shodan_data or "{}"))
+            except Exception:
+                prev_shodan = {}
+            curr_shodan = {}
+            try:
+                curr_shodan = json.loads(item.get("shodan_data", "{}"))
+            except Exception:
+                curr_shodan = {}
+
+            prev_cves = set(prev_shodan.get("shodan_vulns", {}).get("cve_ids", []))
+            curr_cves = set(curr_shodan.get("shodan_vulns", {}).get("cve_ids", []))
+            new_cves = list(curr_cves - prev_cves)
+
+            new_ports = list(set(curr_ports) - set(prev_ports))
+            closed_ports = list(set(prev_ports) - set(curr_ports))
+            dns_changed = bool(prev_ip and curr_ip and prev_ip != curr_ip)
+            new_tech = list(set(curr_tech) - set(prev_tech))
+            status_changed = (
+                prev_status is not None
+                and curr_status is not None
+                and prev_status != curr_status
+            )
+            title_changed = (
+                prev_title is not None
+                and curr_title is not None
+                and prev_title != curr_title
+            )
+            service_changed = bool(new_tech or status_changed or title_changed)
+
             changed = (
-                set(curr_ports) != set(prev_ports)
+                bool(new_ports)
+                or bool(closed_ports)
+                or dns_changed
+                or service_changed
+                or bool(new_cves)
                 or existing.risk_level != item["risk_level"]
             )
 
-            existing.ip_address = item.get("ip_address")
+            existing.ip_address = curr_ip
             existing.open_ports = json.dumps(curr_ports)
-            existing.technologies = json.dumps(item.get("technologies", []))
-            existing.http_status = item.get("http_status")
-            existing.http_title = item.get("http_title")
+            existing.technologies = json.dumps(curr_tech)
+            existing.http_status = curr_status
+            existing.http_title = curr_title
             existing.risk_score = item["risk_score"]
             existing.risk_level = item["risk_level"]
             existing.shodan_data = item.get("shodan_data", "{}")
@@ -277,19 +321,113 @@ async def discover_assets(
             if changed:
                 updated_assets.append(existing.value)
 
-                # Check for specific diffs to log events
-                new_ports = list(set(curr_ports) - set(prev_ports))
+                # 1. New open ports
                 if new_ports:
+                    has_high_risk = any(p in HIGH_RISK_PORTS for p in new_ports)
                     evt = ASMEvent(
                         org_id=org_id,
                         asset_id=existing.id,
                         scan_id=scan_id,
                         event_type=ASMEventType.new_port,
-                        severity=ASMEventSeverity.medium,
+                        severity=ASMEventSeverity.high
+                        if has_high_risk
+                        else ASMEventSeverity.medium,
                         title=f"New open ports discovered on {item['value']}",
-                        description=f"Detected new ports: {', '.join(map(str, new_ports))}",
+                        description=f"Detected new ports: {', '.join(map(str, sorted(new_ports)))}",
                         details=json.dumps(
-                            {"new_ports": new_ports, "all_ports": curr_ports}
+                            {
+                                "new_ports": sorted(new_ports),
+                                "all_ports": sorted(curr_ports),
+                            }
+                        ),
+                    )
+                    db.add(evt)
+
+                # 2. Closed ports
+                if closed_ports:
+                    evt = ASMEvent(
+                        org_id=org_id,
+                        asset_id=existing.id,
+                        scan_id=scan_id,
+                        event_type=ASMEventType.port_closed,
+                        severity=ASMEventSeverity.info,
+                        title=f"Port(s) closed on {item['value']}",
+                        description=f"Ports no longer open: {', '.join(map(str, sorted(closed_ports)))}",
+                        details=json.dumps(
+                            {
+                                "closed_ports": sorted(closed_ports),
+                                "all_ports": sorted(curr_ports),
+                            }
+                        ),
+                    )
+                    db.add(evt)
+
+                # 3. DNS / IP changed
+                if dns_changed:
+                    evt = ASMEvent(
+                        org_id=org_id,
+                        asset_id=existing.id,
+                        scan_id=scan_id,
+                        event_type=ASMEventType.dns_changed,
+                        severity=ASMEventSeverity.medium,
+                        title=f"DNS / IP resolution changed for {item['value']}",
+                        description=f"IP address moved from {prev_ip} to {curr_ip}",
+                        details=json.dumps({"previous_ip": prev_ip, "new_ip": curr_ip}),
+                    )
+                    db.add(evt)
+
+                # 4. Service / HTTP fingerprint changed
+                if service_changed:
+                    desc_parts = []
+                    if new_tech:
+                        desc_parts.append(f"New tech: {', '.join(new_tech)}")
+                    if status_changed:
+                        desc_parts.append(
+                            f"HTTP status changed ({prev_status} -> {curr_status})"
+                        )
+                    if title_changed:
+                        desc_parts.append(f"Title changed to '{curr_title}'")
+
+                    evt = ASMEvent(
+                        org_id=org_id,
+                        asset_id=existing.id,
+                        scan_id=scan_id,
+                        event_type=ASMEventType.service_changed,
+                        severity=ASMEventSeverity.low,
+                        title=f"Service / HTTP change detected on {item['value']}",
+                        description="; ".join(desc_parts)
+                        if desc_parts
+                        else "HTTP service fingerprint changed.",
+                        details=json.dumps(
+                            {
+                                "previous_status": prev_status,
+                                "new_status": curr_status,
+                                "previous_title": prev_title,
+                                "new_title": curr_title,
+                                "new_technologies": new_tech,
+                                "all_technologies": curr_tech,
+                            }
+                        ),
+                    )
+                    db.add(evt)
+
+                # 5. New vulnerabilities (CVEs)
+                if new_cves:
+                    evt = ASMEvent(
+                        org_id=org_id,
+                        asset_id=existing.id,
+                        scan_id=scan_id,
+                        event_type=ASMEventType.new_vulnerability,
+                        severity=ASMEventSeverity.critical
+                        if item["risk_level"] == "Critical"
+                        else ASMEventSeverity.high,
+                        title=f"New CVE(s) detected on {item['value']}",
+                        description=f"Detected {len(new_cves)} new CVE(s): {', '.join(sorted(new_cves)[:5])}",
+                        details=json.dumps(
+                            {
+                                "new_cves": sorted(new_cves),
+                                "all_cves": sorted(curr_cves),
+                            }
                         ),
                     )
                     db.add(evt)
@@ -318,15 +456,21 @@ async def discover_assets(
             await db.flush()  # ensure new_asset.id is populated
 
             # Emit ASM new asset record event
+            raw_asset_type = item["asset_type"]
             evt_type = (
                 ASMEventType.new_subdomain
-                if item["asset_type"] == AssetType.subdomain
+                if raw_asset_type == AssetType.subdomain
                 else ASMEventType.new_ip
-                if item["asset_type"] == AssetType.ip
+                if raw_asset_type == AssetType.ip
                 else ASMEventType.new_service
             )
 
-            evt_title = f"New {item['asset_type'].value} discovered: {item['value']}"
+            type_name = (
+                raw_asset_type.value
+                if hasattr(raw_asset_type, "value")
+                else str(raw_asset_type)
+            )
+            evt_title = f"New {type_name} discovered: {item['value']}"
 
             evt = ASMEvent(
                 org_id=org_id,
@@ -335,7 +479,7 @@ async def discover_assets(
                 event_type=evt_type,
                 severity=ASMEventSeverity.info,
                 title=evt_title,
-                description=f"A new {item['asset_type'].value} was found during continuous enumeration.",
+                description=f"A new {type_name} was found during continuous enumeration.",
                 details=json.dumps(
                     {
                         "value": item["value"],
@@ -345,6 +489,28 @@ async def discover_assets(
                 ),
             )
             db.add(evt)
+
+            # If new asset has CVEs, emit new_vulnerability event immediately
+            curr_shodan = {}
+            try:
+                curr_shodan = json.loads(item.get("shodan_data", "{}"))
+            except Exception:
+                curr_shodan = {}
+            new_asset_cves = curr_shodan.get("shodan_vulns", {}).get("cve_ids", [])
+            if new_asset_cves:
+                vuln_evt = ASMEvent(
+                    org_id=org_id,
+                    asset_id=new_asset.id,
+                    scan_id=scan_id,
+                    event_type=ASMEventType.new_vulnerability,
+                    severity=ASMEventSeverity.critical
+                    if item["risk_level"] == "Critical"
+                    else ASMEventSeverity.high,
+                    title=f"Vulnerabilities detected on new asset {item['value']}",
+                    description=f"Shodan reported {len(new_asset_cves)} known CVE(s): {', '.join(sorted(new_asset_cves)[:5])}",
+                    details=json.dumps({"cve_ids": sorted(new_asset_cves)}),
+                )
+                db.add(vuln_evt)
 
     await db.commit()
 

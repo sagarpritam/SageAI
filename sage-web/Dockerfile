@@ -35,9 +35,10 @@ COPY --from=builder --chown=sageai:sageai /app/.next/static ./.next/static
 
 USER sageai
 
-EXPOSE 3000
+EXPOSE 3000 8080
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "if [ -f server.js ]; then node server.js; elif [ -f sage-web/server.js ]; then cd sage-web && node server.js; else npm start; fi"]
+

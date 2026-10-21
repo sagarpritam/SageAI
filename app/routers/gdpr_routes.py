@@ -14,6 +14,7 @@ router = APIRouter(prefix="/gdpr", tags=["Compliance"])
 
 
 @router.get("/export")
+@router.post("/export")
 async def export_data(
     current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
@@ -21,6 +22,7 @@ async def export_data(
     GDPR Article 20: Right to Data Portability.
     Export all data associated with the user and their organization.
     """
+
     user_id = current_user.get("sub")
     org_id = current_user.get("org")
 

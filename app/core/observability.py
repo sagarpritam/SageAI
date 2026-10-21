@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from typing import Any
 
 import structlog
 from prometheus_client import Counter
@@ -38,6 +39,17 @@ def setup_sentry():
 # --- Structured Logging Setup ---
 def setup_logging():
     """Configure structured JSON logging using structlog."""
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    if hasattr(sys.stderr, "reconfigure"):
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
     # Configure standard logging to use structlog
@@ -47,7 +59,7 @@ def setup_logging():
         level=getattr(logging, log_level),
     )
 
-    processors = [
+    processors: list[Any] = [
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
