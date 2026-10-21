@@ -60,4 +60,36 @@ jobs:
             --quiet \
             --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL,INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
 
+      - name: Verify Live Endpoints & Health Check
+        run: |
+          BACKEND_URL=$(gcloud run services describe sageai-backend --region ${{ env.REGION }} --format 'value(status.url)')
+          FRONTEND_URL=$(gcloud run services describe sageai-frontend --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "Verifying Backend endpoint: $BACKEND_URL"
+          curl --fail --retry 5 --retry-delay 3 "$BACKEND_URL/health" || curl --fail "$BACKEND_URL/"
+          echo "Verifying Frontend endpoint: $FRONTEND_URL"
+          curl --fail -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" || true
+
+      - name: Deployment Summary & Live URLs
+        if: always()
+        run: |
+          BACKEND_URL=$(gcloud run services describe sageai-backend --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "N/A")
+          FRONTEND_URL=$(gcloud run services describe sageai-frontend --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "N/A")
+          echo "=========================================="
+          echo "🚀 Cloud Run Deployment Complete"
+          echo "Backend API:  $BACKEND_URL"
+          echo "Frontend UI:  $FRONTEND_URL"
+          echo "=========================================="
+          if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+            echo "### 🚀 Cloud Run Deployment Complete" >> $GITHUB_STEP_SUMMARY
+            echo "| Service | Cloud Run URL |" >> $GITHUB_STEP_SUMMARY
+            echo "|:---|:---|" >> $GITHUB_STEP_SUMMARY
+            echo "| **Backend API** | [\`$BACKEND_URL\`]($BACKEND_URL) |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Frontend UI** | [\`$FRONTEND_URL\`]($FRONTEND_URL) |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Deployment Metadata:**" >> $GITHUB_STEP_SUMMARY
+            echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Region:** \`${{ env.REGION }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **GCP Project:** \`${{ env.PROJECT_ID }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
 
