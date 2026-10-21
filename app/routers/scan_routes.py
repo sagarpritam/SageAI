@@ -44,6 +44,30 @@ async def create_scan(
             detail="Target must be a valid URL starting with http:// or https://",
         )
 
+    # SSRF & Private IP Target Validation
+    from app.routers.webhook_routes import is_safe_webhook_url
+
+    is_safe, error_msg = is_safe_webhook_url(target_url)
+    if not is_safe:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Target URL is not permitted for scanning: {error_msg}",
+        )
+
+    # Asset Ownership Verification Check
+    from app.models.asset import Asset
+    from app.services.asset_inventory.verification_service import extract_target_domain
+
+    target_domain = extract_target_domain(target_url)
+    asset_res = await db.execute(
+        select(Asset).where(
+            Asset.organization_id == current_user["org"],
+            Asset.value == target_domain,
+            Asset.is_verified == True,  # noqa: E712
+        )
+    )
+    is_authorized = asset_res.scalar_one_or_none() is not None
+
     # Check scan limit based on org's plan (current calendar month only)
     org_result = await db.execute(
         select(Organization).where(Organization.id == current_user["org"])
@@ -73,6 +97,7 @@ async def create_scan(
         user_id=current_user["sub"],
         organization_id=current_user["org"],
         status="running",
+        is_authorized=is_authorized,
     )
     db.add(scan)
     await db.commit()
@@ -142,6 +167,7 @@ async def create_scan(
         if formatted_findings
         else [],
         risk_summary=RiskSummary(**risk),
+        is_authorized=bool(scan.is_authorized),
     )
 
 
@@ -376,6 +402,7 @@ async def list_scans(
             status=s.status,
             risk_score=s.risk_score,
             risk_level=s.risk_level,
+            is_authorized=bool(s.is_authorized),
             created_at=s.created_at,
         )
         for s in scans

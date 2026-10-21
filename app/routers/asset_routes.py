@@ -39,8 +39,11 @@ def _parse_asset(a: Asset) -> dict:
         "status": a.status,
         "first_seen": a.first_seen.isoformat() if a.first_seen else None,
         "last_seen": a.last_seen.isoformat() if a.last_seen else None,
-        "last_scanned": a.last_scanned.isoformat() if a.last_scanned else None,
         "discovered_in_scan": a.discovered_in_scan,
+        "is_verified": bool(a.is_verified),
+        "verification_token": a.verification_token,
+        "verification_method": a.verification_method,
+        "verified_at": a.verified_at.isoformat() if a.verified_at else None,
     }
 
 
@@ -243,3 +246,63 @@ async def delete_asset(
     await db.delete(asset)
     await db.commit()
     return {"status": "deleted", "id": asset_id}
+
+
+@router.get("/{asset_id}/challenge", summary="Get Asset Verification Challenge")
+async def get_asset_challenge(
+    asset_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Retrieve DNS TXT and HTTP file challenge instructions to verify asset ownership."""
+    result = await db.execute(
+        select(Asset).where(
+            and_(Asset.id == asset_id, Asset.organization_id == current_user["org"])
+        )
+    )
+    asset = result.scalar_one_or_none()
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    from app.services.asset_inventory.verification_service import (
+        get_challenge_instructions,
+    )
+
+    instructions = get_challenge_instructions(asset)
+    await db.commit()
+    return instructions
+
+
+@router.post("/{asset_id}/verify", summary="Verify Asset Ownership")
+async def verify_asset_endpoint(
+    asset_id: str,
+    method: Optional[str] = Query(
+        default=None, description="dns or http (checks both if omitted)"
+    ),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Execute live DNS TXT or HTTP file challenge checks to verify domain ownership."""
+    result = await db.execute(
+        select(Asset).where(
+            and_(Asset.id == asset_id, Asset.organization_id == current_user["org"])
+        )
+    )
+    asset = result.scalar_one_or_none()
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    from app.services.asset_inventory.verification_service import verify_asset_ownership
+
+    success, message = await verify_asset_ownership(db, asset, method=method)
+    if not success:
+        raise HTTPException(status_code=400, detail=message)
+
+    return {
+        "status": "verified",
+        "asset_id": asset.id,
+        "domain": asset.value,
+        "method": asset.verification_method,
+        "verified_at": asset.verified_at.isoformat() if asset.verified_at else None,
+        "message": message,
+    }

@@ -1,6 +1,6 @@
 import json
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
@@ -31,6 +31,7 @@ class Scan(Base):
     risk_level = Column(String, default="Low")
     status = Column(String, default="pending")  # pending / running / completed / failed
     share_token = Column(String, unique=True, nullable=True)
+    is_authorized = Column(Boolean, default=False, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=utc_now)
 

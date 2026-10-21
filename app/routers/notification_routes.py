@@ -119,7 +119,7 @@ async def update_notification_channel(
             status_code=status.HTTP_404_NOT_FOUND, detail="Channel not found"
         )
 
-    if payload.webhook_url is not None:
+    if payload.webhook_url is not None and "****" not in payload.webhook_url:
         is_safe, error_msg = is_safe_webhook_url(payload.webhook_url)
         if not is_safe:
             raise HTTPException(

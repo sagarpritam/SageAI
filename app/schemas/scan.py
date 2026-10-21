@@ -39,6 +39,7 @@ class ScanResponse(BaseModel):
     findings: List[Vulnerability]
     analyzed_findings: Optional[List[dict]] = None
     risk_summary: RiskSummary
+    is_authorized: bool = False
     report: Optional[dict] = None
     graph: Optional[dict] = None
 
@@ -51,4 +52,5 @@ class ScanListItem(BaseModel):
     status: str
     risk_score: int
     risk_level: str
+    is_authorized: bool = False
     created_at: datetime

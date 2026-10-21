@@ -7,6 +7,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -102,6 +103,14 @@ class Asset(Base):
 
     # Related scan
     discovered_in_scan: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # Ownership Verification
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    verification_token: Mapped[str | None] = mapped_column(String, nullable=True)
+    verification_method: Mapped[str | None] = mapped_column(String, nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(

@@ -27,6 +27,7 @@ async def test_create_notification_channel(client, auth_headers):
     assert data["channel_type"] == "slack"
     assert data["is_active"] is True
     assert "id" in data
+    assert "****" in data["webhook_url"]
 
 
 @pytest.mark.asyncio
