@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const { access_token } = data;
 
     // Create response and set HttpOnly cookie
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true, access_token });
     response.cookies.set("sageai_jwt", access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
