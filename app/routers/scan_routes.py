@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import BaseModel, Field
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +10,7 @@ from app.agents.analyzer import analyze_findings
 from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.models.finding import Finding
+from app.models.finding import Finding, FindingStatus
 from app.models.organization import Organization
 from app.models.scan import Scan
 from app.schemas.scan import (
@@ -19,6 +20,11 @@ from app.schemas.scan import (
     ScanResponse,
     Vulnerability,
 )
+from app.services.asset_inventory.verification_service import (
+    extract_target_domain,
+    is_target_authorized,
+)
+from app.services.audit_service import log_audit_event
 from app.services.risk_engine import calculate_risk
 from app.services.scanner_service import run_all_scans
 from app.services.subscription import check_scan_limit, get_plan
@@ -54,19 +60,9 @@ async def create_scan(
             detail=f"Target URL is not permitted for scanning: {error_msg}",
         )
 
-    # Asset Ownership Verification Check
-    from app.models.asset import Asset
-    from app.services.asset_inventory.verification_service import extract_target_domain
-
+    # Asset Ownership Verification Check (including domain hierarchy)
     target_domain = extract_target_domain(target_url)
-    asset_res = await db.execute(
-        select(Asset).where(
-            Asset.organization_id == current_user["org"],
-            Asset.value == target_domain,
-            Asset.is_verified == True,  # noqa: E712
-        )
-    )
-    is_authorized = asset_res.scalar_one_or_none() is not None
+    is_authorized = await is_target_authorized(db, current_user["org"], target_url)
 
     # Check scan limit based on org's plan (current calendar month only)
     org_result = await db.execute(
@@ -74,6 +70,13 @@ async def create_scan(
     )
     org = org_result.scalar_one_or_none()
     if org:
+        # Enforce enterprise verified domains policy if enabled
+        if getattr(org, "require_verified_domains", False) and not is_authorized:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Target domain '{target_domain}' is not verified. Your organization requires verified asset ownership prior to scanning.",
+            )
+
         now = datetime.now(timezone.utc)
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         scan_count = await db.execute(
@@ -102,6 +105,22 @@ async def create_scan(
     db.add(scan)
     await db.commit()
     await db.refresh(scan)
+
+    # Audit log scan initiation
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="SCAN_STARTED",
+        resource_type="scan",
+        resource_id=scan.id,
+        details={
+            "target": target_url,
+            "target_domain": target_domain,
+            "is_authorized": is_authorized,
+        },
+        ip_address=request.client.host if request.client else None,
+    )
 
     # Run async scans
     formatted_findings = []
@@ -370,13 +389,128 @@ async def get_scan_findings(
             "id": f.id,
             "title": f.title,
             "description": f.description,
-            "severity": f.severity,
+            "severity": f.severity.value
+            if hasattr(f.severity, "value")
+            else str(f.severity),
             "cvss_score": f.cvss_score,
+            "status": f.status.value
+            if hasattr(f.status, "value")
+            else str(f.status),
+            "assigned_to": f.assigned_to,
+            "resolved_at": f.resolved_at.isoformat() if f.resolved_at else None,
+            "notes": f.notes,
             "asset_identified": f.asset_identified,
             "created_at": f.created_at,
         }
         for f in findings
     ]
+
+
+class FindingStatusUpdate(BaseModel):
+    status: str = Field(
+        ...,
+        description="Lifecycle status: new, confirmed, in_progress, fixed, accepted_risk, reopened",
+    )
+    assigned_to: str | None = None
+    notes: str | None = None
+
+
+@router.patch("/{scan_id}/findings/{finding_id}/status")
+@limiter.limit("60/minute")
+async def update_finding_status(
+    request: Request,
+    scan_id: str,
+    finding_id: str,
+    payload: FindingStatusUpdate,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update lifecycle status of a finding with strict tenant verification and audit logging."""
+    # 1. Enforce tenant isolation on parent scan
+    scan_res = await db.execute(
+        select(Scan).where(
+            Scan.id == scan_id,
+            Scan.organization_id == current_user["org"],
+        )
+    )
+    scan = scan_res.scalar_one_or_none()
+    if not scan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found"
+        )
+
+    # 2. Find finding linked to this scan
+    f_res = await db.execute(
+        select(Finding).where(
+            Finding.id == finding_id,
+            Finding.scan_id == scan_id,
+        )
+    )
+    finding = f_res.scalar_one_or_none()
+    if not finding:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Finding not found"
+        )
+
+    # 3. Validate status
+    try:
+        new_status = FindingStatus(payload.status.lower().strip())
+    except ValueError:
+        valid_statuses = [s.value for s in FindingStatus]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid finding status '{payload.status}'. Allowed: {valid_statuses}",
+        )
+
+    old_status = (
+        finding.status.value
+        if hasattr(finding.status, "value")
+        else str(finding.status)
+    )
+    finding.status = new_status
+    if payload.assigned_to is not None:
+        finding.assigned_to = payload.assigned_to
+    if payload.notes is not None:
+        finding.notes = payload.notes
+
+    if new_status in (FindingStatus.fixed, FindingStatus.accepted_risk):
+        finding.resolved_at = datetime.now(timezone.utc)
+    elif new_status in (FindingStatus.new, FindingStatus.in_progress, FindingStatus.reopened):
+        finding.resolved_at = None
+
+    await db.commit()
+    await db.refresh(finding)
+
+    # 4. Record audit event
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="FINDING_STATUS_CHANGED",
+        resource_type="finding",
+        resource_id=finding.id,
+        details={
+            "scan_id": scan_id,
+            "old_status": old_status,
+            "new_status": new_status.value,
+            "assigned_to": finding.assigned_to,
+        },
+        ip_address=request.client.host if request.client else None,
+    )
+
+    return {
+        "id": finding.id,
+        "scan_id": finding.scan_id,
+        "title": finding.title,
+        "status": finding.status.value
+        if hasattr(finding.status, "value")
+        else str(finding.status),
+        "assigned_to": finding.assigned_to,
+        "resolved_at": finding.resolved_at.isoformat()
+        if finding.resolved_at
+        else None,
+        "notes": finding.notes,
+    }
 
 
 @router.get("s", response_model=list[ScanListItem])

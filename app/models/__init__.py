@@ -3,7 +3,8 @@ from app.models.api_key import APIKey
 from app.models.asm_event import ASMEvent, ASMEventSeverity, ASMEventType
 from app.models.asset import Asset, AssetStatus, AssetType
 from app.models.asset_diff import AttackSurfaceDiff
-from app.models.finding import Finding, FindingSeverity
+from app.models.audit_log import AuditLog
+from app.models.finding import Finding, FindingSeverity, FindingStatus
 from app.models.knowledge_graph import GraphEdge, GraphNode
 from app.models.notification import NotificationChannel
 from app.models.organization import Organization
@@ -25,8 +26,10 @@ __all__ = [
     "Asset",
     "AssetType",
     "AssetStatus",
+    "AuditLog",
     "Finding",
     "FindingSeverity",
+    "FindingStatus",
     "AgentLog",
     "ASMEvent",
     "ASMEventType",

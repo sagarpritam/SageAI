@@ -7,11 +7,13 @@ Supports two enterprise verification methods:
 """
 
 import asyncio
+import ipaddress
 import logging
 import uuid
 from typing import Optional, Tuple
 
 import httpx
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.asset import Asset
@@ -96,37 +98,60 @@ async def verify_dns_challenge(domain: str, token: str) -> Tuple[bool, str]:
     return await asyncio.to_thread(_lookup_dns_txt, domain, token)
 
 
+async def _safe_http_probe(
+    initial_url: str, expected_token: str, max_redirects: int = 3
+) -> Tuple[bool, str]:
+    """Safely fetch challenge URL inspecting each redirect hop for SSRF and private address escape."""
+    current_url = initial_url
+    async with httpx.AsyncClient(
+        timeout=5.0, follow_redirects=False, verify=True
+    ) as client:
+        for hop in range(max_redirects + 1):
+            is_safe, error_msg = is_safe_webhook_url(current_url)
+            if not is_safe:
+                logger.warning(
+                    f"Blocked HTTP challenge hop {hop} to '{current_url}': {error_msg}"
+                )
+                return False, f"Redirect target '{current_url}' is not permitted: {error_msg}"
+
+            try:
+                res = await client.get(
+                    current_url,
+                    headers={"User-Agent": "SageAI-Domain-Verifier/2.0"},
+                )
+                if res.is_redirect and "location" in res.headers:
+                    next_loc = res.headers["location"]
+                    current_url = str(res.url.join(next_loc))
+                    continue
+
+                if res.status_code == 200:
+                    body = res.text.strip()
+                    if expected_token in body:
+                        return True, f"Verified via HTTP file at {initial_url}"
+                return False, "HTTP challenge response status != 200 or token mismatch"
+            except Exception as e:
+                logger.debug(f"HTTP challenge request failed for {current_url}: {e}")
+                return False, f"HTTP request failed: {e}"
+
+    return False, "Too many redirects during verification challenge"
+
+
 async def verify_http_challenge(domain: str, token: str) -> Tuple[bool, str]:
-    """Verify HTTP challenge file at https://<domain>/.well-known/sageai-challenge.txt."""
+    """Verify HTTP challenge file at https://<domain>/.well-known/sageai-challenge.txt with redirect validation."""
     candidate_urls = [
         f"https://{domain}/.well-known/sageai-challenge.txt",
         f"http://{domain}/.well-known/sageai-challenge.txt",
     ]
 
+    last_error = "HTTP challenge file not found or token does not match"
     for target_url in candidate_urls:
-        is_safe, error_msg = is_safe_webhook_url(target_url)
-        if not is_safe:
-            logger.warning(
-                f"Blocked HTTP challenge probe to '{target_url}': {error_msg}"
-            )
-            continue
+        success, msg = await _safe_http_probe(target_url, token)
+        if success:
+            return True, msg
+        if "not permitted" in msg or "restricted" in msg or "Redirect target" in msg:
+            last_error = msg
 
-        try:
-            async with httpx.AsyncClient(
-                timeout=5.0, follow_redirects=True, verify=True
-            ) as client:
-                res = await client.get(
-                    target_url,
-                    headers={"User-Agent": "SageAI-Domain-Verifier/2.0"},
-                )
-                if res.status_code == 200:
-                    body = res.text.strip()
-                    if token in body:
-                        return True, f"Verified via HTTP file at {target_url}"
-        except Exception as e:
-            logger.debug(f"HTTP challenge check failed for {target_url}: {e}")
-
-    return False, "HTTP challenge file not found or token does not match"
+    return False, last_error
 
 
 async def verify_asset_ownership(
@@ -188,3 +213,50 @@ def extract_target_domain(target: str) -> str:
             target = target[len(prefix) :]
     target = target.split("/")[0].split(":")[0]
     return target
+
+
+async def is_target_authorized(
+    db: AsyncSession, org_id: str, target_url_or_domain: str
+) -> bool:
+    """Check if target domain or any of its parent domains are verified by the organization.
+
+    Example: if 'api.staging.example.com' is checked, returns True if 'api.staging.example.com',
+    'staging.example.com', or 'example.com' is verified by org_id.
+    """
+    clean_target = extract_target_domain(target_url_or_domain)
+    if not clean_target:
+        return False
+
+    # 1. Direct match on asset
+    asset_res = await db.execute(
+        select(Asset).where(
+            Asset.organization_id == org_id,
+            Asset.value == clean_target,
+            Asset.is_verified == True,  # noqa: E712
+        )
+    )
+    if asset_res.scalar_one_or_none():
+        return True
+
+    # 2. Check parent domain hierarchy if target is a hostname (contains dots and not an IP)
+    try:
+        ipaddress.ip_address(clean_target)
+        return False  # IPs do not inherit domain hierarchy
+    except ValueError:
+        pass
+
+    parts = clean_target.split(".")
+    # Must have at least 2 parts for a domain (e.g. example.com)
+    for i in range(1, len(parts) - 1):
+        parent_domain = ".".join(parts[i:])
+        parent_res = await db.execute(
+            select(Asset).where(
+                Asset.organization_id == org_id,
+                Asset.value == parent_domain,
+                Asset.is_verified == True,  # noqa: E712
+            )
+        )
+        if parent_res.scalar_one_or_none():
+            return True
+
+    return False

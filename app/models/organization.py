@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
@@ -15,6 +15,7 @@ class Organization(Base):
     name = Column(String, nullable=False)
     plan = Column(String, default="free")  # free / pro / enterprise
     github_token_encrypted: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    require_verified_domains = Column(Boolean, default=False, nullable=False)
 
     # Stripe Integration
     stripe_customer_id = Column(String, nullable=True, unique=True)
@@ -22,6 +23,9 @@ class Organization(Base):
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships
+    audit_logs = relationship(
+        "AuditLog", back_populates="organization", cascade="all, delete-orphan"
+    )
     users = relationship(
         "User", back_populates="organization", cascade="all, delete-orphan"
     )

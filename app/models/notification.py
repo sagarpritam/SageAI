@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -13,6 +13,9 @@ class NotificationChannel(Base):
     """Configuration for an alert destination channel (Slack, Discord, Teams, etc.)."""
 
     __tablename__ = "notification_channels"
+    __table_args__ = (
+        UniqueConstraint("organization_id", "name", name="uq_org_notification_name"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=generate_uuid)
     organization_id: Mapped[str] = mapped_column(

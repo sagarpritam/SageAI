@@ -14,6 +14,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy import (
     Enum as SAEnum,
@@ -41,6 +42,9 @@ class AssetStatus(str, enum.Enum):
 
 class Asset(Base):
     __tablename__ = "assets"
+    __table_args__ = (
+        UniqueConstraint("organization_id", "value", name="uq_org_asset_value"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=generate_uuid)
     organization_id: Mapped[str] = mapped_column(

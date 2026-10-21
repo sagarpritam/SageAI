@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import require_role
 from app.models.webhook import Webhook
+from app.schemas.notification import mask_webhook_url
+from app.services.audit_service import log_audit_event
 
 logger = logging.getLogger("SageAI.webhooks")
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
@@ -64,6 +66,7 @@ def is_safe_webhook_url(url: str) -> tuple[bool, str]:
             or ip.is_link_local
             or ip.is_reserved
             or ip.is_multicast
+            or ip.is_unspecified
         ):
             return (
                 False,
@@ -85,6 +88,7 @@ def is_safe_webhook_url(url: str) -> tuple[bool, str]:
                     or ip.is_link_local
                     or ip.is_reserved
                     or ip.is_multicast
+                    or ip.is_unspecified
                 ):
                     return (
                         False,
@@ -125,10 +129,21 @@ async def create_webhook(
     )
     db.add(webhook)
     await db.commit()
+    await db.refresh(webhook)
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="WEBHOOK_CREATED",
+        resource_type="webhook",
+        resource_id=webhook.id,
+        details={"event": event, "url": mask_webhook_url(url)},
+    )
 
     return {
         "id": webhook.id,
-        "url": url,
+        "url": mask_webhook_url(url),
         "event": event,
         "secret": secret,
         "message": "Save the secret for HMAC verification.",
@@ -149,7 +164,7 @@ async def list_webhooks(
     return [
         {
             "id": h.id,
-            "url": h.url,
+            "url": mask_webhook_url(h.url),
             "event": h.event,
             "is_active": h.is_active,
             "created_at": h.created_at,
@@ -176,6 +191,16 @@ async def delete_webhook(
 
     await db.delete(hook)
     await db.commit()
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="WEBHOOK_DELETED",
+        resource_type="webhook",
+        resource_id=webhook_id,
+    )
+
     return {"message": "Webhook deleted"}
 
 

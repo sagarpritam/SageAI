@@ -18,6 +18,7 @@ from app.models.asset import Asset, AssetStatus, AssetType
 from app.models.user import User
 from app.schemas.asset import DiscoveryRequest
 from app.services.asset_inventory.asset_discovery_service import discover_assets
+from app.services.audit_service import log_audit_event
 
 router = APIRouter(prefix="/assets", tags=["Asset Inventory"])
 logger = logging.getLogger("sageai.asset_routes")
@@ -245,6 +246,17 @@ async def delete_asset(
         raise HTTPException(status_code=404, detail="Asset not found")
     await db.delete(asset)
     await db.commit()
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="ASSET_DELETED",
+        resource_type="asset",
+        resource_id=asset_id,
+        details={"domain": asset.value, "asset_type": asset.asset_type},
+    )
+
     return {"status": "deleted", "id": asset_id}
 
 
@@ -297,6 +309,19 @@ async def verify_asset_endpoint(
     success, message = await verify_asset_ownership(db, asset, method=method)
     if not success:
         raise HTTPException(status_code=400, detail=message)
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="ASSET_VERIFIED",
+        resource_type="asset",
+        resource_id=asset.id,
+        details={
+            "domain": asset.value,
+            "method": asset.verification_method,
+        },
+    )
 
     return {
         "status": "verified",

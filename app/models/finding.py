@@ -21,6 +21,15 @@ class FindingSeverity(str, enum.Enum):
     info = "Info"
 
 
+class FindingStatus(str, enum.Enum):
+    new = "new"
+    confirmed = "confirmed"
+    in_progress = "in_progress"
+    fixed = "fixed"
+    accepted_risk = "accepted_risk"
+    reopened = "reopened"
+
+
 class Finding(Base):
     __tablename__ = "findings"
 
@@ -36,6 +45,14 @@ class Finding(Base):
         SAEnum(FindingSeverity), default=FindingSeverity.low, nullable=False, index=True
     )
     cvss_score = Column(Float, nullable=True)
+
+    # Lifecycle management
+    status = Column(
+        SAEnum(FindingStatus), default=FindingStatus.new, nullable=False, index=True
+    )
+    assigned_to = Column(String, nullable=True)  # User email or ID
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+    notes = Column(Text, nullable=True)
 
     # Context
     asset_identified = Column(String, nullable=True)  # URL, endpoint, or IP where found

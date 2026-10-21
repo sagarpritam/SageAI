@@ -19,6 +19,7 @@ from app.schemas.notification import (
     NotificationTestResponse,
 )
 from app.services.alerting.dispatcher import send_to_channel
+from app.services.audit_service import log_audit_event
 
 logger = logging.getLogger("SageAI.notifications")
 router = APIRouter(prefix="/notifications/channels", tags=["Notifications"])
@@ -70,6 +71,17 @@ async def create_notification_channel(
     db.add(channel)
     await db.commit()
     await db.refresh(channel)
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="CHANNEL_CREATED",
+        resource_type="notification_channel",
+        resource_id=channel.id,
+        details={"name": channel.name, "type": channel.channel_type},
+    )
+
     logger.info(
         f"Created notification channel '{channel.name}' ({channel.channel_type}) for org '{current_user['org']}'"
     )
@@ -139,6 +151,17 @@ async def update_notification_channel(
 
     await db.commit()
     await db.refresh(channel)
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="CHANNEL_UPDATED",
+        resource_type="notification_channel",
+        resource_id=channel.id,
+        details={"name": channel.name, "type": channel.channel_type},
+    )
+
     return channel
 
 
@@ -164,6 +187,16 @@ async def delete_notification_channel(
 
     await db.delete(channel)
     await db.commit()
+
+    await log_audit_event(
+        db=db,
+        organization_id=current_user["org"],
+        user_id=current_user.get("sub"),
+        action="CHANNEL_DELETED",
+        resource_type="notification_channel",
+        resource_id=channel_id,
+    )
+
     return None
 
 

@@ -35,6 +35,9 @@ class AssetOut(BaseModel):
     last_seen: datetime
     last_scanned: Optional[datetime] = None
     discovered_in_scan: Optional[str] = None
+    is_verified: bool = False
+    verification_method: Optional[str] = None
+    verified_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
