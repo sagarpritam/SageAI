@@ -31,6 +31,7 @@ from app.routers import (
     integration_routes,
     intelligence_hub_routes,
     mfa_routes,
+    notification_routes,
     org_routes,
     password_routes,
     payment_routes,
@@ -169,6 +170,7 @@ app.add_api_route(
     "/export", gdpr_routes.export_data, methods=["GET", "POST"], tags=["Compliance"]
 )
 app.include_router(email_report_routes.router)
+app.include_router(notification_routes.router)
 
 
 # ---------------------

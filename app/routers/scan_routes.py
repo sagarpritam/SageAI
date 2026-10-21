@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -23,6 +24,7 @@ from app.services.scanner_service import run_all_scans
 from app.services.subscription import check_scan_limit, get_plan
 
 router = APIRouter(prefix="/scan", tags=["Scanning"])
+logger = logging.getLogger("SageAI.scan")
 
 
 @router.post("", response_model=ScanResponse, status_code=status.HTTP_201_CREATED)
@@ -111,6 +113,25 @@ async def create_scan(
 
     await db.commit()
     await db.refresh(scan)
+
+    # Multi-channel alerting (Slack, Discord, Teams, Webhook)
+    if scan.status == "completed" and scan.risk_level in ("Critical", "High", "Medium"):
+        try:
+            from app.services.alerting.dispatcher import dispatch_security_alert
+
+            await dispatch_security_alert(
+                db=db,
+                organization_id=current_user["org"],
+                title=f"Scan Completed: {scan.target} ({scan.risk_level} Risk)",
+                target=str(scan.target),
+                severity=scan.risk_level.lower(),
+                risk_score=float(scan.risk_score or 0.0),
+                details=f"Scan completed with {len(formatted_findings)} findings identified. Highest severity: {scan.risk_level}.",
+                findings_count=len(formatted_findings),
+                metadata={"scan_id": scan.id, "risk_score": scan.risk_score},
+            )
+        except Exception as alert_err:
+            logger.warning(f"Failed to dispatch alerts for scan {scan.id}: {alert_err}")
 
     return ScanResponse(
         id=scan.id,

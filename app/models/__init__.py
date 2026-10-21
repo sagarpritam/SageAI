@@ -5,6 +5,7 @@ from app.models.asset import Asset, AssetStatus, AssetType
 from app.models.asset_diff import AttackSurfaceDiff
 from app.models.finding import Finding, FindingSeverity
 from app.models.knowledge_graph import GraphEdge, GraphNode
+from app.models.notification import NotificationChannel
 from app.models.organization import Organization
 from app.models.role import RoleEnum
 from app.models.scan import Scan
@@ -19,6 +20,7 @@ __all__ = [
     "RoleEnum",
     "APIKey",
     "Webhook",
+    "NotificationChannel",
     "ScanSchedule",
     "Asset",
     "AssetType",

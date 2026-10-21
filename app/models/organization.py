@@ -43,6 +43,11 @@ class Organization(Base):
     webhooks = relationship(
         "Webhook", back_populates="organization", cascade="all, delete-orphan"
     )
+    notification_channels = relationship(
+        "NotificationChannel",
+        back_populates="organization",
+        cascade="all, delete-orphan",
+    )
     schedules = relationship(
         "ScanSchedule", back_populates="organization", cascade="all, delete-orphan"
     )
