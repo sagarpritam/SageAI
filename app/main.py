@@ -25,6 +25,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     billing_routes,
+    ci_routes,
     email_report_routes,
     explain_routes,
     gdpr_routes,
@@ -171,6 +172,7 @@ app.add_api_route(
 )
 app.include_router(email_report_routes.router)
 app.include_router(notification_routes.router)
+app.include_router(ci_routes.router)
 
 
 # ---------------------

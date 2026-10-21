@@ -16,8 +16,10 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.database import get_db
 
 logger = logging.getLogger("SageAI.security")
 
@@ -105,7 +107,7 @@ def is_ip_allowed(client_ip: str) -> bool:
 # ---------------------
 # JWT Token Operations
 # ---------------------
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -198,20 +200,53 @@ def _verify_service_token(token: str) -> dict | None:
 # ---------------------
 async def get_current_user(
     request: Request,
-    token: str = Depends(oauth2_scheme),
+    token: str | None = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
-    """FastAPI dependency — decode JWT and return the payload.
+    """FastAPI dependency — decode JWT, API Key, or Service token and return the payload.
 
-    Supports two authentication flows:
+    Supports three authentication flows:
+    0. API Key (X-API-Key header or Bearer sageai_...)
     1. Standard user JWT (signed with SECRET_KEY, iss=sageai-api)
     2. Internal service JWT (signed with INTERNAL_SERVICE_KEY, iss=sageai-frontend)
-       — only accepted from allowlisted IPs, must carry real user/org context
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired token",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    # --- Flow 0: Check API Key (X-API-Key header or Bearer sageai_...) ---
+    api_key_candidate = request.headers.get("x-api-key")
+    if not api_key_candidate and token and token.startswith("sageai_"):
+        api_key_candidate = token
+
+    if api_key_candidate:
+        from sqlalchemy import select
+
+        from app.models.api_key import APIKey
+
+        res = await db.execute(
+            select(APIKey).where(
+                APIKey.key == api_key_candidate,
+                APIKey.is_active == True,  # noqa: E712
+            )
+        )
+        key_record = res.scalar_one_or_none()
+        if not key_record:
+            raise credentials_exception
+
+        key_record.last_used_at = datetime.now(timezone.utc)
+        await db.commit()
+        return {
+            "sub": key_record.created_by,
+            "org": key_record.organization_id,
+            "role": "admin",
+            "_auth_type": "api_key",
+        }
+
+    if not token:
+        raise credentials_exception
 
     # --- Flow 2: Check if this is an internal service token ---
     # Only attempt service token verification if:

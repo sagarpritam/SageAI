@@ -17,6 +17,11 @@ class Organization(Base):
     github_token_encrypted: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     require_verified_domains = Column(Boolean, default=False, nullable=False)
 
+    # DevSecOps CI Quality Gate Policy
+    ci_fail_on_critical: Mapped[bool] = mapped_column(Boolean, default=True)
+    ci_fail_on_high: Mapped[bool] = mapped_column(Boolean, default=True)
+    ci_auto_remediate: Mapped[bool] = mapped_column(Boolean, default=False)
+
     # Stripe Integration
     stripe_customer_id = Column(String, nullable=True, unique=True)
     stripe_subscription_id = Column(String, nullable=True, unique=True)
