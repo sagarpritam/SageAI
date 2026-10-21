@@ -35,7 +35,7 @@ compliance_router = APIRouter(prefix="/compliance", tags=["Compliance"])
 
 
 @compliance_router.get("/report")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_compliance_report(
     request: Request,
     framework: str = "soc2",
@@ -47,7 +47,7 @@ async def get_compliance_report(
 
 
 @router.get("/compliance/report")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_compliance_report_alias(
     request: Request,
     framework: str = "soc2",
@@ -77,7 +77,7 @@ async def _get_org_scans(
 
 
 @router.get("/score")
-@limiter.limit("60/minute")
+@limiter.limit("120/minute")
 async def get_posture_score(
     request: Request,
     current_user: dict = Depends(get_current_user),
@@ -124,7 +124,7 @@ async def get_posture_score(
 
 
 @router.get("/trends")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_posture_trends(
     request: Request,
     days: int = Query(default=30, ge=7, le=90),
@@ -152,7 +152,7 @@ async def get_posture_trends(
 
 
 @router.get("/compliance")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_all_compliance(
     request: Request,
     current_user: dict = Depends(get_current_user),
@@ -183,7 +183,7 @@ async def get_all_compliance(
 
 
 @router.get("/compliance/{framework}")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_framework_compliance(
     request: Request,
     framework: str,
@@ -217,7 +217,7 @@ async def get_framework_compliance(
 
 
 @router.get("/remediation/{scan_id}")
-@limiter.limit("20/minute")
+@limiter.limit("60/minute")
 async def get_remediation_plan(
     request: Request,
     scan_id: str,
@@ -253,7 +253,7 @@ async def get_remediation_plan(
 
 
 @router.get("/quick-wins/{scan_id}")
-@limiter.limit("30/minute")
+@limiter.limit("60/minute")
 async def get_quick_wins_endpoint(
     request: Request,
     scan_id: str,

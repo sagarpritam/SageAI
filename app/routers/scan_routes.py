@@ -26,7 +26,7 @@ router = APIRouter(prefix="/scan", tags=["Scanning"])
 
 
 @router.post("", response_model=ScanResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("5/minute")
+@limiter.limit("30/minute")
 async def create_scan(
     request: Request,
     payload: ScanRequest,
@@ -125,7 +125,7 @@ async def create_scan(
 
 
 @router.get("/{scan_id}", response_model=ScanResponse)
-@limiter.limit("30/minute")
+@limiter.limit("60/minute")
 async def get_scan(
     request: Request,
     scan_id: str,
@@ -236,7 +236,7 @@ async def get_scan(
 
 
 @router.get("/{scan_id}/report")
-@limiter.limit("10/minute")
+@limiter.limit("30/minute")
 async def get_scan_report(
     request: Request,
     scan_id: str,
@@ -289,7 +289,7 @@ async def get_scan_report(
 
 
 @router.get("/{scan_id}/findings", response_model=list[dict])
-@limiter.limit("30/minute")
+@limiter.limit("60/minute")
 async def get_scan_findings(
     request: Request,
     scan_id: str,
@@ -333,7 +333,7 @@ async def get_scan_findings(
 
 
 @router.get("s", response_model=list[ScanListItem])
-@limiter.limit("30/minute")
+@limiter.limit("60/minute")
 async def list_scans(
     request: Request,
     current_user: dict = Depends(get_current_user),
@@ -362,7 +362,7 @@ async def list_scans(
 
 
 @router.post("/{scan_id}/share")
-@limiter.limit("10/minute")
+@limiter.limit("30/minute")
 async def generate_share_link(
     request: Request,
     scan_id: str,
@@ -389,7 +389,7 @@ async def generate_share_link(
 
 
 @router.get("/public/{share_token}")
-@limiter.limit("30/minute")
+@limiter.limit("60/minute")
 async def get_public_scan(
     request: Request,
     share_token: str,

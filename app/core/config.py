@@ -132,7 +132,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # Rate limiting
-    RATE_LIMIT: str = "60/minute"
+    RATE_LIMIT: str = "300/minute"
+    RATE_LIMIT_BURST: str = "120/minute"
+    RATE_LIMIT_SCAN: str = "30/minute"
+    RATE_LIMIT_AUTH: str = "15/minute"
 
     # CORS — comma-separated origins
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
