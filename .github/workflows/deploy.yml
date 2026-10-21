@@ -25,7 +25,7 @@ jobs:
 
       - name: Build and Push Backend Image
         run: |
-          gcloud auth configure-docker
+          gcloud auth configure-docker --quiet
           docker build -t gcr.io/$PROJECT_ID/sageai-backend:${{ github.sha }} -f docker/Dockerfile.backend .
           docker push gcr.io/$PROJECT_ID/sageai-backend:${{ github.sha }}
 
@@ -47,6 +47,7 @@ jobs:
             SECRET_KEY=${{ secrets.PROD_SECRET_KEY }}
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
             INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
+            CORS_ORIGINS=${{ secrets.PROD_CORS_ORIGINS || '*' }}
 
       - name: Deploy Frontend to Cloud Run
         run: |
@@ -56,6 +57,7 @@ jobs:
             --image gcr.io/${{ env.PROJECT_ID }}/sageai-frontend:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
+            --quiet \
             --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL,INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
 
 

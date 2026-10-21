@@ -36,6 +36,7 @@ services:
 
   # ── Backend (FastAPI) ──
   backend:
+    image: sageai-backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -86,6 +87,7 @@ services:
 
   # ── Frontend (Next.js) ──
   frontend:
+    image: sageai-frontend
     build:
       context: ./sage-web
       dockerfile: Dockerfile
@@ -97,6 +99,7 @@ services:
       - "3000:3000"
     environment:
       BACKEND_URL: http://backend:8000
+      INTERNAL_SERVICE_KEY: ${INTERNAL_SERVICE_KEY:-change-this-super-secret-key-for-service-auth}
       NODE_ENV: production
 
 volumes:

@@ -24,7 +24,7 @@ jobs:
           cache-dependency-path: sage-web/package-lock.json
 
       - name: Install backend dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Frontend Sanity Check (Lint & Build)
         working-directory: sage-web
