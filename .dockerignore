@@ -23,3 +23,12 @@ node_modules/
 LICENSE
 .github/
 test_output.txt
+test_out.log
+deployment.zip
+*.zip
+*.pem
+.code-review-graph/
+frontend/
+sageai---autonomous-pentesting/
+sage-frontend/
+sage-web/

@@ -1512,36 +1512,36 @@ const TypewriterLine = ({ text, onComplete }: TypewriterLineProps) => {
   );
 };
 
+const SAGE_LOG_LINES = [
+  "[+] Initializing SageAI Core...",
+  "[+] Target: staging.startup-app.io",
+  "[+] Mapping attack surface...",
+  "[+] 9 subdomains discovered",
+  "[+] Scanning ports 1-65535...",
+  "[!] Port 8080 open (Jenkins)",
+  "[+] Running LLM reasoning engine...",
+  "[+] Analyzing JS bundles for secrets...",
+  "[!] CRITICAL: AWS_SECRET_KEY found in main.js",
+  "[+] Testing SQL injection vectors...",
+  "[+] Generating exploit proof...",
+  "[+] Scanning complete. 1 Critical, 3 High found."
+];
+
 const Terminal = () => {
   const [activeLines, setActiveLines] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  const logLines = [
-    "[+] Initializing SageAI Core...",
-    "[+] Target: staging.startup-app.io",
-    "[+] Mapping attack surface...",
-    "[+] 9 subdomains discovered",
-    "[+] Scanning ports 1-65535...",
-    "[!] Port 8080 open (Jenkins)",
-    "[+] Running LLM reasoning engine...",
-    "[+] Analyzing JS bundles for secrets...",
-    "[!] CRITICAL: AWS_SECRET_KEY found in main.js",
-    "[+] Testing SQL injection vectors...",
-    "[+] Generating exploit proof...",
-    "[+] Scanning complete. 1 Critical, 3 High found."
-  ];
 
   const handleLineComplete = () => {
-    if (currentIndex < logLines.length - 1) {
+    if (currentIndex < SAGE_LOG_LINES.length - 1) {
       setTimeout(() => {
         setCurrentIndex(prev => prev + 1);
-        setActiveLines(prev => [...prev, logLines[currentIndex]]);
+        setActiveLines(prev => [...prev, SAGE_LOG_LINES[currentIndex]]);
       }, 400);
     }
   };
 
   useEffect(() => {
-    setActiveLines([logLines[0]]);
+    setActiveLines([SAGE_LOG_LINES[0]]);
   }, []);
 
   return (
