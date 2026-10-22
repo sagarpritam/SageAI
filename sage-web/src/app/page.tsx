@@ -1568,7 +1568,7 @@ const Terminal = () => {
             </div>
           )
         ))}
-        {currentIndex === logLines.length - 1 && activeLines.length === logLines.length && (
+        {currentIndex === SAGE_LOG_LINES.length - 1 && activeLines.length === SAGE_LOG_LINES.length && (
            <div className="text-zinc-400">
              <span className="text-emerald-500/50 mr-2">$</span>
              <motion.div 

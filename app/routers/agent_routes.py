@@ -4,7 +4,7 @@ Exposes the multi-agent security team via REST endpoints.
 """
 
 import logging
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel
@@ -14,7 +14,6 @@ from app.core.database import AsyncSessionLocal, get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.models.scan import Scan
-from app.models.user import User
 from app.plugins.registry import get_marketplace_listing, run_all_plugins
 from app.routers.ws_routes import broadcast_scan_progress
 from app.schemas.responses import (
@@ -44,7 +43,7 @@ async def run_assessment(
     req: AssessmentRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """
     Triggers the full 5-agent security assessment:
@@ -140,7 +139,7 @@ async def run_assessment_async(
     req: AssessmentRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Starts multi-agent assessment in background. Poll scan results for status."""
     org_id = str(current_user["org"])
@@ -210,7 +209,7 @@ async def run_assessment_async(
     "/status", summary="List Available Agents", response_model=AgentListResponse
 )
 @limiter.limit("60/minute")
-async def list_agents(request: Request, current_user: User = Depends(get_current_user)):
+async def list_agents(request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
     """Returns the list of AI agents available in the system."""
     return {
         "agents": [
@@ -256,7 +255,7 @@ async def list_agents(request: Request, current_user: User = Depends(get_current
 async def get_attack_paths(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieve stored attack paths from the Security Knowledge Graph."""
     org_id = str(current_user["org"])
@@ -275,7 +274,7 @@ async def get_attack_paths(
 )
 @limiter.limit("60/minute")
 async def list_plugins(
-    request: Request, current_user: User = Depends(get_current_user)
+    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """Lists all available security plugins with metadata."""
     plugins = get_marketplace_listing()
@@ -296,7 +295,7 @@ class PluginRunRequest(BaseModel):
 async def run_plugin_endpoint(
     request: Request,
     req: PluginRunRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Run a named security plugin against a target."""
     from app.plugins.registry import run_plugin
@@ -319,7 +318,7 @@ async def run_all_plugins_endpoint(
     request: Request,
     target: str,
     category: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Run all applicable plugins against a target (or filter by category)."""
     plan = "pro"  # TODO: pull from user's plan

@@ -89,7 +89,7 @@ def calculate_risk(findings: list[dict]) -> dict:
 
 
 async def calculate_risk_ai(
-    findings: list[dict], org_id: str = "system", provider: str = None
+    findings: list[dict], org_id: str = "system", provider: str | None = None
 ) -> dict:
     """Use AI to calculate a context-aware risk score.
 

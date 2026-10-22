@@ -10,12 +10,12 @@ from app.utils.helpers import generate_uuid, utc_now
 class Organization(Base):
     __tablename__ = "organizations"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=generate_uuid)
     org_id = synonym("id")
-    name = Column(String, nullable=False)
-    plan = Column(String, default="free")  # free / pro / enterprise
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    plan: Mapped[str] = mapped_column(String, default="free")  # free / pro / enterprise
     github_token_encrypted: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    require_verified_domains = Column(Boolean, default=False, nullable=False)
+    require_verified_domains: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # DevSecOps CI Quality Gate Policy
     ci_fail_on_critical: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -23,8 +23,8 @@ class Organization(Base):
     ci_auto_remediate: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Stripe Integration
-    stripe_customer_id = Column(String, nullable=True, unique=True)
-    stripe_subscription_id = Column(String, nullable=True, unique=True)
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, unique=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, unique=True)
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships

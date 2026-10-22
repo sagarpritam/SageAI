@@ -180,7 +180,7 @@ async def execute_ci_gate_loop(
         pr_tool = GitHubPRTool()
         try:
             remediation_result = await pr_tool.run(
-                repository=repository,
+                target=repository,
                 github_token=github_token,
                 findings=evaluation["violations"][:5],
                 branch=branch,

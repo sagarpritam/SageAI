@@ -74,9 +74,9 @@ async def test_threat_indexer_search_and_deduplication():
     # Specific CVE lookup
     cve = await indexer.get_cve("CVE-2023-34362")
     assert cve is not None
-    assert "Progress" in cve.vendor_project
+    assert cve.vendor_project is not None and "Progress" in cve.vendor_project
     assert cve.is_kev is True
-    assert "MOVEit" in cve.product
+    assert cve.product is not None and "MOVEit" in cve.product
 
     # Test stale feed detection
     assert not indexer.is_stale(max_age_hours=24)

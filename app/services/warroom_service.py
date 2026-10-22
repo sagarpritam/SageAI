@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 from fastapi import WebSocket
 
@@ -9,45 +9,67 @@ from app.core.config import settings
 
 # Attempt to import SageStrike Event Bus
 try:
-    from sagestrike.event_bus import Event, EventBus, EventPriority, EventType
+    from sagestrike.event_bus import (
+        Event as _SsEvent,
+        EventBus as _SsEventBus,
+        EventPriority as _SsEventPriority,
+        EventType as _SsEventType,
+    )
+    _SAGESTRIKE_AVAILABLE = True
 except ImportError:
-    # Fallback/Mock for environments where sagestrike isn't in path correctly
-    from dataclasses import dataclass
-    from enum import Enum
+    _SsEvent = None  # type: ignore[assignment]
+    _SsEventBus = None  # type: ignore[assignment]
+    _SsEventPriority = None  # type: ignore[assignment]
+    _SsEventType = None  # type: ignore[assignment]
+    _SAGESTRIKE_AVAILABLE = False
 
-    class EventType(Enum):
-        SCAN_STARTED = "scan.started"
-        SCAN_COMPLETED = "scan.completed"
-        EXPLOIT_SUCCESS = "exploit.success"
-        FINDING_DISCOVERED = "finding.discovered"
-        TELEMETRY = "telemetry"
+# Fallback/Mock types for environments where sagestrike isn't installed
+from dataclasses import dataclass
+from enum import Enum
 
-    class EventPriority(Enum):
-        LOW = 1
-        NORMAL = 2
-        HIGH = 3
-        CRITICAL = 4
 
-    @dataclass
-    class Event:
-        id: str
-        type: EventType
-        source: str
-        timestamp: datetime
-        priority: EventPriority
-        payload: Dict
-        target: str = None
+class EventType(Enum):
+    SCAN_STARTED = "scan.started"
+    SCAN_COMPLETED = "scan.completed"
+    EXPLOIT_SUCCESS = "exploit.success"
+    FINDING_DISCOVERED = "finding.discovered"
+    TELEMETRY = "telemetry"
 
-        def to_dict(self):
-            return {
-                "id": self.id,
-                "type": self.type.value,
-                "source": self.source,
-                "timestamp": self.timestamp.isoformat(),
-                "priority": self.priority.value,
-                "payload": self.payload,
-                "target": self.target,
-            }
+
+class EventPriority(Enum):
+    LOW = 1
+    NORMAL = 2
+    HIGH = 3
+    CRITICAL = 4
+
+
+@dataclass
+class Event:
+    id: str
+    type: EventType
+    source: str
+    timestamp: datetime
+    priority: EventPriority
+    payload: Dict
+    target: Optional[str] = None
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": self.type.value,
+            "source": self.source,
+            "timestamp": self.timestamp.isoformat(),
+            "priority": self.priority.value,
+            "payload": self.payload,
+            "target": self.target,
+        }
+
+
+if _SAGESTRIKE_AVAILABLE:
+    # Use the real types at runtime
+    Event = _SsEvent  # type: ignore[assignment,misc]
+    EventPriority = _SsEventPriority  # type: ignore[assignment,misc]
+    EventType = _SsEventType  # type: ignore[assignment,misc]
 
 
 logger = logging.getLogger("SageAI.warroom")
@@ -71,19 +93,24 @@ class WarRoomManager:
         self.active_connections: Set[WebSocket] = set()
         self.event_history: List[Dict] = []
         self.max_history = 100
-        self.bus: EventBus = None
+        self.bus: Optional[Any] = None
         self._initialized = True
 
     async def start(self):
         """Initialize the event bus and start listening for events."""
         try:
-            self.bus = EventBus(
+            if not _SAGESTRIKE_AVAILABLE:
+                raise ImportError("sagestrike not available")
+            assert _SsEventBus is not None
+            self.bus = _SsEventBus(
                 kafka_brokers=settings.KAFKA_BROKERS.split(","),
                 redis_url=settings.REDIS_URL,
                 service_name="warroom-manager",
             )
-            # Subscribe to all events
-            await self.bus.subscribe("*", self.handle_bus_event)
+            # Subscribe to all events — subscribe() may be sync or async
+            _sub = self.bus.subscribe("*", self.handle_bus_event)
+            if _sub is not None:
+                await _sub
             logger.info("📡 WarRoomManager connected to SageStrike EventBus")
         except Exception as e:
             logger.error(f"❌ Failed to connect WarRoomManager to EventBus: {e}")

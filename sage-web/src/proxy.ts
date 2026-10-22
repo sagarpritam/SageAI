@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 // Routes that require authentication
 const protectedRoutes = ['/history', '/dashboard']
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get('sageai_jwt')?.value
   const path = request.nextUrl.pathname
 

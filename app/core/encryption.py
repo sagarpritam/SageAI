@@ -28,7 +28,7 @@ def encrypt(data: str) -> str:
     return _cipher.encrypt(data.encode("utf-8")).decode("utf-8")
 
 
-def decrypt(token_encrypted: str) -> str:
+def decrypt(token_encrypted: str | None) -> str:
     """Decrypts an encrypted string back to plaintext."""
     if not token_encrypted:
         return ""

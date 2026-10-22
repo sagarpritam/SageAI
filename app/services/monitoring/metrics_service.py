@@ -110,7 +110,7 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
             "p95_latency_ms": alert_percentiles["p95"],
             "p99_latency_ms": alert_percentiles["p99"],
             "sla_compliant": alert_percentiles["p95"] < 1000.0,  # P95 under 1s SLA
-            "active_channels_count": sum(active_channels.values()),
+            "active_channels_count": sum(int(v) for v in active_channels.values()),
             "channels_breakdown": active_channels,
         },
         "threat_feed_intel": {

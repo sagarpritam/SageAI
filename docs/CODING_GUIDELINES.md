@@ -1,9 +1,11 @@
 # SageAI Enterprise Coding Guidelines & Architecture Standards
 
 ## 1. Core Principles & Philosophy
+
 SageAI is an enterprise-grade AI-powered autonomous security platform combining active reconnaissance, automated vulnerability assessment, multi-agent exploitation verification, deterministic remediation (`SagePatch`), and enterprise observability.
 
 All contributions to SageAI must adhere strictly to these core pillars:
+
 1. **Stateless Compute**: API routes must be ephemeral and stateless to ensure seamless scale-to-zero and Vercel/Cloud Run deployment compatibility.
 2. **Strict Multi-Tenant Isolation**: Zero cross-tenant data leakage. Every database query, cache key, and Celery task must be strictly scoped to `organization_id`.
 3. **Defense in Depth**: Every external URL input is untrusted and subject to SSRF inspection. Every token is validated with short TTLs and cryptographic signatures.
@@ -13,6 +15,7 @@ All contributions to SageAI must adhere strictly to these core pillars:
 ---
 
 ## 2. Vercel & Stateless Function Rules
+
 Adhere to Vercel and modern serverless application constraints:
 
 - **Stateless & Ephemeral Execution**:
@@ -33,6 +36,7 @@ Adhere to Vercel and modern serverless application constraints:
 ## 3. Backend & Security Guardrails (FastAPI / SQLAlchemy)
 
 ### 3.1 Multi-Tenant Row-Level Security (RLS)
+
 - Every query operating on tenant data MUST filter by `Scan.organization_id == current_user["org"]` or use the active `OrganizationContextMiddleware`.
 - Never trust `org_id` supplied in request bodies or query parameters. Always resolve tenant context from verified JWT claims (`get_current_user`).
 
@@ -48,10 +52,12 @@ scan = result.scalar_one_or_none()
 ```
 
 ### 3.2 Anti-SSRF & Target Verification
+
 - All endpoints accepting target hostnames or URLs (`/scan`, `/agent/assess`, `/asset-inventory`) MUST validate targets through `is_target_authorized` and `extract_target_domain`.
 - Private IP ranges (`127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.169.254`) must be rejected unless specifically in loopback mock mode.
 
 ### 3.3 Dynamic Rate Limiting & Enterprise Quotas
+
 - Rely on `app.core.rate_limit.limiter` with proxy-aware identifier resolution:
   - Default rate limit: `1200/minute`
   - Burst limit: `600/minute`
@@ -60,6 +66,7 @@ scan = result.scalar_one_or_none()
 - Internal worker requests with valid `x-internal-service` JWT tokens are automatically exempt from client rate limiting.
 
 ### 3.4 OpenTelemetry & Prometheus Observability
+
 - All HTTP endpoints pass through `TracingMiddleware` generating W3C `traceparent` headers (`trace_id`, `span_id`).
 - Record custom business spans using `record_child_span(name, attributes)`.
 - Use `app.services.monitoring.metrics_service` for atomic metrics increments (`scans_total`, `findings_total`, `patches_applied_total`).
@@ -97,11 +104,13 @@ scan = result.scalar_one_or_none()
 ## 6. Frontend Next.js 16 & UI Standards
 
 ### 6.1 Component Hierarchy & Client Boundaries
+
 - **Server Components by Default**: Place static or server-rendered layouts in React Server Components.
 - **Client Boundaries**: Explicitly mark interactive dashboards, real-time terminals, and charts with `'use client';` at the top of the file.
 - **Route Modularization**: Avoid monolithic page files (>500 lines). Break complex dashboards into dedicated components (e.g., `AutoFixPanel.tsx`, `SecurityPosture.tsx`, `LiveAttackMap.tsx`).
 
 ### 6.2 Visual Excellence & Theme Guidelines
+
 - Dark cybernetic palette:
   - Background: Obsidian `#030712`, Charcoal `#0B0F19`
   - Surface cards: Glassmorphic borders `border-emerald-500/20` with `bg-slate-900/60 backdrop-blur-md`
@@ -112,7 +121,9 @@ scan = result.scalar_one_or_none()
 ---
 
 ## 7. Verification & Code Quality Checklist
+
 Before submitting any pull request or deployment:
+
 - [ ] **Linter**: `python -m ruff check app/` exits 0.
 - [ ] **Test Suite**: `python -m pytest tests/` passes 100% of tests (227/227).
 - [ ] **Frontend**: `npm run lint` in `sage-web` exits 0 with no syntax/type errors.

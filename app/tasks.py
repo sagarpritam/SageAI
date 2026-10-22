@@ -91,7 +91,7 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str, **kwargs):
                     scan.progress = 30
                     await db.commit()
 
-                findings = await run_all_scans(target, scan_id=scan_id, db=db)
+                findings = await run_all_scans(target, scan_id=scan_id)
                 risk = calculate_risk(findings)
 
                 # Update scan record

@@ -89,7 +89,7 @@ def _build_risk_chart(risk_score: int) -> Drawing:
     d = Drawing(200, 120)
 
     # Background bar
-    d.add(Rect(10, 50, 180, 20, fillColor=colors.HexColor("#E2E8F0"), strokeColor=None))
+    d.add(Rect(10, 50, 180, 20, fillColor=colors.HexColor("#E2E8F0"), strokeColor=None))  # type: ignore[call-arg]
 
     # Filled bar
     fill_width = max(1, int(180 * min(risk_score, 100) / 100))
@@ -102,7 +102,7 @@ def _build_risk_chart(risk_score: int) -> Drawing:
         if risk_score >= 20
         else BRAND_GREEN
     )
-    d.add(Rect(10, 50, fill_width, 20, fillColor=fill_color, strokeColor=None))
+    d.add(Rect(10, 50, fill_width, 20, fillColor=fill_color, strokeColor=None))  # type: ignore[call-arg]
 
     # Score label
     d.add(

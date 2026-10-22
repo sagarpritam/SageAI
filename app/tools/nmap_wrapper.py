@@ -13,9 +13,9 @@ import time
 from typing import Any, Dict, List
 
 try:
-    import defusedxml.ElementTree as ET
+    import defusedxml.ElementTree as ET  # type: ignore[import-untyped]
 except ImportError:
-    import xml.etree.ElementTree as ET  # nosec B405
+    import xml.etree.ElementTree as ET  # nosec B405  # type: ignore[no-redef]
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,7 @@ def run_nmap(
     """
     target = _sanitize_target(target)
     start = time.monotonic()
+    result: subprocess.CompletedProcess | None = None
 
     try:
         cmd = [NMAP_BIN, "-T4", "-oX", "-"]
@@ -156,7 +157,8 @@ def run_nmap(
 
     except ET.ParseError as exc:
         logger.error("Failed to parse nmap XML for %s: %s", target, exc)
-        return {"error": f"XML Parse Error: {exc}", "raw_output": result.stdout}
+        raw = result.stdout if result is not None else ""
+        return {"error": f"XML Parse Error: {exc}", "raw_output": raw}
 
 
 def parse_nmap_xml(xml_content: str) -> Dict[str, Any]:

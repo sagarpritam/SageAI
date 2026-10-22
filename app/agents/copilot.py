@@ -57,7 +57,7 @@ class CopilotAgent:
         if not scan_id or not org_id:
             return {"error": "scan_id and org_id are required", "authorized": False}
 
-        query = select(Scan).where(Scan.id == scan_id, Scan.organization_id == str(org_id))
+        query = select(Scan).where(Scan.id == scan_id, Scan.organization_id == org_id)
         res = await db.execute(query)
         scan = res.scalar_one_or_none()
 
@@ -76,17 +76,17 @@ class CopilotAgent:
         severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
         findings_summary = []
         for f in findings:
-            sev = f.severity.lower() if f.severity else "medium"
+            sev = f.severity.value.lower() if hasattr(f.severity, "value") else str(f.severity).lower()
             if sev in severity_counts:
                 severity_counts[sev] += 1
             findings_summary.append({
                 "id": f.id,
                 "title": f.title,
-                "severity": f.severity,
-                "cve_id": f.cve_id,
-                "status": f.status,
+                "severity": f.severity.value if hasattr(f.severity, "value") else str(f.severity),
+                "cve_id": getattr(f, "cve_id", None),
+                "status": f.status.value if hasattr(f.status, "value") else str(f.status),
                 "cvss_score": f.cvss_score,
-                "target": f.target or scan.target,
+                "target": f.asset_identified or scan.target,
             })
 
         return {
@@ -119,7 +119,7 @@ class CopilotAgent:
         if finding_id and db and org_id:
             query = select(Finding).join(Scan).where(
                 Finding.id == finding_id,
-                Scan.organization_id == str(org_id),
+                Scan.organization_id == org_id,
             )
             res = await db.execute(query)
             finding = res.scalar_one_or_none()
@@ -130,8 +130,8 @@ class CopilotAgent:
                 }
             finding_title = finding.title
             finding_desc = finding.description or ""
-            cve_id = finding.cve_id
-            target_info = finding.target
+            cve_id = getattr(finding, "cve_id", None)
+            target_info = finding.asset_identified
 
         # Extract CVE pattern if present
         cve_match = re.search(r"CVE-\d{4}-\d{4,7}", cve_or_title, re.IGNORECASE)
@@ -185,7 +185,7 @@ class CopilotAgent:
         if finding_id and db and org_id:
             query = select(Finding).join(Scan).where(
                 Finding.id == finding_id,
-                Scan.organization_id == str(org_id),
+                Scan.organization_id == org_id,
             )
             res = await db.execute(query)
             finding = res.scalar_one_or_none()
@@ -194,7 +194,7 @@ class CopilotAgent:
                     "error": f"Finding '{finding_id}' not found or unauthorized.",
                     "authorized": False,
                 }
-            clean_target = clean_target or finding.target
+            clean_target = clean_target or finding.asset_identified
 
         clean_target = clean_target or "https://target.example.com"
         clean_target = clean_target.strip()
@@ -346,7 +346,7 @@ class CopilotAgent:
             reply = await llm_gateway.generate(
                 prompt=conversation_prompt,
                 system_message=system_prompt,
-                org_id=str(org_id),
+                org_id=org_id,
                 provider=provider,
             )
             return {"reply": reply, "sources": sources}

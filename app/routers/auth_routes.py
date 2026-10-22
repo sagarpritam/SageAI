@@ -81,7 +81,7 @@ async def login(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="mfa_required",
             )
-        if not verify_totp(user.mfa_secret, payload.mfa_code):
+        if not user.mfa_secret or not verify_totp(user.mfa_secret, payload.mfa_code):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid MFA code",

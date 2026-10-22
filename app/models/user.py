@@ -1,5 +1,7 @@
+from typing import Optional
+
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
-from sqlalchemy.orm import relationship, synonym
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
 from app.models.role import RoleEnum
@@ -9,17 +11,17 @@ from app.utils.helpers import generate_uuid, utc_now
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=generate_uuid)
-    email = Column(String, unique=True, nullable=False, index=True)
-    password_hash = Column(String, nullable=False)
-    role = Column(String, default=RoleEnum.MEMBER.value)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=generate_uuid)
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    password_hash: Mapped[str] = mapped_column(String, nullable=False)
+    role: Mapped[str] = mapped_column(String, default=RoleEnum.MEMBER.value)
 
     # MFA
-    mfa_secret = Column(String, nullable=True)
-    mfa_enabled = Column(Boolean, default=False)
-    mfa_backup_codes = Column(String, nullable=True)
+    mfa_secret: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    mfa_backup_codes: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
-    organization_id = Column(
+    organization_id: Mapped[str] = mapped_column(
         String,
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,

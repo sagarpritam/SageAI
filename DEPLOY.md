@@ -32,7 +32,7 @@ docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 | **Backend** | FastAPI + Gunicorn | `8000` | Via Caddy `https://api.${DOMAIN}` | `curl http://localhost:8000/` |
 | **Worker Fleet** | Celery Async Engine | N/A (Internal) | N/A | Process supervisor |
 | **Database** | PostgreSQL 16 Alpine | `5432` | Internal bridge only | `pg_isready -U sageai` |
-| **Cache/Queue**| Redis 7 Alpine | `6379` | Internal bridge only | `redis-cli ping` |
+| **Cache/Queue** | Redis 7 Alpine | `6379` | Internal bridge only | `redis-cli ping` |
 
 ---
 
@@ -40,7 +40,8 @@ docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 
 The Next.js 16 frontend (`sage-web`) is optimized for Vercel deployment with Turbopack, standalone static generation, and edge routing.
 
-### Steps to Deploy on Vercel:
+### Steps to Deploy on Vercel
+
 1. Import repository on [Vercel](https://vercel.com/new).
 2. Configure **Root Directory** as `sage-web`.
 3. Set **Framework Preset** to `Next.js`.
@@ -67,6 +68,7 @@ docker compose -f docker-compose.prod.yml up -d --scale worker=4
 ```
 
 ### Worker Queue Topology
+
 - `scans`: Heavy parallel DAST & port scanners (Nmap, Nuclei, ZAP).
 - `recon`: Subfinder and OSINT discovery sweeps.
 - `remediation`: Deterministic `SagePatch` diff generation & AST validation.
@@ -99,6 +101,7 @@ kubectl apply -f k8s/ingress.yaml
 ## 5. Required Environment Variables Checklist
 
 ### Core Infrastructure
+
 - `DATABASE_URL`: `postgresql+asyncpg://sageai:PASSWORD@postgres:5432/sageai`
 - `REDIS_URL`: `redis://redis:6379/1`
 - `SECRET_KEY`: High-entropy 64-character secret for JWT tokens (`openssl rand -hex 32`)
@@ -106,12 +109,14 @@ kubectl apply -f k8s/ingress.yaml
 - `CORS_ORIGINS`: Comma-separated allowed frontend domains (`https://yourdomain.com`)
 
 ### Rate Limits (Default Enterprise Quotas)
+
 - `RATE_LIMIT`: `1200/minute`
 - `RATE_LIMIT_BURST`: `600/minute`
 - `RATE_LIMIT_SCAN`: `120/minute`
 - `RATE_LIMIT_AUTH`: `60/minute`
 
 ### AI & Threat Intelligence (Optional / Pro Features)
+
 - `GOOGLE_GENERATIVE_AI_API_KEY`: Gemini Copilot reasoning engine
 - `NVIDIA_API_KEY`: NVIDIA NIM/NeMo microservices
 - `SHODAN_API_KEY`: Shodan OSINT integration

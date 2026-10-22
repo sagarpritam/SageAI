@@ -12,7 +12,7 @@ import os
 import socket
 import urllib.parse
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -62,7 +62,7 @@ class FleetManager:
 
         cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)
         query = select(Scan).where(
-            Scan.organization_id == str(org_id),
+            Scan.organization_id == org_id,
             Scan.idempotency_key == idempotency_key,
             Scan.created_at >= cutoff,
         )
@@ -109,7 +109,7 @@ class FleetManager:
                 from app.tasks import run_scan_task
 
                 # Attempt Celery dispatch
-                task = run_scan_task.apply_async(
+                task = cast(Any, run_scan_task).apply_async(
                     args=[scan_id, target, org_id],
                     kwargs={"deep_scan": deep_scan, "scan_type": scan_type},
                     countdown=0,
@@ -177,7 +177,7 @@ class FleetManager:
             scan.progress = 50
             await db.commit()
 
-            raw_findings = await run_all_scans(target, scan_id=scan.id, db=db)
+            raw_findings = await run_all_scans(target, scan_id=scan.id)
 
             # Stage 3: Risk evaluation & finding persistence
             scan.stage = "risk_analysis"
@@ -258,7 +258,7 @@ class FleetManager:
     async def cancel_scan(self, db: AsyncSession, scan_id: str, org_id: str) -> Dict[str, Any]:
         """Cancel/terminate an active scan job in the worker fleet."""
         res = await db.execute(
-            select(Scan).where(Scan.id == scan_id, Scan.organization_id == str(org_id))
+            select(Scan).where(Scan.id == scan_id, Scan.organization_id == org_id)
         )
         scan = res.scalar_one_or_none()
         if not scan:
@@ -324,7 +324,7 @@ class FleetManager:
         status_counts_res = await db.execute(
             select(Scan.status, func.count(Scan.id)).group_by(Scan.status)
         )
-        counts = dict(status_counts_res.all())
+        counts = {str(row[0]): int(row[1]) for row in status_counts_res.all()}
 
         return {
             "status": "healthy" if (broker_connected or counts.get("running", 0) >= 0) else "degraded",

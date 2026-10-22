@@ -79,7 +79,7 @@ class GitHubPRTool(BaseTool):
             "Generates AI-powered code patches and opens GitHub Pull Requests with the fixes."
         )
 
-    async def run(self, target: str, **kwargs) -> Dict[str, Any]:
+    async def run(self, target: str = "", **kwargs) -> Dict[str, Any]:
         """
         Run the auto-fix workflow.
 
@@ -96,6 +96,7 @@ class GitHubPRTool(BaseTool):
         base_branch = kwargs.get("branch", "main")
         org_id = kwargs.get("org_id", "system")
 
+        target = target or kwargs.get("repository", "")
         if not github_token:
             return {"error": "GitHub token is required for auto-fix."}
         if not findings:

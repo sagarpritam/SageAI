@@ -44,7 +44,7 @@ class VectorStore:
         with open(KNOWLEDGE_FILE, "w") as f:
             json.dump(self.documents, f, indent=2)
 
-    async def add_document(self, text: str, metadata: Dict[str, str] = None):
+    async def add_document(self, text: str, metadata: Dict[str, str] | None = None):
         """Embed and add a document to the store."""
         # Simple deduplication
         for doc in self.documents:

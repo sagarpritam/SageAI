@@ -16,7 +16,7 @@ class NeMoAuditor:
     for security and safety guardrail violations.
     """
 
-    def __init__(self, base_url: str = None):
+    def __init__(self, base_url: Optional[str] = None):
         self.base_url = base_url or settings.AUDITOR_BASE_URL
         # Initialize the NeMo Microservices client
         try:
@@ -43,7 +43,7 @@ class NeMoAuditor:
         default_options = {"openai": {"uri": uri, "max_tokens": 1024, "seed": 42}}
 
         try:
-            target = self._client.beta.audit.targets.create(
+            target = self._client.beta.audit.targets.create(  # type: ignore[call-arg]
                 namespace=namespace,
                 name=name,
                 type=target_type,
@@ -63,7 +63,7 @@ class NeMoAuditor:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
         try:
-            targets = self._client.beta.audit.targets.list(namespace=namespace)
+            targets = self._client.beta.audit.targets.list(namespace=namespace)  # type: ignore[call-arg]
             return [t.model_dump() for t in targets]
         except Exception as e:
             logger.error(f"Failed to list audit targets: {e}")
@@ -83,7 +83,7 @@ class NeMoAuditor:
 
         try:
             # Typical probes include 'jailbreak', 'pii_leakage', 'offensive_content'
-            job = self._client.beta.audit.jobs.create(
+            job = self._client.beta.audit.jobs.create(  # type: ignore[call-arg]
                 namespace=namespace,
                 target_name=target_name,
                 probes=probes or ["jailbreak"],
@@ -103,7 +103,9 @@ class NeMoAuditor:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
         try:
-            results = self._client.beta.audit.jobs.get(namespace=namespace, name=job_id)
+            results = self._client.beta.audit.jobs.get(  # type: ignore[call-arg]
+                namespace=namespace, name=job_id
+            )
             return results.model_dump()
         except Exception as e:
             logger.error(f"Failed to get audit results: {e}")

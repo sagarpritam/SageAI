@@ -6,11 +6,19 @@ and private cryptographic keys.
 
 import os
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Pattern, TypedDict
 
 from app.services.tools.base import BaseTool
 
-SECRET_PATTERNS = [
+
+class SecretPattern(TypedDict):
+    type: str
+    pattern: Pattern[str]
+    severity: str
+    description: str
+
+
+SECRET_PATTERNS: List[SecretPattern] = [
     {
         "type": "AWS Access Key",
         "pattern": re.compile(r"\b(AKIA[0-9A-Z]{16})\b"),
@@ -80,8 +88,9 @@ class SecretScanner(BaseTool):
             "keys in repository files."
         )
 
-    async def run(self, target_dir: str, **kwargs) -> Dict[str, Any]:
+    async def run(self, target: str, **kwargs) -> Dict[str, Any]:
         """Scan a local directory for secrets."""
+        target_dir = kwargs.get("target_dir") or target
         findings: List[Dict[str, Any]] = []
 
         if not os.path.exists(target_dir):
