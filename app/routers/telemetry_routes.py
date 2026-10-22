@@ -7,10 +7,9 @@ Exposes:
 - POST /dast/scan: Two-tier DAST scanner (passive baseline + authorized staging active)
 """
 
-from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db

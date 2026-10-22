@@ -4,11 +4,12 @@ Synchronizes and indices Known Exploited Vulnerabilities (KEV) from CISA
 and CVE feeds from NVD with deduplication, stale-feed detection, and fast in-memory search.
 """
 
-from datetime import datetime, timezone
 import json
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
 import httpx
 from pydantic import BaseModel, Field
 

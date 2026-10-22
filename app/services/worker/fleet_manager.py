@@ -6,13 +6,14 @@ fallback when Redis brokers are unavailable.
 """
 
 import asyncio
-from datetime import datetime, timedelta, timezone
 import hashlib
 import logging
 import os
 import socket
-from typing import Any, Dict, Optional
 import urllib.parse
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -303,7 +304,6 @@ class FleetManager:
     async def get_fleet_status(self, db: AsyncSession) -> Dict[str, Any]:
         """Inspect queue length, active workers, and Redis broker connectivity."""
         broker_connected = False
-        queue_size = 0
         active_workers = 0
 
         try:

@@ -34,7 +34,7 @@ async def _check_export_plan(current_user: dict, db: AsyncSession):
 
 
 @router.get("/{scan_id}")
-@limiter.limit("30/minute")
+@limiter.limit("120/minute")
 async def get_report_json(
     request: Request,
     scan_id: str,
@@ -56,7 +56,7 @@ async def get_report_json(
 
 
 @router.get("/{scan_id}/pdf")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def get_report_pdf(
     request: Request,
     scan_id: str,
@@ -88,7 +88,7 @@ async def get_report_pdf(
 
 
 @router.get("/{scan_id}/hackerone")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def get_hackerone_report(
     request: Request,
     scan_id: str,
@@ -140,7 +140,7 @@ async def _get_scan(scan_id: str, current_user: dict, db: AsyncSession) -> Scan:
 
 
 @router.get("/{scan_id}/sarif")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def get_report_sarif(
     request: Request,
     scan_id: str,

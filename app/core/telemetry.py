@@ -7,7 +7,6 @@ worker fleet, LLM, and alerting operations.
 
 import contextvars
 import dataclasses
-import os
 import re
 import threading
 import time

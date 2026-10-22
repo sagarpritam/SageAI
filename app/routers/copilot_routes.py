@@ -6,6 +6,7 @@ vulnerability explanations, and safe PoC curl generation.
 
 import logging
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field

@@ -38,7 +38,7 @@ class AssessmentRequest(BaseModel):
 
 
 @router.post("/assess", summary="Run Full Multi-Agent Security Assessment")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def run_assessment(
     request: Request,
     req: AssessmentRequest,
@@ -134,7 +134,7 @@ async def run_assessment(
     summary="Start Async Assessment (Background)",
     response_model=AsyncAssessmentResponse,
 )
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def run_assessment_async(
     request: Request,
     req: AssessmentRequest,
@@ -292,7 +292,7 @@ class PluginRunRequest(BaseModel):
 
 
 @router.post("/plugins/run", summary="Run a Specific Plugin")
-@limiter.limit("20/minute")
+@limiter.limit("60/minute")
 async def run_plugin_endpoint(
     request: Request,
     req: PluginRunRequest,
@@ -314,7 +314,7 @@ async def run_plugin_endpoint(
     summary="Run All Plugins Against a Target",
     response_model=PluginRunAllResponse,
 )
-@limiter.limit("5/minute")
+@limiter.limit("30/minute")
 async def run_all_plugins_endpoint(
     request: Request,
     target: str,

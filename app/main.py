@@ -13,6 +13,7 @@ from app.core.database import init_db
 # Observability
 # ---------------------
 from app.core.observability import logger, setup_sentry
+from app.core.telemetry import TracingMiddleware
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import (
@@ -46,9 +47,7 @@ from app.routers import (
     webhook_routes,
     ws_routes,
 )
-from app.core.telemetry import TracingMiddleware
 from app.services.warroom_service import warroom_manager
-
 
 setup_sentry()
 

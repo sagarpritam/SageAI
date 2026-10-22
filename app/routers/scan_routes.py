@@ -7,6 +7,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.analyzer import analyze_findings
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
@@ -34,7 +35,7 @@ logger = logging.getLogger("SageAI.scan")
 
 
 @router.post("", response_model=ScanResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("30/minute")
+@limiter.limit(settings.RATE_LIMIT_SCAN)
 async def create_scan(
     request: Request,
     payload: ScanRequest,

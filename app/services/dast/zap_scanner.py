@@ -8,7 +8,7 @@ Strictly blocks invasive active scanning against unauthorized or production targ
 
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from urllib.parse import urljoin, urlparse
 
 import httpx

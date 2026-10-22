@@ -10,7 +10,7 @@ Exposes:
 """
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -21,7 +21,7 @@ from app.core.database import get_db
 from app.core.encryption import decrypt
 from app.core.security import get_current_user
 from app.models.organization import Organization
-from app.models.remediation_patch import PatchStatus, RemediationPatch
+from app.models.remediation_patch import RemediationPatch
 from app.services.sagepatch.engine import (
     ApprovalRequiredError,
     SagePatchEngine,

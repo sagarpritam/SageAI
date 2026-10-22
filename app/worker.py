@@ -6,9 +6,8 @@ Usage:
 """
 
 import logging
-import os
 
-from app.tasks import celery_app, run_scan_task, cleanup_old_scans, asm_scheduled_recon
+from app.tasks import asm_scheduled_recon, celery_app, cleanup_old_scans, run_scan_task
 
 logger = logging.getLogger("SageAI.worker")
 logger.info("Initializing SageAI Distributed Ephemeral Scanner Worker Fleet...")

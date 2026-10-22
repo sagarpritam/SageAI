@@ -16,7 +16,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import NotificationChannel
-from app.models.remediation_patch import PatchStatus, RemediationPatch
+from app.models.remediation_patch import RemediationPatch
 from app.models.scan import Scan
 from app.services.worker.fleet_manager import fleet_manager
 

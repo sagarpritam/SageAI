@@ -11,7 +11,7 @@ import logging
 import os
 import re
 import uuid
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -55,7 +55,7 @@ def generate_deterministic_diff(file_path: str, original_code: str, patched_code
     """Generate a canonical, deterministic unified diff with consistent headers."""
     orig_lines = original_code.splitlines(keepends=True)
     patch_lines = patched_code.splitlines(keepends=True)
-    
+
     # Ensure newline termination for clean diffs
     if orig_lines and not orig_lines[-1].endswith("\n"):
         orig_lines[-1] += "\n"
