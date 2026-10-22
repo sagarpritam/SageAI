@@ -51,6 +51,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { CommandPalette } from "@/components/CommandPalette";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { CopilotDrawer } from "@/components/copilot/CopilotDrawer";
 
 export default async function RootLayout({
   children,
@@ -120,6 +121,7 @@ export default async function RootLayout({
           <>
             <CommandPalette />
             <OnboardingWizard />
+            <CopilotDrawer />
           </>
         )}
       </body>

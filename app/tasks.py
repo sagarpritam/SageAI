@@ -59,12 +59,14 @@ def _run_async(coro):
         return asyncio.run(coro)
 
 
-@celery_app.task(bind=True, name="SageAI.run_scan")
-def run_scan_task(self, scan_id: str, target: str, org_id: str):
-    """Async scan task — runs security checks in a background worker.
+@celery_app.task(bind=True, name="SageAI.run_scan", max_retries=3, default_retry_delay=10)
+def run_scan_task(self, scan_id: str, target: str, org_id: str, **kwargs):
+    """Async scan task — runs security checks in a background worker fleet.
 
-    Updates the Scan DB record with results on completion or failure.
+    Updates the Scan DB record with results, progress, and dispatches alerts on completion.
     """
+    from app.services.alerting.dispatcher import dispatch_security_alert
+    from app.services.audit_service import log_audit_event
     from app.services.risk_engine import calculate_risk
     from app.services.scanner_service import run_all_scans
 
@@ -77,8 +79,17 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
 
         async with AsyncSessionLocal() as db:
             try:
-                self.update_state(state="SCANNING", meta={"target": target})
-                logger.info("Task %s: scanning %s", scan_id, target)
+                self.update_state(state="SCANNING", meta={"target": target, "progress": 25})
+                logger.info("Task %s: scanning %s (kwargs: %s)", scan_id, target, kwargs)
+
+                # Set running state
+                scan_res = await db.execute(select(Scan).where(Scan.id == scan_id))
+                scan = scan_res.scalar_one_or_none()
+                if scan:
+                    scan.status = "running"
+                    scan.stage = "network_scanning"
+                    scan.progress = 30
+                    await db.commit()
 
                 findings = await run_all_scans(target, scan_id=scan_id, db=db)
                 risk = calculate_risk(findings)
@@ -92,6 +103,8 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
                     scan.risk_score = risk["risk_score"]
                     scan.risk_level = risk["risk_level"]
                     scan.status = "completed"
+                    scan.stage = "completed"
+                    scan.progress = 100
 
                     # Persist individual findings
                     for f in findings:
@@ -110,6 +123,28 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
                         "Task %s: completed with %d findings", scan_id, len(findings)
                     )
 
+                    # Trigger alert dispatch
+                    await dispatch_security_alert(
+                        db=db,
+                        organization_id=org_id,
+                        title=f"Scan Completed: {target} ({scan.risk_level} Risk)",
+                        target=target,
+                        severity=scan.risk_level.lower() if scan.risk_level else "medium",
+                        risk_score=float(scan.risk_score or 0.0),
+                        details=f"Scan completed with {len(findings)} findings identified.",
+                        findings_count=len(findings),
+                        metadata={"scan_id": scan.id, "risk_score": scan.risk_score},
+                    )
+
+                    await log_audit_event(
+                        db=db,
+                        organization_id=org_id,
+                        action="SCAN_COMPLETED",
+                        resource_type="scan",
+                        resource_id=scan.id,
+                        details={"target": target, "findings_count": len(findings)},
+                    )
+
                 return {
                     "scan_id": scan_id,
                     "status": "completed",
@@ -126,7 +161,18 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str):
                     scan = result.scalar_one_or_none()
                     if scan:
                         scan.status = "failed"
+                        scan.stage = "error"
+                        scan.retry_count += 1
                         await db.commit()
+
+                    await log_audit_event(
+                        db=db,
+                        organization_id=org_id,
+                        action="SCAN_FAILED",
+                        resource_type="scan",
+                        resource_id=scan_id,
+                        details={"target": target, "error": str(exc)},
+                    )
                 except Exception:
                     pass
 

@@ -46,9 +46,14 @@ export const downloadHackerOne = (scanId) =>
 // ── AI Explain ────────────────────────────────────
 export const explainFinding = (type) => api.get(`/explain/${encodeURIComponent(type)}`);
 
-// ── AI Chat (Copilot) ─────────────────────────────
+// ── AI Chat & Security Copilot (Phase 02) ─────────
 // V2: `context` is optional. Pass { scan_id: "..." } to inject live scan findings into the prompt.
-export const chatWithCopilot = (message, context = null) => api.post('/ai/chat', { message, context });
+export const chatWithCopilot = (message, context = null) => api.post('/copilot/chat', { message, context, stream: false });
+export const copilotChat = (message, context = null, stream = false) => api.post('/copilot/chat', { message, context, stream });
+export const copilotExplain = (query, finding_id = null) => api.post('/copilot/explain', { query, finding_id });
+export const copilotPoC = (vulnerability_type, target = null, finding_id = null) => api.post('/copilot/poc', { vulnerability_type, target, finding_id });
+export const getThreatFeed = (limit = 20, kev_only = false) => api.get(`/threat-feed?limit=${limit}&kev_only=${kev_only}`);
+export const getThreatIntel = (query, limit = 10, kev_only = false) => api.get(`/copilot/threat-intel?query=${encodeURIComponent(query)}&limit=${limit}&kev_only=${kev_only}`);
 export const runAiCommand = (command, context) => api.post('/ai/command', { command, context });
 
 // ── Organization ──────────────────────────────────

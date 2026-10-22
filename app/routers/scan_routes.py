@@ -94,6 +94,25 @@ async def create_scan(
                 detail=f"Monthly scan limit reached ({current_scans}/{max_scans}). Upgrade to Pro for unlimited scans.",
             )
 
+    # ── Check Idempotency ─────────────────────────────
+    idempotency_key = payload.idempotency_key or request.headers.get("idempotency-key")
+    if idempotency_key:
+        from app.services.worker.fleet_manager import fleet_manager
+        existing_scan = await fleet_manager.check_idempotency(db, current_user["org"], idempotency_key)
+        if existing_scan:
+            logger.info(f"Returning idempotent existing scan {existing_scan.id} for key {idempotency_key}")
+            findings_data = existing_scan.get_findings()
+            risk = calculate_risk(findings_data)
+            return ScanResponse(
+                id=existing_scan.id,
+                target=existing_scan.target,
+                status=existing_scan.status,
+                timestamp=existing_scan.created_at,
+                findings=[Vulnerability(**f) for f in findings_data] if findings_data else [],
+                risk_summary=RiskSummary(**risk),
+                is_authorized=bool(existing_scan.is_authorized),
+            )
+
     # Create scan record
     scan = Scan(
         target=target_url,
@@ -101,6 +120,10 @@ async def create_scan(
         organization_id=current_user["org"],
         status="running",
         is_authorized=is_authorized,
+        idempotency_key=idempotency_key,
+        scan_type="deep" if payload.deep_scan else "full",
+        stage="init",
+        progress=0,
     )
     db.add(scan)
     await db.commit()
@@ -118,11 +141,35 @@ async def create_scan(
             "target": target_url,
             "target_domain": target_domain,
             "is_authorized": is_authorized,
+            "idempotency_key": idempotency_key,
+            "async_mode": payload.async_mode,
         },
         ip_address=request.client.host if request.client else None,
     )
 
-    # Run async scans
+    # If async_mode requested, dispatch to worker fleet immediately
+    if payload.async_mode:
+        from app.services.worker.fleet_manager import fleet_manager
+        await fleet_manager.dispatch_scan(
+            db=db,
+            scan_id=scan.id,
+            target=target_url,
+            org_id=current_user["org"],
+            scan_type="deep" if payload.deep_scan else "full",
+            idempotency_key=idempotency_key,
+            deep_scan=payload.deep_scan,
+        )
+        return ScanResponse(
+            id=scan.id,
+            target=scan.target,
+            status=scan.status,
+            timestamp=scan.created_at,
+            findings=[],
+            risk_summary=RiskSummary(risk_score=0, risk_level="Low", total_findings=0),
+            is_authorized=bool(scan.is_authorized),
+        )
+
+    # Run synchronous scans
     formatted_findings = []
     try:
         raw_findings = await run_all_scans(target_url, scan_id=scan.id, db=db)
@@ -137,6 +184,8 @@ async def create_scan(
         scan.risk_score = risk["risk_score"]
         scan.risk_level = risk["risk_level"]
         scan.status = "completed"
+        scan.stage = "completed"
+        scan.progress = 100
 
         # V2 compliance: Store in robust Findings table
         for f in findings_data:
@@ -188,6 +237,62 @@ async def create_scan(
         risk_summary=RiskSummary(**risk),
         is_authorized=bool(scan.is_authorized),
     )
+
+
+@router.get("/fleet/status")
+async def get_fleet_status(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get the real-time operational status of the distributed worker fleet."""
+    from app.services.worker.fleet_manager import fleet_manager
+
+    return await fleet_manager.get_fleet_status(db)
+
+
+@router.post("/{scan_id}/cancel")
+async def cancel_scan(
+    scan_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Cancel an active or queued scan in the worker fleet."""
+    from app.services.worker.fleet_manager import fleet_manager
+
+    res = await fleet_manager.cancel_scan(db, scan_id, current_user["org"])
+    if not res.get("authorized", True):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=res.get("error", "Scan not found")
+        )
+    return res
+
+
+@router.get("/{scan_id}/progress")
+async def get_scan_progress(
+    scan_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Track progress percentage and current stage of an active scan."""
+    query = select(Scan).where(
+        Scan.id == scan_id, Scan.organization_id == current_user["org"]
+    )
+    res = await db.execute(query)
+    scan = res.scalar_one_or_none()
+    if not scan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Scan not found"
+        )
+    return {
+        "scan_id": scan.id,
+        "target": scan.target,
+        "status": scan.status,
+        "stage": scan.stage or "init",
+        "progress": scan.progress or 0,
+        "retry_count": scan.retry_count or 0,
+        "celery_task_id": scan.celery_task_id,
+        "created_at": scan.created_at,
+    }
 
 
 @router.get("/{scan_id}", response_model=ScanResponse)

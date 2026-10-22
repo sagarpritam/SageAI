@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sageai-worker-fleet
+  namespace: sageai
+  labels:
+    app: sageai-worker
+    role: scanner-fleet
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sageai-worker
+  template:
+    metadata:
+      labels:
+        app: sageai-worker
+        role: scanner-fleet
+    spec:
+      containers:
+        - name: worker
+          image: sageai-worker:latest
+          command: ["celery", "-A", "app.worker", "worker", "--loglevel=info", "-c", "4", "-Q", "celery,scans,deep_scans"]
+          envFrom:
+            - configMapRef:
+                name: sageai-config
+            - secretRef:
+                name: sageai-secrets
+          env:
+            - name: SUBFINDER_BIN
+              value: "subfinder"
+            - name: NMAP_BIN
+              value: "nmap"
+            - name: NUCLEI_BIN
+              value: "nuclei"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_RAW
+                - NET_ADMIN
+                - NET_BIND_SERVICE

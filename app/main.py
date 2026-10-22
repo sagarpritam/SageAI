@@ -26,6 +26,7 @@ from app.routers import (
     autofix_routes,
     billing_routes,
     ci_routes,
+    copilot_routes,
     email_report_routes,
     explain_routes,
     gdpr_routes,
@@ -41,10 +42,13 @@ from app.routers import (
     report_routes,
     scan_routes,
     schedule_routes,
+    telemetry_routes,
     webhook_routes,
     ws_routes,
 )
+from app.core.telemetry import TracingMiddleware
 from app.services.warroom_service import warroom_manager
+
 
 setup_sentry()
 
@@ -107,8 +111,12 @@ app.add_middleware(
 # Security headers (HSTS, CSP, X-Frame-Options)
 app.add_middleware(SecurityHeadersMiddleware)
 
+# Distributed tracing & W3C traceparent propagation
+app.add_middleware(TracingMiddleware)
+
 # GDPR-compliant audit logging
 app.add_middleware(AuditLogMiddleware)
+
 
 # Prometheus metrics (exposes /metrics endpoint)
 try:
@@ -173,6 +181,9 @@ app.add_api_route(
 app.include_router(email_report_routes.router)
 app.include_router(notification_routes.router)
 app.include_router(ci_routes.router)
+app.include_router(copilot_routes.router)
+app.include_router(copilot_routes.threat_feed_router)
+app.include_router(telemetry_routes.router)
 
 
 # ---------------------

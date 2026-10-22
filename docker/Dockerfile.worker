@@ -1,0 +1,66 @@
+# ============================================
+# SageAI Phase 03 — Ephemeral Scanner Worker Fleet
+# Container with pre-installed Nmap, Subfinder, Nuclei
+# ============================================
+
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies, network security utilities, and libpcap
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        wget \
+        ca-certificates \
+        git \
+        nmap \
+        libpcap-dev \
+        libcap2-bin \
+        dnsutils \
+        procps && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install ProjectDiscovery Subfinder binary
+RUN SUBFINDER_VERSION="2.6.8" && \
+    wget -q "https://github.com/projectdiscovery/subfinder/releases/download/v${SUBFINDER_VERSION}/subfinder_${SUBFINDER_VERSION}_linux_amd64.zip" -O /tmp/subfinder.zip || true && \
+    if [ -f /tmp/subfinder.zip ]; then \
+        unzip -q /tmp/subfinder.zip -d /usr/local/bin/ subfinder && \
+        chmod +x /usr/local/bin/subfinder && \
+        rm -f /tmp/subfinder.zip; \
+    fi
+
+# Install ProjectDiscovery Nuclei binary
+RUN NUCLEI_VERSION="3.3.7" && \
+    wget -q "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}/nuclei_${NUCLEI_VERSION}_linux_amd64.zip" -O /tmp/nuclei.zip || true && \
+    if [ -f /tmp/nuclei.zip ]; then \
+        unzip -q /tmp/nuclei.zip -d /usr/local/bin/ nuclei && \
+        chmod +x /usr/local/bin/nuclei && \
+        rm -f /tmp/nuclei.zip; \
+    fi
+
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application source
+COPY app/ ./app/
+COPY alembic/ ./alembic/
+COPY alembic.ini .
+
+# Create non-root system user and grant minimal capabilities for raw network capture
+RUN addgroup --system sageai && adduser --system --group sageai && \
+    setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap || true
+
+USER sageai
+
+# Health check inspecting Celery worker status
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD python -c "from app.tasks import celery_app; celery_app.control.ping(timeout=3.0)" || exit 0
+
+ENTRYPOINT ["celery", "-A", "app.worker", "worker"]
+CMD ["--loglevel=info", "-c", "4", "-Q", "celery,scans,deep_scans"]

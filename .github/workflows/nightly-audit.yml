@@ -38,7 +38,7 @@ jobs:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           SECRET_KEY: "test-secret-key-for-ci"
         run: |
-          pytest tests/test_ai_resilience.py tests/test_ai_model.py tests/test_nvidia_llm.py tests/test_llm_gateway.py -v --tb=short
+          pytest tests/test_ai_resilience.py tests/test_ai_model.py tests/test_nvidia_llm.py tests/test_llm_gateway.py tests/test_phase05_observability.py -v --tb=short
 
       - name: Run Live AI Security & NeMo Audit
         env:

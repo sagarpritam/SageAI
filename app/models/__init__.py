@@ -8,6 +8,7 @@ from app.models.finding import Finding, FindingSeverity, FindingStatus
 from app.models.knowledge_graph import GraphEdge, GraphNode
 from app.models.notification import NotificationChannel
 from app.models.organization import Organization
+from app.models.remediation_patch import PatchStatus, RemediationPatch
 from app.models.role import RoleEnum
 from app.models.scan import Scan
 from app.models.schedule import ScanSchedule
@@ -37,4 +38,7 @@ __all__ = [
     "AttackSurfaceDiff",
     "GraphNode",
     "GraphEdge",
+    "RemediationPatch",
+    "PatchStatus",
 ]
+

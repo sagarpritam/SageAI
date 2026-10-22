@@ -8,8 +8,11 @@ class ScanRequest(BaseModel):
     """Scan request body."""
 
     target: HttpUrl = Field(..., description="Target URL to scan")
+    idempotency_key: Optional[str] = Field(None, description="Client idempotency key to prevent duplicate scans")
+    async_mode: bool = Field(False, description="If True, dispatches to worker fleet and returns immediately")
+    deep_scan: bool = Field(False, description="Enable deep network template and port scans")
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
 
 class Vulnerability(BaseModel):

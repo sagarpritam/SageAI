@@ -14,9 +14,11 @@ import { SystemHealth } from "@/components/SystemHealth";
 import { ThreatFeed } from "@/components/ThreatFeed";
 import { SecurityPosture } from "@/components/SecurityPosture";
 import { WarRoom } from "@/components/WarRoom";
+import { ObservabilityDashboard } from "@/components/ObservabilityDashboard";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "observability", label: "Observability", icon: Activity },
   { id: "posture", label: "Security Shield", icon: Shield },
   { id: "copilot", label: "AI Copilot", icon: Sparkles },
   { id: "intel", label: "Intel Hub", icon: Radar },
@@ -75,6 +77,7 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "observability" && <ObservabilityDashboard />}
           {activeTab === "posture" && <SecurityPosture />}
           {activeTab === "copilot" && <AICopilot />}
           {activeTab === "intel" && <IntelligenceHub />}

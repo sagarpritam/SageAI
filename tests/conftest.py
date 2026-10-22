@@ -21,7 +21,14 @@ async def engine():
     engine = create_async_engine(TEST_DB_URL, echo=False)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    import app.core.database
+    original_sessionmaker = app.core.database.AsyncSessionLocal
+    app.core.database.AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
     yield engine
+
+    app.core.database.AsyncSessionLocal = original_sessionmaker
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
     await engine.dispose()

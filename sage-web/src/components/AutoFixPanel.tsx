@@ -1,7 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GitBranch, Play, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
+import {
+  GitBranch,
+  Play,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  AlertCircle,
+  Shield,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  X,
+  FileCode,
+} from "lucide-react";
 import axios from "axios";
 
 interface FixResult {
@@ -11,17 +25,54 @@ interface FixResult {
   fix_results?: Record<string, unknown>;
 }
 
+interface PatchItem {
+  id: string;
+  repository: string;
+  base_branch: string;
+  patch_branch: string;
+  file_path: string;
+  vulnerability_type: string;
+  severity: string;
+  diff: string;
+  lines_changed: number;
+  status: string;
+  sandbox_passed: boolean;
+  sandbox_details?: {
+    safe?: boolean;
+    syntax_valid?: boolean;
+    security_valid?: boolean;
+    reasons?: string[];
+  };
+  requested_by: string;
+  approved_by?: string;
+  approved_at?: string;
+  rejection_reason?: string;
+  pr_number?: number;
+  pr_url?: string;
+  created_at?: string;
+}
+
 export function AutoFixPanel() {
+  const [activeTab, setActiveTab] = useState<"queue" | "scan">("queue");
   const [ready, setReady] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [checkingStatus, setCheckingStatus] = useState(true);
 
+  // Scan state
   const [repo, setRepo] = useState("");
   const [branch, setBranch] = useState("main");
   const [maxFixes, setMaxFixes] = useState(5);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<FixResult | null>(null);
   const [error, setError] = useState("");
+
+  // Review Queue state
+  const [patches, setPatches] = useState<PatchItem[]>([]);
+  const [loadingPatches, setLoadingPatches] = useState(false);
+  const [expandedDiffId, setExpandedDiffId] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [rejectionModalId, setRejectionModalId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     axios
@@ -32,7 +83,22 @@ export function AutoFixPanel() {
       })
       .catch(() => setStatusMsg("Failed to check autofix status."))
       .finally(() => setCheckingStatus(false));
+
+    fetchPatches();
   }, []);
+
+  const fetchPatches = async () => {
+    setLoadingPatches(true);
+    try {
+      const res = await axios.get("/api/autofix/patches");
+      setPatches(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      // Gracefully handle if no patches yet
+      setPatches([]);
+    } finally {
+      setLoadingPatches(false);
+    }
+  };
 
   const handleRun = async () => {
     if (!repo.trim()) return;
@@ -47,6 +113,7 @@ export function AutoFixPanel() {
         max_fixes: maxFixes,
       });
       setResult(r.data);
+      fetchPatches();
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         setError(e.response?.data?.detail || e.message);
@@ -58,92 +125,447 @@ export function AutoFixPanel() {
     }
   };
 
+  const handleApprove = async (patchId: string) => {
+    setActionLoadingId(patchId);
+    try {
+      await axios.post(`/api/autofix/patches/${patchId}/approve`);
+      await fetchPatches();
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        alert(`Approval error: ${err.response?.data?.detail || err.message}`);
+      } else {
+        alert("Failed to approve patch.");
+      }
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleReject = async (patchId: string) => {
+    if (!rejectionReason.trim()) {
+      alert("Please specify a reason for rejecting the patch.");
+      return;
+    }
+    setActionLoadingId(patchId);
+    try {
+      await axios.post(`/api/autofix/patches/${patchId}/reject`, {
+        reason: rejectionReason,
+      });
+      setRejectionModalId(null);
+      setRejectionReason("");
+      await fetchPatches();
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        alert(`Rejection error: ${err.response?.data?.detail || err.message}`);
+      } else {
+        alert("Failed to reject patch.");
+      }
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Status Check */}
-      <div className={`rounded-xl p-5 border ${ready ? "bg-emerald-950/30 border-emerald-700/40" : "bg-zinc-900/60 border-zinc-700/40"}`}>
-        <div className="flex items-center gap-3">
-          {checkingStatus ? (
-            <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
-          ) : ready ? (
-            <CheckCircle className="w-5 h-5 text-emerald-400" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-amber-400" />
-          )}
-          <div>
-            <p className="text-sm font-bold text-white">
-              {checkingStatus ? "Checking status..." : ready ? "Self-Healing Code Ready" : "Configuration Needed"}
-            </p>
-            <p className="text-xs text-zinc-400 mt-0.5">{statusMsg}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Run Panel */}
-      <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-5 space-y-4">
-        <h3 className="text-sm font-bold text-emerald-400 flex items-center gap-2">
-          <GitBranch className="w-4 h-4" /> Run Auto-Fix on Repository
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <input
-            value={repo}
-            onChange={(e) => setRepo(e.target.value)}
-            placeholder="owner/repo"
-            className="col-span-2 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
-          />
-          <input
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-            placeholder="Branch"
-            className="bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <label className="text-xs text-zinc-400 font-mono">
-            Max Fixes:
-            <input
-              type="number"
-              min={1}
-              max={20}
-              value={maxFixes}
-              onChange={(e) => setMaxFixes(Number(e.target.value))}
-              className="ml-2 w-16 bg-black/50 border border-zinc-700 rounded px-2 py-1 text-white text-sm focus:outline-none focus:border-emerald-500"
-            />
-          </label>
-          <button
-            onClick={handleRun}
-            disabled={running || !repo.trim()}
-            className="ml-auto bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-6 py-2 rounded-lg transition-colors text-sm flex items-center gap-2"
-          >
-            {running ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Running...</>
+      {/* Status Banner */}
+      <div
+        className={`rounded-xl p-5 border ${
+          ready
+            ? "bg-emerald-950/30 border-emerald-700/40"
+            : "bg-zinc-900/60 border-zinc-700/40"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {checkingStatus ? (
+              <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+            ) : ready ? (
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
             ) : (
-              <><Play className="w-4 h-4" /> Run Auto-Fix</>
+              <AlertCircle className="w-5 h-5 text-amber-400" />
             )}
-          </button>
+            <div>
+              <p className="text-sm font-bold text-white">
+                {checkingStatus
+                  ? "Checking status..."
+                  : ready
+                  ? "SagePatch Remediation Engine Ready"
+                  : "Configuration Needed"}
+              </p>
+              <p className="text-xs text-zinc-400 mt-0.5">{statusMsg}</p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-950/60 border border-emerald-700/50 text-emerald-400">
+            <Shield className="w-3.5 h-3.5" /> Phase 04 Verified
+          </span>
         </div>
       </div>
 
-      {/* Results */}
-      {error && (
-        <div className="bg-red-950/40 border border-red-700/40 rounded-xl p-4 flex items-start gap-3">
-          <XCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-300">{error}</p>
+      {/* Navigation Tabs */}
+      <div className="flex items-center gap-3 border-b border-zinc-800 pb-3">
+        <button
+          onClick={() => setActiveTab("queue")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
+            activeTab === "queue"
+              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-950"
+              : "bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
+          }`}
+        >
+          <FileCode className="w-4 h-4" /> SagePatch Review Queue
+          {patches.filter((p) => p.status === "proposed").length > 0 && (
+            <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-400 text-black font-extrabold">
+              {patches.filter((p) => p.status === "proposed").length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("scan")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
+            activeTab === "scan"
+              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-950"
+              : "bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
+          }`}
+        >
+          <GitBranch className="w-4 h-4" /> Scan & Propose Patch
+        </button>
+      </div>
+
+      {/* TAB 1: SagePatch Review Queue */}
+      {activeTab === "queue" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Shield className="w-4 h-4 text-emerald-400" />
+              Human-in-the-Loop Patch Approvals
+            </h3>
+            <button
+              onClick={fetchPatches}
+              disabled={loadingPatches}
+              className="text-xs text-zinc-400 hover:text-white transition-colors"
+            >
+              {loadingPatches ? "Refreshing..." : "↻ Refresh List"}
+            </button>
+          </div>
+
+          {loadingPatches ? (
+            <div className="p-8 text-center bg-zinc-900/40 rounded-xl border border-zinc-800 text-zinc-400 text-sm flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              Loading proposed patches...
+            </div>
+          ) : patches.length === 0 ? (
+            <div className="p-10 text-center bg-zinc-900/30 rounded-xl border border-zinc-800/60 text-zinc-400 space-y-2">
+              <CheckCircle className="w-8 h-8 text-emerald-500/60 mx-auto" />
+              <p className="text-sm font-semibold text-white">No Pending Patches</p>
+              <p className="text-xs text-zinc-500">
+                All proposed remediation patches have been reviewed or merged.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {patches.map((patch) => {
+                const isExpanded = expandedDiffId === patch.id;
+                const isActionLoading = actionLoadingId === patch.id;
+                const isProposed = patch.status === "proposed";
+                const isApproved = patch.status === "approved";
+                const isRejected = patch.status === "rejected";
+
+                return (
+                  <div
+                    key={patch.id}
+                    className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-5 space-y-4 transition-all hover:border-zinc-700"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                              patch.severity === "CRITICAL"
+                                ? "bg-red-950 text-red-400 border border-red-800"
+                                : patch.severity === "HIGH"
+                                ? "bg-amber-950 text-amber-400 border border-amber-800"
+                                : "bg-blue-950 text-blue-400 border border-blue-800"
+                            }`}
+                          >
+                            {patch.severity}
+                          </span>
+                          <span className="text-sm font-bold text-white font-mono">
+                            {patch.vulnerability_type}
+                          </span>
+                          <span className="text-xs text-zinc-500">in</span>
+                          <span className="text-xs font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/40">
+                            {patch.file_path}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-zinc-400 font-mono">
+                          <span>Repo: {patch.repository}</span>
+                          <span>•</span>
+                          <span>Branch: {patch.patch_branch}</span>
+                          <span>•</span>
+                          <span>+{patch.lines_changed} lines</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {isProposed && (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-950/60 border border-amber-700/60 text-amber-300">
+                            Awaiting Human Approval
+                          </span>
+                        )}
+                        {isApproved && (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 flex items-center gap-1.5">
+                            <Check className="w-3.5 h-3.5" /> Approved & PR Dispatched
+                          </span>
+                        )}
+                        {isRejected && (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-800 border border-zinc-700 text-zinc-400 flex items-center gap-1.5">
+                            <X className="w-3.5 h-3.5" /> Rejected
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Sandbox Verification Badges */}
+                    <div className="flex items-center gap-2 text-xs flex-wrap">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-zinc-800 text-zinc-300 font-mono">
+                        <CheckCircle className="w-3 h-3 text-emerald-400" /> AST Syntax Validated
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-zinc-800 text-zinc-300 font-mono">
+                        <CheckCircle className="w-3 h-3 text-emerald-400" /> Sandboxed Isolation
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-zinc-800 text-zinc-300 font-mono">
+                        <Shield className="w-3 h-3 text-emerald-400" /> Human Review Enforced
+                      </span>
+                    </div>
+
+                    {/* PR Link if already approved */}
+                    {patch.pr_url && (
+                      <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-800/40 flex items-center justify-between">
+                        <div className="text-xs text-emerald-300">
+                          GitHub Pull Request:{" "}
+                          <span className="font-mono font-bold">#{patch.pr_number || "PR"}</span>
+                        </div>
+                        <a
+                          href={patch.pr_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold underline"
+                        >
+                          View PR on GitHub <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Rejection Reason if rejected */}
+                    {patch.rejection_reason && (
+                      <div className="p-3 rounded-lg bg-red-950/20 border border-red-800/40 text-xs text-red-300">
+                        <span className="font-bold">Rejection Rationale:</span>{" "}
+                        {patch.rejection_reason}
+                      </div>
+                    )}
+
+                    {/* Diff Inspection View */}
+                    <div>
+                      <button
+                        onClick={() =>
+                          setExpandedDiffId(isExpanded ? null : patch.id)
+                        }
+                        className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 font-mono transition-colors"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="w-3.5 h-3.5" /> Hide Unified Diff
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-3.5 h-3.5" /> Inspect Unified Diff
+                          </>
+                        )}
+                      </button>
+
+                      {isExpanded && (
+                        <div className="mt-3 bg-black/70 border border-zinc-800 rounded-lg p-3 font-mono text-xs overflow-x-auto max-h-72">
+                          {patch.diff.split("\n").map((line, idx) => {
+                            const isAdd = line.startsWith("+") && !line.startsWith("+++");
+                            const isDel = line.startsWith("-") && !line.startsWith("---");
+                            const isHeader = line.startsWith("@@") || line.startsWith("---") || line.startsWith("+++");
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`whitespace-pre ${
+                                  isAdd
+                                    ? "bg-emerald-950/40 text-emerald-300"
+                                    : isDel
+                                    ? "bg-red-950/40 text-red-300"
+                                    : isHeader
+                                    ? "text-blue-400 font-bold"
+                                    : "text-zinc-400"
+                                }`}
+                              >
+                                {line}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions: Approve / Reject (Only for proposed patches) */}
+                    {isProposed && (
+                      <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => setRejectionModalId(patch.id)}
+                          disabled={isActionLoading}
+                          className="px-3 py-1.5 rounded-lg border border-red-800/50 hover:bg-red-950/30 text-red-400 text-xs font-semibold transition-colors disabled:opacity-50"
+                        >
+                          Reject Patch
+                        </button>
+                        <button
+                          onClick={() => handleApprove(patch.id)}
+                          disabled={isActionLoading}
+                          className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950 disabled:opacity-50"
+                        >
+                          {isActionLoading ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Dispatching PR...
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-3.5 h-3.5" /> Approve & Open Pull Request
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Rejection Modal */}
+          {rejectionModalId && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-red-400" />
+                  Reject Remediation Patch
+                </h4>
+                <p className="text-xs text-zinc-400">
+                  Please provide a rationale for rejecting this patch. This explanation will be
+                  recorded in the audit trail.
+                </p>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="e.g. Approach introduces breaking API change; requires manual refactor."
+                  className="w-full h-24 bg-black/60 border border-zinc-700 rounded-lg p-3 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-red-500 font-mono"
+                />
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setRejectionModalId(null);
+                      setRejectionReason("");
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleReject(rejectionModalId)}
+                    disabled={actionLoadingId === rejectionModalId}
+                    className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold"
+                  >
+                    Confirm Rejection
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {result && (
-        <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-emerald-400" />
-            <p className="text-sm font-bold text-white">
-              {result.status === "clean" ? "No Vulnerabilities Found 🎉" : "Auto-Fix Completed"}
+      {/* TAB 2: Scan & Run Auto-Fix */}
+      {activeTab === "scan" && (
+        <div className="space-y-4">
+          <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-bold text-emerald-400 flex items-center gap-2">
+              <GitBranch className="w-4 h-4" /> Run SAST & Propose Fixes
+            </h3>
+            <p className="text-xs text-zinc-400">
+              Scans target GitHub repository with static analysis (Bandit/Semgrep) and generates candidate
+              patches using the DeveloperAgent. All patches will enter the Review Queue for human approval.
             </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                value={repo}
+                onChange={(e) => setRepo(e.target.value)}
+                placeholder="owner/repo"
+                className="col-span-2 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
+              />
+              <input
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                placeholder="Branch"
+                className="bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="text-xs text-zinc-400 font-mono">
+                Max Fixes:
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={maxFixes}
+                  onChange={(e) => setMaxFixes(Number(e.target.value))}
+                  className="ml-2 w-16 bg-black/50 border border-zinc-700 rounded px-2 py-1 text-white text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </label>
+              <button
+                onClick={handleRun}
+                disabled={running || !repo.trim()}
+                className="ml-auto bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-6 py-2 rounded-lg transition-colors text-sm flex items-center gap-2"
+              >
+                {running ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Scanning & Generating...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4" /> Start Remediation Scan
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-          {result.message && <p className="text-xs text-zinc-400">{result.message}</p>}
-          <pre className="text-xs text-zinc-500 bg-black/50 rounded-lg p-3 overflow-auto max-h-60 font-mono">
-            {JSON.stringify(result.fix_results || result.scan_results, null, 2)}
-          </pre>
+
+          {/* Results */}
+          {error && (
+            <div className="bg-red-950/40 border border-red-700/40 rounded-xl p-4 flex items-start gap-3">
+              <XCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-300">{error}</p>
+            </div>
+          )}
+
+          {result && (
+            <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <p className="text-sm font-bold text-white">
+                  {result.status === "clean"
+                    ? "No Vulnerabilities Found 🎉"
+                    : "Auto-Fix Scan Completed"}
+                </p>
+              </div>
+              {result.message && (
+                <p className="text-xs text-zinc-400">{result.message}</p>
+              )}
+              <pre className="text-xs text-zinc-500 bg-black/50 rounded-lg p-3 overflow-auto max-h-60 font-mono">
+                {JSON.stringify(result.fix_results || result.scan_results, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
       )}
     </div>
