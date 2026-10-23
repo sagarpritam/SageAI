@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiError, handleRouteError } from "@/lib/api-response";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const data = await backendRes.json();
     if (!backendRes.ok) {
-      return NextResponse.json({ error: data.detail || "Login failed" }, { status: backendRes.status });
+      return apiError(data.detail || "Login failed", backendRes.status);
     }
 
     const { access_token } = data;
@@ -35,8 +36,7 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return handleRouteError(err);
   }
 }

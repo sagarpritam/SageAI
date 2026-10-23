@@ -85,9 +85,13 @@ export default function Home() {
     connectWebSocket(newScanId, target);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const connectWebSocket = (id: string, target: string) => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/scan/${id}`);
+    const wsBase =
+      process.env.NEXT_PUBLIC_WS_URL ||
+      (typeof window !== "undefined" && window.location.hostname !== "localhost"
+        ? `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`
+        : "ws://localhost:8000");
+    const ws = new WebSocket(`${wsBase}/ws/scan/${id}`);
     
     ws.onmessage = (event) => {
       try {
