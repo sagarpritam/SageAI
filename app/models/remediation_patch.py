@@ -4,13 +4,12 @@ Stores proposed, approved, and applied AI code patches for Phase 04 SagePatch en
 Supports human approval workflows, sandboxed validation results, and deterministic diff tracking.
 """
 
-from datetime import datetime
 import enum
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (
     Boolean,
-    Column,
     DateTime,
     ForeignKey,
     Index,

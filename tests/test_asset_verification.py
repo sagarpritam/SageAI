@@ -41,7 +41,7 @@ def test_challenge_instructions():
 async def test_asset_challenge_and_verification_endpoints(
     client, auth_headers, db_session
 ):
-    from jose import jwt
+    import jwt
 
     token = auth_headers["Authorization"].split(" ")[1]
     payload = jwt.decode(
@@ -111,7 +111,7 @@ async def test_scan_blocks_internal_and_loopback_targets(client, auth_headers):
 async def test_scan_sets_is_authorized_on_verified_asset(
     client, auth_headers, db_session
 ):
-    from jose import jwt
+    import jwt
 
     token = auth_headers["Authorization"].split(" ")[1]
     payload = jwt.decode(

@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.database import Base
@@ -25,7 +26,7 @@ class Organization(Base):
     # Stripe Integration
     stripe_customer_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, unique=True)
     stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, unique=True)
-    created_at = Column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     # Relationships
     audit_logs = relationship(

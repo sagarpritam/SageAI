@@ -14,9 +14,9 @@ Tests:
 import time
 import uuid
 from unittest.mock import AsyncMock, patch
+
 import httpx
 import pytest
-from sqlalchemy import select
 
 from app.core.telemetry import (
     TraceSpan,
@@ -26,8 +26,6 @@ from app.core.telemetry import (
     record_child_span,
     trace_storage,
 )
-from app.models.organization import Organization
-from app.models.user import User
 from app.services.dast.zap_scanner import DASTAuthorizationError, StagedDASTScanner
 from app.services.monitoring.metrics_service import (
     compute_percentiles,
@@ -126,7 +124,7 @@ async def test_trace_waterfall_endpoints(client):
     trace_storage.record_span(root_span)
 
     # Child worker span
-    worker_span = record_child_span(
+    record_child_span(
         name="Worker: Ephemeral Scanner (Nmap)",
         duration_ms=150.0,
         status="ok",

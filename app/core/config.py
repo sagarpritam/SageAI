@@ -81,7 +81,7 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "SageAI Security Scanner"
     ENV: str = "development"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     # Internal service communication
     INTERNAL_SERVICE_KEY: str = ""  # Shared secret for Next.js → FastAPI service JWTs

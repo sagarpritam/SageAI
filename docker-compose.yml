@@ -47,6 +47,8 @@ services:
     ports:
       - "8000:8000"
     environment:
+      ENV: ${ENV:-development}
+      DEBUG: ${DEBUG:-true}
       DATABASE_URL: postgresql+asyncpg://sageai:${POSTGRES_PASSWORD:-changeme}@postgres:5432/sageai
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       ALGORITHM: HS256

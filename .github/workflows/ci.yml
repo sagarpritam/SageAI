@@ -97,7 +97,7 @@ jobs:
         working-directory: sage-web
         run: |
           npm ci
-          npm run lint || true
+          npm run lint
           npm run build
 
   # ––– Docker Build + Security Scan –––

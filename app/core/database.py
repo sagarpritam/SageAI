@@ -37,10 +37,14 @@ class Base(DeclarativeBase):
 # Dependency
 # ---------------------
 async def get_db():
-    """FastAPI dependency — yields an async database session."""
+    """FastAPI dependency — yields an async database session with auto-commit/rollback."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
         finally:
             await session.close()
 

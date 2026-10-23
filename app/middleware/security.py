@@ -1,50 +1,60 @@
 """Security headers middleware.
 
 Adds OWASP-recommended security headers to all responses.
-Implements HSTS, CSP, and other protective headers.
+Implements HSTS, CSP, and other protective headers via pure ASGI.
 """
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
+from starlette.datastructures import MutableHeaders
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Add security headers to every response."""
+class SecurityHeadersMiddleware:
+    """Add OWASP security headers to every HTTP response using pure ASGI."""
 
-    async def dispatch(self, request: Request, call_next) -> Response:
-        response = await call_next(request)
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
 
-        # Prevent clickjacking
-        response.headers["X-Frame-Options"] = "DENY"
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
 
-        # Prevent MIME sniffing
-        response.headers["X-Content-Type-Options"] = "nosniff"
+        async def send_wrapper(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
 
-        # XSS protection (legacy, but still useful)
-        response.headers["X-XSS-Protection"] = "1; mode=block"
+                # Prevent clickjacking
+                headers["X-Frame-Options"] = "DENY"
 
-        # Referrer policy
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+                # Prevent MIME sniffing
+                headers["X-Content-Type-Options"] = "nosniff"
 
-        # Strict transport security (HTTPS only)
-        response.headers["Strict-Transport-Security"] = (
-            "max-age=31536000; includeSubDomains"
-        )
+                # XSS protection (legacy, but still useful)
+                headers["X-XSS-Protection"] = "1; mode=block"
 
-        # Content Security Policy
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline'; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' data:; "
-            "connect-src 'self';"
-        )
+                # Referrer policy
+                headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-        # Permissions policy
-        response.headers["Permissions-Policy"] = (
-            "geolocation=(), microphone=(), camera=(), payment=()"
-        )
+                # Strict transport security (HTTPS only)
+                headers["Strict-Transport-Security"] = (
+                    "max-age=31536000; includeSubDomains"
+                )
 
-        return response
+                # Content Security Policy
+                headers["Content-Security-Policy"] = (
+                    "default-src 'self'; "
+                    "script-src 'self' 'unsafe-inline'; "
+                    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                    "font-src 'self' https://fonts.gstatic.com; "
+                    "img-src 'self' data: https:; "
+                    "connect-src 'self' https: wss: ws:;"
+                )
+
+                # Permissions policy
+                headers["Permissions-Policy"] = (
+                    "geolocation=(), microphone=(), camera=(), payment=()"
+                )
+
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)

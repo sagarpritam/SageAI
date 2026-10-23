@@ -10,7 +10,7 @@
  *   fetch(BACKEND + "/scan", { headers: { Authorization: `Bearer ${serviceToken}` } });
  */
 
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT } from "jose";
 
 const INTERNAL_SERVICE_KEY = process.env.INTERNAL_SERVICE_KEY || "";
 const SERVICE_TOKEN_MAX_AGE = 60; // seconds — must match backend SERVICE_TOKEN_MAX_AGE_SECONDS

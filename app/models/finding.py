@@ -3,11 +3,11 @@ SageAI 2.0 — Finding Model
 Stores individual vulnerability findings linked to scans.
 """
 
-from datetime import datetime
 import enum
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

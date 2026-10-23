@@ -10,9 +10,9 @@ Tests:
 7. Tamper-evident audit logging for all remediation lifecycle events.
 """
 
-import json
 import uuid
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from sqlalchemy import select
 
@@ -204,6 +204,7 @@ async def test_propose_patch_api_and_finding_lifecycle(client, db_session):
     # Verify Finding lifecycle transition
     await db_session.refresh(finding)
     assert finding.status == FindingStatus.in_progress
+    assert finding.notes is not None
     assert "Awaiting human approval" in finding.notes
 
     # Verify Audit Log

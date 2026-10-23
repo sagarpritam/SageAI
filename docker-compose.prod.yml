@@ -59,6 +59,8 @@ services:
         condition: service_healthy
     # Port removed for security in prod, Caddy routes to it internally
     environment:
+      ENV: production
+      DEBUG: "false"
       DATABASE_URL: postgresql+asyncpg://sageai:${POSTGRES_PASSWORD}@postgres:5432/sageai
       SECRET_KEY: ${SECRET_KEY}
       ALGORITHM: HS256
@@ -84,7 +86,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.worker
     restart: unless-stopped
     command: ["celery", "-A", "app.worker", "worker", "--loglevel=info"]
     depends_on:

@@ -51,12 +51,14 @@ class VectorStore:
             if doc["text"] == text:
                 return
 
+        meta: Dict[str, str] = {} if metadata is None else metadata
         embedding = await get_embedding(text)
         self.documents.append(
-            {"text": text, "metadata": metadata or {}, "embedding": embedding}
+            {"text": text, "metadata": meta, "embedding": embedding}
         )
         self._save()
-        logger.info(f"Added document: {metadata.get('title', 'Unknown')}")
+        title = meta.get("title", "Unknown")
+        logger.info(f"Added document: {title}")
 
     async def search(
         self, query: str, top_k: int = 3, threshold: float = 0.3

@@ -166,7 +166,6 @@ app.include_router(integration_routes.router)
 app.include_router(autofix_routes.router)
 app.include_router(asset_routes.router)
 app.include_router(agent_routes.router)
-app.include_router(intelligence_hub_routes.router)
 app.include_router(intelligence_hub_routes.router, prefix="/intelligence")
 app.include_router(intelligence_hub_routes.router, prefix="/intel")
 app.include_router(asm_routes.router)
@@ -204,34 +203,38 @@ async def health_check():
     except Exception:
         db_ok = False
 
-    return {
+    health_data = {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": "2.0.0",
         "environment": settings.ENV,
         "database": "connected" if db_ok else "unreachable",
-        "scanners": 11,
-        "intelligence_modules": 10,
-        "endpoints": 65,
-        "new_in_v2": [
-            "Asset Inventory",
-            "Attack Surface Management",
-            "AI Copilot",
-            "Bug Bounty Reports",
-            "Multi-Agent AI Team",
-            "Security Knowledge Graph",
-            "Plugin Marketplace",
-        ],
-        "new_in_v3": [
-            "Shodan Panopticon",
-            "Maltego Link Analysis",
-            "Babel X Dark Web",
-            "SpiderFoot Recon",
-            "Social Links De-Masking",
-            "Intel X Archives",
-            "Recon-ng Framework",
-            "Censys Global Radar",
-            "OSINT Industries Interceptor",
-            "Deep Search: The Abyss",
-        ],
     }
+    if settings.ENV != "production":
+        health_data.update({
+            "scanners": 11,
+            "intelligence_modules": 10,
+            "endpoints": 65,
+            "new_in_v2": [
+                "Asset Inventory",
+                "Attack Surface Management",
+                "AI Copilot",
+                "Bug Bounty Reports",
+                "Multi-Agent AI Team",
+                "Security Knowledge Graph",
+                "Plugin Marketplace",
+            ],
+            "new_in_v3": [
+                "Shodan Panopticon",
+                "Maltego Link Analysis",
+                "Babel X Dark Web",
+                "SpiderFoot Recon",
+                "Social Links De-Masking",
+                "Intel X Archives",
+                "Recon-ng Framework",
+                "Censys Global Radar",
+                "OSINT Industries Interceptor",
+                "Deep Search: The Abyss",
+            ],
+        })
+    return health_data

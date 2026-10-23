@@ -12,14 +12,17 @@ Tests:
 
 import uuid
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from sqlalchemy import select
 
-from app.models.finding import Finding
 from app.models.organization import Organization
 from app.models.scan import Scan
 from app.models.user import User
-from app.services.worker.fleet_manager import fleet_manager, generate_scan_idempotency_key
+from app.services.worker.fleet_manager import (
+    fleet_manager,
+    generate_scan_idempotency_key,
+)
 
 
 async def get_test_tenant(client, prefix: str):

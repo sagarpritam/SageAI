@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Routes that require authentication
-const protectedRoutes = ['/history', '/dashboard']
+const protectedRoutes = ['/history', '/dashboard', '/settings']
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get('sageai_jwt')?.value

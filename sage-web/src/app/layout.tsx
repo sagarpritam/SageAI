@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sageai.vercel.app"),
   title: {
     default: "SageAI — Autonomous AI Pentester",
     template: "%s | SageAI"

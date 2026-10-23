@@ -27,11 +27,11 @@ def scan_ssl(hostname: str, port: int = 443) -> list[dict]:
                 cipher = ssock.cipher()
 
                 # Check certificate expiration
-                not_after_str = cert["notAfter"] if cert else None  # type: ignore[index]
-                if not_after_str is None:
-                    raise ValueError("Missing notAfter in certificate")
+                not_after_raw = cert.get("notAfter") if isinstance(cert, dict) else None
+                if not isinstance(not_after_raw, str):
+                    raise ValueError("Missing or invalid notAfter in certificate")
                 not_after = datetime.strptime(
-                    not_after_str, "%b %d %H:%M:%S %Y %Z"
+                    not_after_raw, "%b %d %H:%M:%S %Y %Z"
                 ).replace(tzinfo=timezone.utc)
                 days_left = (not_after - datetime.now(timezone.utc)).days
 

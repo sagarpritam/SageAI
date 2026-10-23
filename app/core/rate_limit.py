@@ -25,9 +25,9 @@ def get_client_identifier(request: Request) -> str:
     token = internal_header.replace("Bearer ", "").strip()
     if token and settings.INTERNAL_SERVICE_KEY:
         try:
-            from jose import jwt as jose_jwt
+            import jwt
 
-            payload = jose_jwt.decode(
+            payload = jwt.decode(
                 token, settings.INTERNAL_SERVICE_KEY, algorithms=["HS256"]
             )
             if payload.get("type") == "internal_service":

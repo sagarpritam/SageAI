@@ -3,8 +3,8 @@
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
+import jwt
 import pytest
-from jose import jwt
 
 from app.core.config import settings
 from app.core.security import (
@@ -78,7 +78,11 @@ class TestAccessTokens:
     def test_token_rejected_with_wrong_secret(self):
         token = create_access_token({"sub": "user-1"})
         with pytest.raises(Exception):
-            jwt.decode(token, "wrong-secret", algorithms=["HS256"])
+            jwt.decode(
+                token,
+                "wrong-secret-key-that-is-at-least-32-bytes-long",
+                algorithms=["HS256"],
+            )
 
 
 # ── Service Tokens ──────────────────────────────

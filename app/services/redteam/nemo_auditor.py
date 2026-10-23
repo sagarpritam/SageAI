@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from nemo_microservices import NeMoMicroservices
 
@@ -40,10 +40,10 @@ class NeMoAuditor:
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
-        default_options = {"openai": {"uri": uri, "max_tokens": 1024, "seed": 42}}
+        default_options: Dict[str, Any] = {"openai": {"uri": uri, "max_tokens": 1024, "seed": 42}}
 
         try:
-            target = self._client.beta.audit.targets.create(  # type: ignore[call-arg]
+            target = cast(Any, self._client.beta.audit.targets).create(
                 namespace=namespace,
                 name=name,
                 type=target_type,
@@ -63,7 +63,7 @@ class NeMoAuditor:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
         try:
-            targets = self._client.beta.audit.targets.list(namespace=namespace)  # type: ignore[call-arg]
+            targets = cast(Any, self._client.beta.audit.targets).list(namespace=namespace)
             return [t.model_dump() for t in targets]
         except Exception as e:
             logger.error(f"Failed to list audit targets: {e}")
@@ -83,7 +83,7 @@ class NeMoAuditor:
 
         try:
             # Typical probes include 'jailbreak', 'pii_leakage', 'offensive_content'
-            job = self._client.beta.audit.jobs.create(  # type: ignore[call-arg]
+            job = cast(Any, self._client.beta.audit.jobs).create(
                 namespace=namespace,
                 target_name=target_name,
                 probes=probes or ["jailbreak"],

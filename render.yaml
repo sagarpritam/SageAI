@@ -35,34 +35,21 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
 
-  # React Frontend (Static Site)
+  # Next.js Frontend
   - type: web
     name: SageAI-dashboard
-    runtime: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: cd sage-web && npm install && npm run build
+    startCommand: cd sage-web && npm start
     envVars:
-      - key: VITE_API_URL
+      - key: BACKEND_URL
         value: https://sageai-api.onrender.com
-    routes:
-      - type: rewrite
-        source: /auth/*
-        destination: https://sageai-api.onrender.com/auth/*
-      - type: rewrite
-        source: /scan*
-        destination: https://sageai-api.onrender.com/scan*
-      - type: rewrite
-        source: /reports/*
-        destination: https://sageai-api.onrender.com/reports/*
-      - type: rewrite
-        source: /explain/*
-        destination: https://sageai-api.onrender.com/explain/*
-      - type: rewrite
-        source: /org/*
-        destination: https://sageai-api.onrender.com/org/*
-      - type: rewrite
-        source: /*
-        destination: /index.html
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20
     headers:
       - path: /*
         name: X-Frame-Options

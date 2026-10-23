@@ -104,9 +104,9 @@ async def get_ci_policy(
 
     return {
         "organization": org.name,
-        "ci_fail_on_critical": bool(org.ci_fail_on_critical),
-        "ci_fail_on_high": bool(org.ci_fail_on_high),
-        "ci_auto_remediate": bool(org.ci_auto_remediate),
+        "ci_fail_on_critical": org.ci_fail_on_critical,
+        "ci_fail_on_high": org.ci_fail_on_high,
+        "ci_auto_remediate": org.ci_auto_remediate,
     }
 
 

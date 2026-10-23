@@ -13,16 +13,18 @@ Tests:
 
 import uuid
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from sqlalchemy import select
 
 from app.agents.copilot import copilot_agent
 from app.models.audit_log import AuditLog
-from app.models.finding import Finding
 from app.models.organization import Organization
 from app.models.scan import Scan
 from app.models.user import User
-from app.services.threat_feed.cve_indexer import CVEIndexer, ThreatVulnerability, cve_indexer
+from app.services.threat_feed.cve_indexer import (
+    CVEIndexer,
+)
 
 
 async def get_test_tenant(client, prefix: str):
