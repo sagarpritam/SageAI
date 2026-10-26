@@ -12,6 +12,7 @@ Tests:
 """
 
 import uuid
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -82,7 +83,10 @@ async def test_threat_indexer_search_and_deduplication():
     assert cve.product is not None and "MOVEit" in cve.product
 
     # Test stale feed detection
+    indexer._last_synced = datetime.now(timezone.utc)
     assert not indexer.is_stale(max_age_hours=24)
+    indexer._last_synced = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    assert indexer.is_stale(max_age_hours=24)
 
 
 # ─────────────────────────────────────────────────────────────
