@@ -74,19 +74,6 @@ export function AutoFixPanel() {
   const [rejectionModalId, setRejectionModalId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  useEffect(() => {
-    axios
-      .get("/api/autofix")
-      .then((r) => {
-        setReady(r.data.ready);
-        setStatusMsg(r.data.message);
-      })
-      .catch(() => setStatusMsg("Failed to check autofix status."))
-      .finally(() => setCheckingStatus(false));
-
-    fetchPatches();
-  }, []);
-
   const fetchPatches = async () => {
     setLoadingPatches(true);
     try {
@@ -99,6 +86,19 @@ export function AutoFixPanel() {
       setLoadingPatches(false);
     }
   };
+
+  useEffect(() => {
+    axios
+      .get("/api/autofix")
+      .then((r) => {
+        setReady(r.data.ready);
+        setStatusMsg(r.data.message);
+      })
+      .catch(() => setStatusMsg("Failed to check autofix status."))
+      .finally(() => setCheckingStatus(false));
+
+    fetchPatches();
+  }, []);
 
   const handleRun = async () => {
     if (!repo.trim()) return;
