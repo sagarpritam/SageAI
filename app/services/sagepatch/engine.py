@@ -30,7 +30,17 @@ from app.utils.helpers import utc_now
 logger = logging.getLogger("SageAI.sagepatch")
 
 ALLOWED_FILE_EXTENSIONS = {
-    ".py", ".js", ".jsx", ".ts", ".tsx", ".json", ".yaml", ".yml", ".go", ".html", ".css"
+    ".py",
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".go",
+    ".html",
+    ".css",
 }
 
 DANGEROUS_AST_CALLS = {"eval", "exec", "__import__"}
@@ -38,20 +48,25 @@ DANGEROUS_AST_CALLS = {"eval", "exec", "__import__"}
 
 class SagePatchError(Exception):
     """Base exception for SagePatch remediation failures."""
+
     pass
 
 
 class SandboxedValidationError(SagePatchError):
     """Raised when an AI patch violates sandbox security constraints."""
+
     pass
 
 
 class ApprovalRequiredError(SagePatchError):
     """Raised when an action violates the mandatory human approval policy."""
+
     pass
 
 
-def generate_deterministic_diff(file_path: str, original_code: str, patched_code: str) -> str:
+def generate_deterministic_diff(
+    file_path: str, original_code: str, patched_code: str
+) -> str:
     """Generate a canonical, deterministic unified diff with consistent headers."""
     orig_lines = original_code.splitlines(keepends=True)
     patch_lines = patched_code.splitlines(keepends=True)
@@ -72,7 +87,9 @@ def generate_deterministic_diff(file_path: str, original_code: str, patched_code
     return "".join(diff)
 
 
-def validate_sandbox(file_path: str, original_code: str, patched_code: str) -> Dict[str, Any]:
+def validate_sandbox(
+    file_path: str, original_code: str, patched_code: str
+) -> Dict[str, Any]:
     """Execute sandboxed security and syntactic validation on a proposed patch.
 
     Validates:
@@ -90,11 +107,15 @@ def validate_sandbox(file_path: str, original_code: str, patched_code: str) -> D
 
     _, ext = os.path.splitext(normalized_path)
     if ext.lower() not in ALLOWED_FILE_EXTENSIONS:
-        reasons.append(f"File extension '{ext}' is not within allowed remediation extensions.")
+        reasons.append(
+            f"File extension '{ext}' is not within allowed remediation extensions."
+        )
 
     for pattern in RESTRICTED_FILE_PATTERNS:
         if re.search(pattern, normalized_path, re.IGNORECASE):
-            reasons.append(f"Target path '{file_path}' matches restricted file pattern: {pattern}")
+            reasons.append(
+                f"Target path '{file_path}' matches restricted file pattern: {pattern}"
+            )
             break
 
     # 2. Content Diff & Size Bounds
@@ -104,23 +125,31 @@ def validate_sandbox(file_path: str, original_code: str, patched_code: str) -> D
     if not patch_stripped:
         reasons.append("Proposed patch code is empty.")
     elif orig_stripped == patch_stripped:
-        reasons.append("Proposed patch is identical to original code (no changes made).")
+        reasons.append(
+            "Proposed patch is identical to original code (no changes made)."
+        )
 
     orig_lines = original_code.splitlines()
     patch_lines = patched_code.splitlines()
     max_len = max(len(orig_lines), len(patch_lines))
     diff_count = sum(
-        1 for i in range(max_len)
-        if (orig_lines[i] if i < len(orig_lines) else None) != (patch_lines[i] if i < len(patch_lines) else None)
+        1
+        for i in range(max_len)
+        if (orig_lines[i] if i < len(orig_lines) else None)
+        != (patch_lines[i] if i < len(patch_lines) else None)
     )
 
     if diff_count > MAX_LINES_CHANGED:
-        reasons.append(f"Patch changes {diff_count} lines, exceeding the limit of {MAX_LINES_CHANGED}.")
+        reasons.append(
+            f"Patch changes {diff_count} lines, exceeding the limit of {MAX_LINES_CHANGED}."
+        )
 
     # 3. Anti-Injection Pattern Check in Patched Code
     for pattern in INJECTION_PATTERNS:
         if re.search(pattern, patched_code, re.IGNORECASE):
-            reasons.append(f"Patched code contains prohibited prompt injection or malicious pattern: {pattern}")
+            reasons.append(
+                f"Patched code contains prohibited prompt injection or malicious pattern: {pattern}"
+            )
             break
 
     # 4. Syntactic AST Validation (for Python files)
@@ -132,12 +161,19 @@ def validate_sandbox(file_path: str, original_code: str, patched_code: str) -> D
             # Inspect AST for dangerous calls
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call):
-                    if isinstance(node.func, ast.Name) and node.func.id in DANGEROUS_AST_CALLS:
+                    if (
+                        isinstance(node.func, ast.Name)
+                        and node.func.id in DANGEROUS_AST_CALLS
+                    ):
                         security_valid = False
-                        reasons.append(f"Prohibited dangerous function '{node.func.id}()' introduced in patch.")
+                        reasons.append(
+                            f"Prohibited dangerous function '{node.func.id}()' introduced in patch."
+                        )
         except SyntaxError as syn_err:
             syntax_valid = False
-            reasons.append(f"Syntactic parsing failure: SyntaxError at line {syn_err.lineno}: {syn_err.msg}")
+            reasons.append(
+                f"Syntactic parsing failure: SyntaxError at line {syn_err.lineno}: {syn_err.msg}"
+            )
 
     safe = len(reasons) == 0 and syntax_valid and security_valid
     return {
@@ -172,7 +208,9 @@ class SagePatchEngine:
         # 1. Run Sandboxed Security Validation
         validation = validate_sandbox(file_path, original_code, patched_code)
         if not validation["safe"]:
-            logger.warning(f"SagePatch sandbox validation rejected patch for {file_path}: {validation['reasons']}")
+            logger.warning(
+                f"SagePatch sandbox validation rejected patch for {file_path}: {validation['reasons']}"
+            )
             raise SandboxedValidationError(
                 f"Patch rejected by sandbox guardrails: {'; '.join(validation['reasons'])}"
             )
@@ -181,7 +219,9 @@ class SagePatchEngine:
         diff = generate_deterministic_diff(file_path, original_code, patched_code)
 
         # 3. Build isolated branch name
-        vuln_slug = re.sub(r"[^a-zA-Z0-9]+", "-", vulnerability_type.lower()).strip("-")[:24]
+        vuln_slug = re.sub(r"[^a-zA-Z0-9]+", "-", vulnerability_type.lower()).strip(
+            "-"
+        )[:24]
         patch_branch = f"sagepatch/fix-{vuln_slug}-{uuid.uuid4().hex[:8]}"
 
         # 4. Persist RemediationPatch
@@ -239,7 +279,9 @@ class SagePatchEngine:
             },
         )
 
-        logger.info(f"SagePatch: proposed patch {patch.id} on isolated branch {patch.patch_branch}")
+        logger.info(
+            f"SagePatch: proposed patch {patch.id} on isolated branch {patch.patch_branch}"
+        )
         return patch
 
     async def approve_and_dispatch(
@@ -282,7 +324,9 @@ class SagePatchEngine:
         # 3. Parse repository coordinates
         parts = patch.repository.strip("/").split("/")
         if len(parts) != 2:
-            raise SagePatchError(f"Invalid repository format: '{patch.repository}'. Expected 'owner/repo'.")
+            raise SagePatchError(
+                f"Invalid repository format: '{patch.repository}'. Expected 'owner/repo'."
+            )
         owner, repo = parts
 
         # 4. Dispatch GitHub PR on isolated branch
@@ -290,7 +334,9 @@ class SagePatchEngine:
 
         try:
             # Create isolated branch
-            await github.create_branch(owner, repo, patch.base_branch, patch.patch_branch)
+            await github.create_branch(
+                owner, repo, patch.base_branch, patch.patch_branch
+            )
 
             # Commit patched file with signed trailer
             commit_msg = (
@@ -309,7 +355,9 @@ class SagePatchEngine:
             )
 
             # Open Pull Request
-            pr_title = f"[SagePatch] Fix {patch.vulnerability_type} in {patch.file_path}"
+            pr_title = (
+                f"[SagePatch] Fix {patch.vulnerability_type} in {patch.file_path}"
+            )
             pr_body = (
                 f"### 🛡️ SageAI SagePatch Automated Remediation\n\n"
                 f"**Vulnerability:** `{patch.vulnerability_type}` ({patch.severity})\n"
@@ -382,7 +430,9 @@ class SagePatchEngine:
             },
         )
 
-        logger.info(f"SagePatch: patch {patch.id} approved by {approved_by}. PR: {pr_url}")
+        logger.info(
+            f"SagePatch: patch {patch.id} approved by {approved_by}. PR: {pr_url}"
+        )
         return patch
 
     async def reject_patch(

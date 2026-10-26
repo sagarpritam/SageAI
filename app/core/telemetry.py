@@ -90,15 +90,17 @@ class TraceStorage:
                 root_span = sorted_spans[0]
                 total_duration = sum(s.duration_ms for s in sorted_spans)
                 has_error = any(s.status == "error" for s in sorted_spans)
-                results.append({
-                    "trace_id": tid,
-                    "root_name": root_span.name,
-                    "start_time": root_span.start_time,
-                    "duration_ms": round(total_duration, 2),
-                    "span_count": len(sorted_spans),
-                    "status": "error" if has_error else "ok",
-                    "path": root_span.attributes.get("http.target", ""),
-                })
+                results.append(
+                    {
+                        "trace_id": tid,
+                        "root_name": root_span.name,
+                        "start_time": root_span.start_time,
+                        "duration_ms": round(total_duration, 2),
+                        "span_count": len(sorted_spans),
+                        "status": "error" if has_error else "ok",
+                        "path": root_span.attributes.get("http.target", ""),
+                    }
+                )
             return results
 
     def clear(self) -> None:
@@ -125,7 +127,9 @@ def parse_traceparent(header_val: str) -> Optional[tuple[str, str]]:
     """Parse W3C traceparent header: '00-{trace_id}-{parent_id}-{trace_flags}'."""
     if not header_val:
         return None
-    match = re.match(r"^00-([0-9a-fA-F]{32})-([0-9a-fA-F]{16})-[0-9a-fA-F]{2}$", header_val.strip())
+    match = re.match(
+        r"^00-([0-9a-fA-F]{32})-([0-9a-fA-F]{16})-[0-9a-fA-F]{2}$", header_val.strip()
+    )
     if match:
         return match.group(1).lower(), match.group(2).lower()
     return None

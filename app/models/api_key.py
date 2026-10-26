@@ -25,7 +25,9 @@ class APIKey(Base):
         String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
     # Relationships

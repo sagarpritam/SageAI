@@ -23,8 +23,11 @@ async def engine():
         await conn.run_sync(Base.metadata.create_all)
 
     import app.core.database
+
     original_sessionmaker = app.core.database.AsyncSessionLocal
-    app.core.database.AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    app.core.database.AsyncSessionLocal = async_sessionmaker(
+        engine, expire_on_commit=False
+    )
 
     yield engine
 

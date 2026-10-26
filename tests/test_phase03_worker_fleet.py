@@ -56,12 +56,15 @@ async def get_test_tenant(client, prefix: str):
 # 1. Idempotency Engine & Key Generation Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_idempotency_key_generation_and_reuse(client, db_session):
     """Verify that identical scans with the same idempotency key are deduplicated."""
     headers, org_name = await get_test_tenant(client, "idem")
     org = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
     ).scalar_one()
 
     key1 = generate_scan_idempotency_key(org.id, "https://api.example.com", "full")
@@ -72,8 +75,12 @@ async def test_idempotency_key_generation_and_reuse(client, db_session):
     key_deep = generate_scan_idempotency_key(org.id, "https://api.example.com", "deep")
     assert key1 != key_deep
 
-    with patch("app.routers.scan_routes.run_all_scans", new_callable=AsyncMock) as mock_scan:
-        mock_scan.return_value = [{"type": "port_open", "severity": "low", "detail": "port 80"}]
+    with patch(
+        "app.routers.scan_routes.run_all_scans", new_callable=AsyncMock
+    ) as mock_scan:
+        mock_scan.return_value = [
+            {"type": "port_open", "severity": "low", "detail": "port 80"}
+        ]
 
         # 1. Submit first scan with idempotency key
         res1 = await client.post(
@@ -105,13 +112,18 @@ async def test_idempotency_key_generation_and_reuse(client, db_session):
 # 2. Async Worker Fleet Dispatch & Staged Progress Tracking
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_async_worker_fleet_dispatch(client, db_session):
     """Verify async_mode dispatches to worker fleet and returns 200/201 immediately."""
     headers, org_name = await get_test_tenant(client, "async_fleet")
 
-    with patch("app.services.scanner_service.run_all_scans", new_callable=AsyncMock) as mock_scan:
-        mock_scan.return_value = [{"type": "port_open", "severity": "low", "detail": "port 443"}]
+    with patch(
+        "app.services.scanner_service.run_all_scans", new_callable=AsyncMock
+    ) as mock_scan:
+        mock_scan.return_value = [
+            {"type": "port_open", "severity": "low", "detail": "port 443"}
+        ]
 
         res = await client.post(
             "/scan",
@@ -140,6 +152,7 @@ async def test_async_worker_fleet_dispatch(client, db_session):
 # 3. Scan Cancellation & Cross-Tenant Security
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_scan_cancellation_and_tenant_security(client, db_session):
     """Ensure active scans can be cancelled, and foreign tenants cannot cancel scans."""
@@ -147,11 +160,15 @@ async def test_scan_cancellation_and_tenant_security(client, db_session):
     headers_b, org_name_b = await get_test_tenant(client, "cancel_b")
 
     org_a = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name_a))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name_a)
+        )
     ).scalar_one()
     user_a = (
-        await db_session.execute(select(User).where(User.organization_id == org_a.id))
-    ).scalars().first()
+        (await db_session.execute(select(User).where(User.organization_id == org_a.id)))
+        .scalars()
+        .first()
+    )
 
     # Create active scan for Org A
     scan_a = Scan(
@@ -184,6 +201,7 @@ async def test_scan_cancellation_and_tenant_security(client, db_session):
 # 4. Fleet Status & Health Monitoring Endpoint
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_worker_fleet_status_endpoint(client):
     """Test GET /scan/fleet/status for worker queue metrics."""
@@ -202,16 +220,21 @@ async def test_worker_fleet_status_endpoint(client):
 # 5. Alert Triggering on Worker Scan Completion
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_worker_completion_triggers_notifications(client, db_session):
     """Verify that background worker completion automatically triggers multi-channel alerts."""
     headers, org_name = await get_test_tenant(client, "alert_worker")
     org = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
     ).scalar_one()
     user = (
-        await db_session.execute(select(User).where(User.organization_id == org.id))
-    ).scalars().first()
+        (await db_session.execute(select(User).where(User.organization_id == org.id)))
+        .scalars()
+        .first()
+    )
 
     scan = Scan(
         id=str(uuid.uuid4()),
@@ -224,12 +247,22 @@ async def test_worker_completion_triggers_notifications(client, db_session):
     await db_session.commit()
 
     with (
-        patch("app.services.worker.fleet_manager.dispatch_security_alert", new_callable=AsyncMock) as mock_dispatch,
-        patch("app.services.scanner_service.run_all_scans", new_callable=AsyncMock) as mock_scans,
+        patch(
+            "app.services.worker.fleet_manager.dispatch_security_alert",
+            new_callable=AsyncMock,
+        ) as mock_dispatch,
+        patch(
+            "app.services.scanner_service.run_all_scans", new_callable=AsyncMock
+        ) as mock_scans,
     ):
         mock_dispatch.return_value = 1
         mock_scans.return_value = [
-            {"type": "ssl_invalid", "severity": "high", "detail": "expired cert", "cvss": 7.5}
+            {
+                "type": "ssl_invalid",
+                "severity": "high",
+                "detail": "expired cert",
+                "cvss": 7.5,
+            }
         ]
 
         # Run worker scan

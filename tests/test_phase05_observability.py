@@ -65,6 +65,7 @@ async def get_test_tenant(client, prefix: str):
 # 1. Distributed Tracing & W3C Context Propagation Tests
 # ─────────────────────────────────────────────────────────────
 
+
 def test_traceparent_header_parsing():
     """Verify standard W3C traceparent header parser."""
     valid_header = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
@@ -154,6 +155,7 @@ async def test_trace_waterfall_endpoints(client):
 # 2. Operations & Reliability Metrics Tests
 # ─────────────────────────────────────────────────────────────
 
+
 def test_compute_percentiles():
     """Verify percentile calculation for SLA reporting."""
     samples = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0]
@@ -197,6 +199,7 @@ def test_threat_feed_staleness_detection():
     record_feed_sync_timestamp(stale_ts)
 
     from app.services.monitoring.metrics_service import _LAST_FEED_SYNC_TIME
+
     hours_since = (time.time() - _LAST_FEED_SYNC_TIME) / 3600.0
     assert hours_since >= 24.0
 
@@ -204,6 +207,7 @@ def test_threat_feed_staleness_detection():
 # ─────────────────────────────────────────────────────────────
 # 3. Two-Tier DAST Scanner Tests (Passive Baseline & Staging Active)
 # ─────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_dast_passive_baseline_scan():
@@ -303,7 +307,10 @@ async def test_dast_api_endpoint_authorization_enforcement(client):
     assert "not an authorized staging asset" in res_denied.json()["detail"]
 
     # Authorized passive scan -> 200
-    with patch("app.services.dast.zap_scanner.StagedDASTScanner.scan_target", new_callable=AsyncMock) as mock_scan:
+    with patch(
+        "app.services.dast.zap_scanner.StagedDASTScanner.scan_target",
+        new_callable=AsyncMock,
+    ) as mock_scan:
         mock_scan.return_value = {
             "status": "completed",
             "target": "https://staging.authorized.com",

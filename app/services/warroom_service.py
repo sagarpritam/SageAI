@@ -21,6 +21,7 @@ try:
     from sagestrike.event_bus import (
         EventType as _SsEventType,
     )
+
     _SAGESTRIKE_AVAILABLE = True
 except ImportError:
     _SsEvent = None  # type: ignore[assignment]

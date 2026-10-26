@@ -51,7 +51,9 @@ class ProposePatchRequest(BaseModel):
     repository: str = Field(..., description="GitHub repository 'owner/repo'")
     file_path: str = Field(..., description="Relative file path within repository")
     vulnerability_type: str = Field(..., description="Vulnerability type or test ID")
-    severity: str = Field(default="MEDIUM", description="Severity (LOW, MEDIUM, HIGH, CRITICAL)")
+    severity: str = Field(
+        default="MEDIUM", description="Severity (LOW, MEDIUM, HIGH, CRITICAL)"
+    )
     original_code: str = Field(..., description="Original code before patch")
     patched_code: str = Field(..., description="AI proposed patched code")
     base_branch: str = Field(default="main", description="Target base branch")
@@ -59,12 +61,15 @@ class ProposePatchRequest(BaseModel):
 
 
 class RejectPatchRequest(BaseModel):
-    reason: str = Field(..., min_length=3, description="Rationale for rejecting the patch")
+    reason: str = Field(
+        ..., min_length=3, description="Rationale for rejecting the patch"
+    )
 
 
 # ─────────────────────────────────────────────────────────────
 # 1. Status & Readiness
 # ─────────────────────────────────────────────────────────────
+
 
 @router.get("/status", response_model=AutoFixStatusResponse)
 async def autofix_status(
@@ -86,6 +91,7 @@ async def autofix_status(
 # ─────────────────────────────────────────────────────────────
 # 2. SagePatch Remediation Review Queue (Phase 04)
 # ─────────────────────────────────────────────────────────────
+
 
 @router.get("/patches")
 async def list_remediation_patches(
@@ -309,6 +315,7 @@ async def reject_patch(
 # ─────────────────────────────────────────────────────────────
 # 3. Pipeline Run (Backward Compatibility & Automation)
 # ─────────────────────────────────────────────────────────────
+
 
 @router.post("/run")
 async def run_autofix(

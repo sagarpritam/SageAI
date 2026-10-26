@@ -28,6 +28,7 @@ threat_feed_router = APIRouter(prefix="/threat-feed", tags=["Threat Intelligence
 # Request / Response Schemas
 # ─────────────────────────────────────────────────────────────
 
+
 class CopilotChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=4000)
     context: Optional[Dict[str, Any]] = None
@@ -55,6 +56,7 @@ class PoCGenerateRequest(BaseModel):
 # Copilot Endpoints
 # ─────────────────────────────────────────────────────────────
 
+
 @router.post("/chat")
 async def copilot_chat(
     req: CopilotChatRequest,
@@ -78,7 +80,11 @@ async def copilot_chat(
         action="COPILOT_QUERY",
         resource_type="copilot",
         user_id=user_id,
-        details={"message_len": len(req.message), "has_context": bool(req.context), "streaming": req.stream},
+        details={
+            "message_len": len(req.message),
+            "has_context": bool(req.context),
+            "streaming": req.stream,
+        },
         ip_address=client_ip,
     )
 
@@ -134,7 +140,9 @@ async def explain_vulnerability(
     )
 
     if not explanation.get("authorized", True):
-        raise HTTPException(status_code=403, detail=explanation.get("error", "Access denied."))
+        raise HTTPException(
+            status_code=403, detail=explanation.get("error", "Access denied.")
+        )
 
     return explanation
 
@@ -167,11 +175,15 @@ async def generate_safe_poc(
 async def get_threat_intel(
     query: str = Query(default="", description="Search CVE, product, or keyword"),
     limit: int = Query(default=10, ge=1, le=50),
-    kev_only: bool = Query(default=False, description="Filter for CISA KEV actively exploited only"),
+    kev_only: bool = Query(
+        default=False, description="Filter for CISA KEV actively exploited only"
+    ),
     current_user: dict = Depends(get_current_user),
 ):
     """Search live CISA KEV and indexed CVE threat intelligence."""
-    results = copilot_agent.query_threat_intel(query=query, limit=limit, kev_only=kev_only)
+    results = copilot_agent.query_threat_intel(
+        query=query, limit=limit, kev_only=kev_only
+    )
     return {
         "count": len(results),
         "results": results,
@@ -212,6 +224,7 @@ async def list_copilot_tools(current_user: dict = Depends(get_current_user)):
 # Threat Feed Router (Used by Dashboard & ThreatFeed component)
 # ─────────────────────────────────────────────────────────────
 
+
 @threat_feed_router.get("")
 async def get_recent_threat_feed(
     limit: int = Query(default=20, ge=1, le=100),
@@ -225,16 +238,18 @@ async def get_recent_threat_feed(
     threats = cve_indexer.get_recent(limit=limit, kev_only=kev_only)
     feed_items = []
     for t in threats:
-        feed_items.append({
-            "id": t.id,
-            "title": t.title,
-            "severity": t.severity,
-            "source": t.source,
-            "published": t.published,
-            "url": t.url or f"https://nvd.nist.gov/vuln/detail/{t.id}",
-            "is_kev": t.is_kev,
-            "ransomware": t.ransomware_campaign,
-        })
+        feed_items.append(
+            {
+                "id": t.id,
+                "title": t.title,
+                "severity": t.severity,
+                "source": t.source,
+                "published": t.published,
+                "url": t.url or f"https://nvd.nist.gov/vuln/detail/{t.id}",
+                "is_kev": t.is_kev,
+                "ransomware": t.ransomware_campaign,
+            }
+        )
     return feed_items
 
 

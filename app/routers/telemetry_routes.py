@@ -7,7 +7,6 @@ Exposes:
 - POST /dast/scan: Two-tier DAST scanner (passive baseline + authorized staging active)
 """
 
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,14 +21,22 @@ router = APIRouter(tags=["Observability & Release Hardening"])
 
 
 class DASTScanRequest(BaseModel):
-    target: str = Field(..., description="Target URL (e.g. https://staging.example.com)")
-    mode: str = Field(default="passive", description="'passive' (baseline) or 'active' (staging probes)")
-    is_authorized: bool = Field(default=False, description="Whether target is an authorized staging asset")
+    target: str = Field(
+        ..., description="Target URL (e.g. https://staging.example.com)"
+    )
+    mode: str = Field(
+        default="passive",
+        description="'passive' (baseline) or 'active' (staging probes)",
+    )
+    is_authorized: bool = Field(
+        default=False, description="Whether target is an authorized staging asset"
+    )
 
 
 # ─────────────────────────────────────────────────────────────
 # 1. Distributed Traces Endpoints
 # ─────────────────────────────────────────────────────────────
+
 
 @router.get("/telemetry/traces")
 async def list_recent_traces(
@@ -70,6 +77,7 @@ async def get_trace_waterfall(
 # 2. Operations & Reliability Metrics Endpoint
 # ─────────────────────────────────────────────────────────────
 
+
 @router.get("/metrics/operations")
 async def operational_scorecard(
     db: AsyncSession = Depends(get_db),
@@ -82,6 +90,7 @@ async def operational_scorecard(
 # ─────────────────────────────────────────────────────────────
 # 3. Authorized Staging DAST Scanner Endpoint
 # ─────────────────────────────────────────────────────────────
+
 
 @router.post("/dast/scan")
 async def run_dast_scan(

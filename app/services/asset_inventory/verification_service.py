@@ -112,7 +112,10 @@ async def _safe_http_probe(
                 logger.warning(
                     f"Blocked HTTP challenge hop {hop} to '{current_url}': {error_msg}"
                 )
-                return False, f"Redirect target '{current_url}' is not permitted: {error_msg}"
+                return (
+                    False,
+                    f"Redirect target '{current_url}' is not permitted: {error_msg}",
+                )
 
             try:
                 res = await client.get(

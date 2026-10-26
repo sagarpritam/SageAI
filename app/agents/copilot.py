@@ -47,7 +47,9 @@ class CopilotAgent:
         """Sanitize user input against prompt injection patterns."""
         sanitized = text
         for pattern in INJECTION_PATTERNS:
-            sanitized = re.sub(pattern, "[FILTERED_INJECTION]", sanitized, flags=re.IGNORECASE)
+            sanitized = re.sub(
+                pattern, "[FILTERED_INJECTION]", sanitized, flags=re.IGNORECASE
+            )
         return sanitized
 
     async def get_scan_summary(
@@ -62,7 +64,9 @@ class CopilotAgent:
         scan = res.scalar_one_or_none()
 
         if not scan:
-            logger.warning(f"Tenant {org_id} attempted unauthorized or invalid scan access: {scan_id}")
+            logger.warning(
+                f"Tenant {org_id} attempted unauthorized or invalid scan access: {scan_id}"
+            )
             return {
                 "error": f"Scan '{scan_id}' not found or does not belong to your organization.",
                 "authorized": False,
@@ -76,18 +80,28 @@ class CopilotAgent:
         severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
         findings_summary = []
         for f in findings:
-            sev = f.severity.value.lower() if hasattr(f.severity, "value") else str(f.severity).lower()
+            sev = (
+                f.severity.value.lower()
+                if hasattr(f.severity, "value")
+                else str(f.severity).lower()
+            )
             if sev in severity_counts:
                 severity_counts[sev] += 1
-            findings_summary.append({
-                "id": f.id,
-                "title": f.title,
-                "severity": f.severity.value if hasattr(f.severity, "value") else str(f.severity),
-                "cve_id": getattr(f, "cve_id", None),
-                "status": f.status.value if hasattr(f.status, "value") else str(f.status),
-                "cvss_score": f.cvss_score,
-                "target": f.asset_identified or scan.target,
-            })
+            findings_summary.append(
+                {
+                    "id": f.id,
+                    "title": f.title,
+                    "severity": f.severity.value
+                    if hasattr(f.severity, "value")
+                    else str(f.severity),
+                    "cve_id": getattr(f, "cve_id", None),
+                    "status": f.status.value
+                    if hasattr(f.status, "value")
+                    else str(f.status),
+                    "cvss_score": f.cvss_score,
+                    "target": f.asset_identified or scan.target,
+                }
+            )
 
         return {
             "authorized": True,
@@ -117,9 +131,13 @@ class CopilotAgent:
 
         # If a finding_id was provided, verify tenant ownership
         if finding_id and db and org_id:
-            query = select(Finding).join(Scan).where(
-                Finding.id == finding_id,
-                Scan.organization_id == org_id,
+            query = (
+                select(Finding)
+                .join(Scan)
+                .where(
+                    Finding.id == finding_id,
+                    Scan.organization_id == org_id,
+                )
             )
             res = await db.execute(query)
             finding = res.scalar_one_or_none()
@@ -145,7 +163,10 @@ class CopilotAgent:
         # OWASP mapping lookup
         owasp_data = None
         for key, val in OWASP_MAP.items():
-            if key.lower() in finding_title.lower() or key.lower() in finding_desc.lower():
+            if (
+                key.lower() in finding_title.lower()
+                or key.lower() in finding_desc.lower()
+            ):
                 owasp_data = val
                 break
 
@@ -166,8 +187,13 @@ class CopilotAgent:
             "owasp": owasp_data,
             "threat_intel": threat_intel.model_dump() if threat_intel else None,
             "is_actively_exploited": bool(threat_intel and threat_intel.is_kev),
-            "ransomware_campaign": threat_intel.ransomware_campaign if threat_intel else None,
-            "remediation_action": (threat_intel.remediation_action if threat_intel else None) or "Apply latest vendor security patch and implement defense-in-depth controls.",
+            "ransomware_campaign": threat_intel.ransomware_campaign
+            if threat_intel
+            else None,
+            "remediation_action": (
+                threat_intel.remediation_action if threat_intel else None
+            )
+            or "Apply latest vendor security patch and implement defense-in-depth controls.",
         }
 
     async def generate_poc_curl(
@@ -183,9 +209,13 @@ class CopilotAgent:
 
         # If finding_id is provided, verify ownership and extract target
         if finding_id and db and org_id:
-            query = select(Finding).join(Scan).where(
-                Finding.id == finding_id,
-                Scan.organization_id == org_id,
+            query = (
+                select(Finding)
+                .join(Scan)
+                .where(
+                    Finding.id == finding_id,
+                    Scan.organization_id == org_id,
+                )
             )
             res = await db.execute(query)
             finding = res.scalar_one_or_none()
@@ -198,7 +228,9 @@ class CopilotAgent:
 
         clean_target = clean_target or "https://target.example.com"
         clean_target = clean_target.strip()
-        if not clean_target.startswith("http://") and not clean_target.startswith("https://"):
+        if not clean_target.startswith("http://") and not clean_target.startswith(
+            "https://"
+        ):
             clean_target = f"https://{clean_target}"
 
         # If org_id and db are provided, verify target authorization
@@ -208,7 +240,12 @@ class CopilotAgent:
 
         # Generate safe verification curl command
         v_type = vulnerability_type.lower()
-        if "header" in v_type or "missing" in v_type or "hsts" in v_type or "csp" in v_type:
+        if (
+            "header" in v_type
+            or "missing" in v_type
+            or "hsts" in v_type
+            or "csp" in v_type
+        ):
             curl_cmd = f"curl -s -I -L '{clean_target}'"
             purpose = "Inspect response headers for missing HSTS, CSP, and X-Frame-Options headers."
             expected_safe = "Headers like Strict-Transport-Security and Content-Security-Policy should be present."
@@ -244,7 +281,9 @@ class CopilotAgent:
             "safety_warning": "Diagnostic non-destructive verification only. Never execute active exploitation on unapproved targets.",
         }
 
-    def query_threat_intel(self, query: str, limit: int = 5, kev_only: bool = False) -> List[Dict[str, Any]]:
+    def query_threat_intel(
+        self, query: str, limit: int = 5, kev_only: bool = False
+    ) -> List[Dict[str, Any]]:
         """Query CISA KEV and indexed threat intelligence."""
         threats = self.indexer.search(query=query, limit=limit, kev_only=kev_only)
         return [t.model_dump() for t in threats]
@@ -260,7 +299,10 @@ class CopilotAgent:
         """Execute Copilot multi-turn conversation with dynamic tool enrichment."""
         user_msg = self._sanitize_input(message.strip())
         if not user_msg:
-            return {"reply": "Please enter a question or command for SageAI Copilot.", "sources": []}
+            return {
+                "reply": "Please enter a question or command for SageAI Copilot.",
+                "sources": [],
+            }
 
         system_prompt = COPILOT_SYSTEM_PROMPT
         sources = []
@@ -271,13 +313,19 @@ class CopilotAgent:
         if scan_id or "scan" in user_msg.lower():
             # If scan_id in context, summarize it
             if scan_id:
-                summary = await self.get_scan_summary(scan_id=scan_id, org_id=org_id, db=db)
+                summary = await self.get_scan_summary(
+                    scan_id=scan_id, org_id=org_id, db=db
+                )
                 if summary.get("authorized"):
-                    tool_artifacts.append(f"AUTHENTICATED SCAN SUMMARY (Target: {summary['target']}):\n"
-                                          f"- Risk Score: {summary['risk_score']}\n"
-                                          f"- Findings: {json.dumps(summary['severity_counts'])}\n"
-                                          f"- Total: {summary['total_findings']}")
-                    sources.append({"title": f"Scan {scan_id[:8]} Context", "type": "scan"})
+                    tool_artifacts.append(
+                        f"AUTHENTICATED SCAN SUMMARY (Target: {summary['target']}):\n"
+                        f"- Risk Score: {summary['risk_score']}\n"
+                        f"- Findings: {json.dumps(summary['severity_counts'])}\n"
+                        f"- Total: {summary['total_findings']}"
+                    )
+                    sources.append(
+                        {"title": f"Scan {scan_id[:8]} Context", "type": "scan"}
+                    )
 
         # ── Tool 2: CVE / Vulnerability threat intel lookup ──
         cve_match = re.search(r"CVE-\d{4}-\d{4,7}", user_msg, re.IGNORECASE)
@@ -285,8 +333,16 @@ class CopilotAgent:
             cve_id = cve_match.group(0).upper()
             cve_data = await self.indexer.get_cve(cve_id)
             if cve_data:
-                kev_str = "YES (ACTIVELY EXPLOITED IN THE WILD)" if cve_data.is_kev else "No known active exploitation"
-                ransom_str = f"Ransomware Campaign: {cve_data.ransomware_campaign}" if cve_data.ransomware_campaign else ""
+                kev_str = (
+                    "YES (ACTIVELY EXPLOITED IN THE WILD)"
+                    if cve_data.is_kev
+                    else "No known active exploitation"
+                )
+                ransom_str = (
+                    f"Ransomware Campaign: {cve_data.ransomware_campaign}"
+                    if cve_data.ransomware_campaign
+                    else ""
+                )
                 tool_artifacts.append(
                     f"LIVE THREAT INTEL FOR {cve_id}:\n"
                     f"- Title: {cve_data.title}\n"
@@ -299,7 +355,10 @@ class CopilotAgent:
                 sources.append({"title": f"CISA KEV: {cve_id}", "type": "threat_intel"})
 
         # ── Tool 3: PoC Curl generation request ──
-        if any(term in user_msg.lower() for term in ["curl", "poc", "reproduce", "verify", "probe"]):
+        if any(
+            term in user_msg.lower()
+            for term in ["curl", "poc", "reproduce", "verify", "probe"]
+        ):
             target_url = (context or {}).get("target") or "https://target.example.com"
             finding_id = (context or {}).get("finding_id")
             poc = await self.generate_poc_curl(
@@ -323,13 +382,21 @@ class CopilotAgent:
                 rag_snippets = "\n".join([f"- {d['text']}" for d in rag_docs])
                 tool_artifacts.append(f"CYBERSECURITY KNOWLEDGE BASE:\n{rag_snippets}")
                 for d in rag_docs:
-                    sources.append({"title": d["metadata"].get("title", "OWASP Guidance"), "type": "rag"})
+                    sources.append(
+                        {
+                            "title": d["metadata"].get("title", "OWASP Guidance"),
+                            "type": "rag",
+                        }
+                    )
         except Exception as e:
             logger.debug(f"RAG search error: {e}")
 
         # Assemble full prompt
         if tool_artifacts:
-            system_prompt += "\n\nVERIFIED SECURITY CONTEXT & TOOL OUTPUTS:\n" + "\n\n".join(tool_artifacts)
+            system_prompt += (
+                "\n\nVERIFIED SECURITY CONTEXT & TOOL OUTPUTS:\n"
+                + "\n\n".join(tool_artifacts)
+            )
 
         # Include prior conversation turns if provided
         conversation_prompt = ""
@@ -342,6 +409,7 @@ class CopilotAgent:
 
         try:
             from app.core.config import settings
+
             provider = "nvidia" if settings.NVIDIA_API_KEY else "openai"
             reply = await llm_gateway.generate(
                 prompt=conversation_prompt,
@@ -354,8 +422,7 @@ class CopilotAgent:
             logger.error(f"Copilot inference error: {e}")
             # Fallback high-utility response synthesizing tool outputs
             fallback_reply = (
-                "### 🛡️ SageAI Copilot Analysis\n\n"
-                f"**Query:** {user_msg}\n\n"
+                f"### 🛡️ SageAI Copilot Analysis\n\n**Query:** {user_msg}\n\n"
             )
             if tool_artifacts:
                 fallback_reply += "#### 🔍 Investigation Findings & Context\n"

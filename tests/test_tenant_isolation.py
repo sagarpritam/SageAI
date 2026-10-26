@@ -78,7 +78,9 @@ async def test_cross_tenant_scan_and_finding_isolation(client, db_session):
     assert scan_a_id not in b_scan_ids
 
     # Tenant A gets findings
-    findings_a = (await client.get(f"/scan/{scan_a_id}/findings", headers=headers_a)).json()
+    findings_a = (
+        await client.get(f"/scan/{scan_a_id}/findings", headers=headers_a)
+    ).json()
     if findings_a:
         finding_id = findings_a[0]["id"]
         # Tenant B attempts to update finding status -> 404
@@ -102,7 +104,12 @@ async def test_cross_tenant_asset_isolation(client, db_session):
     from sqlalchemy import select
 
     from app.models.organization import Organization
-    org_a = (await db_session.execute(select(Organization).where(Organization.name == plan_a["organization"]))).scalar_one()
+
+    org_a = (
+        await db_session.execute(
+            select(Organization).where(Organization.name == plan_a["organization"])
+        )
+    ).scalar_one()
 
     asset_a = Asset(
         organization_id=org_a.id,
@@ -153,7 +160,9 @@ async def test_cross_tenant_notification_channel_isolation(client):
     channel_a_id = create_res.json()["id"]
 
     # Tenant B attempts to GET channel A -> 404
-    get_res = await client.get(f"/notifications/channels/{channel_a_id}", headers=headers_b)
+    get_res = await client.get(
+        f"/notifications/channels/{channel_a_id}", headers=headers_b
+    )
     assert get_res.status_code == 404
 
     # Tenant B attempts to PATCH channel A -> 404
@@ -165,7 +174,9 @@ async def test_cross_tenant_notification_channel_isolation(client):
     assert patch_res.status_code == 404
 
     # Tenant B attempts to DELETE channel A -> 404
-    del_res = await client.delete(f"/notifications/channels/{channel_a_id}", headers=headers_b)
+    del_res = await client.delete(
+        f"/notifications/channels/{channel_a_id}", headers=headers_b
+    )
     assert del_res.status_code == 404
 
     # Tenant B lists channels -> empty / does not contain channel_a_id

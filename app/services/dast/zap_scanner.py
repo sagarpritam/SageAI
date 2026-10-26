@@ -18,6 +18,7 @@ logger = logging.getLogger("SageAI.dast")
 
 class DASTAuthorizationError(Exception):
     """Raised when active DAST scans are attempted against unauthorized targets."""
+
     pass
 
 
@@ -53,7 +54,9 @@ class StagedDASTScanner:
         """
         parsed = urlparse(target_url)
         if not parsed.scheme or not parsed.netloc:
-            raise ValueError(f"Invalid target URL: '{target_url}'. Must include http:// or https://")
+            raise ValueError(
+                f"Invalid target URL: '{target_url}'. Must include http:// or https://"
+            )
 
         # 1. Authorization Gate for Active Mode
         if mode == "active" and not is_authorized_staging:
@@ -68,7 +71,9 @@ class StagedDASTScanner:
         findings: List[Dict[str, Any]] = []
 
         # 2. Tier 1: Passive Baseline Scan (Safe for all valid targets)
-        async with httpx.AsyncClient(verify=False, timeout=self.timeout, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            verify=False, timeout=self.timeout, follow_redirects=True
+        ) as client:  # nosec B501
             try:
                 resp = await client.get(target_url)
                 passive_findings = self._evaluate_passive_baseline(target_url, resp)
@@ -87,7 +92,10 @@ class StagedDASTScanner:
             # 3. Tier 2: Controlled Active Staging Probing (Authorized Staging Only)
             active_probes_run = 0
             if mode == "active" and is_authorized_staging:
-                active_findings, active_probes_run = await self._run_controlled_active_probe(client, target_url)
+                (
+                    active_findings,
+                    active_probes_run,
+                ) = await self._run_controlled_active_probe(client, target_url)
                 findings.extend(active_findings)
 
         return {
@@ -100,54 +108,86 @@ class StagedDASTScanner:
             "findings": findings,
         }
 
-    def _evaluate_passive_baseline(self, target_url: str, resp: httpx.Response) -> List[Dict[str, Any]]:
+    def _evaluate_passive_baseline(
+        self, target_url: str, resp: httpx.Response
+    ) -> List[Dict[str, Any]]:
         """Passive analysis of response headers, cookies, and information disclosure."""
         findings = []
         headers = {k.lower(): v for k, v in resp.headers.items()}
 
         # 1. Check Missing Security Headers
         security_headers = [
-            ("strict-transport-security", "Missing HSTS Header", "high", 7.5, "Add Strict-Transport-Security: max-age=31536000; includeSubDomains"),
-            ("content-security-policy", "Missing Content Security Policy (CSP)", "medium", 6.0, "Define a robust Content-Security-Policy to mitigate XSS"),
-            ("x-content-type-options", "Missing X-Content-Type-Options Header", "low", 4.3, "Set X-Content-Type-Options: nosniff"),
-            ("x-frame-options", "Missing X-Frame-Options Header", "low", 4.3, "Set X-Frame-Options: DENY or SAMEORIGIN to prevent clickjacking"),
+            (
+                "strict-transport-security",
+                "Missing HSTS Header",
+                "high",
+                7.5,
+                "Add Strict-Transport-Security: max-age=31536000; includeSubDomains",
+            ),
+            (
+                "content-security-policy",
+                "Missing Content Security Policy (CSP)",
+                "medium",
+                6.0,
+                "Define a robust Content-Security-Policy to mitigate XSS",
+            ),
+            (
+                "x-content-type-options",
+                "Missing X-Content-Type-Options Header",
+                "low",
+                4.3,
+                "Set X-Content-Type-Options: nosniff",
+            ),
+            (
+                "x-frame-options",
+                "Missing X-Frame-Options Header",
+                "low",
+                4.3,
+                "Set X-Frame-Options: DENY or SAMEORIGIN to prevent clickjacking",
+            ),
         ]
 
         for hdr, title, sev, cvss, rem in security_headers:
             if hdr not in headers:
-                findings.append({
-                    "title": title,
-                    "severity": sev,
-                    "cvss": cvss,
-                    "type": "dast_missing_header",
-                    "detail": f"Response from {target_url} lacks the '{hdr}' security header.",
-                    "remediation": rem,
-                })
+                findings.append(
+                    {
+                        "title": title,
+                        "severity": sev,
+                        "cvss": cvss,
+                        "type": "dast_missing_header",
+                        "detail": f"Response from {target_url} lacks the '{hdr}' security header.",
+                        "remediation": rem,
+                    }
+                )
 
         # 2. Check Server Version Disclosure
         server_val = headers.get("server", "")
         if server_val and re.search(r"\d+\.\d+", server_val):
-            findings.append({
-                "title": "Server Banner Version Disclosure",
-                "severity": "low",
-                "cvss": 3.7,
-                "type": "dast_info_disclosure",
-                "detail": f"Server header reveals exact version: '{server_val}'.",
-                "remediation": "Suppress server tokens in web server configuration.",
-            })
+            findings.append(
+                {
+                    "title": "Server Banner Version Disclosure",
+                    "severity": "low",
+                    "cvss": 3.7,
+                    "type": "dast_info_disclosure",
+                    "detail": f"Server header reveals exact version: '{server_val}'.",
+                    "remediation": "Suppress server tokens in web server configuration.",
+                }
+            )
 
         # 3. Check Insecure Cookie Attributes
         for cookie_hdr in resp.headers.get_list("set-cookie"):
             c_lower = cookie_hdr.lower()
             if "secure" not in c_lower or "httponly" not in c_lower:
-                findings.append({
-                    "title": "Insecure Cookie Attributes",
-                    "severity": "medium",
-                    "cvss": 5.4,
-                    "type": "dast_cookie_security",
-                    "detail": f"Cookie '{cookie_hdr.split(';')[0]}' lacks 'Secure' or 'HttpOnly' flags.",
-                    "remediation": "Ensure all session and authentication cookies include Secure and HttpOnly flags.",
-                })
+                findings.append(
+                    {
+                        "title": "Insecure Cookie Attributes",
+                        "severity": "medium",
+                        "cvss": 5.4,
+                        "type": "dast_cookie_security",
+                        "detail": f"Cookie '{cookie_hdr.split(';')[0]}' lacks 'Secure' or 'HttpOnly' flags.",
+                        "remediation": "Ensure all session and authentication cookies include Secure and HttpOnly flags.",
+                    }
+                )
                 break
 
         return findings
@@ -168,15 +208,22 @@ class StagedDASTScanner:
                 if p_resp.status_code == 200 and len(p_resp.content) > 0:
                     # Verify content isn't a custom 404 page
                     content_str = p_resp.text.lower()
-                    if "not found" not in content_str and "page does not exist" not in content_str:
-                        findings.append({
-                            "title": f"Exposed Sensitive Endpoint: {path}",
-                            "severity": "high" if path in ("/.env", "/.git/HEAD") else "medium",
-                            "cvss": 8.1 if path in ("/.env", "/.git/HEAD") else 5.3,
-                            "type": "dast_exposed_file",
-                            "detail": f"Sensitive file or diagnostic interface accessible at {probe_url} (HTTP 200).",
-                            "remediation": f"Restrict access to '{path}' in web server routing or ingress rules.",
-                        })
+                    if (
+                        "not found" not in content_str
+                        and "page does not exist" not in content_str
+                    ):
+                        findings.append(
+                            {
+                                "title": f"Exposed Sensitive Endpoint: {path}",
+                                "severity": "high"
+                                if path in ("/.env", "/.git/HEAD")
+                                else "medium",
+                                "cvss": 8.1 if path in ("/.env", "/.git/HEAD") else 5.3,
+                                "type": "dast_exposed_file",
+                                "detail": f"Sensitive file or diagnostic interface accessible at {probe_url} (HTTP 200).",
+                                "remediation": f"Restrict access to '{path}' in web server routing or ingress rules.",
+                            }
+                        )
             except Exception:
                 continue
 
@@ -187,14 +234,16 @@ class StagedDASTScanner:
         try:
             r_resp = await client.get(test_url)
             if canary in r_resp.text:
-                findings.append({
-                    "title": "Reflected Parameter in Web Response",
-                    "severity": "medium",
-                    "cvss": 5.0,
-                    "type": "dast_reflected_param",
-                    "detail": f"Query parameter was reflected directly in response body at {test_url}.",
-                    "remediation": "Contextually HTML-encode and sanitize all user-supplied query parameters.",
-                })
+                findings.append(
+                    {
+                        "title": "Reflected Parameter in Web Response",
+                        "severity": "medium",
+                        "cvss": 5.0,
+                        "type": "dast_reflected_param",
+                        "detail": f"Query parameter was reflected directly in response body at {test_url}.",
+                        "remediation": "Contextually HTML-encode and sanitize all user-supplied query parameters.",
+                    }
+                )
         except Exception:
             pass
 

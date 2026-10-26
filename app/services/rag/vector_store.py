@@ -53,9 +53,7 @@ class VectorStore:
 
         meta: Dict[str, str] = {} if metadata is None else metadata
         embedding = await get_embedding(text)
-        self.documents.append(
-            {"text": text, "metadata": meta, "embedding": embedding}
-        )
+        self.documents.append({"text": text, "metadata": meta, "embedding": embedding})
         self._save()
         title = meta.get("title", "Unknown")
         logger.info(f"Added document: {title}")

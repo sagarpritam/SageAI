@@ -59,7 +59,9 @@ def _run_async(coro):
         return asyncio.run(coro)
 
 
-@celery_app.task(bind=True, name="SageAI.run_scan", max_retries=3, default_retry_delay=10)
+@celery_app.task(
+    bind=True, name="SageAI.run_scan", max_retries=3, default_retry_delay=10
+)
 def run_scan_task(self, scan_id: str, target: str, org_id: str, **kwargs):
     """Async scan task — runs security checks in a background worker fleet.
 
@@ -79,8 +81,12 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str, **kwargs):
 
         async with AsyncSessionLocal() as db:
             try:
-                self.update_state(state="SCANNING", meta={"target": target, "progress": 25})
-                logger.info("Task %s: scanning %s (kwargs: %s)", scan_id, target, kwargs)
+                self.update_state(
+                    state="SCANNING", meta={"target": target, "progress": 25}
+                )
+                logger.info(
+                    "Task %s: scanning %s (kwargs: %s)", scan_id, target, kwargs
+                )
 
                 # Set running state
                 scan_res = await db.execute(select(Scan).where(Scan.id == scan_id))
@@ -129,7 +135,9 @@ def run_scan_task(self, scan_id: str, target: str, org_id: str, **kwargs):
                         organization_id=org_id,
                         title=f"Scan Completed: {target} ({scan.risk_level} Risk)",
                         target=target,
-                        severity=scan.risk_level.lower() if scan.risk_level else "medium",
+                        severity=scan.risk_level.lower()
+                        if scan.risk_level
+                        else "medium",
                         risk_score=float(scan.risk_score or 0.0),
                         details=f"Scan completed with {len(findings)} findings identified.",
                         findings_count=len(findings),

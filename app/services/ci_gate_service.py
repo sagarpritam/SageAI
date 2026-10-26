@@ -79,7 +79,9 @@ async def run_parallel_security_matrix(
 
     try:
         if github_token:
-            clone_url = f"https://x-access-token:{github_token}@github.com/{owner_repo}.git"
+            clone_url = (
+                f"https://x-access-token:{github_token}@github.com/{owner_repo}.git"
+            )
         else:
             clone_url = f"https://github.com/{owner_repo}.git"
 
@@ -208,7 +210,11 @@ async def execute_ci_gate_loop(
             organization_id=org.id,
             title=title,
             target=f"https://github.com/{repository}/commit/{commit_sha}",
-            severity="critical" if evaluation["counts"]["critical"] > 0 else "high" if not passed else "info",
+            severity="critical"
+            if evaluation["counts"]["critical"] > 0
+            else "high"
+            if not passed
+            else "info",
             risk_score=90.0 if not passed else 10.0,
             details=details,
             findings_count=len(findings),

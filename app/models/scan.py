@@ -32,16 +32,28 @@ class Scan(Base):
     )  # JSON stored as text for SQLite compat
     risk_score: Mapped[int] = mapped_column(Integer, default=0)
     risk_level: Mapped[str] = mapped_column(String, default="Low")
-    status: Mapped[str] = mapped_column(String, default="pending")  # pending / queued / running / completed / failed / cancelled
-    stage: Mapped[Optional[str]] = mapped_column(String, default="init", nullable=True)  # init / dns / ports / osint / nuclei / complete
-    progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # 0 to 100
+    status: Mapped[str] = mapped_column(
+        String, default="pending"
+    )  # pending / queued / running / completed / failed / cancelled
+    stage: Mapped[Optional[str]] = mapped_column(
+        String, default="init", nullable=True
+    )  # init / dns / ports / osint / nuclei / complete
+    progress: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False
+    )  # 0 to 100
     retry_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    idempotency_key: Mapped[Optional[str]] = mapped_column(String, nullable=True, index=True)
+    idempotency_key: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True, index=True
+    )
     celery_task_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    share_token: Mapped[Optional[str]] = mapped_column(String, unique=True, nullable=True)
+    share_token: Mapped[Optional[str]] = mapped_column(
+        String, unique=True, nullable=True
+    )
     is_authorized: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now
+    )
 
     # Relationships
     organization = relationship("Organization", back_populates="scans")

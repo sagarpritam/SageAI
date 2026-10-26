@@ -58,6 +58,7 @@ async def get_test_tenant(client, prefix: str):
 # 1. Threat Feed Indexer Unit Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_threat_indexer_search_and_deduplication():
     """Verify CISA KEV indexer correctly searches, filters, and deduplicates vulnerabilities."""
@@ -88,6 +89,7 @@ async def test_threat_indexer_search_and_deduplication():
 # 2. Copilot Agent Tenant Isolation Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_copilot_tenant_isolation(client, db_session):
     """Ensure Copilot cannot inspect or summarize scans belonging to a foreign tenant."""
@@ -95,15 +97,21 @@ async def test_copilot_tenant_isolation(client, db_session):
     headers_b, org_name_b = await get_test_tenant(client, "copilot_b")
 
     org_a = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name_a))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name_a)
+        )
     ).scalar_one()
     org_b = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name_b))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name_b)
+        )
     ).scalar_one()
 
     user_a = (
-        await db_session.execute(select(User).where(User.organization_id == org_a.id))
-    ).scalars().first()
+        (await db_session.execute(select(User).where(User.organization_id == org_a.id)))
+        .scalars()
+        .first()
+    )
 
     # Create scan for Org A
     scan_a = Scan(
@@ -118,12 +126,16 @@ async def test_copilot_tenant_isolation(client, db_session):
     await db_session.commit()
 
     # Org A requests its own scan summary -> Authorized
-    summary_a = await copilot_agent.get_scan_summary(scan_id=scan_a.id, org_id=org_a.id, db=db_session)
+    summary_a = await copilot_agent.get_scan_summary(
+        scan_id=scan_a.id, org_id=org_a.id, db=db_session
+    )
     assert summary_a["authorized"] is True
     assert summary_a["target"] == "internal-portal.tenant-a.com"
 
     # Org B attempts to summarize Org A's scan -> Denied
-    summary_b = await copilot_agent.get_scan_summary(scan_id=scan_a.id, org_id=org_b.id, db=db_session)
+    summary_b = await copilot_agent.get_scan_summary(
+        scan_id=scan_a.id, org_id=org_b.id, db=db_session
+    )
     assert summary_b["authorized"] is False
     assert "not found or does not belong" in summary_b["error"]
 
@@ -131,6 +143,7 @@ async def test_copilot_tenant_isolation(client, db_session):
 # ─────────────────────────────────────────────────────────────
 # 3. Copilot Explainer & Threat Intelligence Enrichment Tests
 # ─────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_copilot_explain_vulnerability():
@@ -144,7 +157,9 @@ async def test_copilot_explain_vulnerability():
     assert res["remediation_action"] is not None
 
     # Explain OWASP SQL Injection
-    res_sqli = await copilot_agent.explain_vulnerability(cve_or_title="SQL Injection in auth query")
+    res_sqli = await copilot_agent.explain_vulnerability(
+        cve_or_title="SQL Injection in auth query"
+    )
     assert res_sqli["authorized"] is True
     assert res_sqli["owasp"]["owasp_category"] == "Injection"
     assert res_sqli["owasp"]["cwe"] == "CWE-89"
@@ -153,6 +168,7 @@ async def test_copilot_explain_vulnerability():
 # ─────────────────────────────────────────────────────────────
 # 4. Safe PoC Generation Guardrails Tests
 # ─────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_copilot_safe_poc_guardrails():
@@ -181,13 +197,16 @@ async def test_copilot_safe_poc_guardrails():
 # 5. Copilot Endpoints & Streaming Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_copilot_chat_endpoint_json_and_streaming(client, db_session):
     """Test POST /copilot/chat in both standard JSON and SSE streaming modes."""
     headers, org_name = await get_test_tenant(client, "chat")
 
     # 1. Standard JSON mode
-    with patch("app.services.llm.gateway.llm_gateway.generate", new_callable=AsyncMock) as mock_llm:
+    with patch(
+        "app.services.llm.gateway.llm_gateway.generate", new_callable=AsyncMock
+    ) as mock_llm:
         mock_llm.return_value = "Here is the threat intelligence for your scan."
 
         res = await client.post(
@@ -204,7 +223,9 @@ async def test_copilot_chat_endpoint_json_and_streaming(client, db_session):
         assert len(data["reply"]) > 0
 
     # 2. SSE Streaming mode
-    with patch("app.services.llm.gateway.llm_gateway.generate", new_callable=AsyncMock) as mock_llm:
+    with patch(
+        "app.services.llm.gateway.llm_gateway.generate", new_callable=AsyncMock
+    ) as mock_llm:
         mock_llm.return_value = "Streaming token response for Copilot analysis."
 
         stream_res = await client.post(
@@ -268,6 +289,7 @@ async def test_copilot_dedicated_endpoints(client):
 # 6. Threat Feed Dashboard Endpoints Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_threat_feed_dashboard_endpoints(client):
     """Test GET /threat-feed and POST /threat-feed/sync for dashboard widget compatibility."""
@@ -295,13 +317,16 @@ async def test_threat_feed_dashboard_endpoints(client):
 # 7. Audit Logging for Copilot Inquiries
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_copilot_audit_logging(client, db_session):
     """Verify that every copilot inquiry records an immutable audit log entry."""
     headers, org_name = await get_test_tenant(client, "copilot_audit")
 
     org = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
     ).scalar_one()
 
     # Send a query
@@ -314,13 +339,17 @@ async def test_copilot_audit_logging(client, db_session):
 
     # Query audit logs for Org
     logs = (
-        await db_session.execute(
-            select(AuditLog).where(
-                AuditLog.organization_id == org.id,
-                AuditLog.action == "COPILOT_QUERY",
+        (
+            await db_session.execute(
+                select(AuditLog).where(
+                    AuditLog.organization_id == org.id,
+                    AuditLog.action == "COPILOT_QUERY",
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     assert len(logs) >= 1
     assert logs[0].resource_type == "copilot"

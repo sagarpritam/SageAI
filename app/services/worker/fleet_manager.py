@@ -40,7 +40,9 @@ def is_broker_online(timeout: float = 0.2) -> bool:
         return False
 
 
-def generate_scan_idempotency_key(org_id: str, target: str, scan_type: str = "full") -> str:
+def generate_scan_idempotency_key(
+    org_id: str, target: str, scan_type: str = "full"
+) -> str:
     """Generate deterministic idempotency hash based on tenant, target, and 5-minute time window."""
     window = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")[:11]  # 5-minute block
     raw = f"{org_id}:{target.lower().strip()}:{scan_type}:{window}"
@@ -54,7 +56,11 @@ class FleetManager:
         self._max_retries = 3
 
     async def check_idempotency(
-        self, db: AsyncSession, org_id: str, idempotency_key: str, current_scan_id: Optional[str] = None
+        self,
+        db: AsyncSession,
+        org_id: str,
+        idempotency_key: str,
+        current_scan_id: Optional[str] = None,
     ) -> Optional[Scan]:
         """Check if an identical scan was already submitted recently for this organization."""
         if not idempotency_key:
@@ -92,7 +98,9 @@ class FleetManager:
         if not scan:
             raise ValueError(f"Scan '{scan_id}' not found")
 
-        idem_key = idempotency_key or generate_scan_idempotency_key(org_id, target, scan_type)
+        idem_key = idempotency_key or generate_scan_idempotency_key(
+            org_id, target, scan_type
+        )
         scan.idempotency_key = idem_key
         scan.scan_type = scan_type
         scan.status = "queued"
@@ -118,15 +126,25 @@ class FleetManager:
                 celery_task_id = task.id
                 scan.celery_task_id = celery_task_id
                 await db.commit()
-                logger.info(f"Dispatched scan {scan_id} to Celery worker (Task ID: {celery_task_id})")
+                logger.info(
+                    f"Dispatched scan {scan_id} to Celery worker (Task ID: {celery_task_id})"
+                )
             except Exception as e:
-                logger.warning(f"Celery broker unavailable ({e}); falling back to in-process worker fleet runner.")
+                logger.warning(
+                    f"Celery broker unavailable ({e}); falling back to in-process worker fleet runner."
+                )
                 dispatched_via = "local_fleet_async"
-                asyncio.create_task(self._execute_scan_worker(scan_id, target, org_id, deep_scan))
+                asyncio.create_task(
+                    self._execute_scan_worker(scan_id, target, org_id, deep_scan)
+                )
         else:
-            logger.info("Redis broker offline; using resilient in-process worker fleet runner.")
+            logger.info(
+                "Redis broker offline; using resilient in-process worker fleet runner."
+            )
             dispatched_via = "local_fleet_async"
-            asyncio.create_task(self._execute_scan_worker(scan_id, target, org_id, deep_scan))
+            asyncio.create_task(
+                self._execute_scan_worker(scan_id, target, org_id, deep_scan)
+            )
 
         return {
             "scan_id": scan.id,
@@ -149,13 +167,22 @@ class FleetManager:
     ) -> None:
         """Durable scan executor with staged progress tracking and alert notification hooks."""
         if session is not None:
-            await self._run_worker_with_session(session, scan_id, target, org_id, deep_scan)
+            await self._run_worker_with_session(
+                session, scan_id, target, org_id, deep_scan
+            )
         else:
             async with AsyncSessionLocal() as db:
-                await self._run_worker_with_session(db, scan_id, target, org_id, deep_scan)
+                await self._run_worker_with_session(
+                    db, scan_id, target, org_id, deep_scan
+                )
 
     async def _run_worker_with_session(
-        self, db: AsyncSession, scan_id: str, target: str, org_id: str, deep_scan: bool = False
+        self,
+        db: AsyncSession,
+        scan_id: str,
+        target: str,
+        org_id: str,
+        deep_scan: bool = False,
     ) -> None:
         """Internal execution body for worker scan."""
         from app.services.scanner_service import run_all_scans
@@ -185,6 +212,7 @@ class FleetManager:
             await db.commit()
 
             from app.agents.analyzer import analyze_findings
+
             findings_data = analyze_findings(raw_findings)
             risk = calculate_risk(findings_data)
 
@@ -210,7 +238,9 @@ class FleetManager:
                 db.add(finding_entry)
 
             await db.commit()
-            logger.info(f"Worker fleet completed scan {scan_id} with {len(findings_data)} findings.")
+            logger.info(
+                f"Worker fleet completed scan {scan_id} with {len(findings_data)} findings."
+            )
 
             # Dispatch notification alerts (Phase 01 integration)
             await dispatch_security_alert(
@@ -240,7 +270,9 @@ class FleetManager:
             )
 
         except Exception as e:
-            logger.error(f"Worker scan {scan_id} encountered fatal error: {e}", exc_info=True)
+            logger.error(
+                f"Worker scan {scan_id} encountered fatal error: {e}", exc_info=True
+            )
             scan.status = "failed"
             scan.stage = "error"
             scan.retry_count += 1
@@ -255,14 +287,19 @@ class FleetManager:
                 details={"target": target, "error": str(e)},
             )
 
-    async def cancel_scan(self, db: AsyncSession, scan_id: str, org_id: str) -> Dict[str, Any]:
+    async def cancel_scan(
+        self, db: AsyncSession, scan_id: str, org_id: str
+    ) -> Dict[str, Any]:
         """Cancel/terminate an active scan job in the worker fleet."""
         res = await db.execute(
             select(Scan).where(Scan.id == scan_id, Scan.organization_id == org_id)
         )
         scan = res.scalar_one_or_none()
         if not scan:
-            return {"error": f"Scan '{scan_id}' not found or unauthorized", "authorized": False}
+            return {
+                "error": f"Scan '{scan_id}' not found or unauthorized",
+                "authorized": False,
+            }
 
         if scan.status in ("completed", "failed", "cancelled"):
             return {
@@ -276,10 +313,17 @@ class FleetManager:
         if scan.celery_task_id:
             try:
                 from app.tasks import celery_app
-                celery_app.control.revoke(scan.celery_task_id, terminate=True, signal="SIGTERM")
-                logger.info(f"Revoked Celery task {scan.celery_task_id} for scan {scan_id}")
+
+                celery_app.control.revoke(
+                    scan.celery_task_id, terminate=True, signal="SIGTERM"
+                )
+                logger.info(
+                    f"Revoked Celery task {scan.celery_task_id} for scan {scan_id}"
+                )
             except Exception as e:
-                logger.warning(f"Could not revoke Celery task {scan.celery_task_id}: {e}")
+                logger.warning(
+                    f"Could not revoke Celery task {scan.celery_task_id}: {e}"
+                )
 
         scan.status = "cancelled"
         scan.stage = "cancelled"
@@ -308,6 +352,7 @@ class FleetManager:
 
         try:
             from app.tasks import celery_app
+
             conn = celery_app.connection()
             conn.ensure_connection(max_retries=1)
             broker_connected = True
@@ -327,7 +372,9 @@ class FleetManager:
         counts = {str(row[0]): int(row[1]) for row in status_counts_res.all()}
 
         return {
-            "status": "healthy" if (broker_connected or counts.get("running", 0) >= 0) else "degraded",
+            "status": "healthy"
+            if (broker_connected or counts.get("running", 0) >= 0)
+            else "degraded",
             "broker_connected": broker_connected,
             "active_workers": active_workers,
             "scans": {

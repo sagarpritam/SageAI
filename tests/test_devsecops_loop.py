@@ -35,7 +35,9 @@ async def test_secret_scanner_detection():
 
         # Create a file with leaked Slack webhook
         with open(os.path.join(tmp_dir, "slack_leak.py"), "w") as f:
-            f.write("URL = 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'\n")
+            f.write(
+                "URL = 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'\n"
+            )
 
         res = await scanner.run(tmp_dir)
         assert res["total_findings"] >= 2
@@ -46,7 +48,9 @@ async def test_secret_scanner_detection():
 
 def test_evaluate_gate_policy():
     """Verify policy evaluation passes/fails according to severity thresholds."""
-    org = Organization(name="TestGateOrg", ci_fail_on_critical=True, ci_fail_on_high=True)
+    org = Organization(
+        name="TestGateOrg", ci_fail_on_critical=True, ci_fail_on_high=True
+    )
 
     # 1. Clean findings -> passes
     clean_eval = evaluate_gate_policy(
@@ -81,9 +85,15 @@ async def test_ci_gate_api_flow(client, db_session):
     email = f"ci_{uid}@devsecops.corp"
     await client.post(
         "/auth/register",
-        json={"email": email, "password": "Password123!", "organization_name": f"CI_Org_{uid}"},
+        json={
+            "email": email,
+            "password": "Password123!",
+            "organization_name": f"CI_Org_{uid}",
+        },
     )
-    login_r = await client.post("/auth/login", json={"email": email, "password": "Password123!"})
+    login_r = await client.post(
+        "/auth/login", json={"email": email, "password": "Password123!"}
+    )
     token = login_r.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
@@ -94,7 +104,13 @@ async def test_ci_gate_api_flow(client, db_session):
             "repository": "acme/web-app",
             "commit_sha": "a1b2c3d4e5f67890",
             "branch": "feature/login",
-            "findings": [{"severity": "LOW", "type": "Informational", "issue_text": "Minor header"}],
+            "findings": [
+                {
+                    "severity": "LOW",
+                    "type": "Informational",
+                    "issue_text": "Minor header",
+                }
+            ],
             "trigger_autofix": False,
         },
         headers=headers,
@@ -111,7 +127,13 @@ async def test_ci_gate_api_flow(client, db_session):
             "commit_sha": "a1b2c3d4e5f67890",
             "branch": "feature/payment",
             "findings": [
-                {"severity": "CRITICAL", "type": "Hardcoded AWS Key", "issue_text": "AWS Key leaked", "file": "config.py", "line": 12}
+                {
+                    "severity": "CRITICAL",
+                    "type": "Hardcoded AWS Key",
+                    "issue_text": "AWS Key leaked",
+                    "file": "config.py",
+                    "line": 12,
+                }
             ],
             "trigger_autofix": False,
         },
@@ -144,14 +166,22 @@ async def test_ci_api_key_authentication(client, db_session):
     email = f"runner_{uid}@devsecops.corp"
     await client.post(
         "/auth/register",
-        json={"email": email, "password": "Password123!", "organization_name": f"Runner_Org_{uid}"},
+        json={
+            "email": email,
+            "password": "Password123!",
+            "organization_name": f"Runner_Org_{uid}",
+        },
     )
-    login_r = await client.post("/auth/login", json={"email": email, "password": "Password123!"})
+    login_r = await client.post(
+        "/auth/login", json={"email": email, "password": "Password123!"}
+    )
     token = login_r.json()["access_token"]
     auth_headers = {"Authorization": f"Bearer {token}"}
 
     # Create an API Key for CI runner
-    key_res = await client.post("/api-keys?name=GitHubActionsRunner", headers=auth_headers)
+    key_res = await client.post(
+        "/api-keys?name=GitHubActionsRunner", headers=auth_headers
+    )
     assert key_res.status_code == 200
     raw_api_key = key_res.json()["key"]
 

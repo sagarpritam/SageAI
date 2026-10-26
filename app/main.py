@@ -211,30 +211,32 @@ async def health_check():
         "database": "connected" if db_ok else "unreachable",
     }
     if settings.ENV != "production":
-        health_data.update({
-            "scanners": 11,
-            "intelligence_modules": 10,
-            "endpoints": 65,
-            "new_in_v2": [
-                "Asset Inventory",
-                "Attack Surface Management",
-                "AI Copilot",
-                "Bug Bounty Reports",
-                "Multi-Agent AI Team",
-                "Security Knowledge Graph",
-                "Plugin Marketplace",
-            ],
-            "new_in_v3": [
-                "Shodan Panopticon",
-                "Maltego Link Analysis",
-                "Babel X Dark Web",
-                "SpiderFoot Recon",
-                "Social Links De-Masking",
-                "Intel X Archives",
-                "Recon-ng Framework",
-                "Censys Global Radar",
-                "OSINT Industries Interceptor",
-                "Deep Search: The Abyss",
-            ],
-        })
+        health_data.update(
+            {
+                "scanners": 11,
+                "intelligence_modules": 10,
+                "endpoints": 65,
+                "new_in_v2": [
+                    "Asset Inventory",
+                    "Attack Surface Management",
+                    "AI Copilot",
+                    "Bug Bounty Reports",
+                    "Multi-Agent AI Team",
+                    "Security Knowledge Graph",
+                    "Plugin Marketplace",
+                ],
+                "new_in_v3": [
+                    "Shodan Panopticon",
+                    "Maltego Link Analysis",
+                    "Babel X Dark Web",
+                    "SpiderFoot Recon",
+                    "Social Links De-Masking",
+                    "Intel X Archives",
+                    "Recon-ng Framework",
+                    "Censys Global Radar",
+                    "OSINT Industries Interceptor",
+                    "Deep Search: The Abyss",
+                ],
+            }
+        )
     return health_data

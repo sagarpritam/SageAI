@@ -40,7 +40,9 @@ class NeMoAuditor:
         if not self._client:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
-        default_options: Dict[str, Any] = {"openai": {"uri": uri, "max_tokens": 1024, "seed": 42}}
+        default_options: Dict[str, Any] = {
+            "openai": {"uri": uri, "max_tokens": 1024, "seed": 42}
+        }
 
         try:
             target = cast(Any, self._client.beta.audit.targets).create(
@@ -63,7 +65,9 @@ class NeMoAuditor:
             raise RuntimeError("NeMo Auditor client is not initialized")
 
         try:
-            targets = cast(Any, self._client.beta.audit.targets).list(namespace=namespace)
+            targets = cast(Any, self._client.beta.audit.targets).list(
+                namespace=namespace
+            )
             return [t.model_dump() for t in targets]
         except Exception as e:
             logger.error(f"Failed to list audit targets: {e}")

@@ -59,6 +59,7 @@ async def get_test_tenant(client, prefix: str, role: str = "admin"):
 # 1. Deterministic Unified Diff Tests
 # ─────────────────────────────────────────────────────────────
 
+
 def test_deterministic_diff_generation():
     """Verify deterministic, canonical unified diff with consistent headers."""
     orig = "def query_db(user_input):\n    sql = f'SELECT * FROM users WHERE name={user_input}'\n    return db.execute(sql)\n"
@@ -78,10 +79,11 @@ def test_deterministic_diff_generation():
 # 2. Sandboxed Validation Guardrail Tests
 # ─────────────────────────────────────────────────────────────
 
+
 def test_sandbox_validation_valid_python_patch():
     """Valid patch with good AST syntax and bounded changes passes sandbox."""
     orig = "def add(a, b):\n    return a + b\n"
-    patched = "def add(a: int, b: int) -> int:\n    \"\"\"Type-safe addition.\"\"\"\n    return int(a) + int(b)\n"
+    patched = 'def add(a: int, b: int) -> int:\n    """Type-safe addition."""\n    return int(a) + int(b)\n'
 
     res = validate_sandbox("app/utils/math.py", orig, patched)
     assert res["safe"] is True
@@ -117,7 +119,10 @@ def test_sandbox_validation_rejects_restricted_files():
     ]:
         res = validate_sandbox(restricted_path, orig, patched)
         assert res["safe"] is False
-        assert any("restricted" in r or "pattern" in r or "extension" in r for r in res["reasons"])
+        assert any(
+            "restricted" in r or "pattern" in r or "extension" in r
+            for r in res["reasons"]
+        )
 
 
 def test_sandbox_validation_rejects_dangerous_ast_calls():
@@ -145,16 +150,21 @@ def test_sandbox_validation_rejects_prompt_injection():
 # 3. Patch Proposal Endpoint & Finding Lifecycle Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_propose_patch_api_and_finding_lifecycle(client, db_session):
     """POST /autofix/propose validates sandbox, creates proposed patch, and sets finding in_progress."""
     headers, org_name, email = await get_test_tenant(client, "propose")
     org = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
     ).scalar_one()
     user = (
-        await db_session.execute(select(User).where(User.organization_id == org.id))
-    ).scalars().first()
+        (await db_session.execute(select(User).where(User.organization_id == org.id)))
+        .scalars()
+        .first()
+    )
 
     # Create dummy scan and finding
     scan = Scan(
@@ -223,16 +233,20 @@ async def test_propose_patch_api_and_finding_lifecycle(client, db_session):
 # 4. Human Approval Workflow & GitHub PR Dispatch Tests
 # ─────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_human_approval_workflow_and_pr_dispatch(client, db_session):
     """Verify that human approval executes isolated branch commit and PR creation."""
     headers, org_name, email = await get_test_tenant(client, "approve")
     org = (
-        await db_session.execute(select(Organization).where(Organization.name == org_name))
+        await db_session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
     ).scalar_one()
 
     # Setup simulated GitHub token in organization
     from app.core.encryption import encrypt
+
     org.github_token_encrypted = encrypt("ghp_mocktoken1234567890abcdef")
     await db_session.commit()
 
@@ -258,9 +272,18 @@ async def test_human_approval_workflow_and_pr_dispatch(client, db_session):
 
     # 2. Mock GitHubService API methods
     with (
-        patch("app.services.integrations.github_service.GitHubService.create_branch", new_callable=AsyncMock) as mock_branch,
-        patch("app.services.integrations.github_service.GitHubService.commit_file", new_callable=AsyncMock) as mock_commit,
-        patch("app.services.integrations.github_service.GitHubService.create_pull_request", new_callable=AsyncMock) as mock_pr,
+        patch(
+            "app.services.integrations.github_service.GitHubService.create_branch",
+            new_callable=AsyncMock,
+        ) as mock_branch,
+        patch(
+            "app.services.integrations.github_service.GitHubService.commit_file",
+            new_callable=AsyncMock,
+        ) as mock_commit,
+        patch(
+            "app.services.integrations.github_service.GitHubService.create_pull_request",
+            new_callable=AsyncMock,
+        ) as mock_pr,
     ):
         mock_branch.return_value = None
         mock_commit.return_value = "https://github.com/sec-org/target-app/commit/123456"
@@ -285,7 +308,9 @@ async def test_human_approval_workflow_and_pr_dispatch(client, db_session):
 
     # Verify status in database
     patch_obj = (
-        await db_session.execute(select(RemediationPatch).where(RemediationPatch.id == patch_id))
+        await db_session.execute(
+            select(RemediationPatch).where(RemediationPatch.id == patch_id)
+        )
     ).scalar_one()
     assert patch_obj.status == PatchStatus.approved
     assert patch_obj.approved_by is not None
@@ -294,6 +319,7 @@ async def test_human_approval_workflow_and_pr_dispatch(client, db_session):
 # ─────────────────────────────────────────────────────────────
 # 5. Patch Rejection Workflow Tests
 # ─────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_patch_rejection_workflow(client, db_session):
@@ -309,8 +335,8 @@ async def test_patch_rejection_workflow(client, db_session):
             "file_path": "app/auth.json",
             "vulnerability_type": "weak_config",
             "severity": "LOW",
-            "original_code": "{\"debug\": true}\n",
-            "patched_code": "{\"debug\": false}\n",
+            "original_code": '{"debug": true}\n',
+            "patched_code": '{"debug": false}\n',
         },
     )
     patch_id = prop_res.json()["patch_id"]
@@ -326,7 +352,9 @@ async def test_patch_rejection_workflow(client, db_session):
 
     # Verify in DB
     patch_obj = (
-        await db_session.execute(select(RemediationPatch).where(RemediationPatch.id == patch_id))
+        await db_session.execute(
+            select(RemediationPatch).where(RemediationPatch.id == patch_id)
+        )
     ).scalar_one()
     assert patch_obj.status == PatchStatus.rejected
     assert "architectural review" in patch_obj.rejection_reason
@@ -335,6 +363,7 @@ async def test_patch_rejection_workflow(client, db_session):
 # ─────────────────────────────────────────────────────────────
 # 6. Multi-Tenant Security Isolation Tests
 # ─────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_sagepatch_cross_tenant_isolation(client, db_session):
@@ -362,7 +391,9 @@ async def test_sagepatch_cross_tenant_isolation(client, db_session):
     assert view_b.status_code == 404
 
     # Tenant B tries to approve Tenant A's patch -> 400/404
-    approve_b = await client.post(f"/autofix/patches/{patch_a_id}/approve", headers=headers_b)
+    approve_b = await client.post(
+        f"/autofix/patches/{patch_a_id}/approve", headers=headers_b
+    )
     assert approve_b.status_code in (400, 404)
 
     # Tenant B tries to reject Tenant A's patch -> 404

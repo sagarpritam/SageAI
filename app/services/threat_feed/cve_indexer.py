@@ -81,7 +81,9 @@ class CVEIndexer:
             self._cache_file.parent.mkdir(parents=True, exist_ok=True)
             payload = {
                 "metadata": {
-                    "last_synced": self._last_synced.isoformat() if self._last_synced else None,
+                    "last_synced": self._last_synced.isoformat()
+                    if self._last_synced
+                    else None,
                     "total_count": len(self._index),
                     "kev_count": sum(1 for v in self._index.values() if v.is_kev),
                 },
@@ -224,12 +226,16 @@ class CVEIndexer:
             async with httpx.AsyncClient(timeout=25.0) as client:
                 res = await client.get(CISA_KEV_FEED_URL)
                 if res.status_code != 200:
-                    logger.warning(f"CISA KEV feed responded with HTTP {res.status_code}")
+                    logger.warning(
+                        f"CISA KEV feed responded with HTTP {res.status_code}"
+                    )
                     return len(self._index)
 
                 data = res.json()
                 vulnerabilities = data.get("vulnerabilities", [])
-                logger.info(f"Fetched {len(vulnerabilities)} vulnerabilities from CISA KEV.")
+                logger.info(
+                    f"Fetched {len(vulnerabilities)} vulnerabilities from CISA KEV."
+                )
 
                 for item in vulnerabilities:
                     cve_id = item.get("cveID", "").strip().upper()
@@ -237,11 +243,20 @@ class CVEIndexer:
                         continue
 
                     ransomware = item.get("knownRansomwareCampaignUse", "Unknown")
-                    short_desc = item.get("shortDescription", "No description provided.")
-                    vuln_name = item.get("vulnerabilityName", f"Exploited Vulnerability {cve_id}")
+                    short_desc = item.get(
+                        "shortDescription", "No description provided."
+                    )
+                    vuln_name = item.get(
+                        "vulnerabilityName", f"Exploited Vulnerability {cve_id}"
+                    )
 
                     # Determine severity heuristic for KEV
-                    severity = "critical" if ransomware.lower() == "known" or "remote code execution" in short_desc.lower() else "high"
+                    severity = (
+                        "critical"
+                        if ransomware.lower() == "known"
+                        or "remote code execution" in short_desc.lower()
+                        else "high"
+                    )
 
                     entry = ThreatVulnerability(
                         id=cve_id,
@@ -249,9 +264,13 @@ class CVEIndexer:
                         description=short_desc,
                         severity=severity,
                         source="CISA KEV",
-                        published=item.get("dateAdded", datetime.now(timezone.utc).isoformat()),
+                        published=item.get(
+                            "dateAdded", datetime.now(timezone.utc).isoformat()
+                        ),
                         is_kev=True,
-                        ransomware_campaign=ransomware if ransomware != "Unknown" else None,
+                        ransomware_campaign=ransomware
+                        if ransomware != "Unknown"
+                        else None,
                         remediation_action=item.get("requiredAction"),
                         due_date=item.get("dueDate"),
                         vendor_project=item.get("vendorProject"),
@@ -262,7 +281,9 @@ class CVEIndexer:
 
                 self._last_synced = datetime.now(timezone.utc)
                 self._save_cache()
-                logger.info(f"CISA KEV sync complete. Total threats indexed: {len(self._index)}")
+                logger.info(
+                    f"CISA KEV sync complete. Total threats indexed: {len(self._index)}"
+                )
                 return len(self._index)
 
         except Exception as e:
@@ -308,7 +329,9 @@ class CVEIndexer:
 
         # Prioritize KEV and critical severity, then newest
         def rank_sort(v: ThreatVulnerability):
-            sev_weight = {"critical": 4, "high": 3, "medium": 2, "low": 1}.get(v.severity.lower(), 0)
+            sev_weight = {"critical": 4, "high": 3, "medium": 2, "low": 1}.get(
+                v.severity.lower(), 0
+            )
             kev_weight = 10 if v.is_kev else 0
             return (kev_weight + sev_weight, v.published)
 
@@ -346,7 +369,9 @@ class CVEIndexer:
 
         return None
 
-    def get_recent(self, limit: int = 20, kev_only: bool = False) -> List[ThreatVulnerability]:
+    def get_recent(
+        self, limit: int = 20, kev_only: bool = False
+    ) -> List[ThreatVulnerability]:
         """Get most recent threats for display in feeds and dashboard."""
         return self.search(query="", limit=limit, kev_only=kev_only)
 

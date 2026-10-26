@@ -99,9 +99,14 @@ async def create_scan(
     idempotency_key = payload.idempotency_key or request.headers.get("idempotency-key")
     if idempotency_key:
         from app.services.worker.fleet_manager import fleet_manager
-        existing_scan = await fleet_manager.check_idempotency(db, current_user["org"], idempotency_key)
+
+        existing_scan = await fleet_manager.check_idempotency(
+            db, current_user["org"], idempotency_key
+        )
         if existing_scan:
-            logger.info(f"Returning idempotent existing scan {existing_scan.id} for key {idempotency_key}")
+            logger.info(
+                f"Returning idempotent existing scan {existing_scan.id} for key {idempotency_key}"
+            )
             findings_data = existing_scan.get_findings()
             risk = calculate_risk(findings_data)
             return ScanResponse(
@@ -109,7 +114,9 @@ async def create_scan(
                 target=existing_scan.target,
                 status=existing_scan.status,
                 timestamp=existing_scan.created_at,
-                findings=[Vulnerability(**f) for f in findings_data] if findings_data else [],
+                findings=[Vulnerability(**f) for f in findings_data]
+                if findings_data
+                else [],
                 risk_summary=RiskSummary(**risk),
                 is_authorized=bool(existing_scan.is_authorized),
             )
@@ -151,6 +158,7 @@ async def create_scan(
     # If async_mode requested, dispatch to worker fleet immediately
     if payload.async_mode:
         from app.services.worker.fleet_manager import fleet_manager
+
         await fleet_manager.dispatch_scan(
             db=db,
             scan_id=scan.id,
@@ -263,7 +271,8 @@ async def cancel_scan(
     res = await fleet_manager.cancel_scan(db, scan_id, current_user["org"])
     if not res.get("authorized", True):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=res.get("error", "Scan not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=res.get("error", "Scan not found"),
         )
     return res
 
@@ -499,9 +508,7 @@ async def get_scan_findings(
             if hasattr(f.severity, "value")
             else str(f.severity),
             "cvss_score": f.cvss_score,
-            "status": f.status.value
-            if hasattr(f.status, "value")
-            else str(f.status),
+            "status": f.status.value if hasattr(f.status, "value") else str(f.status),
             "assigned_to": f.assigned_to,
             "resolved_at": f.resolved_at.isoformat() if f.resolved_at else None,
             "notes": f.notes,
@@ -581,7 +588,11 @@ async def update_finding_status(
 
     if new_status in (FindingStatus.fixed, FindingStatus.accepted_risk):
         finding.resolved_at = datetime.now(timezone.utc)
-    elif new_status in (FindingStatus.new, FindingStatus.in_progress, FindingStatus.reopened):
+    elif new_status in (
+        FindingStatus.new,
+        FindingStatus.in_progress,
+        FindingStatus.reopened,
+    ):
         finding.resolved_at = None
 
     await db.commit()
@@ -612,9 +623,7 @@ async def update_finding_status(
         if hasattr(finding.status, "value")
         else str(finding.status),
         "assigned_to": finding.assigned_to,
-        "resolved_at": finding.resolved_at.isoformat()
-        if finding.resolved_at
-        else None,
+        "resolved_at": finding.resolved_at.isoformat() if finding.resolved_at else None,
         "notes": finding.notes,
     }
 

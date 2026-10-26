@@ -73,7 +73,9 @@ async def test_target_domain_inheritance(client, db_session):
     assert await is_target_authorized(db_session, org.id, "https://acme.org") is True
 
     # Check subdomain inheritance
-    assert await is_target_authorized(db_session, org.id, "https://api.acme.org") is True
+    assert (
+        await is_target_authorized(db_session, org.id, "https://api.acme.org") is True
+    )
     assert (
         await is_target_authorized(
             db_session, org.id, "https://app.staging.dev.acme.org:8080/path"
@@ -82,7 +84,9 @@ async def test_target_domain_inheritance(client, db_session):
     )
 
     # Different domain is not authorized
-    assert await is_target_authorized(db_session, org.id, "https://notacme.org") is False
+    assert (
+        await is_target_authorized(db_session, org.id, "https://notacme.org") is False
+    )
 
 
 @pytest.mark.asyncio
@@ -171,7 +175,11 @@ async def test_finding_lifecycle_status_transitions(client, db_session):
     # Transition to in_progress
     r1 = await client.patch(
         f"/scan/{scan_id}/findings/{finding_id}/status",
-        json={"status": "in_progress", "assigned_to": "alice@secops.corp", "notes": "Investigating headers"},
+        json={
+            "status": "in_progress",
+            "assigned_to": "alice@secops.corp",
+            "notes": "Investigating headers",
+        },
         headers=headers,
     )
     assert r1.status_code == 200
@@ -219,14 +227,18 @@ async def test_redirect_ssrf_protection_in_http_challenge():
     mock_response_redirect = httpx.Response(
         status_code=302,
         headers={"location": "http://169.254.169.254/latest/meta-data/"},
-        request=httpx.Request("GET", f"https://{target_domain}/.well-known/sageai-challenge.txt"),
+        request=httpx.Request(
+            "GET", f"https://{target_domain}/.well-known/sageai-challenge.txt"
+        ),
     )
 
     with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_response_redirect
         success, message = await verify_http_challenge(target_domain, token)
         assert success is False
-        assert "not permitted" in message or "restricted" in message or "failed" in message
+        assert (
+            "not permitted" in message or "restricted" in message or "failed" in message
+        )
 
 
 @pytest.mark.asyncio

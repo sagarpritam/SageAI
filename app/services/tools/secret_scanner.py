@@ -27,7 +27,9 @@ SECRET_PATTERNS: List[SecretPattern] = [
     },
     {
         "type": "GitHub Personal Access Token",
-        "pattern": re.compile(r"\b(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{60,90})\b"),
+        "pattern": re.compile(
+            r"\b(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{60,90})\b"
+        ),
         "severity": "CRITICAL",
         "description": "Exposed GitHub Personal Access Token allows repository compromise.",
     },
@@ -101,7 +103,8 @@ class SecretScanner(BaseTool):
             dirs[:] = [
                 d
                 for d in dirs
-                if not d.startswith(".") and d not in ("node_modules", "venv", "__pycache__")
+                if not d.startswith(".")
+                and d not in ("node_modules", "venv", "__pycache__")
             ]
 
             for file_name in files:

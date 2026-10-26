@@ -33,7 +33,9 @@ COMMON_PORTS = {
 RISKY_PORTS = {21, 23, 445, 3306, 3389, 5432, 6379, 27017}
 
 
-def scan_ports(hostname: str, ports: dict | None = None, timeout: float = 2.0) -> list[dict]:
+def scan_ports(
+    hostname: str, ports: dict | None = None, timeout: float = 2.0
+) -> list[dict]:
     """Scan common ports on a host."""
     findings = []
     ports = ports or COMMON_PORTS

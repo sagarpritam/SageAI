@@ -52,19 +52,31 @@ class Finding(Base):
     status: Mapped[FindingStatus] = mapped_column(
         SAEnum(FindingStatus), default=FindingStatus.new, nullable=False, index=True
     )
-    assigned_to: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # User email or ID
-    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    assigned_to: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # User email or ID
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Context
-    asset_identified: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # URL, endpoint, or IP where found
-    remediation_steps: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Markdown instructions for fix
+    asset_identified: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # URL, endpoint, or IP where found
+    remediation_steps: Mapped[Optional[str]] = mapped_column(
+        Text, nullable=True
+    )  # Markdown instructions for fix
 
     # Optional metadata (JSON stored as text)
-    evidence: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Raw request/response snippet
+    evidence: Mapped[Optional[str]] = mapped_column(
+        Text, nullable=True
+    )  # Raw request/response snippet
 
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now
+    )
 
     # Relationship
     scan = relationship("Scan", back_populates="db_findings")

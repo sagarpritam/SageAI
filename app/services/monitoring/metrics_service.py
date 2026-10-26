@@ -59,7 +59,13 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
     now_ts = time.time()
 
     # 1. Scan Queue & Worker Fleet Depth
-    queue_counts = {"queued": 0, "running": 0, "completed": 0, "failed": 0, "cancelled": 0}
+    queue_counts = {
+        "queued": 0,
+        "running": 0,
+        "completed": 0,
+        "failed": 0,
+        "cancelled": 0,
+    }
     res = await db.execute(
         select(Scan.status, func.count(Scan.id)).group_by(Scan.status)
     )
@@ -72,9 +78,9 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
     # 2. Alert SLA & Latency Distribution
     alert_percentiles = compute_percentiles(_ALERT_LATENCY_SAMPLES)
     channels_res = await db.execute(
-        select(NotificationChannel.channel_type, func.count(NotificationChannel.id)).group_by(
-            NotificationChannel.channel_type
-        )
+        select(
+            NotificationChannel.channel_type, func.count(NotificationChannel.id)
+        ).group_by(NotificationChannel.channel_type)
     )
     active_channels = dict(channels_res.all())
 
@@ -114,7 +120,9 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
             "channels_breakdown": active_channels,
         },
         "threat_feed_intel": {
-            "last_sync_timestamp": datetime.fromtimestamp(_LAST_FEED_SYNC_TIME, timezone.utc).isoformat(),
+            "last_sync_timestamp": datetime.fromtimestamp(
+                _LAST_FEED_SYNC_TIME, timezone.utc
+            ).isoformat(),
             "hours_since_sync": round(hours_since_sync, 2),
             "is_stale": is_feed_stale,
             "status": "warning_stale" if is_feed_stale else "healthy",
@@ -124,7 +132,11 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
             "dispatched_prs": patch_counts["approved"],
             "rejected_patches": patch_counts["rejected"],
             "approval_ratio": (
-                round(patch_counts["approved"] / (patch_counts["approved"] + patch_counts["rejected"]), 2)
+                round(
+                    patch_counts["approved"]
+                    / (patch_counts["approved"] + patch_counts["rejected"]),
+                    2,
+                )
                 if (patch_counts["approved"] + patch_counts["rejected"]) > 0
                 else 1.0
             ),

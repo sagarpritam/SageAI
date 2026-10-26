@@ -209,7 +209,9 @@ async def run_assessment_async(
     "/status", summary="List Available Agents", response_model=AgentListResponse
 )
 @limiter.limit("60/minute")
-async def list_agents(request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
+async def list_agents(
+    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
+):
     """Returns the list of AI agents available in the system."""
     return {
         "agents": [

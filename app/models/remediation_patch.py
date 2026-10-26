@@ -49,9 +49,13 @@ class RemediationPatch(Base):
         index=True,
     )
 
-    repository: Mapped[str] = mapped_column(String, nullable=False, index=True)  # owner/repo
+    repository: Mapped[str] = mapped_column(
+        String, nullable=False, index=True
+    )  # owner/repo
     base_branch: Mapped[str] = mapped_column(String, default="main", nullable=False)
-    patch_branch: Mapped[str] = mapped_column(String, nullable=False)  # sagepatch/fix-xxx
+    patch_branch: Mapped[str] = mapped_column(
+        String, nullable=False
+    )  # sagepatch/fix-xxx
     file_path: Mapped[str] = mapped_column(String, nullable=False)
 
     vulnerability_type: Mapped[str] = mapped_column(String, nullable=False)
@@ -59,7 +63,9 @@ class RemediationPatch(Base):
 
     original_code: Mapped[str] = mapped_column(Text, nullable=False)
     patched_code: Mapped[str] = mapped_column(Text, nullable=False)
-    diff: Mapped[str] = mapped_column(Text, nullable=False)  # Deterministic unified diff
+    diff: Mapped[str] = mapped_column(
+        Text, nullable=False
+    )  # Deterministic unified diff
     lines_changed: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     status: Mapped[PatchStatus] = mapped_column(
@@ -74,17 +80,27 @@ class RemediationPatch(Base):
     sandbox_details: Mapped[str] = mapped_column(Text, default="{}")  # JSON string
 
     # Human approval tracking
-    requested_by: Mapped[str] = mapped_column(String, nullable=False)  # User email or ID
-    approved_by: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # User email who approved
-    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    requested_by: Mapped[str] = mapped_column(
+        String, nullable=False
+    )  # User email or ID
+    approved_by: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # User email who approved
+    approved_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # GitHub Pull Request metadata
     pr_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     pr_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now
+    )
 
     # Relationships
     organization = relationship("Organization")
