@@ -1,17 +1,17 @@
 # ================================
-# SageAI — Render Blueprint
+# SageAI — Render Blueprint (100% Free Tier)
 # https://render.com/docs/blueprint-spec
 # ================================
 
 services:
-  # FastAPI Backend
+  # FastAPI Backend (Free Tier)
   - type: web
     name: SageAI-api
     runtime: python
     region: oregon
-    plan: starter
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
@@ -35,13 +35,13 @@ services:
       - key: PYTHON_VERSION
         value: 3.13.0
 
-  # Next.js Frontend
+  # Next.js Frontend (Free Tier)
   - type: web
     name: SageAI-dashboard
     runtime: node
     region: oregon
-    plan: starter
-    buildCommand: cd sage-web && npm install && npm run build
+    plan: free
+    buildCommand: cd sage-web && npm install --legacy-peer-deps && npm run build
     startCommand: cd sage-web && npm start
     envVars:
       - key: BACKEND_URL
@@ -59,7 +59,8 @@ services:
         value: nosniff
 
 databases:
+  # Free PostgreSQL Database (Or connect free Supabase via DATABASE_URL)
   - name: SageAI-db
-    plan: starter
+    plan: free
     databaseName: sageai
     user: sageai

@@ -2,67 +2,67 @@
     "rewrites": [
         {
             "source": "/auth/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/auth/:path*"
+            "destination": "https://sageai-api.onrender.com/auth/:path*"
         },
         {
             "source": "/scan/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/scan/:path*"
+            "destination": "https://sageai-api.onrender.com/scan/:path*"
         },
         {
             "source": "/scans/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/scans/:path*"
+            "destination": "https://sageai-api.onrender.com/scans/:path*"
         },
         {
             "source": "/reports/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/reports/:path*"
+            "destination": "https://sageai-api.onrender.com/reports/:path*"
         },
         {
             "source": "/explain/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/explain/:path*"
+            "destination": "https://sageai-api.onrender.com/explain/:path*"
         },
         {
             "source": "/org/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/org/:path*"
+            "destination": "https://sageai-api.onrender.com/org/:path*"
         },
         {
             "source": "/api-keys/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/api-keys/:path*"
+            "destination": "https://sageai-api.onrender.com/api-keys/:path*"
         },
         {
             "source": "/webhooks/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/webhooks/:path*"
+            "destination": "https://sageai-api.onrender.com/webhooks/:path*"
         },
         {
             "source": "/billing/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/billing/:path*"
+            "destination": "https://sageai-api.onrender.com/billing/:path*"
         },
         {
             "source": "/schedules/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/schedules/:path*"
+            "destination": "https://sageai-api.onrender.com/schedules/:path*"
         },
         {
             "source": "/ai/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/ai/:path*"
+            "destination": "https://sageai-api.onrender.com/ai/:path*"
         },
         {
             "source": "/assets/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/assets/:path*"
+            "destination": "https://sageai-api.onrender.com/assets/:path*"
         },
         {
             "source": "/agents/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/agents/:path*"
+            "destination": "https://sageai-api.onrender.com/agents/:path*"
         },
         {
             "source": "/autofix/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/autofix/:path*"
+            "destination": "https://sageai-api.onrender.com/autofix/:path*"
         },
         {
             "source": "/integrations/:path*",
-            "destination": "https://web-production-f984b.up.railway.app/integrations/:path*"
+            "destination": "https://sageai-api.onrender.com/integrations/:path*"
         },
         {
             "source": "/metrics",
-            "destination": "https://web-production-f984b.up.railway.app/metrics"
+            "destination": "https://sageai-api.onrender.com/metrics"
         },
         {
             "source": "/((?!assets/).*)",
