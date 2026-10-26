@@ -91,11 +91,6 @@ export function ObservabilityDashboard() {
   const [dastResults, setDastResults] = useState<Record<string, unknown> | null>(null);
   const [dastError, setDastError] = useState("");
 
-  useEffect(() => {
-    fetchMetrics();
-    fetchTraces();
-  }, []);
-
   const fetchMetrics = async () => {
     try {
       const res = await axios.get("/api/telemetry/metrics");
@@ -115,6 +110,11 @@ export function ObservabilityDashboard() {
       setTraces([]);
     }
   };
+
+  useEffect(() => {
+    fetchMetrics();
+    fetchTraces();
+  }, []);
 
   const inspectTrace = async (traceId: string) => {
     setLoadingTraceDetail(true);
