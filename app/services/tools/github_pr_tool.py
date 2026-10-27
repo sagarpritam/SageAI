@@ -108,6 +108,8 @@ class GitHubPRTool(BaseTool):
             }
         owner, repo = parts
 
+        from app.services.agent.developer_agent import DeveloperAgent
+
         github = GitHubService(github_token)
         agent = DeveloperAgent(github, org_id=org_id)
 
