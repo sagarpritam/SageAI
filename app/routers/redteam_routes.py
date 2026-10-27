@@ -1,10 +1,12 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from app.core.security import get_current_user
+from app.core.rate_limit import limiter
+from app.core.security import get_current_user, require_role
+from app.routers.webhook_routes import is_safe_webhook_url
 from app.services.redteam.nemo_auditor import nemo_auditor
 
 logger = logging.getLogger("SageAI.redteam")
@@ -40,12 +42,24 @@ def _resolve_tenant_namespace(user: dict, requested_namespace: str = "default") 
 
 
 @router.post("/targets")
+@limiter.limit("20/minute")
 async def create_audit_target(
-    payload: TargetCreateRequest, current_user: dict = Depends(get_current_user)
+    request: Request,
+    payload: TargetCreateRequest,
+    current_user: dict = Depends(require_role("admin")),
 ):
     """
-    Register a new LLM target for security auditing.
+    Register a new LLM target for security auditing (admin only).
     """
+    # SSRF & Private IP validation
+    if payload.uri.startswith(("http://", "https://")):
+        is_safe, error_msg = is_safe_webhook_url(payload.uri)
+        if not is_safe:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Target URI not allowed: {error_msg}",
+            )
+
     try:
         tenant_namespace = _resolve_tenant_namespace(current_user, payload.namespace)
         target = nemo_auditor.create_target(
@@ -63,8 +77,11 @@ async def create_audit_target(
 
 
 @router.get("/targets")
+@limiter.limit("60/minute")
 async def list_audit_targets(
-    namespace: str = "default", current_user: dict = Depends(get_current_user)
+    request: Request,
+    namespace: str = "default",
+    current_user: dict = Depends(get_current_user),
 ):
     """
     List all configured audit targets for the organization.
@@ -79,11 +96,14 @@ async def list_audit_targets(
 
 
 @router.post("/audit")
+@limiter.limit("10/minute")
 async def start_redteam_audit(
-    payload: AuditJobRequest, current_user: dict = Depends(get_current_user)
+    request: Request,
+    payload: AuditJobRequest,
+    current_user: dict = Depends(require_role("admin")),
 ):
     """
-    Start an automated red team audit on the specified target.
+    Start an automated red team audit on the specified target (admin only).
     """
     try:
         tenant_namespace = _resolve_tenant_namespace(current_user, payload.namespace)
@@ -99,7 +119,9 @@ async def start_redteam_audit(
 
 
 @router.get("/results/{job_id}")
+@limiter.limit("60/minute")
 async def get_audit_results(
+    request: Request,
     job_id: str,
     namespace: str = "default",
     current_user: dict = Depends(get_current_user),

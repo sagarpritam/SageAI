@@ -12,13 +12,14 @@ Exposes:
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.encryption import decrypt
+from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.models.organization import Organization
 from app.models.remediation_patch import RemediationPatch
@@ -185,7 +186,9 @@ async def get_remediation_patch(
 
 
 @router.post("/propose", status_code=status.HTTP_201_CREATED)
+@limiter.limit("20/minute")
 async def propose_patch(
+    request: Request,
     payload: ProposePatchRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -226,7 +229,9 @@ async def propose_patch(
 
 
 @router.post("/patches/{patch_id}/approve")
+@limiter.limit("20/minute")
 async def approve_patch(
+    request: Request,
     patch_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -284,13 +289,22 @@ async def approve_patch(
 
 
 @router.post("/patches/{patch_id}/reject")
+@limiter.limit("20/minute")
 async def reject_patch(
+    request: Request,
     patch_id: str,
     payload: RejectPatchRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Reject a proposed patch with an auditable explanation."""
+    user_role = current_user.get("role", "member")
+    if user_role not in ("admin", "reviewer", "lead"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Unauthorized: Patch rejection requires an admin or reviewer role.",
+        )
+
     engine = SagePatchEngine(db)
     try:
         patch = await engine.reject_patch(
@@ -318,8 +332,10 @@ async def reject_patch(
 
 
 @router.post("/run")
+@limiter.limit("5/minute")
 async def run_autofix(
-    request: AutoFixRequest,
+    request: Request,
+    payload: AutoFixRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -348,7 +364,7 @@ async def run_autofix(
     # Step 1: Run SAST Scanner
     sast = SASTScanner()
     scan_results = await sast.run(
-        request.repository, github_token=github_token, branch=request.branch
+        payload.repository, github_token=github_token, branch=payload.branch
     )
 
     if "error" in scan_results:
@@ -360,19 +376,19 @@ async def run_autofix(
     if not findings:
         return {
             "status": "clean",
-            "message": f"No vulnerabilities found in {request.repository}. Your code is secure! 🎉",
+            "message": f"No vulnerabilities found in {payload.repository}. Your code is secure! 🎉",
             "scan_results": scan_results,
         }
 
-    findings_to_fix = findings[: request.max_fixes]
+    findings_to_fix = findings[: payload.max_fixes]
 
     # Step 2 & 3: Run GitHub PR tool
     pr_tool = GitHubPRTool()
     fix_results = await pr_tool.run(
-        request.repository,
+        payload.repository,
         github_token=github_token,
         findings=findings_to_fix,
-        branch=request.branch,
+        branch=payload.branch,
         org_id=org_id,
     )
 

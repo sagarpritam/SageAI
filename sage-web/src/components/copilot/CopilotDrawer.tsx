@@ -34,6 +34,24 @@ interface CopilotDrawerProps {
   findingId?: string;
 }
 
+function renderSafeMarkdown(raw: string): string {
+  // 1. Sanitize raw text to prevent XSS (escape all HTML tags and characters)
+  const escaped = raw
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  // 2. Safely parse trusted markdown formatting
+  return escaped
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    .replace(/```bash([\s\S]*?)```/g, '<div class="my-2 p-2.5 rounded bg-black/80 font-mono text-emerald-400 text-xs border border-zinc-800 overflow-x-auto">$1</div>')
+    .replace(/```([\s\S]*?)```/g, '<div class="my-2 p-2.5 rounded bg-black/80 font-mono text-zinc-200 text-xs border border-zinc-800 overflow-x-auto">$1</div>')
+    .replace(/`([^`]+)`/g, '<code class="bg-zinc-800/90 text-emerald-300 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
+    .replace(/\n/g, "<br/>");
+}
+
 export function CopilotDrawer({
   initialOpen = false,
   scanId: initialScanId,
@@ -339,12 +357,7 @@ export function CopilotDrawer({
                 <div
                   className="whitespace-pre-wrap break-words prose prose-invert prose-xs"
                   dangerouslySetInnerHTML={{
-                    __html: m.content
-                      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-                      .replace(/```bash([\s\S]*?)```/g, '<div class="my-2 p-2.5 rounded bg-black/80 font-mono text-emerald-400 text-xs border border-zinc-800 overflow-x-auto">$1</div>')
-                      .replace(/```([\s\S]*?)```/g, '<div class="my-2 p-2.5 rounded bg-black/80 font-mono text-zinc-200 text-xs border border-zinc-800 overflow-x-auto">$1</div>')
-                      .replace(/`([^`]+)`/g, '<code class="bg-zinc-800/90 text-emerald-300 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
-                      .replace(/\n/g, "<br/>"),
+                    __html: renderSafeMarkdown(m.content),
                   }}
                 />
 

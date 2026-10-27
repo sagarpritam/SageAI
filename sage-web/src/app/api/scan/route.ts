@@ -30,6 +30,38 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const { target } = body;
+  if (!target || typeof target !== "string") {
+    return NextResponse.json({ error: "Target URL or domain is required" }, { status: 400 });
+  }
+
+  // Normalize target URL
+  let cleanTarget = target.trim();
+  if (!cleanTarget.startsWith("http://") && !cleanTarget.startsWith("https://")) {
+    cleanTarget = `https://${cleanTarget}`;
+  }
+
+  // Validate URL and enforce SSRF check against private networks & metadata endpoints
+  try {
+    const parsed = new URL(cleanTarget);
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return NextResponse.json({ error: "Only HTTP and HTTPS targets are permitted." }, { status: 400 });
+    }
+    const hostname = parsed.hostname.toLowerCase();
+    if (
+      hostname === "localhost" ||
+      hostname.endsWith(".localhost") ||
+      hostname === "127.0.0.1" ||
+      hostname === "::1" ||
+      hostname === "169.254.169.254" ||
+      hostname.startsWith("10.") ||
+      hostname.startsWith("192.168.") ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)
+    ) {
+      return NextResponse.json({ error: "Scanning private or loopback IP ranges is strictly prohibited." }, { status: 400 });
+    }
+  } catch {
+    return NextResponse.json({ error: "Invalid target URL format." }, { status: 400 });
+  }
 
   // Optional Redis-based rate limiting (fast pre-check)
   if (redis) {
@@ -49,7 +81,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ target })
+      body: JSON.stringify({ target: cleanTarget })
     });
 
     // Relay 402 Payment Required from backend
@@ -62,7 +94,7 @@ export async function POST(req: Request) {
     }
 
     const data = await backendRes.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, { status: backendRes.status });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json({ scan_id: "mock-" + Date.now() });

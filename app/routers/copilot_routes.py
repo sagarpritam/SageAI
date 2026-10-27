@@ -14,7 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.copilot import copilot_agent
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.rate_limit import limiter
+from app.core.security import get_current_user, require_role
 from app.services.audit_service import log_audit_event
 from app.services.threat_feed.cve_indexer import cve_indexer
 
@@ -58,6 +59,7 @@ class PoCGenerateRequest(BaseModel):
 
 
 @router.post("/chat")
+@limiter.limit("30/minute")
 async def copilot_chat(
     req: CopilotChatRequest,
     request: Request,
@@ -122,7 +124,9 @@ async def copilot_chat(
 
 
 @router.post("/explain")
+@limiter.limit("30/minute")
 async def explain_vulnerability(
+    request: Request,
     req: VulnerabilityExplainRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -148,7 +152,9 @@ async def explain_vulnerability(
 
 
 @router.post("/poc")
+@limiter.limit("30/minute")
 async def generate_safe_poc(
+    request: Request,
     req: PoCGenerateRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -172,7 +178,9 @@ async def generate_safe_poc(
 
 
 @router.get("/threat-intel")
+@limiter.limit("60/minute")
 async def get_threat_intel(
+    request: Request,
     query: str = Query(default="", description="Search CVE, product, or keyword"),
     limit: int = Query(default=10, ge=1, le=50),
     kev_only: bool = Query(
@@ -254,9 +262,11 @@ async def get_recent_threat_feed(
 
 
 @threat_feed_router.post("/sync")
+@limiter.limit("5/minute")
 async def trigger_threat_feed_sync(
+    request: Request,
     force: bool = Query(default=False),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_role("admin")),
 ):
     """Trigger background or on-demand synchronization of CISA KEV feed."""
     count = await cve_indexer.sync_cisa_kev(force=force)

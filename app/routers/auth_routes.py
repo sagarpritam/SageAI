@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.rate_limit import limiter
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import create_access_token, hash_password, needs_rehash, verify_password
 from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.auth import TokenResponse, UserCreate, UserLogin
@@ -74,6 +74,11 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    # Automatically upgrade legacy or lower-work-factor hashes to modern OWASP standard
+    if needs_rehash(user.password_hash):
+        user.password_hash = hash_password(payload.password)
+        await db.commit()
 
     if user.mfa_enabled:
         if not payload.mfa_code:

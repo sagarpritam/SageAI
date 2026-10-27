@@ -53,17 +53,27 @@ DEFAULT_INTERNAL_IPS = [
 # ---------------------
 # Password Hashing
 # ---------------------
-pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+# OWASP recommends 600,000 iterations for PBKDF2-HMAC-SHA256
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256"],
+    pbkdf2_sha256__default_rounds=600000,
+    deprecated="auto",
+)
 
 
 def hash_password(password: str) -> str:
-    """Hash a plaintext password."""
+    """Hash a plaintext password with 600,000 iterations of PBKDF2-SHA256."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plaintext password against a hash."""
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def needs_rehash(hashed_password: str) -> bool:
+    """Check if an existing hash uses deprecated parameters and needs an upgrade."""
+    return pwd_context.needs_update(hashed_password)
 
 
 # ---------------------

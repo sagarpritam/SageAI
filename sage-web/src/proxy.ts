@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Routes that require authentication
-const protectedRoutes = ['/history', '/dashboard', '/settings']
+// Routes that strictly require authentication
+const protectedRoutes = ['/history', '/dashboard', '/settings', '/scan', '/deep-search']
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get('sageai_jwt')?.value
@@ -10,20 +10,35 @@ export function proxy(request: NextRequest) {
 
   // Check if it's a protected route
   const isProtected = protectedRoutes.some(route => 
-    path.startsWith(route)
+    path === route || path.startsWith(`${route}/`)
   )
 
   if (isProtected && !token) {
-    // Redirect unauthenticated users to login page
-    return NextResponse.redirect(new URL('/login', request.url))
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('from', path)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // If user is already logged in and tries to access login page, redirect to home
+  // If user is already logged in and tries to access login page, redirect to dashboard
   if (path === '/login' && token) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next()
+  const response = NextResponse.next()
+
+  // Apply OWASP security headers to all responses
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  response.headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https: wss: ws:; frame-ancestors 'self';"
+  )
+
+  return response
 }
 
 export const config = {

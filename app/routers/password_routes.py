@@ -6,12 +6,13 @@ import os
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.core.security import hash_password
 from app.models.user import User
 from app.schemas.auth import (
@@ -85,7 +86,9 @@ async def _consume_reset_token(token: str) -> str | None:
 
 
 @router.post("/forgot-password", response_model=MessageResponse)
+@limiter.limit("5/minute")
 async def forgot_password(
+    request: Request,
     body: ForgotPasswordRequest | None = None,
     email: str | None = None,
     db: AsyncSession = Depends(get_db),
@@ -118,7 +121,9 @@ async def forgot_password(
 
 
 @router.post("/reset-password", response_model=MessageResponse)
+@limiter.limit("5/minute")
 async def reset_password(
+    request: Request,
     body: ResetPasswordRequest | None = None,
     token: str | None = None,
     new_password: str | None = None,

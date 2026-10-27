@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -93,11 +94,15 @@ app = FastAPI(
     description="AI-powered Attack Surface Management & Security Platform",
     version="2.0.0",
     lifespan=lifespan,
+    docs_url=None if settings.is_production else "/docs",
+    redoc_url=None if settings.is_production else "/redoc",
+    openapi_url=None if settings.is_production else "/openapi.json",
 )
 
 # Rate limiter
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, cast(Any, _rate_limit_exceeded_handler))
+app.add_middleware(SlowAPIMiddleware)
 
 # CORS — uses configurable origins, not wildcard
 app.add_middleware(
@@ -203,40 +208,34 @@ async def health_check():
     except Exception:
         db_ok = False
 
-    health_data = {
+    return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": "2.0.0",
         "environment": settings.ENV,
         "database": "connected" if db_ok else "unreachable",
+        "scanners": 11,
+        "intelligence_modules": 10,
+        "endpoints": 65,
+        "new_in_v2": [
+            "Asset Inventory",
+            "Attack Surface Management",
+            "AI Copilot",
+            "Bug Bounty Reports",
+            "Multi-Agent AI Team",
+            "Security Knowledge Graph",
+            "Plugin Marketplace",
+        ],
+        "new_in_v3": [
+            "Shodan Panopticon",
+            "Maltego Link Analysis",
+            "Babel X Dark Web",
+            "SpiderFoot Recon",
+            "Social Links De-Masking",
+            "Intel X Archives",
+            "Recon-ng Framework",
+            "Censys Global Radar",
+            "OSINT Industries Interceptor",
+            "Deep Search: The Abyss",
+        ],
     }
-    if settings.ENV != "production":
-        health_data.update(
-            {
-                "scanners": 11,
-                "intelligence_modules": 10,
-                "endpoints": 65,
-                "new_in_v2": [
-                    "Asset Inventory",
-                    "Attack Surface Management",
-                    "AI Copilot",
-                    "Bug Bounty Reports",
-                    "Multi-Agent AI Team",
-                    "Security Knowledge Graph",
-                    "Plugin Marketplace",
-                ],
-                "new_in_v3": [
-                    "Shodan Panopticon",
-                    "Maltego Link Analysis",
-                    "Babel X Dark Web",
-                    "SpiderFoot Recon",
-                    "Social Links De-Masking",
-                    "Intel X Archives",
-                    "Recon-ng Framework",
-                    "Censys Global Radar",
-                    "OSINT Industries Interceptor",
-                    "Deep Search: The Abyss",
-                ],
-            }
-        )
-    return health_data

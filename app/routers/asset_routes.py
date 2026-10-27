@@ -8,12 +8,13 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.rate_limit import limiter
+from app.core.security import get_current_user, require_role
 from app.models.asset import Asset, AssetStatus, AssetType
 from app.models.user import User
 from app.schemas.asset import DiscoveryRequest
@@ -49,11 +50,13 @@ def _parse_asset(a: Asset) -> dict:
 
 
 @router.post("/discover", summary="Trigger Asset Discovery")
+@limiter.limit("10/minute")
 async def trigger_discovery(
+    request: Request,
     req: DiscoveryRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Trigger full attack surface discovery for a root domain.
@@ -73,10 +76,12 @@ async def trigger_discovery(
 
 
 @router.post("/discover/sync", summary="Trigger Asset Discovery (Synchronous)")
+@limiter.limit("10/minute")
 async def trigger_discovery_sync(
+    request: Request,
     req: DiscoveryRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Synchronous asset discovery — waits for completion and returns full summary.
@@ -230,10 +235,12 @@ async def get_asset(
 
 
 @router.delete("/{asset_id}", summary="Delete Asset")
+@limiter.limit("30/minute")
 async def delete_asset(
+    request: Request,
     asset_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(require_role("admin")),
 ):
     """Remove a discovered asset from inventory."""
     result = await db.execute(

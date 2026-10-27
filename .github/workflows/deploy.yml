@@ -43,11 +43,12 @@ jobs:
           flags: '--allow-unauthenticated'
           env_vars: |
             ENV=production
+            DEBUG=false
             DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
             SECRET_KEY=${{ secrets.PROD_SECRET_KEY }}
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
             INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
-            CORS_ORIGINS=${{ secrets.PROD_CORS_ORIGINS || '*' }}
+            CORS_ORIGINS=${{ secrets.PROD_CORS_ORIGINS || 'https://sageai.io,https://app.sageai.io' }}
 
       - name: Deploy Frontend to Cloud Run
         run: |

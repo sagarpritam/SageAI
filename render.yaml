@@ -30,6 +30,8 @@ services:
         value: SageAI Security Scanner
       - key: ENV
         value: production
+      - key: DEBUG
+        value: "false"
       - key: RATE_LIMIT
         value: 60/minute
       - key: PYTHON_VERSION

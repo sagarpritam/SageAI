@@ -11,43 +11,174 @@ jobs:
   # PARALLEL SCAN MATRIX
   # ============================================================================
   sast-analysis:
-    name: "SAST Security Analysis (Bandit)"
+    name: "SAST Security Analysis (Bandit & ESLint)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "sage-web/package-lock.json"
+
       - name: Run Bandit SAST Scanner
         run: |
           pip install bandit
           mkdir -p artifacts
           bandit -r app/ -f json -o artifacts/sast_findings.json -ll || true
+
+      - name: Run Frontend Lint & Security Audit
+        run: |
+          cd sage-web
+          npm ci --prefer-offline || npm install
+          npm run lint || true
+
       - name: Upload SAST Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: sast-findings
           path: artifacts/sast_findings.json
+          retention-days: 7
 
   secret-detection:
-    name: "Secret Leak Detection"
+    name: "Secret Leak Detection (TruffleHog & SageAI SecretScanner)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Scan for Exposed Credentials
+      - name: Checkout Code (Full History)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run TruffleHog OSS Secret Scanner
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch || 'main' }}
+          head: HEAD
+          extra_args: --only-verified
+        continue-on-error: true
+
+      - name: Run SageAI SecretScanner
         run: |
-          echo "Executing parallel secret scanner..."
+          mkdir -p artifacts
+          pip install pydantic pydantic-settings
+          python -c "
+          import asyncio, json, os, sys
+          sys.path.insert(0, '.')
+          from app.services.tools.secret_scanner import SecretScanner
+
+          async def scan():
+              scanner = SecretScanner()
+              res = await scanner.run('.')
+              with open('artifacts/secret_findings.json', 'w') as f:
+                  json.dump(res, f, indent=2)
+              count = res.get('total_findings', 0)
+              print(f'SageAI SecretScanner detected {count} findings.')
+          asyncio.run(scan())
+          "
+
+      - name: Upload Secret Findings
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-findings
+          path: artifacts/secret_findings.json
+          retention-days: 7
 
   dependency-audit:
-    name: "Dependency SCA Audit"
+    name: "Dependency SCA Audit (pip-audit & npm audit)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Audit Vulnerable Dependencies
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run Python pip-audit
         run: |
-          pip install pip-audit || true
-          pip-audit || true
+          mkdir -p artifacts
+          pip install pip-audit
+          pip-audit -r requirements.txt -f json -o artifacts/sca_python.json || true
+
+      - name: Run Node.js npm audit
+        run: |
+          cd sage-web
+          npm audit --json > ../artifacts/sca_node.json || true
+
+      - name: Aggregate SCA Findings
+        run: |
+          python -c "
+          import json, os
+          findings = []
+
+          # Python dependencies
+          if os.path.exists('artifacts/sca_python.json'):
+              try:
+                  with open('artifacts/sca_python.json') as f:
+                      p_data = json.load(f)
+                      for dep in p_data.get('dependencies', []):
+                          for vuln in dep.get('vulns', []):
+                              findings.append({
+                                  'file': 'requirements.txt',
+                                  'line': 1,
+                                  'type': f'Vulnerable Python Package: {dep.get(\"name\")}',
+                                  'severity': 'HIGH',
+                                  'issue_text': f'{vuln.get(\"id\")}: {vuln.get(\"description\", \"\")[:120]}'
+                              })
+              except Exception as e:
+                  print(f'Error reading pip-audit output: {e}')
+
+          # Node dependencies
+          if os.path.exists('artifacts/sca_node.json'):
+              try:
+                  with open('artifacts/sca_node.json') as f:
+                      n_data = json.load(f)
+                      vulnerabilities = n_data.get('vulnerabilities', {})
+                      for pkg_name, details in vulnerabilities.items():
+                          sev = details.get('severity', 'moderate').upper()
+                          if sev == 'MODERATE':
+                              sev = 'MEDIUM'
+                          findings.append({
+                              'file': 'sage-web/package.json',
+                              'line': 1,
+                              'type': f'Vulnerable NPM Package: {pkg_name}',
+                              'severity': sev,
+                              'issue_text': f'NPM advisory: {details.get(\"via\", [{}])[0] if isinstance(details.get(\"via\"), list) else details.get(\"via\", \"\")}'
+                          })
+              except Exception as e:
+                  print(f'Error reading npm audit output: {e}')
+
+          with open('artifacts/sca_findings.json', 'w') as f:
+              json.dump({'findings': findings}, f, indent=2)
+          print(f'Aggregated {len(findings)} SCA findings.')
+          "
+
+      - name: Upload SCA Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-findings
+          path: artifacts/sca_findings.json
+          retention-days: 7
 
   # ============================================================================
   # DEVSECOPS QUALITY GATE & CLOSED-LOOP REMEDIATION
@@ -57,11 +188,27 @@ jobs:
     needs: [sast-analysis, secret-detection, dependency-audit]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Download SAST Artifacts
         uses: actions/download-artifact@v4
         with:
           name: sast-findings
+          path: artifacts
+        continue-on-error: true
+
+      - name: Download Secret Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: secret-findings
+          path: artifacts
+        continue-on-error: true
+
+      - name: Download SCA Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sca-findings
           path: artifacts
         continue-on-error: true
 
@@ -83,24 +230,52 @@ jobs:
               'branch': '${{ github.ref_name }}',
               'pr_number': int('${{ github.event.pull_request.number || 0 }}') or None,
               'trigger_autofix': True,
+              'findings': []
           }
 
+          # 1. Ingest SAST findings
           if os.path.exists('artifacts/sast_findings.json'):
               try:
                   with open('artifacts/sast_findings.json') as f:
-                      data = json.load(f)
-                      payload['findings'] = [
-                          {
+                      sast_data = json.load(f)
+                      for r in sast_data.get('results', []):
+                          payload['findings'].append({
                               'file': r.get('filename'),
                               'line': r.get('line_number'),
-                              'severity': r.get('issue_severity'),
-                              'type': r.get('test_name'),
-                              'issue_text': r.get('issue_text'),
-                          }
-                          for r in data.get('results', [])
-                      ]
+                              'severity': r.get('issue_severity', 'MEDIUM'),
+                              'type': r.get('test_name', 'SAST finding'),
+                              'issue_text': r.get('issue_text', ''),
+                          })
               except Exception as e:
-                  print(f'Warning loading artifacts: {e}')
+                  print(f'Warning loading SAST findings: {e}')
+
+          # 2. Ingest Secret scanner findings
+          if os.path.exists('artifacts/secret_findings.json'):
+              try:
+                  with open('artifacts/secret_findings.json') as f:
+                      secret_data = json.load(f)
+                      for r in secret_data.get('findings', []):
+                          payload['findings'].append({
+                              'file': r.get('file'),
+                              'line': r.get('line'),
+                              'severity': r.get('severity', 'CRITICAL'),
+                              'type': r.get('type', 'Leaked Secret'),
+                              'issue_text': r.get('issue_text', 'Exposed credential'),
+                          })
+              except Exception as e:
+                  print(f'Warning loading secret findings: {e}')
+
+          # 3. Ingest SCA dependency findings
+          if os.path.exists('artifacts/sca_findings.json'):
+              try:
+                  with open('artifacts/sca_findings.json') as f:
+                      sca_data = json.load(f)
+                      for r in sca_data.get('findings', []):
+                          payload['findings'].append(r)
+              except Exception as e:
+                  print(f'Warning loading SCA findings: {e}')
+
+          print(f'Submitting {len(payload[\"findings\"])} aggregated findings to SageAI Quality Gate...')
 
           req = urllib.request.Request(
               f'{api_url}/ci/gate',
@@ -117,9 +292,9 @@ jobs:
                   result = json.loads(res.read().decode('utf-8'))
                   print(json.dumps(result, indent=2))
                   if not result.get('passed', True):
-                      print('::error::SageAI DevSecOps Quality Gate FAILED.')
+                      print('::error::SageAI DevSecOps Quality Gate FAILED policy evaluation.')
                       if result.get('remediation', {}).get('pull_requests'):
-                          print('::notice::SagePatch has opened an automated remediation PR!')
+                          print('::notice::SagePatch has automatically opened a remediation PR!')
                       exit(1)
                   print('SageAI Quality Gate PASSED.')
           except Exception as e:

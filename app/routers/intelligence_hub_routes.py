@@ -3,12 +3,9 @@
 # ────────────────────── Standard library ──────────────────────
 import logging
 
-# ────────────────────── Third‑party ──────────────────────
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
-logger = logging.getLogger(__name__)
-
-# ────────────────────── Local imports ──────────────────────
+from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.schemas.intelligence import (
     DeepSearchRequest,
@@ -27,7 +24,9 @@ router = APIRouter()
 
 
 @router.post("/sweep")
+@limiter.limit("20/minute")
 async def run_intelligence_sweep(
+    request: Request,
     req: IntelligenceSweepRequest,
     user=Depends(get_current_user),
 ):
@@ -151,7 +150,12 @@ async def build_relationship_graph(
 
 
 @router.post("/deep-search")
-async def run_deep_search(req: DeepSearchRequest, user=Depends(get_current_user)):
+@limiter.limit("20/minute")
+async def run_deep_search(
+    request: Request,
+    req: DeepSearchRequest,
+    user=Depends(get_current_user),
+):
     """10 // DEEP SEARCH: THE ABYSS — Autonomous recursive OSINT.
 
     Performs multi-layer intelligence gathering by pivoting on discovered

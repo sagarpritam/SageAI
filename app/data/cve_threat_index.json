@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "last_synced": "2026-10-23T04:35:26.241209+00:00",
-    "total_count": 1755,
-    "kev_count": 1754
+    "last_synced": "2026-10-27T05:48:08.869172+00:00",
+    "total_count": 1759,
+    "kev_count": 1758
   },
   "vulnerabilities": [
     {
@@ -28084,6 +28084,70 @@
       "vendor_project": "Zyxel",
       "product": "Multiple Products",
       "url": "https://nvd.nist.gov/vuln/detail/CVE-2020-29583"
+    },
+    {
+      "id": "CVE-2026-109618",
+      "title": "PHP Memory Corruption Vulnerability",
+      "description": "PHP contains an out-of-memory corruption vulnerability that allows for unauthenticated remote code execution.",
+      "severity": "critical",
+      "cvss_score": null,
+      "source": "CISA KEV",
+      "published": "2026-10-26",
+      "is_kev": true,
+      "ransomware_campaign": null,
+      "remediation_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA\u2019s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA\u2019s \u201cForensics Triage Requirements\u201d (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+      "due_date": "2026-10-29",
+      "vendor_project": "PHP Group",
+      "product": "PHP",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-109618"
+    },
+    {
+      "id": "CVE-2026-109619",
+      "title": "PHP Stale Internal Request-State Vulnerability",
+      "description": "PHP contains a stale internal request-state vulnerability that allows for unauthenticated remote code execution.",
+      "severity": "critical",
+      "cvss_score": null,
+      "source": "CISA KEV",
+      "published": "2026-10-26",
+      "is_kev": true,
+      "ransomware_campaign": null,
+      "remediation_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA\u2019s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA\u2019s \u201cForensics Triage Requirements\u201d (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+      "due_date": "2026-10-29",
+      "vendor_project": "PHP Group",
+      "product": "PHP",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-109619"
+    },
+    {
+      "id": "CVE-2026-114625",
+      "title": "Arista VeloCloud Orchestrator SQL Injection Vulnerability",
+      "description": "Arista VeloCloud Orchestrator on-prem contains a SQL injection vulnerability that may allow a remote attacker to access privileged internal functionality and impact the VCO host. Successful exploitation may compromise the confidentiality, integrity, and availability of the orchestrator and data managed by the orchestrator.",
+      "severity": "high",
+      "cvss_score": null,
+      "source": "CISA KEV",
+      "published": "2026-10-23",
+      "is_kev": true,
+      "ransomware_campaign": null,
+      "remediation_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA\u2019s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA\u2019s \u201cForensics Triage Requirements\u201d (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+      "due_date": "2026-10-26",
+      "vendor_project": "Arista",
+      "product": "VeloCloud Orchestrator",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-114625"
+    },
+    {
+      "id": "CVE-2026-110447",
+      "title": "Collabora Online \u2013 Built-in CODE Server OS Command Injection Vulnerability",
+      "description": "Collabora Collabora Online \u2013 Built-in CODE Server when used within the NextCloud platform contains an OS command injection vulnerability that allows for remote code execution when the CODE server isn't running.",
+      "severity": "critical",
+      "cvss_score": null,
+      "source": "CISA KEV",
+      "published": "2026-10-23",
+      "is_kev": true,
+      "ransomware_campaign": null,
+      "remediation_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA\u2019s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA\u2019s \u201cForensics Triage Requirements\u201d (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+      "due_date": "2026-10-26",
+      "vendor_project": "Collabora",
+      "product": "Collabora Online \u2013 Built-in CODE Server",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-110447"
     }
   ]
 }

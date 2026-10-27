@@ -1,4 +1,7 @@
 # Vercel Ignore
+.env*
+*.env*
+
 venv/
 venv2/
 .venv/

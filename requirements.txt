@@ -64,7 +64,7 @@ resend
 
 # === Development & Testing ===
 ruff==0.15.5
-pytest==8.0.0
+pytest>=8.3.3
 pytest-asyncio==0.23.5
 bandit==1.7.7
 
