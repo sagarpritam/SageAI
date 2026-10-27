@@ -22,22 +22,26 @@ RESTRICTED_FILE_PATTERNS = [
     r".*secret.*\.py$",  # Secret management
     r".*\.github/workflows/.*",  # CI/CD pipelines
     r".*\.gitlab-ci.*",  # GitLab CI
-    r".*Dockerfile.*",  # Container configs
+    r".*dockerfile.*",  # Container configs
     r".*docker-compose.*",  # Docker orchestration
 ]
 
 # Maximum number of lines the AI patch can differ from the original
 MAX_LINES_CHANGED = 50
 
-# Patterns that could indicate prompt injection in source code comments
+# Patterns that could indicate prompt injection in source code comments or user inputs
 INJECTION_PATTERNS = [
-    r"ignore\s+(all\s+)?(previous\s+)?instructions",
-    r"disregard\s+(all\s+)?(previous\s+)?instructions",
+    r"ignore\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
+    r"disregard\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
     r"you\s+are\s+now\s+a",
+    r"you\s+are\s+now\s+(unrestricted|in\s+developer\s+mode|dan|jailbroken)",
     r"delete\s+(all|everything|the\s+entire)",
     r"rm\s+-rf",
     r"drop\s+table",
     r"format\s+c:",
+    r"(reveal|print|dump|show|output)\s+(your\s+)?(system\s+prompt|initial\s+instructions)",
+    r"(reveal|print|dump|show|leak)\s+(the\s+)?(api_key|secret_key|database_url|password)",
+    r"(bypass|disable|override)\s+(all\s+)?(safety|security|guardrails|filters)",
 ]
 
 
@@ -45,7 +49,7 @@ def is_file_restricted(file_path: str) -> bool:
     """Check if a file is in the restricted blocklist."""
     normalized = file_path.replace("\\", "/").lower()
     for pattern in RESTRICTED_FILE_PATTERNS:
-        if re.match(pattern, normalized):
+        if re.search(pattern, normalized, re.IGNORECASE):
             logger.warning(
                 f"BLOCKED: AI patch attempted to modify restricted file: {file_path}"
             )

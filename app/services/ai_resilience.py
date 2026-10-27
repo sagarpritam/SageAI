@@ -62,8 +62,10 @@ openai_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=60)
 # ── Prompt Injection Sanitization ────────────────────
 # Patterns that malicious sites embed to hijack LLM prompts
 INJECTION_PATTERNS = [
-    r"ignore\s+(previous|above|all)\s+(instructions|prompts)",
+    r"ignore\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
+    r"disregard\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
     r"you\s+are\s+now\s+a",
+    r"you\s+are\s+now\s+(unrestricted|in\s+developer\s+mode|dan|jailbroken)",
     r"forget\s+(everything|your\s+instructions)",
     r"system\s*:\s*",
     r"<\s*script",
@@ -73,6 +75,9 @@ INJECTION_PATTERNS = [
     r"window\.location",
     r"base64",
     r"data:text/html",
+    r"(reveal|print|dump|show|output)\s+(your\s+)?(system\s+prompt|initial\s+instructions)",
+    r"(reveal|print|dump|show|leak)\s+(the\s+)?(api_key|secret_key|database_url|password)",
+    r"(bypass|disable|override)\s+(all\s+)?(safety|security|guardrails|filters)",
 ]
 
 COMPILED_PATTERNS = [re.compile(p, re.IGNORECASE) for p in INJECTION_PATTERNS]
