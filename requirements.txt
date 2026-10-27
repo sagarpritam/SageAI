@@ -63,8 +63,8 @@ tenacity==9.1.4
 resend
 
 # === Development & Testing ===
-ruff==0.15.5
-pytest==8.0.0
-pytest-asyncio==0.23.5
-bandit==1.7.7
+ruff>=0.15.9
+pytest>=8.0.0
+pytest-asyncio>=0.23.5
+bandit>=1.8.0
 
