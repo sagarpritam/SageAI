@@ -42,6 +42,8 @@ sage-web/build*.txt
 sage-web/build*.log
 sage-web/err*.txt
 sage-web/lint*.json
+sage-web/playwright-report/
+sage-web/test-results/
 *.tsbuildinfo
 
 # Docker

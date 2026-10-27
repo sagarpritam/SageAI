@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import Link from "next/link";
 import { ScanInput } from "@/components/ScanInput";
@@ -21,6 +22,7 @@ interface RiskData {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [scanState, setScanState] = useState<"idle" | "running" | "completed">("idle");
   const [scanId, setScanId] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
@@ -46,7 +48,7 @@ export default function Home() {
       if (res.data?.limitReached) {
         setScanState("idle");
         alert("Free limit reached! Redirecting to setup Founder Mode.");
-        window.location.assign("/pricing");
+        router.push("/pricing");
         return;
       }
       
@@ -64,13 +66,13 @@ export default function Home() {
         setScanState("idle");
         const msg = e.response?.data?.error || "Monthly scan limit reached. Upgrade to Pro for unlimited scans.";
         alert("🔒 " + msg);
-        window.location.assign("/pricing");
+        router.push("/pricing");
         return;
       }
       if (e.response?.status === 403 && e.response?.data?.limitReached) {
         setScanState("idle");
         alert("Free limit reached! Redirecting to setup Founder Mode.");
-        window.location.assign("/pricing");
+        router.push("/pricing");
         return;
       }
       console.warn("Backend not running or other error, falling back to mock scan.");
