@@ -53,6 +53,8 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { CopilotDrawer } from "@/components/copilot/CopilotDrawer";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default async function RootLayout({
   children,
@@ -125,6 +127,8 @@ export default async function RootLayout({
             <CopilotDrawer />
           </>
         )}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
