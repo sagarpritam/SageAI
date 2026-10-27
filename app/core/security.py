@@ -57,6 +57,7 @@ DEFAULT_INTERNAL_IPS = [
 pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
     pbkdf2_sha256__default_rounds=600000,
+    pbkdf2_sha256__min_rounds=600000,
     deprecated="auto",
 )
 
