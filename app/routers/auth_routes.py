@@ -4,7 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.rate_limit import limiter
-from app.core.security import create_access_token, hash_password, needs_rehash, verify_password
+from app.core.security import (
+    create_access_token,
+    hash_password,
+    needs_rehash,
+    verify_password,
+)
 from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.auth import TokenResponse, UserCreate, UserLogin

@@ -74,7 +74,7 @@ jobs:
       - name: Run SageAI SecretScanner
         run: |
           mkdir -p artifacts
-          pip install pydantic pydantic-settings
+          pip install -r requirements.txt
           python -c "
           import asyncio, json, os, sys
           sys.path.insert(0, '.')

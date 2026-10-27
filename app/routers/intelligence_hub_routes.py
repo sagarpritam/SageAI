@@ -1,6 +1,5 @@
 """Intelligence Hub router."""
 
-# ────────────────────── Standard library ──────────────────────
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -13,6 +12,7 @@ from app.schemas.intelligence import (
     ModuleScanRequest,
 )
 
+logger = logging.getLogger("SageAI.intelligence_hub")
 router = APIRouter()
 
 # NOTE: The duplicate Pydantic model definitions that previously existed
