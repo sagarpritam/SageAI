@@ -223,13 +223,20 @@ async def audit_nvidia_nim_live(api_key: str | None) -> dict[str, Any]:
     key = (api_key or settings.NVIDIA_API_KEY or os.getenv("NVIDIA_API_KEY", "")).strip()
     results: dict[str, Any] = {"name": "NVIDIA NIM Live Integration", "checks": []}
 
-    if not key:
+    is_placeholder = (
+        not key
+        or "placeholder" in key.lower()
+        or "your-" in key.lower()
+        or key.endswith("holder")
+        or "..." in key
+    )
+    if is_placeholder:
         results["status"] = "SKIPPED"
         results["passed"] = True
         results["checks"].append({
             "test": "NVIDIA_API_KEY Configuration",
             "status": "SKIPPED",
-            "detail": "NVIDIA_API_KEY is not set in secrets/environment. Live NIM tests skipped.",
+            "detail": "NVIDIA_API_KEY is not set or contains placeholder credentials. Live NIM tests skipped.",
         })
         return results
 
