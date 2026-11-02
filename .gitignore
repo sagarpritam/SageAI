@@ -76,6 +76,7 @@ htmlcov/
 .code-review-graph/
 
 # Misc
+0.26.0
 *.log
 tmp/
 .vercel
