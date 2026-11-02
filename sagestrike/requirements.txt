@@ -12,7 +12,7 @@ redis>=5.0.8
 
 # Cryptography
 PyJWT>=2.9.0
-cryptography>=46.0.6
+cryptography>=50.0.2
 
 # Data processing
 pydantic>=2.12.5
