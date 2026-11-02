@@ -110,3 +110,4 @@ def test_preloaded_templates_and_bundle():
     cve_ids = [t["cve_id"] for t in synthesizer.PRELOADED_TEMPLATES]
     assert "CVE-2024-21887" in cve_ids
     assert "CVE-2021-44228" in cve_ids
+

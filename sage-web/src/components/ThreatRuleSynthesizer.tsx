@@ -332,3 +332,4 @@ export function ThreatRuleSynthesizer() {
     </div>
   );
 }
+
