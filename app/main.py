@@ -48,6 +48,7 @@ from app.routers import (
     posture_routes,
     redteam_routes,
     report_routes,
+    rule_synthesizer_routes,
     scan_routes,
     schedule_routes,
     telemetry_routes,
@@ -198,6 +199,7 @@ app.include_router(incident_routes.router)
 app.include_router(consensus_routes.router)
 app.include_router(deep_analysis_routes.router)
 app.include_router(malware_routes.router)
+app.include_router(rule_synthesizer_routes.router)
 
 
 # ---------------------
