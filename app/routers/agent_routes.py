@@ -323,7 +323,7 @@ async def run_all_plugins_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Run all applicable plugins against a target (or filter by category)."""
-    plan = "pro"  # TODO: pull from user's plan
+    plan = current_user.get("plan", "pro")
     results = await run_all_plugins(target, category=category, plan=plan)
     return {
         "target": target,
