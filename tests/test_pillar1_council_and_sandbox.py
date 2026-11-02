@@ -134,3 +134,4 @@ cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
     assert res["deterministic_sandbox"]["deterministic_proof"] is True
     assert res["consensus"]["consensus_verdict"] == "CONFIRMED_EXPLOITABLE"
     assert res["consensus"]["confidence_score"] >= 95
+

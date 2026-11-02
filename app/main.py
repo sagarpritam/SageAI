@@ -32,6 +32,7 @@ from app.routers import (
     consensus_routes,
     copilot_routes,
     deception_routes,
+    deep_analysis_routes,
     email_report_routes,
     explain_routes,
     gdpr_routes,
@@ -194,6 +195,7 @@ app.include_router(telemetry_routes.router)
 app.include_router(deception_routes.router)
 app.include_router(incident_routes.router)
 app.include_router(consensus_routes.router)
+app.include_router(deep_analysis_routes.router)
 
 
 # ---------------------

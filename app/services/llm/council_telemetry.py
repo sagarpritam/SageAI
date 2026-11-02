@@ -157,3 +157,4 @@ class CouncilModelTelemetry:
 
 # Global council telemetry singleton
 council_telemetry = CouncilModelTelemetry()
+

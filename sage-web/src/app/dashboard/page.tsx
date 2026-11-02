@@ -17,6 +17,7 @@ import {
   Swords,
   Radio,
   AlertTriangle,
+  Flame,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -33,11 +34,13 @@ import { WarRoom } from "@/components/WarRoom";
 import { ObservabilityDashboard } from "@/components/ObservabilityDashboard";
 import { HoneypotCenter } from "@/components/HoneypotCenter";
 import { AIConsensusArena } from "@/components/AIConsensusArena";
+import { DeepAnalysisPanel } from "@/components/DeepAnalysisPanel";
 import { IncidentCenter } from "@/components/IncidentCenter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "consensus", label: "Multi-AI Debate", icon: Swords },
+  { id: "deep-analysis", label: "Deep Attacks", icon: Flame },
   { id: "deception", label: "Honeypots", icon: Radio },
   { id: "incidents", label: "Incidents & SOAR", icon: AlertTriangle },
   { id: "observability", label: "Observability", icon: Activity },
@@ -100,6 +103,7 @@ export default function DashboardPage() {
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
           {activeTab === "consensus" && <AIConsensusArena />}
+          {activeTab === "deep-analysis" && <DeepAnalysisPanel />}
           {activeTab === "deception" && <HoneypotCenter />}
           {activeTab === "incidents" && <IncidentCenter />}
           {activeTab === "observability" && <ObservabilityDashboard />}
