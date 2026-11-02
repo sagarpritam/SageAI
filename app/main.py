@@ -30,9 +30,11 @@ from app.routers import (
     billing_routes,
     ci_routes,
     copilot_routes,
+    deception_routes,
     email_report_routes,
     explain_routes,
     gdpr_routes,
+    incident_routes,
     integration_routes,
     intelligence_hub_routes,
     mfa_routes,
@@ -188,6 +190,8 @@ app.include_router(ci_routes.router)
 app.include_router(copilot_routes.router)
 app.include_router(copilot_routes.threat_feed_router)
 app.include_router(telemetry_routes.router)
+app.include_router(deception_routes.router)
+app.include_router(incident_routes.router)
 
 
 # ---------------------
