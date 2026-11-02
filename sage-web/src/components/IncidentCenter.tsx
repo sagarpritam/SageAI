@@ -329,3 +329,4 @@ export function IncidentCenter() {
     </div>
   );
 }
+

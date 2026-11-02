@@ -1,12 +1,14 @@
 """LLM Gateway Layer — Multi-AI Orchestration Engine."""
 
 import logging
+import time
 from typing import Any, Dict, Optional
 
 from app.services.ai_resilience import token_tracker
 
 from .anthropic_client import AnthropicClient
 from .base import BaseLLM
+from .council_telemetry import council_telemetry
 from .deepseek_client import DeepSeekClient
 from .gemini_client import GeminiClient
 from .nvidia_client import NvidiaClient
@@ -108,12 +110,18 @@ class LLMGateway:
             client = self.get_client(current_provider)
 
             for attempt in range(self.max_retries_per_provider):
+                t0 = time.time()
                 try:
                     result = await client.generate(
                         prompt, system_message, model, **kwargs
                     )
+                    latency_ms = (time.time() - t0) * 1000
                     content = result.get("content", "")
                     usage = result.get("usage", {})
+
+                    # Record council telemetry
+                    tokens_used = usage.get("prompt_tokens", 0) + usage.get("completion_tokens", 0)
+                    council_telemetry.record_call(current_provider, latency_ms, success=True, tokens_used=tokens_used)
 
                     # Global token tracking
                     if track_tokens and org_id:
@@ -129,6 +137,8 @@ class LLMGateway:
 
                 except Exception as e:
                     last_error = e
+                    latency_ms = (time.time() - t0) * 1000
+                    council_telemetry.record_call(current_provider, latency_ms, success=False)
                     logger.warning(
                         f"LLM {client.provider} attempt {attempt + 1} failed: {str(e)}"
                     )

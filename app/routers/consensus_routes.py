@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.core.security import get_current_user
+from app.services.llm.council_telemetry import council_telemetry
 from app.services.llm.gateway import llm_gateway
 
 router = APIRouter(prefix="/consensus", tags=["Multi-AI Consensus & Red-vs-Blue"])
@@ -44,5 +45,22 @@ async def evaluate_vulnerability_consensus(
     return {
         "status": "success",
         "evaluation": result,
+    }
+
+
+@router.get("/council-health")
+async def get_ai_council_health(
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Returns real-time health scorecard for the SageAI Multi-AI Council:
+    - Live latency (avg and p95 ms)
+    - Uptime and circuit breaker status
+    - Specialized domain roles
+    - Token consumption and pricing per 1M tokens
+    """
+    return {
+        "status": "success",
+        "matrix": council_telemetry.get_full_council_matrix(),
     }
 

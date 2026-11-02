@@ -41,9 +41,13 @@ class MultiAIConsensusEngine:
         org_id: str = "system",
     ) -> Dict[str, Any]:
         """
-        Runs the full 3-model Red-vs-Blue consensus loop on a security finding.
+        Runs the full 3-model Red-vs-Blue consensus loop with deterministic sandbox verification.
         """
         logger.info(f"[Consensus] Initiating Red-vs-Blue consensus on '{vulnerability_title}' for {target}")
+
+        # ── Step 0: Deterministic Sandbox AST Taint Verification ──────────
+        from app.services.llm.sandbox_verifier import sandbox_verifier
+        taint_result = sandbox_verifier.verify_ast_taint(evidence)
 
         # ── Step 1: Offense Model Hypothesizes Attack Vector ────────────────
         offense_prompt = (
@@ -105,10 +109,14 @@ class MultiAIConsensusEngine:
         arbiter_prompt = (
             f"Vulnerability: {vulnerability_title}\n"
             f"Target: {target}\n\n"
+            f"=== DETERMINISTIC SANDBOX AST TAINT TRACE ===\n"
+            f"Verdict: {taint_result.get('verdict')}\n"
+            f"Deterministic Proof: {taint_result.get('deterministic_proof')}\n"
+            f"Details: {json.dumps(taint_result.get('findings', []), indent=2)}\n\n"
             f"=== OFFENSIVE ARGUMENT ===\n{offense_response}\n\n"
             f"=== DEFENSIVE SKEPTIC ARGUMENT ===\n{defense_response}\n\n"
             "As the Supreme Security Arbiter AI (Gemini 2.5 / Nemotron Ensemble), evaluate both arguments. "
-            "Reconcile technical disagreements. Produce a JSON decision with the following structure:\n"
+            "Reconcile technical disagreements using the deterministic sandbox proof as ground truth. Produce a JSON decision with the following structure:\n"
             "{\n"
             '  "consensus_verdict": "CONFIRMED_EXPLOITABLE" | "THEORETICAL_MITIGATED" | "FALSE_POSITIVE",\n'
             '  "confidence_score": <int 0-100>,\n'
@@ -138,11 +146,17 @@ class MultiAIConsensusEngine:
         # Parse JSON decision
         decision = self._parse_arbiter_json(arbiter_response)
 
+        # If deterministic AST proof verified taint reachability, guarantee high confidence
+        if taint_result.get("deterministic_proof") and decision.get("consensus_verdict") != "FALSE_POSITIVE":
+            decision["consensus_verdict"] = "CONFIRMED_EXPLOITABLE"
+            decision["confidence_score"] = max(decision.get("confidence_score", 0), 95)
+
         return {
             "vulnerability_title": vulnerability_title,
             "target": target,
             "evaluated_at": datetime.now(timezone.utc).isoformat(),
             "models_engaged": ["deepseek-reasoner", "claude-3-7-sonnet", "gemini-2.0-flash"],
+            "deterministic_sandbox": taint_result,
             "offense_perspective": offense_response,
             "defense_perspective": defense_response,
             "consensus": decision,
