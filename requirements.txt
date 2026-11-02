@@ -27,7 +27,7 @@ alembic>=1.13.0
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 PyJWT
-slowapi>=0.1.9
+slowapi>=0.1.10
 cryptography
 pyotp
 qrcode
