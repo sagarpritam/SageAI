@@ -91,6 +91,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     NVIDIA_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    DEEPSEEK_API_KEY: str = ""
+    AI_GATEWAY_API_KEY: str = ""
+    AI_GATEWAY_URL: str = "https://ai-gateway.vercel.sh/v1"
     RESEND_API_KEY: str = ""
     AUDITOR_BASE_URL: str = "http://localhost:8081"
 

@@ -29,6 +29,7 @@ from app.routers import (
     autofix_routes,
     billing_routes,
     ci_routes,
+    consensus_routes,
     copilot_routes,
     deception_routes,
     email_report_routes,
@@ -192,6 +193,7 @@ app.include_router(copilot_routes.threat_feed_router)
 app.include_router(telemetry_routes.router)
 app.include_router(deception_routes.router)
 app.include_router(incident_routes.router)
+app.include_router(consensus_routes.router)
 
 
 # ---------------------

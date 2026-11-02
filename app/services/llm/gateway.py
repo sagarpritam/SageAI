@@ -1,13 +1,17 @@
-"""LLM Gateway Layer."""
+"""LLM Gateway Layer — Multi-AI Orchestration Engine."""
 
 import logging
+from typing import Any, Dict, Optional
 
 from app.services.ai_resilience import token_tracker
 
 from .anthropic_client import AnthropicClient
 from .base import BaseLLM
+from .deepseek_client import DeepSeekClient
+from .gemini_client import GeminiClient
 from .nvidia_client import NvidiaClient
 from .openai_client import OpenAIClient
+from .vercel_client import VercelGatewayClient
 
 logger = logging.getLogger("SageAI.llm")
 
@@ -16,19 +20,40 @@ PROVIDERS = {
     "openai": OpenAIClient(),
     "anthropic": AnthropicClient(),
     "nvidia": NvidiaClient(),
+    "gemini": GeminiClient(),
+    "deepseek": DeepSeekClient(),
+    "vercel": VercelGatewayClient(),
+}
+
+TASK_SPECIALIZATION_ROUTING = {
+    "code_audit": "anthropic",
+    "patch_generation": "anthropic",
+    "exploit_reasoning": "deepseek",
+    "attack_chain": "deepseek",
+    "forensics_logs": "gemini",
+    "large_context": "gemini",
+    "red_team": "nvidia",
+    "payload_mutation": "nvidia",
+    "general": "openai",
 }
 
 
 class LLMGateway:
     """
-    Central gateway for interacting with LLM models.
-    Handles routing, fallbacks, and token tracking execution.
+    Central multi-model gateway for interacting with LLM models.
+    Handles specialized task routing, multi-provider failover, and token tracking.
     """
 
     def __init__(self, default_provider: str = "openai"):
         self.default_provider = default_provider
-        # Circuit breaker state
-        self.failover_chain = ["openai", "anthropic", "nvidia"]
+        self.failover_chain = [
+            "openai",
+            "anthropic",
+            "nvidia",
+            "gemini",
+            "deepseek",
+            "vercel",
+        ]
         self.max_retries_per_provider = 2
         self.error_counts = dict.fromkeys(self.failover_chain, 0)
         self.circuit_open = dict.fromkeys(self.failover_chain, False)
@@ -44,22 +69,28 @@ class LLMGateway:
         self.error_counts[provider_name] = 0
         self.circuit_open[provider_name] = False
 
+    def route_task(self, task_type: str) -> str:
+        """Determines the optimal LLM provider based on task requirements."""
+        return TASK_SPECIALIZATION_ROUTING.get(task_type.lower(), self.default_provider)
+
     async def generate(
         self,
         prompt: str,
         system_message: str = "",
-        provider: str = None,
-        model: str = None,
+        provider: Optional[str] = None,
+        model: Optional[str] = None,
         org_id: str = "system",
         track_tokens: bool = True,
+        task_type: Optional[str] = None,
         **kwargs,
     ) -> str:
         """
-        Generate completion across unified interface.
-        Tracks token usage automatically if org_id is provided.
-        Includes circuit breaker and failover logic.
+        Generate completion across unified interface with circuit breaking and fallback.
         """
-        initial_provider = provider or self.default_provider
+        if task_type and not provider:
+            initial_provider = self.route_task(task_type)
+        else:
+            initial_provider = provider or self.default_provider
 
         # Determine the order of providers to try
         try_order = [initial_provider]
@@ -111,6 +142,26 @@ class LLMGateway:
 
         logger.error("All LLM providers in failover chain failed.")
         raise last_error or Exception("LLM Generation failed across all providers")
+
+    async def generate_consensus(
+        self,
+        vulnerability_title: str,
+        target: str,
+        evidence: str,
+        context: Optional[str] = None,
+        org_id: str = "system",
+    ) -> Dict[str, Any]:
+        """
+        Runs the 3-model Red-vs-Blue consensus engine.
+        """
+        from .consensus_engine import consensus_engine
+        return await consensus_engine.evaluate_vulnerability(
+            vulnerability_title=vulnerability_title,
+            target=target,
+            evidence=evidence,
+            context=context,
+            org_id=org_id,
+        )
 
 
 # Global singleton
