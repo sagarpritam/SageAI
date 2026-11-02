@@ -96,3 +96,4 @@ class GeminiClient(BaseLLM):
             except Exception:
                 gemini_breaker.record_failure()
                 raise
+

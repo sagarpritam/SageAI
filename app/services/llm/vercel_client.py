@@ -96,3 +96,4 @@ class VercelGatewayClient(BaseLLM):
             except Exception:
                 vercel_breaker.record_failure()
                 raise
+

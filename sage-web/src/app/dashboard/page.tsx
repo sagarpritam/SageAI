@@ -1,7 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard, Clock, Activity, GitBranch, Shield, Sparkles, Radar, ShieldAlert, FileCheck, HeartPulse, Rss, Globe } from "lucide-react";
+import {
+  LayoutDashboard,
+  Clock,
+  Activity,
+  GitBranch,
+  Shield,
+  Sparkles,
+  Radar,
+  ShieldAlert,
+  FileCheck,
+  HeartPulse,
+  Rss,
+  Globe,
+  Swords,
+  Radio,
+  AlertTriangle,
+} from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
 import { ASMTimeline } from "@/components/ASMTimeline";
@@ -15,9 +31,15 @@ import { ThreatFeed } from "@/components/ThreatFeed";
 import { SecurityPosture } from "@/components/SecurityPosture";
 import { WarRoom } from "@/components/WarRoom";
 import { ObservabilityDashboard } from "@/components/ObservabilityDashboard";
+import { HoneypotCenter } from "@/components/HoneypotCenter";
+import { AIConsensusArena } from "@/components/AIConsensusArena";
+import { IncidentCenter } from "@/components/IncidentCenter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "consensus", label: "Multi-AI Debate", icon: Swords },
+  { id: "deception", label: "Honeypots", icon: Radio },
+  { id: "incidents", label: "Incidents & SOAR", icon: AlertTriangle },
   { id: "observability", label: "Observability", icon: Activity },
   { id: "posture", label: "Security Shield", icon: Shield },
   { id: "copilot", label: "AI Copilot", icon: Sparkles },
@@ -49,7 +71,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
-            <p className="text-xs text-zinc-500 font-mono">SageAI Pro Dashboard</p>
+            <p className="text-xs text-zinc-500 font-mono">SageAI Enterprise Defense Grid</p>
           </div>
         </div>
 
@@ -77,6 +99,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "consensus" && <AIConsensusArena />}
+          {activeTab === "deception" && <HoneypotCenter />}
+          {activeTab === "incidents" && <IncidentCenter />}
           {activeTab === "observability" && <ObservabilityDashboard />}
           {activeTab === "posture" && <SecurityPosture />}
           {activeTab === "copilot" && <AICopilot />}
