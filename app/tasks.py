@@ -239,11 +239,17 @@ def sync_threat_feeds(force: bool = False):
 
     try:
         count = _run_async(cve_indexer.sync_cisa_kev(force=force))
+        patterns = cve_indexer.synthesize_threat_patterns(limit=5)
         logger.info(
-            "Threat feed sync completed successfully: %d vulnerabilities indexed",
+            "Threat feed sync completed successfully: %d vulnerabilities indexed, %d pattern sets synthesized",
             count,
+            len(patterns),
         )
-        return {"status": "success", "indexed_count": count}
+        return {
+            "status": "success",
+            "indexed_count": count,
+            "patterns_synthesized": len(patterns),
+        }
     except Exception as exc:
         logger.error("Threat feed sync failed: %s", exc, exc_info=True)
         return {"status": "failed", "error": str(exc)}

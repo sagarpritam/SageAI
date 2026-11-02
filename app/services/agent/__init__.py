@@ -1,5 +1,6 @@
 """SageAI 2.0 — AI Agent System Exports."""
 
+from .deep_analysis_agent import DeepAnalysisAgent
 from .developer_agent import DeveloperAgent
 from .exploit_agent import ExploitAgent
 from .multi_agent_orchestrator import MultiAgentOrchestrator
@@ -13,6 +14,7 @@ __all__ = [
     "MultiAgentOrchestrator",
     "ReconAgent",
     "ScannerAgent",
+    "DeepAnalysisAgent",
     "ExploitAgent",
     "ReportAgent",
     "DeveloperAgent",

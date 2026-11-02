@@ -375,6 +375,20 @@ class CVEIndexer:
         """Get most recent threats for display in feeds and dashboard."""
         return self.search(query="", limit=limit, kev_only=kev_only)
 
+    def synthesize_threat_patterns(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Automatically synthesize YARA, Sigma, and Nuclei rules for indexed threats."""
+        from app.services.threat_feed.pattern_synthesizer import (
+            ThreatPatternSynthesizer,
+        )
+
+        synthesizer = ThreatPatternSynthesizer()
+        results = []
+        top_threats = self.search("", limit=limit, kev_only=True) or list(self._index.values())[:limit]
+        for vuln in top_threats:
+            res = synthesizer.process_threat_item(vuln.model_dump())
+            results.append(res)
+        return results
+
     def stats(self) -> Dict[str, Any]:
         """Return indexer metrics and health state."""
         return {

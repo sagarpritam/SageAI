@@ -85,3 +85,7 @@ test_output.txt
 # Deployment keys & archives
 *.pem
 *.zip
+
+# Synthesized threat rules
+app/data/synthesized_rules/*
+!app/data/synthesized_rules/.gitkeep
