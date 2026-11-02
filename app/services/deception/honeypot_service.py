@@ -154,6 +154,7 @@ class DeceptionHoneypotService:
                 "timestamp": record["last_triggered_at"],
                 "confidence": "100% (Zero False Positive)",
                 "threat_verdict": f"Canary token '{record['label']}' was exercised by external IP {source_ip}. Internal breach or credential leak confirmed.",
+                "alert": f"Canary token '{record['label']}' was exercised by external IP {source_ip}. Internal breach or credential leak confirmed.",
             }
             self._interaction_log.append(alert)
             return alert
