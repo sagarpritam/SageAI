@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import Link from "next/link";
@@ -33,7 +33,39 @@ export default function Home() {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [riskData, setRiskData] = useState<RiskData | null>(null);
 
+  // Connection & Polling State Refs
+  const activeWsRef = useRef<WebSocket | null>(null);
+  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isPollingRef = useRef<boolean>(false);
+  const isCompletedRef = useRef<boolean>(false);
+
+  // Clean up timers and sockets on unmount
+  useEffect(() => {
+    return () => {
+      if (activeWsRef.current) {
+        activeWsRef.current.close();
+        activeWsRef.current = null;
+      }
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
+  }, []);
+
   const startScan = async (target: string) => {
+    // Reset connection refs for new scan
+    if (activeWsRef.current) {
+      activeWsRef.current.close();
+      activeWsRef.current = null;
+    }
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+    isPollingRef.current = false;
+    isCompletedRef.current = false;
+
     setScanState("running");
     setLogs([]);
     posthog.capture('scan_initiated', { target });
@@ -93,16 +125,35 @@ export default function Home() {
       (typeof window !== "undefined" && window.location.hostname !== "localhost"
         ? `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`
         : "ws://localhost:8000");
-    const ws = new WebSocket(`${wsBase}/ws/scan/${id}`);
+
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(`${wsBase}/ws/scan/${id}`);
+      activeWsRef.current = ws;
+    } catch (err) {
+      console.warn("WebSocket initialization failed, falling back to telemetry polling", err);
+      pollScan(id);
+      return;
+    }
     
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "ping") return;
+
+        if (data.status === "failed" || data.status === "error") {
+          ws.close();
+          setScanState("idle");
+          setLogs(prev => [...prev, `[-] Scan execution error: ${data.message || data.error || "Process failed"}`]);
+          return;
+        }
         
-        const phaseName = data.phase ? data.phase.toUpperCase() : "UNKNOWN";
+        const phaseName = data.phase ? data.phase.toUpperCase() : "PROGRESS";
         const findings = data.findings_count || 0;
-        const logLine = `[+] Phase: ${phaseName} | Progress: ${data.progress}/${data.total} | Findings: ${findings}`;
+        const progressStr = data.progress !== undefined && data.total !== undefined
+          ? `${data.progress}/${data.total}`
+          : (data.progress !== undefined ? `${data.progress}%` : "Running");
+        const logLine = `[+] Phase: ${phaseName} | Progress: ${progressStr} | Findings: ${findings}`;
         
         setLogs(prev => {
           // Avoid duplicate logs if phase doesn't change
@@ -110,7 +161,8 @@ export default function Home() {
           return [...prev, logLine];
         });
         
-        if (data.status === "complete") {
+        if (data.status === "complete" || data.status === "completed") {
+          isCompletedRef.current = true;
           ws.close();
           fetchFinalResults(id);
         }
@@ -120,8 +172,18 @@ export default function Home() {
     };
     
     ws.onerror = (e) => {
-      console.error("WebSocket error, falling back to polling", e);
-      pollScan(id);
+      console.warn("WebSocket stream error, transitioning to polling", e);
+      if (!isCompletedRef.current) {
+        pollScan(id);
+      }
+    };
+
+    ws.onclose = (e) => {
+      // Seamlessly fall back to polling if connection drops prematurely before completion
+      if (!isCompletedRef.current && e.code !== 1000) {
+        console.log(`WebSocket closed unexpectedly (code: ${e.code}), transitioning to polling fallback`);
+        pollScan(id);
+      }
     };
   };
 
@@ -142,30 +204,66 @@ export default function Home() {
     }
   };
 
-  // Fallback polling if WebSocket fails
-  const pollScan = async (id: string) => {
+  // Resilient fallback polling if WebSocket is unavailable or dropped
+  const pollScan = (id: string) => {
+    if (isPollingRef.current || isCompletedRef.current) return;
+    isPollingRef.current = true;
+
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+
     const checkStatus = async () => {
+      if (isCompletedRef.current) return;
+
       try {
         const res = await axios.get(`/api/scan/${id}`);
-        if (res.data.status === "completed") {
-          setVulnerabilities(res.data.analyzed_findings || []);
-          setReport(res.data.report || null);
-          setGraphData(res.data.graph || null);
+        const data = res.data;
+
+        if (data.status === "completed") {
+          isCompletedRef.current = true;
+          isPollingRef.current = false;
+          setVulnerabilities(data.analyzed_findings || []);
+          setReport(data.report || null);
+          setGraphData(data.graph || null);
+          setRiskData(data.risk || null);
           setScanState("completed");
-          setLogs(prev => [...prev, "[+] Scan Completed Successfully!"]);
+          setLogs(prev => [...prev, "[!] Finalizing OSINT Aggregation...", "[+] Scan Completed Successfully!"]);
           return;
+        }
+
+        if (data.status === "failed" || data.status === "error") {
+          isPollingRef.current = false;
+          setScanState("idle");
+          setLogs(prev => [...prev, "[-] Scan failed during execution."]);
+          return;
+        }
+
+        // Live progress update during polling
+        if (data.stage || data.progress !== undefined) {
+          const phaseName = data.stage ? data.stage.toUpperCase() : "ANALYSIS";
+          const progressStr = data.progress !== undefined ? `${data.progress}%` : "In Progress";
+          const logLine = `[+] Phase: ${phaseName} | Progress: ${progressStr} (via telemetry poll)`;
+          setLogs(prev => {
+            if (prev[prev.length - 1] === logLine) return prev;
+            return [...prev, logLine];
+          });
         }
       } catch (e) {
         console.error("Poll Error", e);
       }
 
       setScanState(current => {
-        if (current === "running") {
-          setTimeout(checkStatus, 2000);
+        if (current === "running" && !isCompletedRef.current) {
+          pollTimerRef.current = setTimeout(checkStatus, 2000);
+        } else {
+          isPollingRef.current = false;
         }
         return current;
       });
     };
+
     checkStatus();
   };
 
