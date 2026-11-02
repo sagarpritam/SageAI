@@ -38,7 +38,15 @@ celery_app.conf.update(
         "asm-continuous-recon-12h": {
             "task": "SageAI.asm_scheduled_recon",
             "schedule": crontab(minute=0, hour="*/12"),
-        }
+        },
+        "cisa-kev-daily-sync": {
+            "task": "SageAI.sync_threat_feeds",
+            "schedule": crontab(minute=30, hour=2),  # Runs daily at 02:30 UTC
+        },
+        "cleanup-old-scans-weekly": {
+            "task": "SageAI.cleanup_old_scans",
+            "schedule": crontab(minute=0, hour=3, day_of_week="sunday"),  # Weekly on Sunday at 03:00 UTC
+        },
     },
 )
 
@@ -222,3 +230,21 @@ def asm_scheduled_recon():
 
     _run_async(run_asm_diff())
     return {"status": "dispatched"}
+
+
+@celery_app.task(name="SageAI.sync_threat_feeds")
+def sync_threat_feeds(force: bool = False):
+    """Scheduled task to sync CISA KEV and threat intelligence feeds. Runs daily at 02:30 UTC."""
+    from app.services.threat_feed.cve_indexer import cve_indexer
+
+    try:
+        count = _run_async(cve_indexer.sync_cisa_kev(force=force))
+        logger.info(
+            "Threat feed sync completed successfully: %d vulnerabilities indexed",
+            count,
+        )
+        return {"status": "success", "indexed_count": count}
+    except Exception as exc:
+        logger.error("Threat feed sync failed: %s", exc, exc_info=True)
+        return {"status": "failed", "error": str(exc)}
+
