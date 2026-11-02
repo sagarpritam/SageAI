@@ -205,3 +205,4 @@ async def redeem_credit(user_id, amount):
     assert race_finding is not None
     assert "TOCTOU Race Hazard" in race_finding["type"]
     assert race_finding["cve_id"] == "CWE-367"
+

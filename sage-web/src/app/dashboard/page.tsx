@@ -18,6 +18,7 @@ import {
   Radio,
   AlertTriangle,
   Flame,
+  Biohazard,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -35,12 +36,14 @@ import { ObservabilityDashboard } from "@/components/ObservabilityDashboard";
 import { HoneypotCenter } from "@/components/HoneypotCenter";
 import { AIConsensusArena } from "@/components/AIConsensusArena";
 import { DeepAnalysisPanel } from "@/components/DeepAnalysisPanel";
+import { DetonationChamber } from "@/components/DetonationChamber";
 import { IncidentCenter } from "@/components/IncidentCenter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "consensus", label: "Multi-AI Debate", icon: Swords },
   { id: "deep-analysis", label: "Deep Attacks", icon: Flame },
+  { id: "detonation", label: "Malware Lab", icon: Biohazard },
   { id: "deception", label: "Honeypots", icon: Radio },
   { id: "incidents", label: "Incidents & SOAR", icon: AlertTriangle },
   { id: "observability", label: "Observability", icon: Activity },
@@ -104,6 +107,7 @@ export default function DashboardPage() {
           {activeTab === "overview" && <DashboardOverview />}
           {activeTab === "consensus" && <AIConsensusArena />}
           {activeTab === "deep-analysis" && <DeepAnalysisPanel />}
+          {activeTab === "detonation" && <DetonationChamber />}
           {activeTab === "deception" && <HoneypotCenter />}
           {activeTab === "incidents" && <IncidentCenter />}
           {activeTab === "observability" && <ObservabilityDashboard />}
