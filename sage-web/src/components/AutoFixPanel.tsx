@@ -15,6 +15,8 @@ import {
   Check,
   X,
   FileCode,
+  Sparkles,
+  Code,
 } from "lucide-react";
 import axios from "axios";
 
@@ -52,8 +54,43 @@ interface PatchItem {
   created_at?: string;
 }
 
+const BENCHMARK_TEMPLATES = [
+  {
+    id: "sqli",
+    title: "SQL Injection → Parameterized ORM",
+    vulnerability_type: "SQL_INJECTION",
+    severity: "CRITICAL",
+    file_path: "app/db/repositories.py",
+    original_code: "def get_user_by_email(db, email: str):\n    query = f\"SELECT * FROM users WHERE email = '{email}'\"\n    return db.execute(query).fetchone()",
+    patched_code: "from sqlalchemy import select\nfrom app.models.user import User\n\nasync def get_user_by_email(db, email: str):\n    stmt = select(User).where(User.email == email)\n    result = await db.execute(stmt)\n    return result.scalar_one_or_none()",
+  },
+  {
+    id: "xss",
+    title: "XSS → TextContent Sanitization",
+    vulnerability_type: "CROSS_SITE_SCRIPTING",
+    severity: "HIGH",
+    file_path: "app/utils/diagnostics.py",
+    original_code: "def render_html_notice(title, content):\n    return f\"<div class='alert'><h1>{title}</h1><p>{content}</p></div>\"",
+    patched_code: "import html\n\ndef render_html_notice(title, content):\n    safe_title = html.escape(str(title))\n    safe_content = html.escape(str(content))\n    return f\"<div class='alert'><h1>{safe_title}</h1><p>{safe_content}</p></div>\"",
+  },
+  {
+    id: "path_traversal",
+    title: "Path Traversal → Resolved Safe Path",
+    vulnerability_type: "PATH_TRAVERSAL",
+    severity: "HIGH",
+    file_path: "app/utils/diagnostics.py",
+    original_code: "def read_audit_log(filename):\n    with open('logs/' + filename, 'r') as f:\n        return f.read()",
+    patched_code: "import os\n\ndef read_audit_log(filename):\n    base_dir = os.path.abspath('logs')\n    target_path = os.path.abspath(os.path.join(base_dir, filename))\n    if not target_path.startswith(base_dir):\n        raise ValueError('Illegal path traversal attempt')\n    with open(target_path, 'r', encoding='utf-8') as f:\n        return f.read()",
+  },
+];
+
 export function AutoFixPanel() {
-  const [activeTab, setActiveTab] = useState<"queue" | "scan">("queue");
+  const [activeTab, setActiveTab] = useState<"queue" | "scan" | "propose">("queue");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("sqli");
+  const [proposeRepo, setProposeRepo] = useState("sagarpritam/SageAI");
+  const [proposeBranch, setProposeBranch] = useState("main");
+  const [proposing, setProposing] = useState(false);
+  const [proposeMsg, setProposeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -99,6 +136,46 @@ export function AutoFixPanel() {
 
     fetchPatches();
   }, []);
+
+  const handleProposeSandboxPatch = async () => {
+    const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
+    if (!tmpl) return;
+
+    setProposing(true);
+    setProposeMsg(null);
+    try {
+      const res = await axios.post("/api/autofix/propose", {
+        repository: proposeRepo,
+        file_path: tmpl.file_path,
+        vulnerability_type: tmpl.vulnerability_type,
+        severity: tmpl.severity,
+        original_code: tmpl.original_code,
+        patched_code: tmpl.patched_code,
+        base_branch: proposeBranch,
+      });
+
+      if (res.data?.status === "proposed" || res.data?.patch_id) {
+        setProposeMsg({
+          type: "success",
+          text: "Patch passed AST validation and has been submitted to the review queue!",
+        });
+        await fetchPatches();
+        setActiveTab("queue");
+      } else {
+        setProposeMsg({
+          type: "error",
+          text: res.data?.detail || "Failed to propose patch.",
+        });
+      }
+    } catch (err: any) {
+      setProposeMsg({
+        type: "error",
+        text: err?.response?.data?.detail || err?.message || "Sandbox validation failed.",
+      });
+    } finally {
+      setProposing(false);
+    }
+  };
 
   const handleRun = async () => {
     if (!repo.trim()) return;
@@ -226,7 +303,17 @@ export function AutoFixPanel() {
               : "bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
           }`}
         >
-          <GitBranch className="w-4 h-4" /> Scan & Propose Patch
+          <GitBranch className="w-4 h-4" /> Scan Repository
+        </button>
+        <button
+          onClick={() => setActiveTab("propose")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
+            activeTab === "propose"
+              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-950"
+              : "bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
+          }`}
+        >
+          <Sparkles className="w-4 h-4" /> Propose Sandbox Fix
         </button>
       </div>
 
@@ -482,6 +569,121 @@ export function AutoFixPanel() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 3: Propose Sandbox Patch */}
+      {activeTab === "propose" && (
+        <div className="space-y-4">
+          <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  SagePatch AST Sandbox Validator
+                </h3>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Simulate and validate an AI-generated code patch through the AST security pipeline and submit to the human approval queue.
+                </p>
+              </div>
+            </div>
+
+            {/* Template selector pills */}
+            <div>
+              <label className="text-xs font-mono text-zinc-400 block mb-2">
+                Select Benchmark Security Fix:
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {BENCHMARK_TEMPLATES.map((tmpl) => (
+                  <button
+                    key={tmpl.id}
+                    onClick={() => setSelectedTemplateId(tmpl.id)}
+                    className={`text-left p-3 rounded-lg border text-xs font-mono transition-all ${
+                      selectedTemplateId === tmpl.id
+                        ? "bg-emerald-950/60 border-emerald-600/80 text-emerald-300"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    <div className="font-bold mb-1">{tmpl.title}</div>
+                    <div className="text-[10px] text-zinc-500">{tmpl.file_path}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Selected Template Details */}
+            {(() => {
+              const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
+              if (!tmpl) return null;
+              return (
+                <div className="space-y-3 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <span className="text-[11px] font-mono text-red-400 block mb-1">Original Vulnerable Code:</span>
+                      <pre className="p-3 bg-zinc-950 rounded-lg border border-red-900/40 text-[11px] text-red-300 font-mono overflow-x-auto leading-relaxed max-h-48">
+                        {tmpl.original_code}
+                      </pre>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-mono text-emerald-400 block mb-1">Proposed AST-Safe Patch:</span>
+                      <pre className="p-3 bg-zinc-950 rounded-lg border border-emerald-900/40 text-[11px] text-emerald-300 font-mono overflow-x-auto leading-relaxed max-h-48">
+                        {tmpl.patched_code}
+                      </pre>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-mono text-zinc-400 block mb-1">Target Repository:</label>
+                      <input
+                        value={proposeRepo}
+                        onChange={(e) => setProposeRepo(e.target.value)}
+                        className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-mono text-zinc-400 block mb-1">Base Branch:</label>
+                      <input
+                        value={proposeBranch}
+                        onChange={(e) => setProposeBranch(e.target.value)}
+                        className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  {proposeMsg && (
+                    <div
+                      className={`p-3 rounded-lg text-xs font-mono border ${
+                        proposeMsg.type === "success"
+                          ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
+                          : "bg-red-950/40 border-red-800 text-red-300"
+                      }`}
+                    >
+                      {proposeMsg.text}
+                    </div>
+                  )}
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      onClick={handleProposeSandboxPatch}
+                      disabled={proposing}
+                      className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
+                    >
+                      {proposing ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Validating AST & Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="w-3.5 h-3.5" /> Validate AST & Propose Patch
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
         </div>
       )}
 
