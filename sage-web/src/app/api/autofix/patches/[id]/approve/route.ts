@@ -12,7 +12,13 @@ export async function POST(
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const res = await fetch(`${BACKEND}/autofix/patches/${id}/approve`, {
+  const { searchParams } = new URL(req.url);
+  const simulate = searchParams.get("simulate");
+  const targetUrl = simulate
+    ? `${BACKEND}/autofix/patches/${id}/approve?simulate=${simulate}`
+    : `${BACKEND}/autofix/patches/${id}/approve`;
+
+  const res = await fetch(targetUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

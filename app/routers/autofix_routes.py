@@ -247,17 +247,20 @@ async def approve_patch(
 
     # Get org GitHub token
     org = await db.get(Organization, current_user["org"])
-    if not org or not org.github_token_encrypted:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="GitHub token not configured. Go to Settings → Integrations.",
-        )
-    github_token = decrypt(org.github_token_encrypted)
+    github_token = ""
+    if org and org.github_token_encrypted:
+        github_token = decrypt(org.github_token_encrypted) or ""
+
     if not github_token:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to decrypt GitHub integration token.",
-        )
+        # Check for simulate mode
+        simulate = request.query_params.get("simulate", "false").lower() == "true"
+        if simulate or request.headers.get("x-simulate-dispatch", "false").lower() == "true":
+            github_token = "mock_gh_token_simulated"
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="GitHub token not configured. Go to Settings → Integrations.",
+            )
 
     engine = SagePatchEngine(db)
     try:

@@ -202,14 +202,28 @@ export function AutoFixPanel() {
     }
   };
 
-  const handleApprove = async (patchId: string) => {
+  const handleApprove = async (patchId: string, simulate = false) => {
     setActionLoadingId(patchId);
     try {
-      await axios.post(`/api/autofix/patches/${patchId}/approve`);
+      const url = simulate
+        ? `/api/autofix/patches/${patchId}/approve?simulate=true`
+        : `/api/autofix/patches/${patchId}/approve`;
+      await axios.post(url);
       await fetchPatches();
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        alert(`Approval error: ${err.response?.data?.detail || err.message}`);
+        const detail = err.response?.data?.detail || err.message;
+        if (detail.includes("GitHub token not configured")) {
+          const trySim = confirm(
+            "GitHub token not configured for live repository dispatch.\n\nWould you like to approve this patch in Simulated PR Mode?"
+          );
+          if (trySim) {
+            await axios.post(`/api/autofix/patches/${patchId}/approve?simulate=true`);
+            await fetchPatches();
+            return;
+          }
+        }
+        alert(`Approval error: ${detail}`);
       } else {
         alert("Failed to approve patch.");
       }
