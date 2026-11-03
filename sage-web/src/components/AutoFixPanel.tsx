@@ -17,6 +17,7 @@ import {
   FileCode,
   Sparkles,
   Code,
+  PenTool,
 } from "lucide-react";
 import axios from "axios";
 
@@ -65,6 +66,24 @@ const BENCHMARK_TEMPLATES = [
     patched_code: "from sqlalchemy import select\nfrom app.models.user import User\n\nasync def get_user_by_email(db, email: str):\n    stmt = select(User).where(User.email == email)\n    result = await db.execute(stmt)\n    return result.scalar_one_or_none()",
   },
   {
+    id: "ssrf_imds",
+    title: "Cloud IMDSv2 SSRF → Token-Bound Header",
+    vulnerability_type: "SSRF_IMDS",
+    severity: "CRITICAL",
+    file_path: "app/services/integrations/webhook_client.py",
+    original_code: "import requests\n\ndef fetch_remote_webhook(url: str):\n    # Direct request to target webhook\n    return requests.get(url, timeout=5).json()",
+    patched_code: "from urllib.parse import urlparse\nimport ipaddress\nimport httpx\n\nBLOCKED_CIDRS = [ipaddress.ip_network('169.254.0.0/16'), ipaddress.ip_network('127.0.0.0/8'), ipaddress.ip_network('10.0.0.0/8')]\n\nasync def fetch_remote_webhook(url: str):\n    parsed = urlparse(url)\n    if not parsed.hostname:\n        raise ValueError('Invalid webhook target hostname')\n    try:\n        ip = ipaddress.ip_address(parsed.hostname)\n        if any(ip in net for net in BLOCKED_CIDRS):\n            raise PermissionError('Cloud metadata / internal IP access prohibited')\n    except ValueError:\n        pass\n    async with httpx.AsyncClient(timeout=5) as client:\n        res = await client.get(url)\n        return res.json()",
+  },
+  {
+    id: "jwt_confusion",
+    title: "JWT Algorithm Confusion → Explicit RS256 Verification",
+    vulnerability_type: "JWT_ALGORITHM_CONFUSION",
+    severity: "CRITICAL",
+    file_path: "app/services/token_service.py",
+    original_code: "import jwt\n\ndef verify_user_jwt(token: str, secret_or_pubkey: str):\n    # Insecure: accepts any algorithm header specified by client token\n    return jwt.decode(token, secret_or_pubkey, verify=True)",
+    patched_code: "import jwt\n\nALLOWED_ALGORITHMS = ['RS256']\n\ndef verify_user_jwt(token: str, public_pem: str):\n    # Explicitly enforce cryptographic RSA public key algorithm check\n    return jwt.decode(token, public_pem, algorithms=ALLOWED_ALGORITHMS, options={'require': ['exp', 'iat', 'sub']})",
+  },
+  {
     id: "xss",
     title: "XSS → TextContent Sanitization",
     vulnerability_type: "CROSS_SITE_SCRIPTING",
@@ -82,6 +101,15 @@ const BENCHMARK_TEMPLATES = [
     original_code: "def read_audit_log(filename):\n    with open('logs/' + filename, 'r') as f:\n        return f.read()",
     patched_code: "import os\n\ndef read_audit_log(filename):\n    base_dir = os.path.abspath('logs')\n    target_path = os.path.abspath(os.path.join(base_dir, filename))\n    if not target_path.startswith(base_dir):\n        raise ValueError('Illegal path traversal attempt')\n    with open(target_path, 'r', encoding='utf-8') as f:\n        return f.read()",
   },
+  {
+    id: "cmdi",
+    title: "Command Injection → Subprocess Argument List",
+    vulnerability_type: "COMMAND_INJECTION",
+    severity: "CRITICAL",
+    file_path: "app/services/system_tools.py",
+    original_code: "import os\n\ndef ping_host(host: str):\n    # Dangerous shell interpolation\n    return os.system('ping -c 1 ' + host)",
+    patched_code: "import subprocess\nimport shlex\n\ndef ping_host(host: str):\n    # Type-safe parameter list without shell=True execution\n    clean_host = shlex.quote(host).strip(\"'\\\"\")\n    res = subprocess.run(['ping', '-c', '1', clean_host], capture_output=True, text=True, check=False)\n    return res.returncode",
+  },
 ];
 
 export function AutoFixPanel() {
@@ -94,6 +122,13 @@ export function AutoFixPanel() {
   const [ready, setReady] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [checkingStatus, setCheckingStatus] = useState(true);
+
+  // Custom Proposal Editor State
+  const [customFilePath, setCustomFilePath] = useState("app/services/auth_validator.py");
+  const [customVulnType, setCustomVulnType] = useState("CUSTOM_SECURITY_AUDIT");
+  const [customSeverity, setCustomSeverity] = useState("HIGH");
+  const [customOrigCode, setCustomOrigCode] = useState("def authenticate(user_token):\n    # Insecure token check\n    return user_token == 'master_admin'");
+  const [customPatchedCode, setCustomPatchedCode] = useState("import hmac\n\ndef authenticate(user_token: str, expected_hash: str) -> bool:\n    # Constant-time comparison preventing timing attacks\n    return hmac.compare_digest(str(user_token), str(expected_hash))");
 
   // Scan state
   const [repo, setRepo] = useState("");
@@ -117,7 +152,6 @@ export function AutoFixPanel() {
       const res = await axios.get("/api/autofix/patches");
       setPatches(Array.isArray(res.data) ? res.data : []);
     } catch {
-      // Gracefully handle if no patches yet
       setPatches([]);
     } finally {
       setLoadingPatches(false);
@@ -138,19 +172,42 @@ export function AutoFixPanel() {
   }, []);
 
   const handleProposeSandboxPatch = async () => {
-    const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
-    if (!tmpl) return;
-
     setProposing(true);
     setProposeMsg(null);
+
+    let filePath = "";
+    let vulnType = "";
+    let severity = "";
+    let origCode = "";
+    let patchedCode = "";
+
+    if (selectedTemplateId === "custom") {
+      filePath = customFilePath;
+      vulnType = customVulnType;
+      severity = customSeverity;
+      origCode = customOrigCode;
+      patchedCode = customPatchedCode;
+    } else {
+      const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
+      if (!tmpl) {
+        setProposing(false);
+        return;
+      }
+      filePath = tmpl.file_path;
+      vulnType = tmpl.vulnerability_type;
+      severity = tmpl.severity;
+      origCode = tmpl.original_code;
+      patchedCode = tmpl.patched_code;
+    }
+
     try {
       const res = await axios.post("/api/autofix/propose", {
         repository: proposeRepo,
-        file_path: tmpl.file_path,
-        vulnerability_type: tmpl.vulnerability_type,
-        severity: tmpl.severity,
-        original_code: tmpl.original_code,
-        patched_code: tmpl.patched_code,
+        file_path: filePath,
+        vulnerability_type: vulnType,
+        severity: severity,
+        original_code: origCode,
+        patched_code: patchedCode,
         base_branch: proposeBranch,
       });
 
@@ -213,7 +270,7 @@ export function AutoFixPanel() {
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const detail = err.response?.data?.detail || err.message;
-        if (detail.includes("GitHub token not configured")) {
+        if (detail.includes("GitHub token not configured") && !simulate) {
           const trySim = confirm(
             "GitHub token not configured for live repository dispatch.\n\nWould you like to approve this patch in Simulated PR Mode?"
           );
@@ -511,9 +568,9 @@ export function AutoFixPanel() {
                       )}
                     </div>
 
-                    {/* Actions: Approve / Reject (Only for proposed patches) */}
+                    {/* Actions: Approve / Reject / Simulate (Only for proposed patches) */}
                     {isProposed && (
-                      <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-end gap-3">
+                      <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-end gap-3 flex-wrap">
                         <button
                           onClick={() => setRejectionModalId(patch.id)}
                           disabled={isActionLoading}
@@ -522,7 +579,14 @@ export function AutoFixPanel() {
                           Reject Patch
                         </button>
                         <button
-                          onClick={() => handleApprove(patch.id)}
+                          onClick={() => handleApprove(patch.id, true)}
+                          disabled={isActionLoading}
+                          className="px-3 py-1.5 rounded-lg border border-emerald-700/60 hover:bg-emerald-950/40 text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                          <Play className="w-3 h-3 text-emerald-400" /> Simulate PR
+                        </button>
+                        <button
+                          onClick={() => handleApprove(patch.id, false)}
                           disabled={isActionLoading}
                           className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950 disabled:opacity-50"
                         >
@@ -532,7 +596,7 @@ export function AutoFixPanel() {
                             </>
                           ) : (
                             <>
-                              <Check className="w-3.5 h-3.5" /> Approve & Open Pull Request
+                              <Check className="w-3.5 h-3.5" /> Approve & Open PR
                             </>
                           )}
                         </button>
@@ -594,7 +658,7 @@ export function AutoFixPanel() {
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-400" />
-                  SagePatch AST Sandbox Validator
+                  SagePatch AST Sandbox Validator & Remediation Studio
                 </h3>
                 <p className="text-xs text-zinc-400 mt-0.5">
                   Simulate and validate an AI-generated code patch through the AST security pipeline and submit to the human approval queue.
@@ -605,9 +669,9 @@ export function AutoFixPanel() {
             {/* Template selector pills */}
             <div>
               <label className="text-xs font-mono text-zinc-400 block mb-2">
-                Select Benchmark Security Fix:
+                Select Security Remediation Benchmark or Custom Code:
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {BENCHMARK_TEMPLATES.map((tmpl) => (
                   <button
                     key={tmpl.id}
@@ -618,85 +682,207 @@ export function AutoFixPanel() {
                         : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                     }`}
                   >
-                    <div className="font-bold mb-1">{tmpl.title}</div>
-                    <div className="text-[10px] text-zinc-500">{tmpl.file_path}</div>
+                    <div className="font-bold mb-1 truncate">{tmpl.title}</div>
+                    <div className="text-[10px] text-zinc-500 truncate">{tmpl.file_path}</div>
                   </button>
                 ))}
+                <button
+                  onClick={() => setSelectedTemplateId("custom")}
+                  className={`text-left p-3 rounded-lg border text-xs font-mono transition-all ${
+                    selectedTemplateId === "custom"
+                      ? "bg-emerald-950/60 border-emerald-600/80 text-emerald-300"
+                      : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  <div className="font-bold mb-1 flex items-center gap-1.5">
+                    <PenTool className="w-3.5 h-3.5 text-emerald-400" />
+                    Custom Code Proposal
+                  </div>
+                  <div className="text-[10px] text-zinc-500">Edit custom vulnerable & patch code</div>
+                </button>
               </div>
             </div>
 
-            {/* Selected Template Details */}
-            {(() => {
-              const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
-              if (!tmpl) return null;
-              return (
-                <div className="space-y-3 pt-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <span className="text-[11px] font-mono text-red-400 block mb-1">Original Vulnerable Code:</span>
-                      <pre className="p-3 bg-zinc-950 rounded-lg border border-red-900/40 text-[11px] text-red-300 font-mono overflow-x-auto leading-relaxed max-h-48">
-                        {tmpl.original_code}
-                      </pre>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-mono text-emerald-400 block mb-1">Proposed AST-Safe Patch:</span>
-                      <pre className="p-3 bg-zinc-950 rounded-lg border border-emerald-900/40 text-[11px] text-emerald-300 font-mono overflow-x-auto leading-relaxed max-h-48">
-                        {tmpl.patched_code}
-                      </pre>
-                    </div>
+            {/* Selected Template / Custom Details */}
+            {selectedTemplateId === "custom" ? (
+              <div className="space-y-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-mono text-zinc-400 block mb-1">Target File Path:</label>
+                    <input
+                      value={customFilePath}
+                      onChange={(e) => setCustomFilePath(e.target.value)}
+                      placeholder="e.g. app/services/auth.py"
+                      className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-mono text-zinc-400 block mb-1">Target Repository:</label>
-                      <input
-                        value={proposeRepo}
-                        onChange={(e) => setProposeRepo(e.target.value)}
-                        className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-mono text-zinc-400 block mb-1">Base Branch:</label>
-                      <input
-                        value={proposeBranch}
-                        onChange={(e) => setProposeBranch(e.target.value)}
-                        className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
+                  <div>
+                    <label className="text-xs font-mono text-zinc-400 block mb-1">Vulnerability Type:</label>
+                    <input
+                      value={customVulnType}
+                      onChange={(e) => setCustomVulnType(e.target.value)}
+                      placeholder="e.g. TIMING_ATTACK"
+                      className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
                   </div>
-
-                  {proposeMsg && (
-                    <div
-                      className={`p-3 rounded-lg text-xs font-mono border ${
-                        proposeMsg.type === "success"
-                          ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
-                          : "bg-red-950/40 border-red-800 text-red-300"
-                      }`}
+                  <div>
+                    <label className="text-xs font-mono text-zinc-400 block mb-1">Severity:</label>
+                    <select
+                      value={customSeverity}
+                      onChange={(e) => setCustomSeverity(e.target.value)}
+                      className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
                     >
-                      {proposeMsg.text}
-                    </div>
-                  )}
-
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={handleProposeSandboxPatch}
-                      disabled={proposing}
-                      className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
-                    >
-                      {proposing ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Validating AST & Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <Shield className="w-3.5 h-3.5" /> Validate AST & Propose Patch
-                        </>
-                      )}
-                    </button>
+                      <option value="CRITICAL">CRITICAL</option>
+                      <option value="HIGH">HIGH</option>
+                      <option value="MEDIUM">MEDIUM</option>
+                      <option value="LOW">LOW</option>
+                    </select>
                   </div>
                 </div>
-              );
-            })()}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-[11px] font-mono text-red-400 block mb-1">Original Code:</span>
+                    <textarea
+                      value={customOrigCode}
+                      onChange={(e) => setCustomOrigCode(e.target.value)}
+                      rows={6}
+                      className="w-full p-3 bg-zinc-950 rounded-lg border border-red-900/40 text-[11px] text-red-300 font-mono focus:outline-none focus:border-red-500 leading-relaxed"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-mono text-emerald-400 block mb-1">Patched Code:</span>
+                    <textarea
+                      value={customPatchedCode}
+                      onChange={(e) => setCustomPatchedCode(e.target.value)}
+                      rows={6}
+                      className="w-full p-3 bg-zinc-950 rounded-lg border border-emerald-900/40 text-[11px] text-emerald-300 font-mono focus:outline-none focus:border-emerald-500 leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-mono text-zinc-400 block mb-1">Target Repository:</label>
+                    <input
+                      value={proposeRepo}
+                      onChange={(e) => setProposeRepo(e.target.value)}
+                      className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-mono text-zinc-400 block mb-1">Base Branch:</label>
+                    <input
+                      value={proposeBranch}
+                      onChange={(e) => setProposeBranch(e.target.value)}
+                      className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {proposeMsg && (
+                  <div
+                    className={`p-3 rounded-lg text-xs font-mono border ${
+                      proposeMsg.type === "success"
+                        ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
+                        : "bg-red-950/40 border-red-800 text-red-300"
+                    }`}
+                  >
+                    {proposeMsg.text}
+                  </div>
+                )}
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    onClick={handleProposeSandboxPatch}
+                    disabled={proposing || !customOrigCode.trim() || !customPatchedCode.trim()}
+                    className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
+                  >
+                    {proposing ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Validating AST & Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-3.5 h-3.5" /> Validate AST & Propose Patch
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              (() => {
+                const tmpl = BENCHMARK_TEMPLATES.find((t) => t.id === selectedTemplateId);
+                if (!tmpl) return null;
+                return (
+                  <div className="space-y-3 pt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-[11px] font-mono text-red-400 block mb-1">Original Vulnerable Code:</span>
+                        <pre className="p-3 bg-zinc-950 rounded-lg border border-red-900/40 text-[11px] text-red-300 font-mono overflow-x-auto leading-relaxed max-h-48">
+                          {tmpl.original_code}
+                        </pre>
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-mono text-emerald-400 block mb-1">Proposed AST-Safe Patch:</span>
+                        <pre className="p-3 bg-zinc-950 rounded-lg border border-emerald-900/40 text-[11px] text-emerald-300 font-mono overflow-x-auto leading-relaxed max-h-48">
+                          {tmpl.patched_code}
+                        </pre>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-mono text-zinc-400 block mb-1">Target Repository:</label>
+                        <input
+                          value={proposeRepo}
+                          onChange={(e) => setProposeRepo(e.target.value)}
+                          className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-mono text-zinc-400 block mb-1">Base Branch:</label>
+                        <input
+                          value={proposeBranch}
+                          onChange={(e) => setProposeBranch(e.target.value)}
+                          className="w-full bg-black/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    {proposeMsg && (
+                      <div
+                        className={`p-3 rounded-lg text-xs font-mono border ${
+                          proposeMsg.type === "success"
+                            ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
+                            : "bg-red-950/40 border-red-800 text-red-300"
+                        }`}
+                      >
+                        {proposeMsg.text}
+                      </div>
+                    )}
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleProposeSandboxPatch}
+                        disabled={proposing}
+                        className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
+                      >
+                        {proposing ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Validating AST & Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="w-3.5 h-3.5" /> Validate AST & Propose Patch
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()
+            )}
           </div>
         </div>
       )}
