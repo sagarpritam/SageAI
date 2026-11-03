@@ -39,6 +39,7 @@ from app.routers import (
     incident_routes,
     integration_routes,
     intelligence_hub_routes,
+    intrusion_routes,
     malware_routes,
     mfa_routes,
     notification_routes,
@@ -200,6 +201,7 @@ app.include_router(consensus_routes.router)
 app.include_router(deep_analysis_routes.router)
 app.include_router(malware_routes.router)
 app.include_router(rule_synthesizer_routes.router)
+app.include_router(intrusion_routes.router)
 
 
 # ---------------------

@@ -101,3 +101,4 @@ def test_simulate_attacker_journey_and_soar_escalation():
     executed_action_names = [a["action"] for a in incident["executed_actions"]]
     assert "GENERATE_VIRTUAL_PATCH" in executed_action_names
     assert "NOTIFY_SOC_WEBHOOK" in executed_action_names
+

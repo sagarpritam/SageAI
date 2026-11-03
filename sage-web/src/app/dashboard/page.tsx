@@ -20,6 +20,7 @@ import {
   Flame,
   Biohazard,
   ScrollText,
+  Network,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -40,6 +41,7 @@ import { DeepAnalysisPanel } from "@/components/DeepAnalysisPanel";
 import { DetonationChamber } from "@/components/DetonationChamber";
 import { ThreatRuleSynthesizer } from "@/components/ThreatRuleSynthesizer";
 import { IncidentCenter } from "@/components/IncidentCenter";
+import { DefenseGridMonitor } from "@/components/DefenseGridMonitor";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -48,6 +50,7 @@ const tabs = [
   { id: "detonation", label: "Malware Lab", icon: Biohazard },
   { id: "rules", label: "Rule Forge", icon: ScrollText },
   { id: "deception", label: "Honeypots", icon: Radio },
+  { id: "defense-grid", label: "Defense Grid", icon: Network },
   { id: "incidents", label: "Incidents & SOAR", icon: AlertTriangle },
   { id: "observability", label: "Observability", icon: Activity },
   { id: "posture", label: "Security Shield", icon: Shield },
@@ -113,6 +116,7 @@ export default function DashboardPage() {
           {activeTab === "detonation" && <DetonationChamber />}
           {activeTab === "rules" && <ThreatRuleSynthesizer />}
           {activeTab === "deception" && <HoneypotCenter />}
+          {activeTab === "defense-grid" && <DefenseGridMonitor />}
           {activeTab === "incidents" && <IncidentCenter />}
           {activeTab === "observability" && <ObservabilityDashboard />}
           {activeTab === "posture" && <SecurityPosture />}
