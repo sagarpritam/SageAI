@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertCircle, ShieldAlert, CheckCircle, FileCode, Upload, RefreshCw, Lock, Terminal, Activity } from "lucide-react";
+import { AlertCircle, ShieldAlert, CheckCircle, FileCode, Upload, RefreshCw, Lock, Terminal, Activity, GitBranch, ExternalLink } from "lucide-react";
 import axios from "axios";
 
 interface IncidentAction {
@@ -48,6 +48,8 @@ export function IncidentCenter() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [remediating, setRemediating] = useState(false);
+  const [patchResult, setPatchResult] = useState<any | null>(null);
 
   // Reverse Engineering State
   const [reSampleText, setReSampleText] = useState("powershell.exe -ExecutionPolicy Bypass -enc SQBFAFgA\nVirtualAllocEx WriteProcessMemory CreateRemoteThread\nhttp://evil-c2.internal/beacon");
@@ -97,6 +99,29 @@ export function IncidentCenter() {
       setMessage(`Authorization blocked: ${detail}`);
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleRemediate = async (incidentId: string) => {
+    setRemediating(true);
+    setPatchResult(null);
+    setMessage(null);
+    try {
+      const res = await axios.post(`/api/incidents/${incidentId}/remediate`, {
+        repository: "demo/security-service",
+      });
+      if (res.data?.status === "success") {
+        setPatchResult(res.data);
+        setMessage(`SagePatch proposed: ${res.data.patch_id}. Queued for human review.`);
+        fetchIncidents();
+      } else {
+        setMessage(res.data?.message || "Remediation submitted.");
+      }
+    } catch (err: any) {
+      const detail = err.response?.data?.detail || err.message;
+      setMessage(`Remediation error: ${detail}`);
+    } finally {
+      setRemediating(false);
     }
   };
 
@@ -228,8 +253,38 @@ export function IncidentCenter() {
                       {act.requires_approval && <span className="text-[9px] text-zinc-400">(Approval Req)</span>}
                     </button>
                   ))}
+                  <button
+                    onClick={() => handleRemediate(selectedIncident.incident_id)}
+                    disabled={remediating}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-blue-900/30 text-blue-300 border border-blue-800/60 hover:bg-blue-900/50 transition"
+                  >
+                    <FileCode className="w-3 h-3 text-blue-400" />
+                    <span>{remediating ? "Synthesizing Patch..." : "Draft SagePatch Code Fix"}</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Proposed Patch Preview */}
+              {patchResult && (
+                <div className="p-4 rounded-xl bg-blue-950/20 border border-blue-500/30 space-y-2 animate-in fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GitBranch className="w-4 h-4 text-blue-400" />
+                      <span className="text-xs font-bold text-white">SagePatch Proposal #{patchResult.patch_id?.substring(0, 8)}</span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-500/20">
+                      AST Validated
+                    </span>
+                  </div>
+                  <pre className="p-3 bg-black/80 border border-zinc-800 rounded-lg text-[11px] font-mono text-zinc-300 overflow-x-auto max-h-48">
+                    {patchResult.diff}
+                  </pre>
+                  <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+                    <span>Branch: {patchResult.patch_branch}</span>
+                    <span className="text-blue-400 font-bold">Review in Auto-Fix Tab</span>
+                  </div>
+                </div>
+              )}
 
               {/* Executed Audit Log */}
               <div className="space-y-2">

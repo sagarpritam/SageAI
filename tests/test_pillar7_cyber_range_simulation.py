@@ -100,3 +100,4 @@ async def test_simulation_api_endpoints():
         drill_data = drill_res.json()
         assert drill_data["status"] == "DRILL_SUCCESSFUL"
         assert drill_data["stages_completed"] == 6
+
