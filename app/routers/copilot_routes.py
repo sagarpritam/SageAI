@@ -224,6 +224,21 @@ async def list_copilot_tools(current_user: dict = Depends(get_current_user)):
                 "description": "Live lookup in CISA KEV catalog for actively exploited vulnerabilities and ransomware.",
                 "scope": "global-threat-feed",
             },
+            {
+                "name": "synthesize_threat_rules",
+                "description": "Autonomous YARA, Sigma, and Virtual WAF rule synthesizer for detected CVEs.",
+                "scope": "tenant-threat-feed",
+            },
+            {
+                "name": "inspect_honeypots",
+                "description": "Query status of active deception mesh traps, canary tokens, and SOAR tripwires.",
+                "scope": "tenant-isolated",
+            },
+            {
+                "name": "evaluate_guardrails",
+                "description": "Inspect adversarial prompts against OWASP LLM01, jailbreaks, and NeMo Colang rails.",
+                "scope": "ai-resilience",
+            },
         ]
     }
 

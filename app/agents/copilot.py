@@ -391,6 +391,58 @@ class CopilotAgent:
         except Exception as e:
             logger.debug(f"RAG search error: {e}")
 
+        # ── Tool 5: Threat Detection Rule Synthesis ──
+        if any(term in user_msg.lower() for term in ["yara", "sigma", "nuclei", "waf", "detection rule", "synthesize rule", "rule forge"]):
+            try:
+                from app.services.threat_feed.pattern_synthesizer import ThreatPatternSynthesizer
+                synth = ThreatPatternSynthesizer()
+                cve_target = cve_match.group(0).upper() if cve_match else "CVE-2024-DEFENSE"
+                rules = synth.synthesize_rules(
+                    cve_id=cve_target,
+                    title=f"Exploit pattern for {cve_target}",
+                    description=user_msg,
+                    attack_vector="network",
+                )
+                tool_artifacts.append(
+                    f"AUTONOMOUS THREAT DETECTION RULES ({cve_target}):\n"
+                    f"Virtual WAF (ModSecurity):\n```apache\n{rules.get('waf_rule', '')}\n```\n"
+                    f"Sigma Rule:\n```yaml\n{rules.get('sigma_rule', '')}\n```"
+                )
+                sources.append({"title": f"Rule Forge: {cve_target}", "type": "rule_synthesizer"})
+            except Exception as e:
+                logger.debug(f"Rule synthesis error: {e}")
+
+        # ── Tool 6: Deception Mesh & Honeypots ──
+        if any(term in user_msg.lower() for term in ["honeypot", "canary", "deception", "decoy", "tripwire"]):
+            try:
+                from app.services.deception.honeypot_service import honeypot_service
+                tokens = honeypot_service.list_tokens(org_id=org_id)
+                tool_artifacts.append(
+                    f"ACTIVE DECEPTION MESH & HONEYTOKENS:\n"
+                    f"- Total Active Canary Tokens: {len(tokens)}\n"
+                    f"- Monitored Traps: AWS IAM Decoys, Database DB canaries, JWT canaries\n"
+                    f"- Auto-Escalation: SOAR containment active on tripwire access"
+                )
+                sources.append({"title": "Deception Mesh Status", "type": "honeypot"})
+            except Exception as e:
+                logger.debug(f"Honeypot lookup error: {e}")
+
+        # ── Tool 7: Adversarial Prompt Guardrails ──
+        if any(term in user_msg.lower() for term in ["guardrail", "jailbreak", "prompt injection", "is this prompt safe", "adversarial"]):
+            try:
+                from app.services.ai_resilience import evaluate_adversarial_input
+                eval_res = evaluate_adversarial_input(user_msg)
+                tool_artifacts.append(
+                    f"ADVERSARIAL GUARDRAIL EVALUATION:\n"
+                    f"- Decision: {eval_res['decision']}\n"
+                    f"- Threat Category: {eval_res['threat_category']}\n"
+                    f"- Severity: {eval_res['severity']}\n"
+                    f"- Recommended NeMo Policy:\n```colang\n{eval_res['recommended_guardrail']}\n```"
+                )
+                sources.append({"title": "NeMo Guardrail Matrix", "type": "guardrails"})
+            except Exception as e:
+                logger.debug(f"Guardrail evaluation error: {e}")
+
         # Assemble full prompt
         if tool_artifacts:
             system_prompt += (

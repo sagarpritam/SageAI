@@ -36,7 +36,7 @@ async def list_incidents(
     current_user: dict = Depends(get_current_user),
 ):
     """List active security incidents prioritized by severity."""
-    org_id = current_user.get("org_id", "system")
+    org_id = current_user.get("org") or current_user.get("org_id") or "system"
     return {
         "status": "success",
         "incidents": soar_engine.list_incidents(limit=limit, org_id=org_id),

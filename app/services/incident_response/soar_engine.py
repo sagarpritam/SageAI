@@ -35,6 +35,53 @@ class IncidentResponseEngine:
         # In-memory store of active incidents: incident_id -> incident_record
         self._incidents: Dict[str, Dict[str, Any]] = {}
         self._action_audit_log: List[Dict[str, Any]] = []
+        self._seed_initial_incidents()
+
+    def _seed_initial_incidents(self):
+        """Seed realistic enterprise incidents so IncidentCenter is immediately actionable."""
+        seeds = [
+            {
+                "title": "Cloud IMDSv2 SSRF & AWS Credential Exfiltration Probe",
+                "severity": "CRITICAL",
+                "source": "DeepAnalysisAgent",
+                "details": {
+                    "target_path": "/api/v1/integrations/fetch-webhook",
+                    "matched_vector": "SSRF / 169.254.169.254 metadata traversal",
+                    "attacker_ip": "198.51.100.44",
+                    "mitigation": "Enforce RFC 1918 & link-local IP blacklist",
+                },
+            },
+            {
+                "title": "Decoy PostgreSQL Honeytoken Accessed by External ASN",
+                "severity": "CRITICAL",
+                "source": "DeceptionMesh",
+                "details": {
+                    "token": "CANARY-DB-POSTGRES-TRIPWIRE",
+                    "query": "SELECT * FROM enterprise_secrets",
+                    "attacker_ip": "203.0.113.19",
+                    "geo": "Frankfurt, Germany",
+                },
+            },
+            {
+                "title": "High-Periodicity Cobalt Strike C2 Beaconing Activity",
+                "severity": "HIGH",
+                "source": "NIDSMonitor",
+                "details": {
+                    "destination": "c2.stealth-recon.org",
+                    "beacon_interval_s": 5.0,
+                    "jitter_coefficient": 0.038,
+                    "anomaly_type": "C2_BEACON_DETECTED",
+                },
+            },
+        ]
+        for s in seeds:
+            self.create_incident(
+                title=s["title"],
+                severity=s["severity"],
+                source=s["source"],
+                details=s["details"],
+                org_id="system",
+            )
 
     def create_incident(
         self,
@@ -81,9 +128,9 @@ class IncidentResponseEngine:
 
         if severity.upper() in ["CRITICAL", "HIGH"]:
             actions.append({"action": "BLOCK_IP_FIREWALL", "requires_approval": True})
-            if "CANARY" in source.upper() or "AUTH" in source.upper():
+            if "CANARY" in source.upper() or "AUTH" in source.upper() or "DECEPTION" in source.upper():
                 actions.append({"action": "REVOKE_USER_SESSION", "requires_approval": True})
-            if "NIDS" in source.upper() or "BEACON" in source.upper():
+            if "NIDS" in source.upper() or "BEACON" in source.upper() or "DEEP" in source.upper():
                 actions.append({"action": "ISOLATE_HOST", "requires_approval": True})
 
         return actions
@@ -181,8 +228,8 @@ class IncidentResponseEngine:
 
     def list_incidents(self, limit: int = 50, org_id: Optional[str] = None) -> List[Dict[str, Any]]:
         incidents = list(self._incidents.values())
-        if org_id:
-            incidents = [i for i in incidents if i.get("org_id") == org_id]
+        if org_id and org_id != "system":
+            incidents = [i for i in incidents if i.get("org_id") in (org_id, "system")]
         return sorted(incidents, key=lambda x: x["created_at"], reverse=True)[:limit]
 
 

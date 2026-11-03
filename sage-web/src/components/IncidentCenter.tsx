@@ -276,9 +276,29 @@ export function IncidentCenter() {
                       AST Validated
                     </span>
                   </div>
-                  <pre className="p-3 bg-black/80 border border-zinc-800 rounded-lg text-[11px] font-mono text-zinc-300 overflow-x-auto max-h-48">
-                    {patchResult.diff}
-                  </pre>
+                  <div className="p-3 bg-black/80 border border-zinc-800 rounded-lg text-[11px] font-mono overflow-x-auto max-h-48 space-y-0.5">
+                    {patchResult.diff.split("\n").map((line: string, idx: number) => {
+                      const isAdd = line.startsWith("+") && !line.startsWith("+++");
+                      const isDel = line.startsWith("-") && !line.startsWith("---");
+                      const isHeader = line.startsWith("@@") || line.startsWith("---") || line.startsWith("+++");
+                      return (
+                        <div
+                          key={idx}
+                          className={`whitespace-pre ${
+                            isAdd
+                              ? "bg-emerald-950/40 text-emerald-300"
+                              : isDel
+                              ? "bg-red-950/40 text-red-300"
+                              : isHeader
+                              ? "text-blue-400 font-bold"
+                              : "text-zinc-400"
+                          }`}
+                        >
+                          {line}
+                        </div>
+                      );
+                    })}
+                  </div>
                   <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
                     <span>Branch: {patchResult.patch_branch}</span>
                     <span className="text-blue-400 font-bold">Review in Auto-Fix Tab</span>
@@ -322,7 +342,32 @@ export function IncidentCenter() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-xs text-zinc-400 block">Sample Payload / Script / Base64 Data</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-zinc-400 block">Sample Payload / Script / Base64 Data</label>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setReSampleText("powershell.exe -ExecutionPolicy Bypass -enc SQBFAFgA\nVirtualAllocEx WriteProcessMemory CreateRemoteThread\nhttp://evil-c2.internal/beacon")}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+                >
+                  PowerShell
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReSampleText("MZ\\x90\\x00\\x03\nKERNEL32.DLL: VirtualAlloc, WriteProcessMemory, CreateProcessA\nADVAPI32.DLL: RegCreateKeyExA, CryptEncrypt\nWS2_32.DLL: connect, send, recv\ncmd.exe /c powershell -w hidden")}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+                >
+                  PE Dropper
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReSampleText("\\x7fELF\\x02\\x01\\x01\\x00\nsys_socket(AF_INET, SOCK_STREAM, 0)\nsys_connect(fd, 10.0.0.1:4444)\nsys_dup2(fd, 0); sys_dup2(fd, 1); sys_dup2(fd, 2)\nsys_execve('/bin/sh', NULL, NULL)")}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+                >
+                  ELF Shell
+                </button>
+              </div>
+            </div>
             <textarea
               rows={5}
               value={reSampleText}
