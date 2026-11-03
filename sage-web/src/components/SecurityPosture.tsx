@@ -17,6 +17,10 @@ import {
   Zap,
   Code,
   ExternalLink,
+  Globe,
+  Copy,
+  Check,
+  FileText,
 } from "lucide-react";
 import axios from "axios";
 
@@ -57,6 +61,60 @@ interface ComplianceData {
   overall_status: string;
   frameworks: Record<string, ComplianceFramework>;
 }
+
+interface DebriefData {
+  status: string;
+  language: { code: string; name: string };
+  metadata: {
+    title: string;
+    target: string;
+    generated_at: string;
+    org_id: string;
+  };
+  posture: {
+    risk_score: number;
+    risk_level: string;
+    section_label: string;
+    metrics_label: string;
+    breakdown: {
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+      total: number;
+    };
+  };
+  executive_summary: {
+    section_label: string;
+    content: string;
+    autonomous_defense_notice: string;
+  };
+  strategic_recommendations: {
+    section_label: string;
+    items: string[];
+  };
+  compliance_assurance: {
+    section_label: string;
+    tamper_proof_statement: string;
+    merkle_verification: {
+      is_valid: boolean;
+      total_blocks: number;
+      tampered_indices: number[];
+    };
+    block_index: number;
+    block_hash: string;
+  };
+}
+
+const DEBRIEF_LANGUAGES = [
+  { code: "en", label: "EN", name: "English" },
+  { code: "ja", label: "JA", name: "日本語" },
+  { code: "de", label: "DE", name: "Deutsch" },
+  { code: "fr", label: "FR", name: "Français" },
+  { code: "es", label: "ES", name: "Español" },
+  { code: "zh", label: "ZH", name: "简体中文" },
+  { code: "ar", label: "AR", name: "العربية" },
+];
 
 interface RemediationItem {
   rank: number;
@@ -234,7 +292,11 @@ export function SecurityPosture() {
   const [compliance, setCompliance] = useState<ComplianceData | null>(null);
   const [remediations, setRemediations] = useState<RemediationItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "remediation">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "remediation" | "debrief">("overview");
+  const [selectedLang, setSelectedLang] = useState<string>("en");
+  const [debrief, setDebrief] = useState<DebriefData | null>(null);
+  const [debriefLoading, setDebriefLoading] = useState(false);
+  const [copiedDebrief, setCopiedDebrief] = useState(false);
   const [expandedRem, setExpandedRem] = useState<number | null>(null);
 
   useEffect(() => {
@@ -271,6 +333,42 @@ export function SecurityPosture() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "debrief") return;
+    const fetchDebrief = async () => {
+      setDebriefLoading(true);
+      try {
+        if (posture?.scan_id) {
+          const res = await axios.get(`/api/reports/${posture.scan_id}/debrief?lang=${selectedLang}`);
+          setDebrief(res.data);
+        } else {
+          const res = await axios.post("/api/reports/debrief", {
+            target: posture?.target || "Enterprise Global Asset",
+            risk_score: 100 - (posture?.posture_score || 85),
+            findings: [],
+            lang: selectedLang,
+          });
+          setDebrief(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to load debrief:", err);
+      } finally {
+        setDebriefLoading(false);
+      }
+    };
+    fetchDebrief();
+  }, [activeTab, selectedLang, posture?.scan_id, posture?.target, posture?.posture_score]);
+
+  const copyDebriefText = () => {
+    if (!debrief) return;
+    const text = `${debrief.metadata.title}\nTarget: ${debrief.metadata.target}\nRisk Score: ${debrief.posture.risk_score}/100 (${debrief.posture.risk_level})\n\n${debrief.executive_summary.section_label}:\n${debrief.executive_summary.content}\n\n${debrief.strategic_recommendations.section_label}:\n` +
+      debrief.strategic_recommendations.items.map((it, idx) => `${idx + 1}. ${it}`).join("\n") +
+      `\n\n${debrief.compliance_assurance.section_label}:\n${debrief.compliance_assurance.tamper_proof_statement} (Block #${debrief.compliance_assurance.block_index}, Hash: ${debrief.compliance_assurance.block_hash})`;
+    navigator.clipboard.writeText(text);
+    setCopiedDebrief(true);
+    setTimeout(() => setCopiedDebrief(false), 2000);
+  };
 
   const downloadSarif = async () => {
     if (!posture?.scan_id) return;
@@ -309,6 +407,7 @@ export function SecurityPosture() {
     { id: "overview" as const, label: "Overview", icon: Shield },
     { id: "compliance" as const, label: "Compliance", icon: FileCheck },
     { id: "remediation" as const, label: "Remediation", icon: Wrench },
+    { id: "debrief" as const, label: "CISO Debrief (i18n)", icon: Globe },
   ];
 
   return (
