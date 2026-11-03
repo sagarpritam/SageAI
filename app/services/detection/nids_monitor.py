@@ -5,6 +5,7 @@ Monitors connection events, flags port scanning sweeps, calculates inter-arrival
 jitter for C2 beacon detection, and identifies suspicious exfiltration spikes.
 """
 
+import math
 import statistics
 import time
 from collections import defaultdict
@@ -90,5 +91,49 @@ class NIDSMonitor:
                 "connections_analyzed": len(recent),
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "recommendation": f"Isolate internal host {internal_host} and investigate process initiating connections to {external_ip}.",
+            }
+        return None
+
+    def analyze_dns_query(
+        self, query_name: str, query_type: str = "A", client_ip: str = "unknown"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Detects DNS tunneling, exfiltration, and C2 domain generation algorithms (DGA).
+        Analyzes label length, character entropy, and anomalous query types.
+        """
+        labels = [l for l in query_name.strip(".").split(".") if l]
+        if not labels:
+            return None
+
+        # Check largest subdomain label
+        subdomain_label = labels[0]
+        label_len = len(subdomain_label)
+
+        # Calculate Shannon entropy of the label
+        prob = [float(subdomain_label.count(c)) / label_len for c in set(subdomain_label)]
+        entropy = -sum(p * math.log2(p) for p in prob) if label_len > 0 else 0.0
+
+        is_tunneling = False
+        reason = ""
+
+        if label_len > 32 and entropy > 3.5:
+            is_tunneling = True
+            reason = f"High-entropy ({entropy:.2f}) long subdomain label ({label_len} chars) indicates encoded exfiltration."
+        elif query_type in ["TXT", "NULL"] and label_len > 24:
+            is_tunneling = True
+            reason = f"Anomalous query type '{query_type}' with elongated payload label ({label_len} chars)."
+
+        if is_tunneling:
+            return {
+                "alert_type": "NIDS_DNS_TUNNELING_DETECTED",
+                "severity": "CRITICAL",
+                "client_ip": client_ip,
+                "queried_domain": query_name,
+                "subdomain_label_length": label_len,
+                "entropy": round(entropy, 2),
+                "query_type": query_type,
+                "reason": reason,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "recommendation": f"Sinkhole DNS domain '{query_name}' and inspect network socket of client {client_ip}.",
             }
         return None

@@ -52,6 +52,7 @@ from app.routers import (
     rule_synthesizer_routes,
     scan_routes,
     schedule_routes,
+    simulation_routes,
     telemetry_routes,
     webhook_routes,
     ws_routes,
@@ -202,6 +203,7 @@ app.include_router(deep_analysis_routes.router)
 app.include_router(malware_routes.router)
 app.include_router(rule_synthesizer_routes.router)
 app.include_router(intrusion_routes.router)
+app.include_router(simulation_routes.router)
 
 
 # ---------------------

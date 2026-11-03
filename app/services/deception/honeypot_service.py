@@ -230,3 +230,4 @@ class DeceptionHoneypotService:
 
 # Global deception service singleton
 honeypot_service = DeceptionHoneypotService()
+deception_service = honeypot_service
