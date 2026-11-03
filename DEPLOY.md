@@ -115,10 +115,14 @@ kubectl apply -f k8s/ingress.yaml
 - `RATE_LIMIT_SCAN`: `120/minute`
 - `RATE_LIMIT_AUTH`: `60/minute`
 
-### AI & Threat Intelligence (Optional / Pro Features)
+### AI & Threat Intelligence (Multi-Model Council & Defense Grid)
 
-- `GOOGLE_GENERATIVE_AI_API_KEY`: Gemini Copilot reasoning engine
-- `NVIDIA_API_KEY`: NVIDIA NIM/NeMo microservices
+- `OPENAI_API_KEY`: OpenAI o1/o3 and GPT-4o reasoning
+- `ANTHROPIC_API_KEY`: Claude 3.7 Sonnet / Opus static AST reasoning and patch synthesis
+- `GEMINI_API_KEY`: Google Gemini 2.5 Pro massive-context repository analysis
+- `DEEPSEEK_API_KEY`: DeepSeek R1 complex non-linear attack path reasoning
+- `NVIDIA_API_KEY`: NVIDIA Nemotron 70B & Llama Guard adversarial red-teaming
+- `AI_GATEWAY_API_KEY`: Vercel / Edge AI Gateway routing key
 - `SHODAN_API_KEY`: Shodan OSINT integration
 - `CENSYS_API_ID` & `CENSYS_API_SECRET`: Censys attack surface discovery
 
@@ -158,4 +162,32 @@ docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 
 # Verify active revision
 docker compose -f docker-compose.prod.yml exec backend alembic current
+```
+
+---
+
+## 8. Multi-AI Council & Enterprise Defense Grid Verification
+
+Verify all 6 pillars of the autonomous defense grid:
+
+```bash
+# 1. Multi-AI Council Telemetry (Claude, OpenAI, Gemini, DeepSeek, NVIDIA)
+curl -s https://api.yourdomain.com/consensus/council-health -H "Authorization: Bearer <TOKEN>"
+
+# 2. Deep Emerging Attack Vector Suite (Cloud SSRF, OAuth Confusion, Cache Poisoning)
+curl -s -X POST https://api.yourdomain.com/deep-analysis/audit -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" -d '{"target_url": "https://example.com"}'
+
+# 3. Malware & Virus Detonation Lab
+curl -s -X POST https://api.yourdomain.com/malware/analyze -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" -d '{"filename": "agent.exe", "file_bytes_base64": "TVqQAAMAAAAEAAAA//8AALgA"}'
+
+# 4. Autonomous Threat Rule Synthesizer (YARA, Sigma, Nuclei, WAF)
+curl -s https://api.yourdomain.com/rules/templates -H "Authorization: Bearer <TOKEN>"
+
+# 5. Deception Honeytokens & Canary Mesh
+curl -s https://api.yourdomain.com/deception/tokens -H "Authorization: Bearer <TOKEN>"
+
+# 6. Ingress WAF & Cryptographic Merkle Audit Chain
+curl -s https://api.yourdomain.com/intrusion/audit-chain -H "Authorization: Bearer <TOKEN>"
 ```
