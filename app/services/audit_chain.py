@@ -154,3 +154,4 @@ class ImmutableAuditChain:
 
 # Global immutable audit chain singleton
 audit_chain = ImmutableAuditChain()
+
