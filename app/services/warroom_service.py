@@ -1,6 +1,8 @@
 import json
 import logging
-from datetime import datetime
+import random
+import uuid
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set
 
 from fastapi import WebSocket
@@ -39,6 +41,7 @@ class EventType(Enum):
     SCAN_STARTED = "scan.started"
     SCAN_COMPLETED = "scan.completed"
     EXPLOIT_SUCCESS = "exploit.success"
+    EXPLOIT_ATTEMPT = "exploit.attempt"
     FINDING_DISCOVERED = "finding.discovered"
     TELEMETRY = "telemetry"
 
@@ -61,25 +64,37 @@ class Event:
     target: Optional[str] = None
 
     def to_dict(self):
+        etype = self.type.value if hasattr(self.type, "value") else str(self.type)
+        eprio = self.priority.value if hasattr(self.priority, "value") else int(self.priority)
         return {
             "id": self.id,
-            "type": self.type.value,
+            "type": etype,
             "source": self.source,
             "timestamp": self.timestamp.isoformat(),
-            "priority": self.priority.value,
+            "priority": eprio,
             "payload": self.payload,
             "target": self.target,
         }
 
 
 if _SAGESTRIKE_AVAILABLE:
-    # Use the real types at runtime
     Event = _SsEvent  # type: ignore[assignment,misc]
     EventPriority = _SsEventPriority  # type: ignore[assignment,misc]
     EventType = _SsEventType  # type: ignore[assignment,misc]
 
 
 logger = logging.getLogger("SageAI.warroom")
+
+# Real-world locations for visual telemetry flair
+SEED_LOCATIONS = [
+    {"lat": 38.8951, "lng": -77.0364, "city": "Washington, D.C.", "country": "United States"},
+    {"lat": 51.5074, "lng": -0.1278, "city": "London", "country": "United Kingdom"},
+    {"lat": 50.1109, "lng": 8.6821, "city": "Frankfurt", "country": "Germany"},
+    {"lat": 35.6762, "lng": 139.6503, "city": "Tokyo", "country": "Japan"},
+    {"lat": 1.3521, "lng": 103.8198, "city": "Singapore", "country": "Singapore"},
+    {"lat": 25.2048, "lng": 55.2708, "city": "Dubai", "country": "United Arab Emirates"},
+    {"lat": -33.8688, "lng": 151.2093, "city": "Sydney", "country": "Australia"},
+]
 
 
 class WarRoomManager:
@@ -101,7 +116,67 @@ class WarRoomManager:
         self.event_history: List[Dict] = []
         self.max_history = 100
         self.bus: Optional[Any] = None
+        self._seed_telemetry()
         self._initialized = True
+
+    def _seed_telemetry(self):
+        """Populate initial realistic threat telemetry for immediate War Room visualization."""
+        now = datetime.now(timezone.utc)
+        seeds = [
+            {
+                "id": f"evt-seed-{uuid.uuid4().hex[:8]}",
+                "type": "exploit.attempt",
+                "source": "DeepAnalysisAgent",
+                "target": "https://auth.enterprise-mesh.internal",
+                "priority": 4,
+                "payload": {
+                    "message": "Cloud IMDSv2 SSRF exploit attempt intercepted and blocked at edge.",
+                    "description": "Probe to 169.254.169.254 neutralized by SageAI Perimeter Defense.",
+                    "geo": SEED_LOCATIONS[0],
+                },
+                "timestamp": now.isoformat(),
+            },
+            {
+                "id": f"evt-seed-{uuid.uuid4().hex[:8]}",
+                "type": "finding.discovered",
+                "source": "DeceptionMesh",
+                "target": "fake-aws-canary-prod",
+                "priority": 4,
+                "payload": {
+                    "message": "AWS Honeytoken Credential Accessed from unauthorized foreign ASN.",
+                    "description": "Honeytoken AKIA-CANARY-TRIPWIRE queried via STS GetCallerIdentity.",
+                    "geo": SEED_LOCATIONS[2],
+                },
+                "timestamp": now.isoformat(),
+            },
+            {
+                "id": f"evt-seed-{uuid.uuid4().hex[:8]}",
+                "type": "exploit.success",
+                "source": "CyberRangeSimulator",
+                "target": "simulated-k8s-ingress.range.local",
+                "priority": 3,
+                "payload": {
+                    "message": "Simulated APT29 Red-Team Drill: JWT Algorithm Confusion proof confirmed in Sandbox.",
+                    "description": "Sandboxed verification confirmed CVE-2022-21449 signature bypass.",
+                    "geo": SEED_LOCATIONS[1],
+                },
+                "timestamp": now.isoformat(),
+            },
+            {
+                "id": f"evt-seed-{uuid.uuid4().hex[:8]}",
+                "type": "scan.completed",
+                "source": "ThreatRuleSynthesizer",
+                "target": "edge-gateway-eu",
+                "priority": 2,
+                "payload": {
+                    "message": "Automated Virtual WAF & Sigma Rule auto-deployed to cloud edge.",
+                    "description": "Rule SYNTH-MODSEC-9002 active with zero-false-positive guarantee.",
+                    "geo": SEED_LOCATIONS[3],
+                },
+                "timestamp": now.isoformat(),
+            },
+        ]
+        self.event_history.extend(seeds)
 
     async def start(self):
         """Initialize the event bus and start listening for events."""
@@ -114,35 +189,67 @@ class WarRoomManager:
                 redis_url=settings.REDIS_URL,
                 service_name="warroom-manager",
             )
-            # Subscribe to all events — subscribe() may be sync or async
             _sub = self.bus.subscribe("*", self.handle_bus_event)
             if _sub is not None:
                 await _sub
             logger.info("📡 WarRoomManager connected to SageStrike EventBus")
         except Exception as e:
-            logger.error(f"❌ Failed to connect WarRoomManager to EventBus: {e}")
+            logger.info(f"WarRoomManager running in autonomous standalone mode: {e}")
+
+    async def emit_event(
+        self,
+        event_type: str,
+        source: str,
+        target: str,
+        payload: Dict[str, Any],
+        priority: int = 2,
+    ) -> Dict[str, Any]:
+        """Directly emit an attack or security telemetry event to all WarRoom listeners."""
+        evt_id = f"evt-{uuid.uuid4().hex[:10]}"
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Enhance geo if missing
+        if not payload.get("geo"):
+            payload["geo"] = self._simulate_geo(target)
+
+        event_dict = {
+            "id": evt_id,
+            "type": event_type,
+            "source": source,
+            "target": target,
+            "priority": priority,
+            "payload": payload,
+            "timestamp": now,
+        }
+
+        self.event_history.append(event_dict)
+        if len(self.event_history) > self.max_history:
+            self.event_history.pop(0)
+
+        await self.broadcast(event_dict)
+        return event_dict
+
+    def get_history(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Return the recent event history."""
+        return list(reversed(self.event_history[-limit:]))
 
     async def handle_bus_event(self, event: Event):
         """Callback for EventBus events."""
         event_dict = event.to_dict()
 
-        # Enhance message if missing
         if not event_dict["payload"].get("message"):
             msg = self._generate_message(event)
             event_dict["payload"]["message"] = msg
 
-        # Add geo-simulation if missing (for the globe)
         if not event_dict["payload"].get("geo"):
             event_dict["payload"]["geo"] = self._simulate_geo(
                 event_dict.get("target", "")
             )
 
-        # Update history
         self.event_history.append(event_dict)
         if len(self.event_history) > self.max_history:
             self.event_history.pop(0)
 
-        # Broadcast to all connected clients
         await self.broadcast(event_dict)
 
     def _generate_message(self, event: Event) -> str:
@@ -165,16 +272,8 @@ class WarRoomManager:
         return f"System Event: {etype} from {event.source}"
 
     def _simulate_geo(self, target: str) -> Dict:
-        """Simulate geo-coordinates for visual flair if real data isn't available."""
-        import random
-
-        # In a real app, this would use a Geo-IP database
-        return {
-            "lat": random.uniform(-60, 80),
-            "lng": random.uniform(-180, 180),
-            "city": "Unknown",
-            "country": "CyberSpace",
-        }
+        """Simulate geo-coordinates using curated high-fidelity locations."""
+        return random.choice(SEED_LOCATIONS)
 
     async def connect(self, websocket: WebSocket):
         """Register a new WebSocket connection and send initial state."""

@@ -24,7 +24,8 @@ import {
   CloudLightning,
   Loader2,
   CheckCircle,
-  XCircle
+  XCircle,
+  Radio
 } from "lucide-react";
 import axios from "axios";
 
@@ -84,8 +85,8 @@ export function WarRoom() {
   const [isConnected, setIsConnected] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [healingEvents, setHealingEvents] = useState<Record<string, 'running' | 'success' | 'error'>>({});
+  const [simulating, setSimulating] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
-  const tickerRef = useRef<HTMLDivElement>(null);
 
   const handleHealNow = async (event: WarRoomEvent) => {
     if (!event.target) return;
@@ -103,12 +104,12 @@ export function WarRoom() {
   };
 
   const handleNewEvent = (event: WarRoomEvent) => {
-    setEvents(prev => [event, ...prev].slice(0, 50));
+    setEvents(prev => [event, ...prev.filter(e => e.id !== event.id)].slice(0, 50));
 
     // If it's an exploit or critical finding, pulse it on the map
-    if (event.payload.geo) {
+    if (event.payload?.geo) {
       const newPulse = {
-        from: [0, 0] as [number, number], // Assume source is central or fixed for now
+        from: [0, 0] as [number, number],
         to: [event.payload.geo.lng, event.payload.geo.lat] as [number, number],
         id: Math.random().toString(36).substring(7)
       };
@@ -119,36 +120,99 @@ export function WarRoom() {
     }
   };
 
-  // WebSocket Connection
+  const handleSimulatePulse = async () => {
+    setSimulating(true);
+    try {
+      await axios.post("/api/warroom", {
+        type: "exploit.attempt",
+        source: "AutonomousRedTeam",
+        target: "perimeter-gateway.range.io",
+        priority: 4,
+        payload: {
+          message: "Simulated APT Threat Drill: Cloud IMDS & OAuth Hijack probe dispatched.",
+          description: "High-intensity adversarial probe packet broadcasted to telemetry grid.",
+        },
+      });
+      const res = await axios.get("/api/warroom");
+      const list = res.data?.events || [];
+      if (Array.isArray(list) && list.length > 0) {
+        setEvents(list.slice(0, 50));
+        handleNewEvent(list[0]);
+      }
+    } catch {
+      // Ignore
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  // Hybrid WebSocket + HTTP Polling Connection
   useEffect(() => {
-    const connect = () => {
-      const url = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/warroom`;
-      const ws = new WebSocket(url);
-      wsRef.current = ws;
+    let pollInterval: NodeJS.Timeout | null = null;
 
-      ws.onopen = () => {
-        setIsConnected(true);
-        console.log("WarRoom connected");
-      };
-
-      ws.onmessage = (e) => {
-        const data = JSON.parse(e.data);
-        
-        if (data.type === "rehydration") {
-          setEvents(data.data.slice(-50));
-        } else {
-          handleNewEvent(data);
+    const fetchHttpEvents = async () => {
+      try {
+        const res = await axios.get("/api/warroom");
+        const list = res.data?.events || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setEvents(list.slice(0, 50));
+          setIsConnected(true);
         }
-      };
-
-      ws.onclose = () => {
-        setIsConnected(false);
-        setTimeout(connect, 3000); // Reconnect
-      };
+      } catch {
+        // Fallback polling error
+      }
     };
 
-    connect();
-    return () => wsRef.current?.close();
+    fetchHttpEvents();
+
+    const connectWs = () => {
+      try {
+        const wsHost = process.env.NEXT_PUBLIC_WS_URL || 
+          `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/warroom`;
+        const ws = new WebSocket(wsHost);
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+          setIsConnected(true);
+          if (pollInterval) clearInterval(pollInterval);
+        };
+
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === "rehydration") {
+              setEvents(data.data.slice(-50));
+            } else {
+              handleNewEvent(data);
+            }
+          } catch {}
+        };
+
+        ws.onclose = () => {
+          if (!pollInterval) {
+            pollInterval = setInterval(fetchHttpEvents, 4000);
+          }
+          setTimeout(connectWs, 8000);
+        };
+
+        ws.onerror = () => {
+          if (!pollInterval) {
+            pollInterval = setInterval(fetchHttpEvents, 4000);
+          }
+        };
+      } catch {
+        if (!pollInterval) {
+          pollInterval = setInterval(fetchHttpEvents, 4000);
+        }
+      }
+    };
+
+    connectWs();
+
+    return () => {
+      wsRef.current?.close();
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, []);
 
   return (
@@ -158,7 +222,7 @@ export function WarRoom() {
       <div className="flex items-center justify-between px-6 py-4 bg-zinc-900/50 border-b border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="relative">
-             <Globe className={`w-5 h-5 ${isConnected ? "text-emerald-500" : "text-red-500"}`} />
+             <Globe className={`w-5 h-5 ${isConnected ? "text-emerald-500" : "text-amber-500"}`} />
              {isConnected && (
                <motion.span 
                  className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full"
@@ -172,7 +236,7 @@ export function WarRoom() {
               War Room: Global Telemetry
             </h2>
             <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest leading-none">
-              {isConnected ? "Secure Channel [TX/RX]" : "Connecting to EventBus..."}
+              {isConnected ? "Live Telemetry Feed [TX/RX Connected]" : "Connecting to Event Mesh..."}
             </p>
           </div>
         </div>
@@ -182,6 +246,16 @@ export function WarRoom() {
             <Metric title="PULSES" value={pulses.length} icon={<CloudLightning className="w-3 h-3 text-amber-500" />} />
             <Metric title="TOTAL" value={events.length} icon={<Activity className="w-3 h-3 text-blue-500" />} />
           </div>
+
+          <button
+            onClick={handleSimulatePulse}
+            disabled={simulating}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold font-mono bg-red-950/70 hover:bg-red-900/70 text-red-300 border border-red-700/60 transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            {simulating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5 text-red-400" />}
+            Simulate Pulse
+          </button>
+
           <button 
             onClick={() => setIsFullScreen(!isFullScreen)}
             className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 transition-colors"
@@ -229,71 +303,71 @@ export function WarRoom() {
               }
             </Geographies>
 
-            {/* Attack Arcs */}
-            {pulses.map((pulse) => (
-              <React.Fragment key={pulse.id}>
-                <motion.path
-                  d={`M ${pulse.from[0]} ${pulse.from[1]} Q ${(pulse.from[0] + pulse.to[0])/2} -50 ${pulse.to[0]} ${pulse.to[1]}`}
-                  fill="none"
-                  stroke="rgba(245, 158, 11, 0.4)"
-                  strokeWidth="1"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                />
-                <Marker coordinates={pulse.to}>
-                  <circle r={2} fill="#ef4444" />
-                  <motion.circle
-                    r={6}
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth={1}
-                    initial={{ scale: 0.5, opacity: 1 }}
-                    animate={{ scale: 2.5, opacity: 0 }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                  />
+            {/* Map Markers for Events */}
+            {events.map((e) => {
+              if (!e.payload?.geo?.lng || !e.payload?.geo?.lat) return null;
+              return (
+                <Marker key={e.id} coordinates={[e.payload.geo.lng, e.payload.geo.lat]}>
+                  <g>
+                    <circle
+                      r={e.priority === 4 ? 6 : 4}
+                      className={
+                        e.type === "exploit.success"
+                          ? "fill-amber-500"
+                          : e.priority === 4
+                          ? "fill-red-500"
+                          : "fill-blue-500"
+                      }
+                      opacity={0.8}
+                    />
+                    <motion.circle
+                      r={14}
+                      className={
+                        e.priority === 4 ? "stroke-red-500" : "stroke-amber-500"
+                      }
+                      fill="none"
+                      strokeWidth={1.5}
+                      initial={{ scale: 0.5, opacity: 1 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ repeat: Infinity, duration: 2.5, ease: "easeOut" }}
+                    />
+                  </g>
                 </Marker>
-              </React.Fragment>
-            ))}
-
-            {/* Static Active Markers from Events */}
-            {events.filter(e => e.payload.geo).slice(0, 10).map((event) => (
-                <Marker key={event.id} coordinates={[event.payload.geo!.lng, event.payload.geo!.lat]}>
-                    <circle r={1.5} fill={event.priority >= 3 ? "#ef4444" : "#3b82f6"} />
-                </Marker>
-            ))}
+              );
+            })}
           </ComposableMap>
         </div>
 
-        {/* Sidebar Ticker Area */}
-        <div className="flex-1 min-w-[320px] bg-zinc-900/30 border-l border-zinc-800 flex flex-col">
-          <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-              <Terminal className="w-3 h-3" /> Event Ticker
+        {/* Live Attack Ticker Sidebar */}
+        <div className="flex-[1.4] flex flex-col bg-zinc-950/80 border-t lg:border-t-0 lg:border-l border-zinc-800 overflow-hidden">
+          <div className="px-4 py-3 bg-zinc-900/40 border-b border-zinc-800 flex items-center justify-between">
+            <span className="text-xs font-mono font-bold text-zinc-400 flex items-center gap-2">
+              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+              THREAT_FEED.STREAM
             </span>
-            <span className="text-[10px] text-zinc-600 font-mono">LIVE_FEED_v2.0</span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">
+              {events.length} EVENTS BUFFERED
+            </span>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" ref={tickerRef}>
-            <AnimatePresence mode="popLayout">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+            <AnimatePresence initial={false}>
               {events.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-20">
-                   <Activity className="w-12 h-12 mb-4" />
-                   <p className="text-xs font-mono">Awaiting incoming signals...</p>
+                <div className="h-full flex flex-col items-center justify-center text-zinc-600 font-mono text-xs">
+                  <Activity className="w-8 h-8 mb-2 opacity-20" />
+                  WAITING FOR TELEMETRY...
                 </div>
               ) : (
                 events.map((event) => (
                   <motion.div
                     key={event.id}
-                    layout
-                    initial={{ opacity: 0, x: -20, height: 0 }}
-                    animate={{ opacity: 1, x: 0, height: "auto" }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="p-3 bg-zinc-900/60 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors group"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="p-3 bg-zinc-900/40 hover:bg-zinc-900/70 rounded-xl border border-zinc-800/80 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                       <div className="p-2 rounded-lg bg-black/40 group-hover:bg-black/60 transition-colors">
+                       <div className="mt-0.5 p-1 bg-black/40 rounded-lg border border-zinc-800">
                           {getEventIcon(event.type)}
                        </div>
                        <div className="flex-1 min-w-0">
@@ -306,34 +380,34 @@ export function WarRoom() {
                              </span>
                           </div>
                           <p className={`text-xs font-bold leading-tight line-clamp-2 ${getPriorityColor(event.priority)}`}>
-                             {event.payload.message || event.type.replace(/\./g, ' ').toUpperCase()}
+                             {event.payload?.message || event.type.replace(/\./g, ' ').toUpperCase()}
                           </p>
                           {event.target && (
                              <div className="mt-2 flex items-center justify-between">
-                               <p className="text-[10px] text-zinc-500 flex items-center gap-1 font-mono">
-                                  <Target className="w-2 h-2" /> {event.target}
-                               </p>
-                               {event.type === "finding.discovered" && (
-                                 <button
-                                   onClick={() => handleHealNow(event)}
-                                   disabled={healingEvents[event.id] === 'running' || healingEvents[event.id] === 'success'}
-                                   className={`text-[9px] px-2 py-1 rounded uppercase font-bold tracking-widest transition-colors flex items-center gap-1
-                                     ${healingEvents[event.id] === 'success' ? 'bg-emerald-500/20 text-emerald-400' 
-                                     : healingEvents[event.id] === 'error' ? 'bg-red-500/20 text-red-400'
-                                     : healingEvents[event.id] === 'running' ? 'bg-zinc-800 text-zinc-500'
-                                     : 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 border border-emerald-500/30'}`}
-                                 >
-                                   {healingEvents[event.id] === 'running' ? (
-                                     <><Loader2 className="w-2 h-2 animate-spin" /> Healing</>
-                                   ) : healingEvents[event.id] === 'success' ? (
-                                     <><CheckCircle className="w-2 h-2" /> Healed</>
-                                   ) : healingEvents[event.id] === 'error' ? (
-                                     <><XCircle className="w-2 h-2" /> Failed</>
-                                   ) : (
-                                     <><Shield className="w-2 h-2" /> Heal Now</>
-                                   )}
-                                 </button>
-                               )}
+                               <p className="text-[10px] text-zinc-500 flex items-center gap-1 font-mono truncate max-w-[150px]">
+                                  <Target className="w-2.5 h-2.5 shrink-0" /> {event.target}
+                                </p>
+                                {event.type === "finding.discovered" && (
+                                  <button
+                                    onClick={() => handleHealNow(event)}
+                                    disabled={healingEvents[event.id] === 'running' || healingEvents[event.id] === 'success'}
+                                    className={`text-[9px] px-2 py-1 rounded uppercase font-bold tracking-widest transition-colors flex items-center gap-1
+                                      ${healingEvents[event.id] === 'success' ? 'bg-emerald-500/20 text-emerald-400' 
+                                      : healingEvents[event.id] === 'error' ? 'bg-red-500/20 text-red-400'
+                                      : healingEvents[event.id] === 'running' ? 'bg-zinc-800 text-zinc-500'
+                                      : 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 border border-emerald-500/30'}`}
+                                  >
+                                    {healingEvents[event.id] === 'running' ? (
+                                      <><Loader2 className="w-2 h-2 animate-spin" /> Healing</>
+                                    ) : healingEvents[event.id] === 'success' ? (
+                                      <><CheckCircle className="w-2 h-2" /> Healed</>
+                                    ) : healingEvents[event.id] === 'error' ? (
+                                      <><XCircle className="w-2 h-2" /> Failed</>
+                                    ) : (
+                                      <><Shield className="w-2 h-2" /> Heal Now</>
+                                    )}
+                                  </button>
+                                )}
                              </div>
                           )}
                        </div>

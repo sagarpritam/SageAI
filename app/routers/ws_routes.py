@@ -10,15 +10,17 @@ import asyncio
 import json
 import logging
 from collections import defaultdict
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel
 
 from app.services.warroom_service import warroom_manager
 
 logger = logging.getLogger("SageAI.ws")
 
-router = APIRouter(tags=["WebSocket"])
+router = APIRouter(tags=["WebSocket & WarRoom"])
 
 # In-memory channel: scan_id → set of connected websockets
 _channels: dict[str, set[WebSocket]] = defaultdict(set)
@@ -50,9 +52,10 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
         # Keep connection alive, listen for client disconnect
         while True:
             try:
-                await asyncio.wait_for(websocket.receive_text(), timeout=300)
+                # Expect ping every 30s from client, or timeout in 60s
+                await asyncio.wait_for(websocket.receive_text(), timeout=60)
             except asyncio.TimeoutError:
-                # Send ping to check if client is still alive
+                # Send keepalive ping
                 await websocket.send_json({"type": "ping"})
     except WebSocketDisconnect:
         pass
@@ -61,6 +64,17 @@ async def scan_progress_ws(websocket: WebSocket, scan_id: UUID):
         if not _channels[scan_id_str]:
             del _channels[scan_id_str]
         logger.info(f"WS disconnected for scan {scan_id_str}")
+
+
+# ── Global WarRoom WebSocket & HTTP REST Endpoints ──────────
+
+
+class WarRoomEventIn(BaseModel):
+    type: str = "finding.discovered"
+    source: str = "DefenseGrid"
+    target: str = "api.internal.corp"
+    priority: int = 3
+    payload: Dict[str, Any] = {}
 
 
 @router.websocket("/ws/warroom")
@@ -78,6 +92,25 @@ async def warroom_ws(websocket: WebSocket):
         logger.error(f"WarRoom WS error: {e}")
     finally:
         warroom_manager.disconnect(websocket)
+
+
+@router.get("/warroom/events")
+async def get_warroom_events(limit: int = 50):
+    """HTTP REST endpoint returning current War Room attack and telemetry events."""
+    return {"status": "success", "events": warroom_manager.get_history(limit=limit)}
+
+
+@router.post("/warroom/events")
+async def post_warroom_event(event_in: WarRoomEventIn):
+    """Dispatch a telemetry event to the War Room."""
+    evt = await warroom_manager.emit_event(
+        event_type=event_in.type,
+        source=event_in.source,
+        target=event_in.target,
+        payload=event_in.payload,
+        priority=event_in.priority,
+    )
+    return {"status": "success", "event": evt}
 
 
 # ── Deep Search WebSocket ─────────────────────────
@@ -100,14 +133,7 @@ async def broadcast_deep_search_progress(session_id: str, data: dict):
 
 @router.websocket("/ws/deep-search/{session_id}")
 async def deep_search_ws(websocket: WebSocket, session_id: str):
-    """WebSocket endpoint for real-time deep search progress.
-
-    Clients receive JSON messages:
-      {"event": "entity_search_started", "entity": "example.com", "depth": 0}
-      {"event": "entity_search_complete", "entity": "example.com", "findings_count": 12}
-      {"event": "pivots_discovered", "parent": "example.com", "pivots": [...]}
-      {"event": "session_complete", "total_entities": 8, "total_findings": 45}
-    """
+    """WebSocket endpoint for real-time deep search progress."""
     await websocket.accept()
     _deep_search_channels[session_id].add(websocket)
     logger.info(

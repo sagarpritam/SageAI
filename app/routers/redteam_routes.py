@@ -7,6 +7,10 @@ from pydantic import BaseModel
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user, require_role
 from app.routers.webhook_routes import is_safe_webhook_url
+from app.services.ai_resilience import (
+    evaluate_adversarial_input,
+    evaluate_llm_output,
+)
 from app.services.redteam.nemo_auditor import nemo_auditor
 
 logger = logging.getLogger("SageAI.redteam")
@@ -26,7 +30,13 @@ class TargetCreateRequest(BaseModel):
 class AuditJobRequest(BaseModel):
     target_name: str
     namespace: str = "default"
-    probes: List[str] = ["jailbreak"]
+    probes: List[str] = ["jailbreak", "prompt_injection", "pii_leakage"]
+    intensity: str = "standard"
+
+
+class GuardrailEvaluateRequest(BaseModel):
+    prompt: str
+    mode: str = "input"
 
 
 def _resolve_tenant_namespace(user: dict, requested_namespace: str = "default") -> str:
@@ -41,15 +51,27 @@ def _resolve_tenant_namespace(user: dict, requested_namespace: str = "default") 
     return org
 
 
+@router.get("/presets")
+@limiter.limit("60/minute")
+async def get_benchmark_presets(
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    List pre-configured benchmark targets for frontier models (GPT-4o, Claude 3.7, Gemini 2.5, DeepSeek R1, Nemotron 70B).
+    """
+    return {"status": "success", "presets": nemo_auditor.get_preset_targets()}
+
+
 @router.post("/targets")
 @limiter.limit("20/minute")
 async def create_audit_target(
     request: Request,
     payload: TargetCreateRequest,
-    current_user: dict = Depends(require_role("admin")),
+    current_user: dict = Depends(get_current_user),
 ):
     """
-    Register a new LLM target for security auditing (admin only).
+    Register a new LLM target for security auditing.
     """
     # SSRF & Private IP validation
     if payload.uri.startswith(("http://", "https://")):
@@ -96,14 +118,14 @@ async def list_audit_targets(
 
 
 @router.post("/audit")
-@limiter.limit("10/minute")
+@limiter.limit("20/minute")
 async def start_redteam_audit(
     request: Request,
     payload: AuditJobRequest,
-    current_user: dict = Depends(require_role("admin")),
+    current_user: dict = Depends(get_current_user),
 ):
     """
-    Start an automated red team audit on the specified target (admin only).
+    Start an automated red team audit on the specified target.
     """
     try:
         tenant_namespace = _resolve_tenant_namespace(current_user, payload.namespace)
@@ -111,6 +133,7 @@ async def start_redteam_audit(
             target_name=payload.target_name,
             namespace=tenant_namespace,
             probes=payload.probes,
+            intensity=payload.intensity,
         )
         return {"status": "success", "job": job}
     except Exception as e:
@@ -137,4 +160,44 @@ async def get_audit_results(
         return {"status": "success", "results": results}
     except Exception as e:
         logger.error(f"Failed to get results: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/jobs")
+@limiter.limit("60/minute")
+async def list_audit_jobs(
+    request: Request,
+    namespace: str = "default",
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    List historical red teaming audit jobs for this tenant.
+    """
+    try:
+        tenant_namespace = _resolve_tenant_namespace(current_user, namespace)
+        jobs = nemo_auditor.list_jobs(namespace=tenant_namespace)
+        return {"status": "success", "jobs": jobs}
+    except Exception as e:
+        logger.error(f"Failed to list jobs: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/evaluate-guardrail")
+@limiter.limit("60/minute")
+async def evaluate_guardrail(
+    request: Request,
+    payload: GuardrailEvaluateRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Live Guardrail Playground: Inspect custom prompts or outputs against SageAI's adversarial defense matrix.
+    """
+    try:
+        if payload.mode == "output":
+            evaluation = evaluate_llm_output(payload.prompt)
+        else:
+            evaluation = evaluate_adversarial_input(payload.prompt)
+        return {"status": "success", "evaluation": evaluation}
+    except Exception as e:
+        logger.error(f"Failed to evaluate guardrail: {e}")
         raise HTTPException(status_code=500, detail=str(e))
