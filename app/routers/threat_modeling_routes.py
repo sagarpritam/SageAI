@@ -29,6 +29,18 @@ class ParseIaCRequest(BaseModel):
     manifest_text: str = Field(..., description="Terraform HCL or Kubernetes YAML manifest text")
 
 
+class ParseMermaidRequest(BaseModel):
+    mermaid_text: str = Field(..., description="Mermaid diagram text (graph TD, flowchart, etc.)")
+
+
+class ExportReportRequest(BaseModel):
+    threat_model: Dict[str, Any] = Field(..., description="Completed threat model data dictionary")
+
+
+class GeneratePatchRequest(BaseModel):
+    patch_type: str = Field(..., description="Identifier for required mitigation patch")
+
+
 @router.get("/templates")
 @limiter.limit("60/minute")
 async def get_threat_model_templates(
@@ -66,6 +78,17 @@ async def analyze_system_threat_model(
     return result
 
 
+@router.post("/parse-mermaid")
+@limiter.limit("30/minute")
+async def parse_mermaid_diagram_endpoint(
+    request: Request,
+    payload: ParseMermaidRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Parses Mermaid architecture diagrams into components, data flows, and trust boundaries."""
+    return threat_modeling_engine.parse_mermaid_diagram(payload.mermaid_text)
+
+
 @router.post("/parse-openapi")
 @limiter.limit("30/minute")
 async def parse_openapi_spec_endpoint(
@@ -87,3 +110,32 @@ async def parse_iac_manifest_endpoint(
     """Parses Terraform or Kubernetes manifest into architectural components for threat modeling."""
     return threat_modeling_engine.parse_iac_manifest(payload.manifest_text)
 
+
+@router.post("/export-report")
+@limiter.limit("30/minute")
+async def export_threat_model_report(
+    request: Request,
+    payload: ExportReportRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Generates an executive CISO Markdown Threat Modeling report with Merkle seal."""
+    report_md = threat_modeling_engine.generate_threat_model_report(payload.threat_model)
+    return {
+        "status": "success",
+        "markdown_report": report_md,
+    }
+
+
+@router.post("/generate-patch")
+@limiter.limit("30/minute")
+async def generate_mitigation_patch_endpoint(
+    request: Request,
+    payload: GeneratePatchRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Generates executable remediation code patch diff or virtual WAF configuration."""
+    patch = threat_modeling_engine.generate_mitigation_diff(payload.patch_type)
+    return {
+        "status": "success",
+        "patch": patch,
+    }
