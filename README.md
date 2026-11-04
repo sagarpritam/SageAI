@@ -3,9 +3,9 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-349%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-86%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-85%2B%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Tests](https://img.shields.io/badge/tests-356%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-90%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-90%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
 [![Version](https://img.shields.io/badge/version-2.5.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
@@ -100,6 +100,12 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 ### 🌐 4. Real-Time SOC War Room
 - **Hybrid WebSocket + HTTP Polling Fallback**: Real-time threat telemetry resilient to serverless cold starts.
 - **Distributed Event Bus**: Connects SageStrike Kafka/Redis streaming telemetry with live attack maps, geo-coordinates, and pulse simulations.
+
+### 🔒 5. Multi-Region Zero Data Egress Edge Enclaves
+- **Sovereign Regional Enclaves**: Partitioned execution zones across **Americas (us-east-1)** (NIST SP 800-53 / FedRAMP High), **European Union (eu-central-1)** (GDPR Chapter V Art. 44-49 / BSI C5), and **Asia-Pacific (ap-southeast-1)** (Singapore PDPA / MAS TRM Level 3).
+- **Client-Side Envelope Encryption**: AES-256-GCM + HKDF-SHA256 authenticated key derivation with region-bound Authenticated Associated Data (AAD), mathematically prohibiting cross-regional data movement even under credential compromise.
+- **Zero-Egress Secret Scrubbing**: Real-time regex and Shannon entropy tokenization engine that catches AWS credentials, asymmetric private keys, database URIs, JWTs, high-entropy API secrets, and PII before cross-boundary transmission.
+- **Cryptographic Sovereignty Verification**: Autonomous multi-region verification drill with real-time Merkle audit ledger anchoring guaranteeing zero-leakage compliance.
 
 ---
 

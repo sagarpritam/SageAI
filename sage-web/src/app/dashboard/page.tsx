@@ -23,6 +23,7 @@ import {
   Network,
   Crosshair,
   ShieldCheck,
+  Lock,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -46,10 +47,12 @@ import { IncidentCenter } from "@/components/IncidentCenter";
 import { DefenseGridMonitor } from "@/components/DefenseGridMonitor";
 import { CyberRangeArena } from "@/components/CyberRangeArena";
 import { EnterpriseSecurityHub } from "@/components/EnterpriseSecurityHub";
+import { ZeroEgressEnclave } from "@/components/ZeroEgressEnclave";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "enterprise", label: "Enterprise Hub", icon: ShieldCheck },
+  { id: "enclave", label: "Zero Egress Enclave", icon: Lock },
   { id: "consensus", label: "Multi-AI Debate", icon: Swords },
   { id: "deep-analysis", label: "Deep Attacks", icon: Flame },
   { id: "detonation", label: "Malware Lab", icon: Biohazard },
@@ -118,6 +121,7 @@ export default function DashboardPage() {
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
           {activeTab === "enterprise" && <EnterpriseSecurityHub />}
+          {activeTab === "enclave" && <ZeroEgressEnclave />}
           {activeTab === "consensus" && <AIConsensusArena />}
           {activeTab === "deep-analysis" && <DeepAnalysisPanel />}
           {activeTab === "detonation" && <DetonationChamber />}
