@@ -6,6 +6,7 @@ import axios from "axios";
 import { MFASettings } from "./MFASettings";
 import { RBACMatrix } from "./RBACMatrix";
 import { EmailReportSettings } from "./EmailReportSettings";
+import { SSOConfigPanel } from "./SSOConfigPanel";
 
 export function SecuritySettings() {
   const [currentPw, setCurrentPw] = useState("");
@@ -75,6 +76,7 @@ export function SecuritySettings() {
         <EmailReportSettings />
       </div>
 
+      <SSOConfigPanel />
       <RBACMatrix />
     </div>
   );
