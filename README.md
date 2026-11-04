@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-384%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-110%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-105%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-2.6.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-390%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-115%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-110%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-2.6.1%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -114,8 +114,9 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **Automated Mitigation Tickets**: Generates prioritized Jira and GitHub Issues action checklists with tamper-evident Merkle seal receipts.
 
 ### ⚛️ 7. Post-Quantum Cryptography (PQC) Migration Layer
-- **NIST FIPS 203 ML-KEM-768**: Lattice-based Module Learning with Errors (M-LWE) key encapsulation mechanism paired with Classical X25519 in a dual-layer hybrid architecture.
-- **NIST FIPS 204 ML-DSA-65**: Module Learning with Rounding (M-LWR) digital signatures paired with Ed25519.
+- **NIST FIPS 203 ML-KEM-768 (Kyber)**: Lattice-based Module Learning with Errors (M-LWE) key encapsulation mechanism paired with Classical X25519 in a dual-layer hybrid architecture (RFC 7748 + FIPS 203).
+- **NIST FIPS 204 ML-DSA-65 (Dilithium-3)**: Lattice-based Module Learning with Rounding (M-LWR) unforgeable digital signatures paired with Classical Ed25519 (RFC 8032 + FIPS 204).
+- **Future-Proof Zero-Egress Sovereign Payloads**: Seals sensitive cross-enclave packets with zero-leakage tokenization, Kyber-768 hybrid encapsulation, Dilithium-3 digital signatures, and sovereign regional boundary binding (US FedRAMP, EU GDPR, APAC PDPA) anchored in the SHA-256 Merkle chain.
 - **HNDL Quantum Risk Scanner**: Audits TLS ciphersuites and certificates against cryptanalytically relevant quantum computers (CRQCs) with automated migration paths to satisfy the 2030 CNSA 2.0 quantum mandate.
 
 ### ⚡ 8. Decentralized SIEM & eBPF Telemetry Agent
@@ -288,7 +289,7 @@ pytest tests/test_phase04_sagepatch.py -v
 
 ### Test Suite Summary:
 ```text
-======================== 384 passed, 2 warnings in 66.80s ========================
+======================== 390 passed, 2 warnings in 84.13s ========================
 - 10-Capability Enterprise Security Drill Suite: 4/4 passed (100%)
 - AI Red-Teaming & Adversarial Guardrails: 8/8 passed (100%)
 - War Room Telemetry & Distributed Events: 2/2 passed (100%)
@@ -296,16 +297,16 @@ pytest tests/test_phase04_sagepatch.py -v
 - Multi-Tenant Isolation & RLS Security: 5/5 passed (100%)
 - Zero Egress Enclaves & Tokenizer: 8/8 passed (100%)
 - Threat Modeling STRIDE/DREAD Engine: 8/8 passed (100%)
-- Post-Quantum Hybrid Cryptography: 8/8 passed (100%)
+- Post-Quantum Hybrid Cryptography (Kyber + Dilithium): 14/14 passed (100%)
 - Decentralized SIEM & eBPF Telemetry: 7/7 passed (100%)
 - Next-5 Defense Grid (CSPM, SBOM, ZTNA, MITRE BAS, EASM): 8/8 passed (100%)
-- Total Pytest Test Suite: 384 / 384 passing (100%)
-- Next.js Turbopack Build: 110 / 110 routes compiled with 0 errors
+- Total Pytest Test Suite: 390 / 390 passing (100%)
+- Next.js Turbopack Build: 115 / 115 routes compiled with 0 errors
 ```
 
 ---
 
-## 📡 API Reference Overview (105+ Endpoints)
+## 📡 API Reference Overview (110+ Endpoints)
 
 ### 1. Enterprise Security Grid & Orchestrator
 | Method | Endpoint | Description |
@@ -386,6 +387,19 @@ pytest tests/test_phase04_sagepatch.py -v
 | :--- | :--- | :--- |
 | `POST` | `/easm/scan` | Discovers perimeter assets, detects dangling DNS takeovers, and grades security posture |
 
+### 13. Post-Quantum Cryptography (ML-KEM / ML-DSA) & Zero-Egress Payloads
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/pqc/generate-keys` | Generates dual Classical X25519 + NIST FIPS 203 ML-KEM-768 (Kyber) keypair |
+| `POST` | `/pqc/generate-signing-keys` | Generates dual Classical Ed25519 + NIST FIPS 204 ML-DSA-65 (Dilithium) signing keypair |
+| `POST` | `/pqc/sign` | Digitally signs payload with unforgeable hybrid Ed25519 + ML-DSA-65 signatures |
+| `POST` | `/pqc/verify-signature` | Cryptographically verifies both Ed25519 and ML-DSA-65 digital signatures |
+| `POST` | `/pqc/encrypt` | Quantum-safe envelope encryption using hybrid KEM encapsulation and AES-256-GCM |
+| `POST` | `/pqc/decrypt` | Decapsulates shared secret and decrypts quantum-safe payload |
+| `POST` | `/pqc/scan-risk` | Audits TLS ciphersuites against Harvest-Now-Decrypt-Later (HNDL) quantum risk |
+| `POST` | `/pqc/zero-egress/seal` | Sanitizes, hybrid encapsulates (Kyber), and signs (Dilithium) zero-egress payloads |
+| `POST` | `/pqc/zero-egress/unseal` | Validates enclave boundary, verifies Dilithium signature, and decapsulates zero-egress data |
+
 ---
 
 ## 🔒 Enterprise Governance & Compliance
@@ -432,22 +446,22 @@ SageAI/
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
 │   ├── app/               # App Router pages (Dashboard, Scans, Intel, War Room, Command Center)
-│   ├── app/api/           # 110 API routes and proxy endpoints
+│   ├── app/api/           # 115 API routes and proxy endpoints
 │   └── components/        # 54 Tailwind & Lucide React UI Components
-│       ├── CSPMHub.tsx                # 🆕 Multi-cloud CIS Benchmarks & toxic combinations
-│       ├── SupplyChainStudio.tsx      # 🆕 CycloneDX 1.5 SBOM viewer & typosquat alerts
-│       ├── ZTNAManager.tsx            # 🆕 Zero-Trust trust scoring & microsegmentation
-│       ├── AdversaryMatrixViewer.tsx  # 🆕 MITRE ATT&CK 14-tactic heatmap & BAS drills
-│       ├── EASMHunter.tsx             # 🆕 Dangling DNS takeover scanner & shadow IT hunter
+│       ├── QuantumSafeStudio.tsx      # 🆕 NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
+│       ├── CSPMHub.tsx                # Multi-cloud CIS Benchmarks & toxic combinations
+│       ├── SupplyChainStudio.tsx      # CycloneDX 1.5 SBOM viewer & typosquat alerts
+│       ├── ZTNAManager.tsx            # Zero-Trust trust scoring & microsegmentation
+│       ├── AdversaryMatrixViewer.tsx  # MITRE ATT&CK 14-tactic heatmap & BAS drills
+│       ├── EASMHunter.tsx             # Dangling DNS takeover scanner & shadow IT hunter
 │       ├── ThreatModelingStudio.tsx   # STRIDE + DREAD threat modeling canvas
-│       ├── PQCMigrationStudio.tsx     # Post-quantum migration & HNDL scan viewer
 │       ├── EBPFTelemetryCenter.tsx    # Kernel syscall telemetry & container sandbox
-│       ├── ZeroEgressConsole.tsx      # Multi-region zero data egress enclave monitor
+│       ├── ZeroEgressEnclave.tsx      # Multi-region zero data egress enclave monitor
 │       ├── EnterpriseSecurityHub.tsx  # 10-Capability Command Center & Drill Console
 │       ├── WarRoom.tsx                # Real-time threat telemetry & geographic map
 │       ├── AutoFixPanel.tsx           # SagePatch proposal studio & AST diff editor
 │       └── RedTeamPanel.tsx           # Multi-model adversarial audit playground
-├── tests/                 # 384 tests across 60 test suites (100% passing)
+├── tests/                 # 390 tests across 61 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```
