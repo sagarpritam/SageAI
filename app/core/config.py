@@ -2,6 +2,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
@@ -82,6 +83,13 @@ class Settings(BaseSettings):
     APP_NAME: str = "SageAI Security Scanner"
     ENV: str = "development"
     DEBUG: bool = False
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, v: object) -> bool:
+        if isinstance(v, str):
+            return v.lower() in ("true", "1", "yes", "debug", "dev", "development")
+        return bool(v)
 
     # Internal service communication
     INTERNAL_SERVICE_KEY: str = ""  # Shared secret for Next.js → FastAPI service JWTs

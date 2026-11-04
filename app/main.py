@@ -34,6 +34,7 @@ from app.routers import (
     deception_routes,
     deep_analysis_routes,
     email_report_routes,
+    enterprise_routes,
     explain_routes,
     gdpr_routes,
     incident_routes,
@@ -205,6 +206,7 @@ app.include_router(malware_routes.router)
 app.include_router(rule_synthesizer_routes.router)
 app.include_router(intrusion_routes.router)
 app.include_router(simulation_routes.router)
+app.include_router(enterprise_routes.router)
 app.include_router(sso_routes.router)
 
 
