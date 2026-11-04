@@ -19,6 +19,7 @@ from app.core.telemetry import TracingMiddleware
 from app.middleware.audit import AuditLogMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import (
+    adversary_routes,
     agent_routes,
     ai_chat_routes,
     ai_command_routes,
@@ -31,9 +32,11 @@ from app.routers import (
     ci_routes,
     consensus_routes,
     copilot_routes,
+    cspm_routes,
     deception_routes,
     deep_analysis_routes,
     email_report_routes,
+    easm_routes,
     ebpf_routes,
     enclave_routes,
     enterprise_routes,
@@ -58,10 +61,12 @@ from app.routers import (
     schedule_routes,
     simulation_routes,
     sso_routes,
+    supply_chain_routes,
     telemetry_routes,
     threat_modeling_routes,
     webhook_routes,
     ws_routes,
+    ztna_routes,
 )
 from app.services.warroom_service import warroom_manager
 
@@ -216,6 +221,11 @@ app.include_router(sso_routes.router)
 app.include_router(threat_modeling_routes.router)
 app.include_router(pqc_routes.router)
 app.include_router(ebpf_routes.router)
+app.include_router(cspm_routes.router)
+app.include_router(supply_chain_routes.router)
+app.include_router(ztna_routes.router)
+app.include_router(adversary_routes.router)
+app.include_router(easm_routes.router)
 
 
 # ---------------------

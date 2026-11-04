@@ -26,6 +26,8 @@ import {
   Lock,
   Cpu,
   Terminal,
+  Cloud,
+  Package,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -53,6 +55,11 @@ import { ZeroEgressEnclave } from "@/components/ZeroEgressEnclave";
 import { ThreatModelingStudio } from "@/components/ThreatModelingStudio";
 import { QuantumSafeStudio } from "@/components/QuantumSafeStudio";
 import { EBPFTelemetryMonitor } from "@/components/EBPFTelemetryMonitor";
+import { CSPMHub } from "@/components/CSPMHub";
+import { SupplyChainStudio } from "@/components/SupplyChainStudio";
+import { ZTNAManager } from "@/components/ZTNAManager";
+import { AdversaryMatrixViewer } from "@/components/AdversaryMatrixViewer";
+import { EASMHunter } from "@/components/EASMHunter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -61,6 +68,11 @@ const tabs = [
   { id: "threat-modeling", label: "Threat Modeling", icon: FileCheck },
   { id: "quantum-safe", label: "Quantum Safe PQC", icon: Cpu },
   { id: "ebpf-telemetry", label: "eBPF SIEM", icon: Terminal },
+  { id: "cspm", label: "Cloud Posture", icon: Cloud },
+  { id: "supply-chain", label: "Supply Chain", icon: Package },
+  { id: "ztna", label: "Zero-Trust", icon: Network },
+  { id: "adversary-matrix", label: "MITRE ATT&CK", icon: Swords },
+  { id: "easm", label: "Shadow IT", icon: Globe },
   { id: "consensus", label: "Multi-AI Debate", icon: Swords },
   { id: "deep-analysis", label: "Deep Attacks", icon: Flame },
   { id: "detonation", label: "Malware Lab", icon: Biohazard },
@@ -133,6 +145,11 @@ export default function DashboardPage() {
           {activeTab === "threat-modeling" && <ThreatModelingStudio />}
           {activeTab === "quantum-safe" && <QuantumSafeStudio />}
           {activeTab === "ebpf-telemetry" && <EBPFTelemetryMonitor />}
+          {activeTab === "cspm" && <CSPMHub />}
+          {activeTab === "supply-chain" && <SupplyChainStudio />}
+          {activeTab === "ztna" && <ZTNAManager />}
+          {activeTab === "adversary-matrix" && <AdversaryMatrixViewer />}
+          {activeTab === "easm" && <EASMHunter />}
           {activeTab === "consensus" && <AIConsensusArena />}
           {activeTab === "deep-analysis" && <DeepAnalysisPanel />}
           {activeTab === "detonation" && <DetonationChamber />}

@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-376%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-102%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-98%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-2.5.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-384%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-110%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-105%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-2.6.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -123,6 +123,34 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **Container Escape Detection**: Detects namespace switching to host (`CLONE_NEWNS`, `setns`), Docker socket mounting, and `CAP_SYS_ADMIN` escalation.
 - **Zero-Overhead Ring Buffer**: In-memory circular FIFO stream with zero drop rate under heavy syscall load.
 - **Autonomous Process Quarantine**: Immediate process isolation (SIGKILL emulation), network socket traffic drop, and cgroup freeze anchored in the SHA-256 Merkle chain.
+
+### ☁️ 9. Autonomous Cloud Security Posture Management (CSPM & CIEM)
+- **Multi-Cloud CIS Benchmarks**: Continuous automated compliance evaluation across **AWS**, **Azure**, **GCP**, and **Kubernetes** with detailed severity scoring and audit evidence trails.
+- **Toxic Combination Risk Correlation**: Identifies compound attack paths where publicly accessible network interfaces, over-privileged IAM roles (`AdministratorAccess`, `iam:*`), and unencrypted sensitive data stores intersect.
+- **IAM Privilege Escalation Analysis**: Detects dangerous permission combinations (`iam:PassRole`, `sts:AssumeRole`, `ec2:RunInstances`) that permit horizontal and vertical privilege escalation.
+- **Automated Remediation Script Synthesis**: One-click generation of hardened Terraform HCL and AWS CLI / Azure CLI remediation scripts.
+
+### 📦 10. Software Supply Chain Security & CycloneDX 1.5 SBOM
+- **Multi-Ecosystem Manifest Ingestion**: Parses Python (`requirements.txt`, `Pipfile`), Node.js (`package.json`), and lockfiles to construct deep dependency trees.
+- **CycloneDX 1.5 JSON Compliance**: Generates standards-compliant Software Bill of Materials (SBOM) with canonical package URLs (`purl`), licenses, and deterministic SHA-256 cryptographic component digests.
+- **Typosquatting & Impersonation Engine**: Employs Levenshtein distance analysis across package registries (PyPI, npm) to flag malicious lookalikes (e.g. `requsts`, `colorama`, `lodsh`).
+- **Transitive CVE & EPSS Correlation**: Maps vulnerabilities through multi-tier transitive dependency trees with EPSS exploit prediction scoring and one-click patch recommendations.
+
+### 🛡️ 11. Zero-Trust Network Access (ZTNA) & Identity-Aware Micro-Segmentation
+- **Dynamic Contextual Trust Scoring (0-100)**: Evaluates authenticated identity, device compliance posture (CrowdStrike, Microsoft Defender), hardware MFA (FIDO2 / WebAuthn, YubiKey), hardware disk encryption (BitLocker / FileVault), and geolocation / IP risk indicators.
+- **Continuous Policy Enforcement**: Four-tier adaptive access control decisions: `ALLOW_FULL_ACCESS` ($\ge 75$), `REQUIRE_STEP_UP_MFA` ($50-74$), `RESTRICTED_SANDBOX_ACCESS` ($25-49$), and `TERMINATE_AND_QUARANTINE` ($< 25$).
+- **L7 NetworkPolicy Synthesizer**: Generates production-ready **Cilium L7 NetworkPolicy** and Envoy Service Mesh configurations for cryptographically isolated, least-privilege east-west pod and service communication.
+
+### 🎯 12. Autonomous Adversary Emulation & Interactive MITRE ATT&CK Matrix
+- **Complete 14-Tactic MITRE ATT&CK Matrix**: Comprehensive visualization covering Initial Access, Execution, Persistence, Privilege Escalation, Defense Evasion, Credential Access, Discovery, Lateral Movement, Collection, Command & Control, Exfiltration, Impact, Resource Development, and Reconnaissance.
+- **APT Adversary Profiles**: Pre-calibrated emulation playbooks for **APT29 (Cozy Bear / SVR)**, **FIN7 (Carbanak)**, and **Volt Typhoon (Living-off-the-Land)**.
+- **Autonomous BAS Drill Runner**: Simulates multi-stage adversarial operations, measures detection latency, validates defensive telemetry (eBPF, WAF, NIDS), and surfaces actionable detection gap remediation.
+
+### 🔭 13. Continuous External Attack Surface Management (EASM) & Shadow IT Hunter
+- **Perimeter Reconnaissance & Asset Discovery**: Enumerates public domains, subdomains, certificates, open ports, and cloud service endpoints.
+- **Dangling DNS & Subdomain Takeover Hunter**: Non-intrusive heuristic detection of orphan CNAME records pointing to deprovisioned cloud services across AWS S3 (`NoSuchBucket`), GitHub Pages (`404`), Heroku (`No such app`), and Azure Traffic Manager.
+- **Shadow IT Discovery**: Uncovers unmanaged cloud storage buckets, unprotected staging/dev environments, exposed CI/CD instances, and orphaned microservice endpoints.
+- **Perimeter Security Grade ($A+$ to $F$)**: Calculates holistic exposure grades with step-by-step containment instructions.
 
 ---
 
@@ -260,19 +288,24 @@ pytest tests/test_phase04_sagepatch.py -v
 
 ### Test Suite Summary:
 ```text
-======================== 349 passed, 2 warnings in 69.53s ========================
+======================== 384 passed, 2 warnings in 66.80s ========================
 - 10-Capability Enterprise Security Drill Suite: 4/4 passed (100%)
 - AI Red-Teaming & Adversarial Guardrails: 8/8 passed (100%)
 - War Room Telemetry & Distributed Events: 2/2 passed (100%)
 - SagePatch Sandboxed AST Remediation: 10/10 passed (100%)
 - Multi-Tenant Isolation & RLS Security: 5/5 passed (100%)
-- Total Pytest Test Suite: 349 / 349 passing (100%)
-- Next.js Turbopack Build: 86 / 86 routes compiled with 0 errors
+- Zero Egress Enclaves & Tokenizer: 8/8 passed (100%)
+- Threat Modeling STRIDE/DREAD Engine: 8/8 passed (100%)
+- Post-Quantum Hybrid Cryptography: 8/8 passed (100%)
+- Decentralized SIEM & eBPF Telemetry: 7/7 passed (100%)
+- Next-5 Defense Grid (CSPM, SBOM, ZTNA, MITRE BAS, EASM): 8/8 passed (100%)
+- Total Pytest Test Suite: 384 / 384 passing (100%)
+- Next.js Turbopack Build: 110 / 110 routes compiled with 0 errors
 ```
 
 ---
 
-## 📡 API Reference Overview (85+ Endpoints)
+## 📡 API Reference Overview (105+ Endpoints)
 
 ### 1. Enterprise Security Grid & Orchestrator
 | Method | Endpoint | Description |
@@ -325,6 +358,34 @@ pytest tests/test_phase04_sagepatch.py -v
 | `POST` | `/warroom/events` | Emits high-priority threat telemetry pulse to all active listeners |
 | `WS` | `/warroom/ws` | Real-time bi-directional threat streaming WebSocket |
 
+### 8. Cloud Security Posture Management (CSPM & CIEM)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/cspm/audit` | Multi-cloud CIS benchmark audit, IAM escalation, and toxic combination evaluation |
+| `POST` | `/cspm/remediation-script` | Generates automated Terraform HCL and CLI remediation script for misconfigurations |
+
+### 9. Software Supply Chain Security & SBOM
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/supply-chain/scan` | Parses manifests, generates CycloneDX 1.5 JSON SBOM, flags typosquats, maps CVEs |
+
+### 10. Zero-Trust Network Access (ZTNA) & Microsegmentation
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/ztna/evaluate-trust` | Dynamic contextual trust score ($0-100$) from identity, device posture, and MFA |
+| `POST` | `/ztna/synthesize-policy` | Synthesizes Cilium L7 NetworkPolicy and Envoy service mesh configurations |
+
+### 11. Autonomous Adversary Emulation & MITRE ATT&CK Matrix
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/adversary/matrix` | Retrieves full 14-tactic MITRE ATT&CK Enterprise matrix & APT profiles |
+| `POST` | `/adversary/run-drill` | Dispatches autonomous Breach and Attack Simulation (BAS) drill with telemetry audit |
+
+### 12. Continuous External Attack Surface Management (EASM)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/easm/scan` | Discovers perimeter assets, detects dangling DNS takeovers, and grades security posture |
+
 ---
 
 ## 🔒 Enterprise Governance & Compliance
@@ -343,18 +404,27 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database engine, JWT, rate limiting, telemetry
 │   ├── models/            # 17 SQLAlchemy models (Scan, Finding, Asset, RemediationPatch...)
-│   ├── routers/           # 40 API router modules (Enterprise, Deception, Intrusion, SOAR...)
+│   ├── routers/           # 45 API router modules (CSPM, Supply Chain, ZTNA, Adversary, EASM...)
 │   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
-│   │   ├── orchestrator/            # 🆕 Enterprise Security Orchestrator (10 Pillars)
-│   │   ├── malware/                 # 🆕 Reverse engineering & PE/ELF disassembly sandbox
-│   │   ├── deception/               # 🆕 Honeypot decoys, canary tokens, intrusion mesh
-│   │   ├── detection/               # 🆕 Ingress WAF, NIDS monitor, UEBA anomaly engine
-│   │   ├── incident_response/       # 🆕 SOAR engine & guarded human-in-the-loop playbooks
-│   │   ├── threat_feed/             # 🆕 CISA KEV indexer & YARA/Sigma/Nuclei rule forge
-│   │   ├── redteam/                 # 🆕 NeMo microservices & multi-model adversarial audits
-│   │   ├── simulation/              # 🆕 Cyber Range simulator & APT kill chain scenarios
-│   │   ├── sagepatch/               # 🆕 AST code remediation & PR generation studio
+│   │   ├── orchestrator/            # Enterprise Security Orchestrator (10 Pillars)
+│   │   ├── cloud_posture/           # 🆕 Multi-cloud CSPM, CIEM & toxic combination engine
+│   │   ├── supply_chain/            # 🆕 CycloneDX 1.5 SBOM generator & typosquat detector
+│   │   ├── ztna/                    # 🆕 Contextual Zero-Trust scoring & Cilium L7 synthesizer
+│   │   ├── adversary/               # 🆕 MITRE ATT&CK 14-tactic matrix & BAS emulator
+│   │   ├── easm/                    # 🆕 External surface recon & dangling DNS takeover hunter
+│   │   ├── enclave/                 # Multi-region zero data egress edge enclaves
+│   │   ├── threat_modeling/         # STRIDE + DREAD threat modeling engine
+│   │   ├── pqc/                     # NIST FIPS 203/204 Post-Quantum Cryptography layer
+│   │   ├── ebpf/                    # Kernel-space eBPF SIEM & process quarantine agent
+│   │   ├── malware/                 # Reverse engineering & PE/ELF disassembly sandbox
+│   │   ├── deception/               # Honeypot decoys, canary tokens, intrusion mesh
+│   │   ├── detection/               # Ingress WAF, NIDS monitor, UEBA anomaly engine
+│   │   ├── incident_response/       # SOAR engine & guarded human-in-the-loop playbooks
+│   │   ├── threat_feed/             # CISA KEV indexer & YARA/Sigma/Nuclei rule forge
+│   │   ├── redteam/                 # NeMo microservices & multi-model adversarial audits
+│   │   ├── simulation/              # Cyber Range simulator & APT kill chain scenarios
+│   │   ├── sagepatch/               # AST code remediation & PR generation studio
 │   │   ├── intelligence/            # 9 OSINT intelligence modules (Shodan, Censys, Babel X...)
 │   │   ├── agent/                   # Multi-agent autonomous swarm (Recon, Scanner, Exploit)
 │   │   ├── audit_chain.py           # Cryptographic SHA-256 Merkle hash chain ledger
@@ -362,14 +432,22 @@ SageAI/
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
 │   ├── app/               # App Router pages (Dashboard, Scans, Intel, War Room, Command Center)
-│   ├── app/api/           # 86 API routes and proxy endpoints
-│   └── components/        # 49 Tailwind & Lucide React UI Components
-│       ├── EnterpriseSecurityHub.tsx  # 🆕 10-Capability Command Center & Drill Console
+│   ├── app/api/           # 110 API routes and proxy endpoints
+│   └── components/        # 54 Tailwind & Lucide React UI Components
+│       ├── CSPMHub.tsx                # 🆕 Multi-cloud CIS Benchmarks & toxic combinations
+│       ├── SupplyChainStudio.tsx      # 🆕 CycloneDX 1.5 SBOM viewer & typosquat alerts
+│       ├── ZTNAManager.tsx            # 🆕 Zero-Trust trust scoring & microsegmentation
+│       ├── AdversaryMatrixViewer.tsx  # 🆕 MITRE ATT&CK 14-tactic heatmap & BAS drills
+│       ├── EASMHunter.tsx             # 🆕 Dangling DNS takeover scanner & shadow IT hunter
+│       ├── ThreatModelingStudio.tsx   # STRIDE + DREAD threat modeling canvas
+│       ├── PQCMigrationStudio.tsx     # Post-quantum migration & HNDL scan viewer
+│       ├── EBPFTelemetryCenter.tsx    # Kernel syscall telemetry & container sandbox
+│       ├── ZeroEgressConsole.tsx      # Multi-region zero data egress enclave monitor
+│       ├── EnterpriseSecurityHub.tsx  # 10-Capability Command Center & Drill Console
 │       ├── WarRoom.tsx                # Real-time threat telemetry & geographic map
 │       ├── AutoFixPanel.tsx           # SagePatch proposal studio & AST diff editor
-│       ├── IncidentCenter.tsx         # SOAR triage & human-in-the-loop containment
 │       └── RedTeamPanel.tsx           # Multi-model adversarial audit playground
-├── tests/                 # 349 tests across 55 test suites (100% passing)
+├── tests/                 # 384 tests across 60 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```
