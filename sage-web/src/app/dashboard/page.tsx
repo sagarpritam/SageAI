@@ -24,6 +24,8 @@ import {
   Crosshair,
   ShieldCheck,
   Lock,
+  Cpu,
+  Terminal,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -48,11 +50,17 @@ import { DefenseGridMonitor } from "@/components/DefenseGridMonitor";
 import { CyberRangeArena } from "@/components/CyberRangeArena";
 import { EnterpriseSecurityHub } from "@/components/EnterpriseSecurityHub";
 import { ZeroEgressEnclave } from "@/components/ZeroEgressEnclave";
+import { ThreatModelingStudio } from "@/components/ThreatModelingStudio";
+import { QuantumSafeStudio } from "@/components/QuantumSafeStudio";
+import { EBPFTelemetryMonitor } from "@/components/EBPFTelemetryMonitor";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "enterprise", label: "Enterprise Hub", icon: ShieldCheck },
   { id: "enclave", label: "Zero Egress Enclave", icon: Lock },
+  { id: "threat-modeling", label: "Threat Modeling", icon: FileCheck },
+  { id: "quantum-safe", label: "Quantum Safe PQC", icon: Cpu },
+  { id: "ebpf-telemetry", label: "eBPF SIEM", icon: Terminal },
   { id: "consensus", label: "Multi-AI Debate", icon: Swords },
   { id: "deep-analysis", label: "Deep Attacks", icon: Flame },
   { id: "detonation", label: "Malware Lab", icon: Biohazard },
@@ -122,6 +130,9 @@ export default function DashboardPage() {
           {activeTab === "overview" && <DashboardOverview />}
           {activeTab === "enterprise" && <EnterpriseSecurityHub />}
           {activeTab === "enclave" && <ZeroEgressEnclave />}
+          {activeTab === "threat-modeling" && <ThreatModelingStudio />}
+          {activeTab === "quantum-safe" && <QuantumSafeStudio />}
+          {activeTab === "ebpf-telemetry" && <EBPFTelemetryMonitor />}
           {activeTab === "consensus" && <AIConsensusArena />}
           {activeTab === "deep-analysis" && <DeepAnalysisPanel />}
           {activeTab === "detonation" && <DetonationChamber />}

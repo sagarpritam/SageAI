@@ -34,6 +34,7 @@ from app.routers import (
     deception_routes,
     deep_analysis_routes,
     email_report_routes,
+    ebpf_routes,
     enclave_routes,
     enterprise_routes,
     explain_routes,
@@ -49,6 +50,7 @@ from app.routers import (
     password_routes,
     payment_routes,
     posture_routes,
+    pqc_routes,
     redteam_routes,
     report_routes,
     rule_synthesizer_routes,
@@ -57,6 +59,7 @@ from app.routers import (
     simulation_routes,
     sso_routes,
     telemetry_routes,
+    threat_modeling_routes,
     webhook_routes,
     ws_routes,
 )
@@ -210,6 +213,9 @@ app.include_router(simulation_routes.router)
 app.include_router(enterprise_routes.router)
 app.include_router(enclave_routes.router)
 app.include_router(sso_routes.router)
+app.include_router(threat_modeling_routes.router)
+app.include_router(pqc_routes.router)
+app.include_router(ebpf_routes.router)
 
 
 # ---------------------
