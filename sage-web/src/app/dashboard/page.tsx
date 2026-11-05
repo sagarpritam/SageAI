@@ -96,9 +96,13 @@ import { DarkWebRadarCenter } from "@/components/DarkWebRadarCenter";
 import { ZKPComplianceStudio } from "@/components/ZKPComplianceStudio";
 import { D3FENDMatrixViewer } from "@/components/D3FENDMatrixViewer";
 import { HardwareEnclaveStudio } from "@/components/HardwareEnclaveStudio";
+import { ThreatHuntingSwarmStudio } from "@/components/ThreatHuntingSwarmStudio";
+import { CanaryFabricCenter } from "@/components/CanaryFabricCenter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "hunting-swarm", label: "Hunter Swarm", icon: Bot },
+  { id: "canary-fabric", label: "Canary Fabric", icon: Radio },
   { id: "hardware-enclave", label: "Hardware Enclave", icon: Cpu },
   { id: "web3-security", label: "Web3 Security", icon: Coins },
   { id: "sdn-shield", label: "SDN Micro-Shield", icon: Zap },
@@ -197,6 +201,8 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "hunting-swarm" && <ThreatHuntingSwarmStudio />}
+          {activeTab === "canary-fabric" && <CanaryFabricCenter />}
           {activeTab === "hardware-enclave" && <HardwareEnclaveStudio />}
           {activeTab === "web3-security" && <Web3SecurityStudio />}
           {activeTab === "sdn-shield" && <SDNShieldStudio />}

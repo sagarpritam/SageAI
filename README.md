@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-423%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-161%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-149%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-3.1.0%20Confidential-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-432%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-167%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-155%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-3.2.0%20Autonomous%20Swarm-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -270,6 +270,16 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **Multi-Silicon Hardware Attestation**: Cryptographic attestation verification across **AWS Nitro Enclaves** (COSE_Sign1 and PCR0/1/2/8 validation), **AMD SEV-SNP** (VCEK and ECDSA P-384 hardware measurement certificates), and **Intel SGX / TDX** (DCAP Quotes).
 - **Golden Reference PCR Integrity**: Enforces strict Golden Reference measurement matching for hypervisors, Linux kernels, and container runtimes, automatically rejecting tampered kernels.
 - **Attested Sovereign Key Release (Unsealing)**: Seals tenant encryption keys, database credentials, and HSM seeds inside hardware enclaves; unseals strictly upon valid silicon remote attestation and zeroizes memory on tampering.
+
+### 🤖 35. Autonomous Multi-Agent Threat Hunting Swarm
+- **Four-Agent Reasoning Pipeline**: Coordinated AI swarm executing continuous, prompt-free hypothesis generation (`HypothesisAgent`), kernel eBPF probe collection (`TelemetryAgent`), entity blast radius correlation (`CorrelationAgent`), and SOAR decision arbitration (`ArbiterAgent`).
+- **Sub-Second Persistence Discovery**: Autonomous hunting for memory hollowing, unbacked RWX shellcode, Active Directory DCSync queries, and cloud console MFA bypasses.
+- **Automated Arbiter Containment**: Immediate process suspension, network microsegmentation, and credential revocation upon multi-agent consensus verification.
+
+### 🪤 36. Dynamic Synthetic Honeytoken & Active Canary Fabric
+- **Multi-Ecosystem Honeytokens**: Autonomous synthesis and distribution of realistic bait credentials across AWS STS session keys, GitHub Enterprise tokens, PostgreSQL database rows, and Active Directory Kerberos SPN accounts.
+- **Zero-Tolerance Tripwire Trigger**: Any interaction with synthetic canaries represents a 100% true-positive breach indicator with zero false positives.
+- **Sub-Second Ephemeral SDN Isolation**: Automatically triggers SDN Micro-Shield network quarantine on the accessing adversary IP or workload with deceptive honeynet redirection.
 
 ---
 

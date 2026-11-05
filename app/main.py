@@ -34,6 +34,7 @@ from app.routers import (
     autofix_routes,
     billing_routes,
     bloodhound_routes,
+    canary_fabric_routes,
     cart_routes,
     ci_routes,
     consensus_routes,
@@ -82,6 +83,7 @@ from app.routers import (
     supply_chain_routes,
     telemetry_routes,
     threat_hunting_routes,
+    threat_hunting_swarm_routes,
     threat_modeling_routes,
     web3_security_routes,
     webhook_routes,
@@ -268,6 +270,8 @@ app.include_router(darkweb_radar_routes.router)
 app.include_router(zkp_routes.router)
 app.include_router(d3fend_routes.router)
 app.include_router(enclave_attestation_routes.router)
+app.include_router(threat_hunting_swarm_routes.router)
+app.include_router(canary_fabric_routes.router)
 
 
 # ---------------------
