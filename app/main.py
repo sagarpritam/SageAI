@@ -66,6 +66,7 @@ from app.routers import (
     iac_drift_routes,
     incident_routes,
     industrial_scada_routes,
+    intergrid_failover_routes,
     integration_routes,
     intelligence_hub_routes,
     intrusion_routes,
@@ -76,6 +77,7 @@ from app.routers import (
     malware_routes,
     mfa_routes,
     micro_hotpatch_routes,
+    neural_bci_routes,
     notification_routes,
     org_routes,
     orbital_laser_routes,
@@ -94,6 +96,7 @@ from app.routers import (
     sdn_shield_routes,
     simulation_routes,
     sso_routes,
+    subsea_cable_routes,
     supply_chain_routes,
     telecom_5g_routes,
     telemetry_routes,
@@ -304,6 +307,9 @@ app.include_router(regulatory_commander_routes.router)
 app.include_router(telecom_5g_routes.router)
 app.include_router(orbital_laser_routes.router)
 app.include_router(ai_immune_routes.router)
+app.include_router(subsea_cable_routes.router)
+app.include_router(neural_bci_routes.router)
+app.include_router(intergrid_failover_routes.router)
 
 
 # ---------------------

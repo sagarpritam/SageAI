@@ -50,6 +50,8 @@ import {
   Scale,
   Antenna,
   Dna,
+  Waves,
+  Brain,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -121,9 +123,15 @@ import { RegulatoryIncidentCommanderStudio } from "@/components/RegulatoryIncide
 import { Telecom5GSliceStudio } from "@/components/Telecom5GSliceStudio";
 import { OrbitalLaserMeshStudio } from "@/components/OrbitalLaserMeshStudio";
 import { AIImmuneDefenseStudio } from "@/components/AIImmuneDefenseStudio";
+import { SubseaCableStudio } from "@/components/SubseaCableStudio";
+import { NeuralBCIStudio } from "@/components/NeuralBCIStudio";
+import { InterGridFailoverStudio } from "@/components/InterGridFailoverStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "subsea-cable", label: "Subsea Fiber", icon: Waves },
+  { id: "neural-bci", label: "Neural BCI", icon: Brain },
+  { id: "intergrid-failover", label: "Inter-Grid", icon: Zap },
   { id: "telecom-5g", label: "5G/6G RAN", icon: Antenna },
   { id: "orbital-laser", label: "Orbital Laser", icon: Globe2 },
   { id: "ai-immune", label: "AI Immune", icon: Dna },
@@ -240,6 +248,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "subsea-cable" && <SubseaCableStudio />}
+          {activeTab === "neural-bci" && <NeuralBCIStudio />}
+          {activeTab === "intergrid-failover" && <InterGridFailoverStudio />}
           {activeTab === "telecom-5g" && <Telecom5GSliceStudio />}
           {activeTab === "orbital-laser" && <OrbitalLaserMeshStudio />}
           {activeTab === "ai-immune" && <AIImmuneDefenseStudio />}
