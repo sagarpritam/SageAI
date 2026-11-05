@@ -83,3 +83,4 @@ async def run_campaign_endpoint(
         return {"status": "success", "campaign_report": res}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+

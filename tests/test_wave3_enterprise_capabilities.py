@@ -158,3 +158,4 @@ def test_wave3_routers(client):
         assert "analysis" in res.json()
     finally:
         app.dependency_overrides.clear()
+

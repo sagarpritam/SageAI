@@ -71,3 +71,4 @@ async def get_slsa_provenance_endpoint(
 ):
     """Generates SLSA Level 3 Cryptographic Build Provenance."""
     return sbom_vex_engine.generate_slsa_provenance(artifact_name=artifact_name or "sageai-core.tar.gz")
+

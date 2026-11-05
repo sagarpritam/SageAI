@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-402%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-138%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-125%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-2.8.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-408%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-148%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-135%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-2.9.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -210,6 +210,36 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **Crown Jewel Kill-Chain Traversal**: Traverses all multi-hop attack vectors to high-value assets (Customer PII Database, Active Directory Domain Controller, S3 Master Data Vault).
 - **Graph Centrality & Choke-Point Identification**: Computes path intersection centrality to pinpoint the singular bottleneck node or edge whose severance breaks **80%+ of all attack paths**.
 - **Dynamic Blast Radius Metric & Auto-Severance**: Computes a 0-100 blast radius score and executes automated network microsegmentation and IAM privilege stripping to collapse attack vectors.
+
+### 🤖 24. AI Security Posture Management (AI-SPM) & LLM Defense
+- **Continuous OWASP Top 10 for LLMs Auditing**: Real-time evaluation of prompt injection (LLM01), sensitive data disclosure (LLM02), supply chain poisoning (LLM03), and unconstrained agency (LLM06).
+- **Real-Time Jailbreak & Semantic Filtering**: Intercepts role-override jailbreaks (`ignore previous instructions`, `DAN`, `developer mode`) and sensitive secret leaks.
+- **RAG Knowledge Store Scanning**: Scans vector embedding chunks for data contamination and indirect prompt injection.
+- **Automated Colang 2.0 Guardrails**: Auto-synthesizes NeMo guardrail policies for boundary enforcement.
+
+### 🔐 25. Sovereign KMS HSM & Shamir's Secret Sharing Quorum
+- **FIPS 140-3 Level 3 Hardware Security Module**: Automated cryptographic key rotation, versioning, and real-time memory zeroization.
+- **Shamir's Secret Sharing ($k$-of-$n$ Quorum)**: Splits critical master secrets into $n$ threshold shares over a 521-bit Mersenne prime field ($GF(2^{521}-1)$), requiring a minimum threshold of $k$ custodian shares to authorize high-impact actions.
+- **Multi-Custodian Governance**: Prohibits unilateral rogue destruction of production assets or firewall isolation without multi-party cryptographic quorum.
+
+### 🏰 26. Active Directory & BloodHound Attack Graph Engine
+- **Tier-0 Domain Attack Topology**: Deep graph modeling of Windows Active Directory and Entra ID forests, domain controllers, and admin groups.
+- **High-Risk Kerberos Attack Vectors**:
+  - *Kerberoasting (T1558.003)*: Service accounts with registered SPNs and legacy RC4-HMAC ciphers.
+  - *AS-REP Roasting (T1558.004)*: Accounts configured with `DONT_REQ_PREAUTH`.
+  - *DCSync Rights*: Non-admin identities with `DS-Replication-Get-Changes-All` permissions capable of dumping all NTDS.dit hashes.
+  - *Unconstrained Delegation*: Machine accounts permitted to forward TGTs.
+- **Automated PowerShell Lockdown**: Emits production-ready PowerShell scripts for instant Active Directory ACL remediation.
+
+### 🔬 27. Autonomous Live Forensics & Volatility Acquisition Engine
+- **Non-Disruptive Memory Acquisition**: Captures volatile memory, parent-child process anomalies (e.g. `nginx` -> `sh` -> `/dev/shm/.beacon`), and active C2 sockets.
+- **Unbacked RWX Shellcode Carving**: Inspects unbacked executable memory allocations (`PAGE_EXECUTE_READWRITE`) and renders byte hex previews.
+- **Chain of Custody Legal Preservation**: Generates SHA-256 evidence seals, encrypted TAR packages, and RFC 3161 cryptographic timestamp receipts.
+
+### 🛡️ 28. API Security & Microservices Boundary Shield (BOLA/BFLA Engine)
+- **OWASP API Security Top 10 Discovery**: Tests REST, GraphQL, and gRPC microservices for Broken Object Level Authorization (BOLA/IDOR), Mass Assignment, and Broken Function Level Authorization (BFLA).
+- **Tenant Scope Enforcement**: Flags endpoints accepting unvalidated resource IDs in URI paths.
+- **Open Policy Agent (OPA) Rego Synthesis**: Generates production-ready OPA Rego authorization policies and Envoy service mesh filter rules.
 
 ---
 

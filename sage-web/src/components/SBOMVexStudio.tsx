@@ -179,3 +179,4 @@ export function SBOMVexStudio() {
     </div>
   );
 }
+

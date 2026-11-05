@@ -35,6 +35,9 @@ import {
   GitPullRequest,
   Fingerprint,
   PackageCheck,
+  Bot,
+  KeyRound,
+  Microscope,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -77,9 +80,19 @@ import { IaCDriftEngine } from "@/components/IaCDriftEngine";
 import { SBOMVexStudio } from "@/components/SBOMVexStudio";
 import { ITDRCommandCenter } from "@/components/ITDRCommandCenter";
 import { CARTHub } from "@/components/CARTHub";
+import { AISPMCommandCenter } from "@/components/AISPMCommandCenter";
+import { KMSHSMStudio } from "@/components/KMSHSMStudio";
+import { BloodHoundStudio } from "@/components/BloodHoundStudio";
+import { ForensicsLab } from "@/components/ForensicsLab";
+import { APIShieldCenter } from "@/components/APIShieldCenter";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "ai-spm", label: "AI-SPM & LLMs", icon: Bot },
+  { id: "kms-hsm", label: "KMS HSM & Shamir", icon: KeyRound },
+  { id: "bloodhound", label: "Active Directory", icon: Network },
+  { id: "forensics", label: "Live Forensics", icon: Microscope },
+  { id: "api-shield", label: "API Shield (BOLA)", icon: ShieldAlert },
   { id: "adversary-emulation", label: "Adversary Emulation", icon: Crosshair },
   { id: "iac-drift", label: "IaC Drift Engine", icon: GitPullRequest },
   { id: "sbom-vex", label: "SBOM & OpenVEX", icon: PackageCheck },
@@ -167,6 +180,11 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "ai-spm" && <AISPMCommandCenter />}
+          {activeTab === "kms-hsm" && <KMSHSMStudio />}
+          {activeTab === "bloodhound" && <BloodHoundStudio />}
+          {activeTab === "forensics" && <ForensicsLab />}
+          {activeTab === "api-shield" && <APIShieldCenter />}
           {activeTab === "adversary-emulation" && <AdversaryEmulationStudio />}
           {activeTab === "iac-drift" && <IaCDriftEngine />}
           {activeTab === "sbom-vex" && <SBOMVexStudio />}

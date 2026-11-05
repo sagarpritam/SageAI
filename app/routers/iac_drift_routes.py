@@ -65,3 +65,4 @@ async def generate_pr_endpoint(
         return {"status": "success", "pull_request": pr_result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+

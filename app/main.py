@@ -24,6 +24,8 @@ from app.routers import (
     ai_chat_routes,
     ai_command_routes,
     ai_soc_routes,
+    ai_spm_routes,
+    api_shield_routes,
     apikey_routes,
     asm_routes,
     asset_routes,
@@ -31,6 +33,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     billing_routes,
+    bloodhound_routes,
     cart_routes,
     ci_routes,
     consensus_routes,
@@ -46,6 +49,7 @@ from app.routers import (
     enclave_routes,
     enterprise_routes,
     explain_routes,
+    forensics_routes,
     gdpr_routes,
     iac_drift_routes,
     incident_routes,
@@ -53,6 +57,7 @@ from app.routers import (
     intelligence_hub_routes,
     intrusion_routes,
     itdr_routes,
+    kms_hsm_routes,
     malware_routes,
     mfa_routes,
     notification_routes,
@@ -246,6 +251,11 @@ app.include_router(iac_drift_routes.router)
 app.include_router(sbom_vex_routes.router)
 app.include_router(itdr_routes.router)
 app.include_router(cart_routes.router)
+app.include_router(ai_spm_routes.router)
+app.include_router(kms_hsm_routes.router)
+app.include_router(bloodhound_routes.router)
+app.include_router(forensics_routes.router)
+app.include_router(api_shield_routes.router)
 
 
 # ---------------------
