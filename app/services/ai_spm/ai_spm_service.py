@@ -252,3 +252,4 @@ class AISPMService:
 
 # Global instance
 ai_spm_service = AISPMService()
+

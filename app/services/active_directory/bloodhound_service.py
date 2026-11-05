@@ -204,3 +204,4 @@ class BloodHoundService:
 
 # Global instance
 bloodhound_service = BloodHoundService()
+

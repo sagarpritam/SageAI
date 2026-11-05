@@ -38,6 +38,11 @@ import {
   Bot,
   KeyRound,
   Microscope,
+  Coins,
+  Zap,
+  Skull,
+  FileCheck2,
+  Grid3X3,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -85,9 +90,19 @@ import { KMSHSMStudio } from "@/components/KMSHSMStudio";
 import { BloodHoundStudio } from "@/components/BloodHoundStudio";
 import { ForensicsLab } from "@/components/ForensicsLab";
 import { APIShieldCenter } from "@/components/APIShieldCenter";
+import { Web3SecurityStudio } from "@/components/Web3SecurityStudio";
+import { SDNShieldStudio } from "@/components/SDNShieldStudio";
+import { DarkWebRadarCenter } from "@/components/DarkWebRadarCenter";
+import { ZKPComplianceStudio } from "@/components/ZKPComplianceStudio";
+import { D3FENDMatrixViewer } from "@/components/D3FENDMatrixViewer";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "web3-security", label: "Web3 Security", icon: Coins },
+  { id: "sdn-shield", label: "SDN Micro-Shield", icon: Zap },
+  { id: "darkweb-radar", label: "Dark Web Radar", icon: Skull },
+  { id: "zkp-compliance", label: "ZKP Attestation", icon: FileCheck2 },
+  { id: "d3fend-matrix", label: "MITRE D3FEND", icon: Grid3X3 },
   { id: "ai-spm", label: "AI-SPM & LLMs", icon: Bot },
   { id: "kms-hsm", label: "KMS HSM & Shamir", icon: KeyRound },
   { id: "bloodhound", label: "Active Directory", icon: Network },
@@ -180,6 +195,11 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "web3-security" && <Web3SecurityStudio />}
+          {activeTab === "sdn-shield" && <SDNShieldStudio />}
+          {activeTab === "darkweb-radar" && <DarkWebRadarCenter />}
+          {activeTab === "zkp-compliance" && <ZKPComplianceStudio />}
+          {activeTab === "d3fend-matrix" && <D3FENDMatrixViewer />}
           {activeTab === "ai-spm" && <AISPMCommandCenter />}
           {activeTab === "kms-hsm" && <KMSHSMStudio />}
           {activeTab === "bloodhound" && <BloodHoundStudio />}

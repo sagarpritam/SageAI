@@ -166,3 +166,4 @@ def test_wave4_routers(client):
         assert "api_audit_report" in res.json()
     finally:
         app.dependency_overrides.clear()
+

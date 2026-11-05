@@ -53,3 +53,4 @@ async def generate_timeline_endpoint(
         return {"status": "success", "timeline": timeline}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+

@@ -40,6 +40,8 @@ from app.routers import (
     copilot_routes,
     cspm_routes,
     cti_routes,
+    d3fend_routes,
+    darkweb_radar_routes,
     deception_routes,
     deep_analysis_routes,
     dspm_routes,
@@ -73,14 +75,17 @@ from app.routers import (
     sbom_vex_routes,
     scan_routes,
     schedule_routes,
+    sdn_shield_routes,
     simulation_routes,
     sso_routes,
     supply_chain_routes,
     telemetry_routes,
     threat_hunting_routes,
     threat_modeling_routes,
+    web3_security_routes,
     webhook_routes,
     ws_routes,
+    zkp_routes,
     ztna_routes,
 )
 from app.services.warroom_service import warroom_manager
@@ -256,6 +261,11 @@ app.include_router(kms_hsm_routes.router)
 app.include_router(bloodhound_routes.router)
 app.include_router(forensics_routes.router)
 app.include_router(api_shield_routes.router)
+app.include_router(web3_security_routes.router)
+app.include_router(sdn_shield_routes.router)
+app.include_router(darkweb_radar_routes.router)
+app.include_router(zkp_routes.router)
+app.include_router(d3fend_routes.router)
 
 
 # ---------------------

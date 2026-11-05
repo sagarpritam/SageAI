@@ -161,3 +161,4 @@ class ForensicsService:
 
 # Global instance
 forensics_service = ForensicsService()
+

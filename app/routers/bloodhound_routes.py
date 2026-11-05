@@ -51,3 +51,4 @@ async def generate_lockdown_endpoint(
         return {"status": "success", "lockdown_script": script}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+

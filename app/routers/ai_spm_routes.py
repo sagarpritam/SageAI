@@ -63,3 +63,4 @@ async def audit_pipeline_endpoint(
         tools_enabled=payload.tools_enabled,
     )
     return {"status": "success", "pipeline_audit": res}
+

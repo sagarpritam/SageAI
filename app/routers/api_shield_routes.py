@@ -49,3 +49,4 @@ async def get_opa_rego_endpoint(
     """Synthesizes an Open Policy Agent (OPA) Rego policy to enforce zero-trust API boundaries."""
     policy = api_shield_service.generate_opa_rego_policy()
     return {"status": "success", "opa_policy": policy}
+

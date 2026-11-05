@@ -191,3 +191,4 @@ class APIShieldService:
 
 # Global instance
 api_shield_service = APIShieldService()
+
