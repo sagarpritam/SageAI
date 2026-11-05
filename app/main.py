@@ -59,10 +59,12 @@ from app.routers import (
     enclave_routes,
     enterprise_routes,
     explain_routes,
+    firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
     iac_drift_routes,
     incident_routes,
+    industrial_scada_routes,
     integration_routes,
     intelligence_hub_routes,
     intrusion_routes,
@@ -81,6 +83,7 @@ from app.routers import (
     pqc_routes,
     ransomware_routes,
     redteam_routes,
+    regulatory_commander_routes,
     report_routes,
     rule_synthesizer_routes,
     sbom_vex_routes,
@@ -292,6 +295,9 @@ app.include_router(crossplane_mesh_routes.router)
 app.include_router(kyber_mesh_vpn_routes.router)
 app.include_router(labyrinth_honeynet_routes.router)
 app.include_router(airgap_llm_guard_routes.router)
+app.include_router(firmware_attestation_routes.router)
+app.include_router(industrial_scada_routes.router)
+app.include_router(regulatory_commander_routes.router)
 
 
 # ---------------------

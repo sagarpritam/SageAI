@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-451%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-189%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-185%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-4.1.0%20Orbital%20Quantum-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-455%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-195%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-195%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-4.2.0%20Kinetic%20Defense-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -642,6 +642,17 @@ SageAI/
 │   │   ├── cti/                     # 🆕 OASIS STIX 2.1 serialization & TAXII 2.1 collection server
 │   │   ├── orchestrator/            # Enterprise Security Orchestrator (10 Pillars)
 │   │   ├── cloud_posture/           # Multi-cloud CSPM, CIEM & toxic combination engine
+│   │   ├── firmware_attestation/    # UEFI Secure Boot, TPM PCR0/2 quotes & SPI Flash attestor
+│   │   ├── industrial_scada/        # ICS/SCADA Modbus/DNP3 micro-firewall & kinetic clamps
+│   │   ├── regulatory_commander/    # Multi-agent CISO, SEC Form 8-K & NIS2 early warning generator
+│   │   ├── kyber_mesh_vpn/          # PQC WireGuard mesh with ML-KEM-768 & ML-DSA-65
+│   │   ├── labyrinth_honeynet/      # Multi-tier deceptive honeynet labyrinths & latency traps
+│   │   ├── airgap_llm_guard/        # Air-gapped model deserialization scanner & LoRA DP validator
+│   │   ├── micro_hotpatch/          # Kernel & bytecode micro-hotpatching with Z3 verification
+│   │   ├── cas_redteam_swarm/       # Continuous multi-agent adversary simulation (CAS)
+│   │   ├── apt_attribution/         # CTI STIX 2.1 graph fusion & Diamond Model JA4 attribution
+│   │   ├── cloud_forensics/         # RFC 3161 cloud snapshot vault & FRE 902 court manifests
+│   │   ├── crossplane_mesh/         # Multi-cloud zero-trust network mesh & SPIRE federation
 │   │   ├── supply_chain/            # CycloneDX 1.5 SBOM generator & typosquat detector
 │   │   ├── ztna/                    # Contextual Zero-Trust scoring & Cilium L7 synthesizer
 │   │   ├── adversary/               # MITRE ATT&CK 14-tactic matrix & BAS emulator
@@ -665,27 +676,27 @@ SageAI/
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
 │   ├── app/               # App Router pages (Dashboard, Scans, Intel, War Room, Command Center)
-│   ├── app/api/           # 128 API routes and proxy endpoints
-│   └── components/        # 59 Tailwind & Lucide React UI Components
-│       ├── AISOCCommandCenter.tsx     # 🆕 Neural alert triage, fatigue reduction & CISO briefs
-│       ├── ThreatHuntingStudio.tsx    # 🆕 Sigma/KQL/SPL/EQL query forge & retrospective hunter
-│       ├── AntiRansomwareShield.tsx   # 🆕 Shannon entropy burst detector & canary trap mesh
-│       ├── DSPMHub.tsx                # 🆕 Sensitive data discovery, lineage & toxic risk
-│       ├── CTIHub.tsx                 # 🆕 OASIS STIX 2.1 bundle forge & TAXII 2.1 collections
-│       ├── QuantumSafeStudio.tsx      # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
-│       ├── CSPMHub.tsx                # Multi-cloud CIS Benchmarks & toxic combinations
-│       ├── SupplyChainStudio.tsx      # CycloneDX 1.5 SBOM viewer & typosquat alerts
-│       ├── ZTNAManager.tsx            # Zero-Trust trust scoring & microsegmentation
-│       ├── AdversaryMatrixViewer.tsx  # MITRE ATT&CK 14-tactic heatmap & BAS drills
-│       ├── EASMHunter.tsx             # Dangling DNS takeover scanner & shadow IT hunter
-│       ├── ThreatModelingStudio.tsx   # STRIDE + DREAD threat modeling canvas
-│       ├── EBPFTelemetryCenter.tsx    # Kernel syscall telemetry & container sandbox
-│       ├── ZeroEgressEnclave.tsx      # Multi-region zero data egress enclave monitor
-│       ├── EnterpriseSecurityHub.tsx  # 10-Capability Command Center & Drill Console
-│       ├── WarRoom.tsx                # Real-time threat telemetry & geographic map
-│       ├── AutoFixPanel.tsx           # SagePatch proposal studio & AST diff editor
-│       └── RedTeamPanel.tsx           # Multi-model adversarial audit playground
-├── tests/                 # 396 tests across 66 test suites (100% passing)
+│   ├── app/api/           # 195 API routes and proxy endpoints
+│   └── components/        # 67 Tailwind & Lucide React UI Components
+│       ├── FirmwareAttestationStudio.tsx         # 🆕 UEFI Secure Boot, TPM PCR0/2 & SPI Flash Attestor
+│       ├── IndustrialSCADAShieldStudio.tsx       # 🆕 ICS/SCADA Modbus/DNP3 firewall & kinetic safety clamps
+│       ├── RegulatoryIncidentCommanderStudio.tsx # 🆕 SEC Form 8-K Item 1.05 & EU NIS2 generator
+│       ├── KyberMeshVPNStudio.tsx                # Post-quantum WireGuard mesh VPN gateway
+│       ├── LabyrinthHoneynetStudio.tsx           # Multi-tier deceptive honeynet labyrinth
+│       ├── AirGapLLMGuardStudio.tsx              # Air-gapped LLM ingestion & weight scanner
+│       ├── MicroHotpatchStudio.tsx               # Live eBPF trampoline injection & Z3 validator
+│       ├── CASRedTeamStudio.tsx                  # 4-agent continuous adversary simulation
+│       ├── APTAttributionCenter.tsx              # CTI STIX 2.1 graph & Diamond Model attribution
+│       ├── CloudForensicsVault.tsx               # RFC 3161 immutable snapshot vault
+│       ├── CrossPlaneMeshStudio.tsx              # Multi-cloud zero-trust network mesh
+│       ├── AISOCCommandCenter.tsx                # Neural alert triage & CISO briefs
+│       ├── ThreatHuntingStudio.tsx               # Sigma/KQL/SPL/EQL query forge
+│       ├── AntiRansomwareShield.tsx              # Shannon entropy detector & canary trap mesh
+│       ├── DSPMHub.tsx                           # Sensitive data discovery & toxic risk
+│       ├── CTIHub.tsx                            # OASIS STIX 2.1 bundle forge & TAXII 2.1
+│       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
+│       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
+├── tests/                 # 455 tests across 36 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

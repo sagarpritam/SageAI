@@ -47,6 +47,7 @@ import {
   Globe2,
   HardDrive,
   Compass,
+  Scale,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -112,9 +113,15 @@ import { CrossPlaneMeshStudio } from "@/components/CrossPlaneMeshStudio";
 import { KyberMeshVPNStudio } from "@/components/KyberMeshVPNStudio";
 import { LabyrinthHoneynetStudio } from "@/components/LabyrinthHoneynetStudio";
 import { AirGapLLMGuardStudio } from "@/components/AirGapLLMGuardStudio";
+import { FirmwareAttestationStudio } from "@/components/FirmwareAttestationStudio";
+import { IndustrialSCADAShieldStudio } from "@/components/IndustrialSCADAShieldStudio";
+import { RegulatoryIncidentCommanderStudio } from "@/components/RegulatoryIncidentCommanderStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "firmware-attestation", label: "Firmware UEFI", icon: Cpu },
+  { id: "industrial-scada", label: "SCADA Kinetic", icon: Zap },
+  { id: "regulatory-commander", label: "SEC 8-K Legal", icon: Scale },
   { id: "micro-hotpatch", label: "Micro-Hotpatch", icon: Cpu },
   { id: "cas-redteam", label: "CAS Red-Team", icon: Flame },
   { id: "apt-attribution", label: "APT Attribution", icon: Globe2 },
@@ -225,6 +232,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "firmware-attestation" && <FirmwareAttestationStudio />}
+          {activeTab === "industrial-scada" && <IndustrialSCADAShieldStudio />}
+          {activeTab === "regulatory-commander" && <RegulatoryIncidentCommanderStudio />}
           {activeTab === "micro-hotpatch" && <MicroHotpatchStudio />}
           {activeTab === "cas-redteam" && <CASRedTeamStudio />}
           {activeTab === "apt-attribution" && <APTAttributionCenter />}

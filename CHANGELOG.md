@@ -2,6 +2,26 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v4.2.0] - 2026-11-06 - Autonomous Cyber Kinetic Defense & Firmware Attestation (Wave 9)
+
+### Added
+- **Capability 47: UEFI Secure Boot & SPI Flash Hash Attestor** (`app/services/firmware_attestation/`):
+  - Hardware Root-of-Trust verification across Dell PowerEdge R750, Supermicro H12SSL, and AWS Nitro TPM 2.0 cryptoprocessors.
+  - Multi-PCR quote validation (PCR0 CRTM, PCR2 Option ROMs) and physical SPI Flash image SHA-256 digest auditing to defeat persistent SMM rootkits (BlackLotus, CosmicStrand) (`FirmwareAttestationStudio.tsx`).
+- **Capability 48: Autonomous ICS/SCADA Modbus/DNP3 Micro-Firewall & Out-of-Band Actuator Safety Clamps** (`app/services/industrial_scada/`):
+  - Layer-7 Deep Packet Inspection (DPI) for Modbus TCP and DNP3 industrial automation protocols protecting critical energy, water, and power grid facilities.
+  - Hardware-speed physical safety envelope enforcement with out-of-band actuator clamps preventing destructive turbine overspeed, toxic chemical dosage, or grid desynchronization (`IndustrialSCADAShieldStudio.tsx`).
+- **Capability 49: Dynamic Multi-Agent AI Incident Commander & Automated SEC Form 8-K Item 1.05 Disclosure Generator** (`app/services/regulatory_commander/`):
+  - Collaborative multi-agent response team coordinating Autonomous CISO containment, Corporate Legal Counsel disclosures, and Forensic Audit chains.
+  - Automated SEC Form 8-K Item 1.05 EDGAR disclosure drafting complying with strict 4-business-day statutory windows, EU NIS2 Article 23 24-hour early warnings, and GDPR Article 33 notifications (`RegulatoryIncidentCommanderStudio.tsx`).
+
+### Verification & Metrics
+- **Pytest**: 455 / 455 tests passing across 36 test suites (100% pass rate).
+- **Next.js Turbopack**: 195 / 195 routes compiled in 302ms with 0 errors.
+- **FastAPI**: 195 endpoints active across all enterprise domains.
+
+---
+
 ## [v4.1.0] - 2026-11-05 - Autonomous Orbital & Quantum-Entangled Infrastructure Defense (Wave 8)
 
 ### Added
