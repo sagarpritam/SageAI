@@ -23,6 +23,7 @@ from app.routers import (
     agent_routes,
     ai_chat_routes,
     ai_command_routes,
+    ai_soc_routes,
     apikey_routes,
     asm_routes,
     asset_routes,
@@ -33,8 +34,10 @@ from app.routers import (
     consensus_routes,
     copilot_routes,
     cspm_routes,
+    cti_routes,
     deception_routes,
     deep_analysis_routes,
+    dspm_routes,
     email_report_routes,
     easm_routes,
     ebpf_routes,
@@ -54,6 +57,7 @@ from app.routers import (
     payment_routes,
     posture_routes,
     pqc_routes,
+    ransomware_routes,
     redteam_routes,
     report_routes,
     rule_synthesizer_routes,
@@ -63,6 +67,7 @@ from app.routers import (
     sso_routes,
     supply_chain_routes,
     telemetry_routes,
+    threat_hunting_routes,
     threat_modeling_routes,
     webhook_routes,
     ws_routes,
@@ -226,6 +231,11 @@ app.include_router(supply_chain_routes.router)
 app.include_router(ztna_routes.router)
 app.include_router(adversary_routes.router)
 app.include_router(easm_routes.router)
+app.include_router(ai_soc_routes.router)
+app.include_router(threat_hunting_routes.router)
+app.include_router(ransomware_routes.router)
+app.include_router(dspm_routes.router)
+app.include_router(cti_routes.router)
 
 
 # ---------------------

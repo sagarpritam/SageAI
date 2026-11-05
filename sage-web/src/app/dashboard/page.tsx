@@ -28,6 +28,10 @@ import {
   Terminal,
   Cloud,
   Package,
+  Search,
+  AlertOctagon,
+  Database,
+  Share2,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -60,9 +64,19 @@ import { SupplyChainStudio } from "@/components/SupplyChainStudio";
 import { ZTNAManager } from "@/components/ZTNAManager";
 import { AdversaryMatrixViewer } from "@/components/AdversaryMatrixViewer";
 import { EASMHunter } from "@/components/EASMHunter";
+import { AISOCCommandCenter } from "@/components/AISOCCommandCenter";
+import { ThreatHuntingStudio } from "@/components/ThreatHuntingStudio";
+import { AntiRansomwareShield } from "@/components/AntiRansomwareShield";
+import { DSPMHub } from "@/components/DSPMHub";
+import { CTIHub } from "@/components/CTIHub";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "ai-soc", label: "AI SOC Triage", icon: ShieldAlert },
+  { id: "threat-hunting", label: "Threat Hunting", icon: Search },
+  { id: "anti-ransomware", label: "Anti-Ransomware", icon: AlertOctagon },
+  { id: "dspm", label: "Cloud DSPM", icon: Database },
+  { id: "cti-hub", label: "CTI & STIX", icon: Share2 },
   { id: "enterprise", label: "Enterprise Hub", icon: ShieldCheck },
   { id: "enclave", label: "Zero Egress Enclave", icon: Lock },
   { id: "threat-modeling", label: "Threat Modeling", icon: FileCheck },
@@ -140,6 +154,11 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "ai-soc" && <AISOCCommandCenter />}
+          {activeTab === "threat-hunting" && <ThreatHuntingStudio />}
+          {activeTab === "anti-ransomware" && <AntiRansomwareShield />}
+          {activeTab === "dspm" && <DSPMHub />}
+          {activeTab === "cti-hub" && <CTIHub />}
           {activeTab === "enterprise" && <EnterpriseSecurityHub />}
           {activeTab === "enclave" && <ZeroEgressEnclave />}
           {activeTab === "threat-modeling" && <ThreatModelingStudio />}
