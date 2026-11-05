@@ -101,3 +101,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves red team swarm performance metrics."""
     return {"status": "success", "metrics": cas_redteam_swarm_service.get_swarm_metrics()}
+

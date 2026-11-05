@@ -183,3 +183,4 @@ class CloudForensicsService:
 
 # Global singleton instance
 cloud_forensics_service = CloudForensicsService()
+

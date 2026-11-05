@@ -49,3 +49,4 @@ function getFallbackAttribution(indicator: string) {
     },
   };
 }
+

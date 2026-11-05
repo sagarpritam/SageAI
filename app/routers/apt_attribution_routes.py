@@ -96,3 +96,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves threat attribution engine metrics."""
     return {"status": "success", "metrics": apt_attribution_service.get_fusion_metrics()}
+

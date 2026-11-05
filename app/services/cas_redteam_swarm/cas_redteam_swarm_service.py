@@ -279,3 +279,4 @@ class CASRedTeamSwarmService:
 
 # Global singleton instance
 cas_redteam_swarm_service = CASRedTeamSwarmService()
+

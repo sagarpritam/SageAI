@@ -309,3 +309,4 @@ class MicroHotpatchService:
 
 # Global singleton instance
 micro_hotpatch_service = MicroHotpatchService()
+

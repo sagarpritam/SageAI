@@ -128,3 +128,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves micro-hotpatch execution telemetry and metrics."""
     return {"status": "success", "metrics": micro_hotpatch_service.get_metrics()}
+

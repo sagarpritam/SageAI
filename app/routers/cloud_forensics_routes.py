@@ -108,3 +108,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves forensic vault metrics."""
     return {"status": "success", "metrics": cloud_forensics_service.get_forensics_metrics()}
+
