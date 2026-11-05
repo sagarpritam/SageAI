@@ -48,6 +48,7 @@ from app.routers import (
     email_report_routes,
     easm_routes,
     ebpf_routes,
+    enclave_attestation_routes,
     enclave_routes,
     enterprise_routes,
     explain_routes,
@@ -266,6 +267,7 @@ app.include_router(sdn_shield_routes.router)
 app.include_router(darkweb_radar_routes.router)
 app.include_router(zkp_routes.router)
 app.include_router(d3fend_routes.router)
+app.include_router(enclave_attestation_routes.router)
 
 
 # ---------------------

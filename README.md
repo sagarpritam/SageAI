@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-414%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-158%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-145%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-3.0.0%20Milestone-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-423%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-161%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-149%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-3.1.0%20Confidential-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -265,6 +265,11 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **Bi-Directional Offense-to-Defense Graph Fusion**: Connects MITRE ATT&CK adversary tactics directly with D3FEND defensive countermeasures across 5 domains (MODEL, HARDEN, DETECT, ISOLATE, DECEIVE).
 - **Defense Maturity Index (DMI)**: Real-time quantification of enterprise defensive posture and countermeasure saturation.
 - **Interactive Graph Querying**: Resolves precise defensive enforcers (eBPF syscall hooks, WAF inspectors, AppLocker, microsegmentation) for any given adversary technique.
+
+### 🔒 34. Confidential Hardware Enclave Remote Attestation Engine
+- **Multi-Silicon Hardware Attestation**: Cryptographic attestation verification across **AWS Nitro Enclaves** (COSE_Sign1 and PCR0/1/2/8 validation), **AMD SEV-SNP** (VCEK and ECDSA P-384 hardware measurement certificates), and **Intel SGX / TDX** (DCAP Quotes).
+- **Golden Reference PCR Integrity**: Enforces strict Golden Reference measurement matching for hypervisors, Linux kernels, and container runtimes, automatically rejecting tampered kernels.
+- **Attested Sovereign Key Release (Unsealing)**: Seals tenant encryption keys, database credentials, and HSM seeds inside hardware enclaves; unseals strictly upon valid silicon remote attestation and zeroizes memory on tampering.
 
 ---
 

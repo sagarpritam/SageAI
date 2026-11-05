@@ -95,9 +95,11 @@ import { SDNShieldStudio } from "@/components/SDNShieldStudio";
 import { DarkWebRadarCenter } from "@/components/DarkWebRadarCenter";
 import { ZKPComplianceStudio } from "@/components/ZKPComplianceStudio";
 import { D3FENDMatrixViewer } from "@/components/D3FENDMatrixViewer";
+import { HardwareEnclaveStudio } from "@/components/HardwareEnclaveStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "hardware-enclave", label: "Hardware Enclave", icon: Cpu },
   { id: "web3-security", label: "Web3 Security", icon: Coins },
   { id: "sdn-shield", label: "SDN Micro-Shield", icon: Zap },
   { id: "darkweb-radar", label: "Dark Web Radar", icon: Skull },
@@ -195,6 +197,7 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "hardware-enclave" && <HardwareEnclaveStudio />}
           {activeTab === "web3-security" && <Web3SecurityStudio />}
           {activeTab === "sdn-shield" && <SDNShieldStudio />}
           {activeTab === "darkweb-radar" && <DarkWebRadarCenter />}
