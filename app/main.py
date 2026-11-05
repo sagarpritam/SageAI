@@ -27,6 +27,7 @@ from app.routers import (
     ai_spm_routes,
     api_shield_routes,
     apikey_routes,
+    apt_attribution_routes,
     asm_routes,
     asset_routes,
     atomic_redteam_routes,
@@ -37,10 +38,13 @@ from app.routers import (
     bloodhound_routes,
     canary_fabric_routes,
     cart_routes,
+    cas_redteam_swarm_routes,
     ci_routes,
+    cloud_forensics_routes,
     consensus_routes,
     copilot_routes,
     cspm_routes,
+    crossplane_mesh_routes,
     cti_routes,
     d3fend_routes,
     darkweb_radar_routes,
@@ -65,6 +69,7 @@ from app.routers import (
     kms_hsm_routes,
     malware_routes,
     mfa_routes,
+    micro_hotpatch_routes,
     notification_routes,
     org_routes,
     password_routes,
@@ -276,6 +281,11 @@ app.include_router(threat_hunting_swarm_routes.router)
 app.include_router(canary_fabric_routes.router)
 app.include_router(binary_deobfuscator_routes.router)
 app.include_router(workload_identity_routes.router)
+app.include_router(micro_hotpatch_routes.router)
+app.include_router(cas_redteam_swarm_routes.router)
+app.include_router(apt_attribution_routes.router)
+app.include_router(cloud_forensics_routes.router)
+app.include_router(crossplane_mesh_routes.router)
 
 
 # ---------------------

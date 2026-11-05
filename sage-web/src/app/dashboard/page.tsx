@@ -44,6 +44,8 @@ import {
   FileCheck2,
   Grid3X3,
   Code2,
+  Globe2,
+  HardDrive,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -101,9 +103,19 @@ import { ThreatHuntingSwarmStudio } from "@/components/ThreatHuntingSwarmStudio"
 import { CanaryFabricCenter } from "@/components/CanaryFabricCenter";
 import { SymbolicDeobfuscatorStudio } from "@/components/SymbolicDeobfuscatorStudio";
 import { WorkloadIdentityStudio } from "@/components/WorkloadIdentityStudio";
+import { MicroHotpatchStudio } from "@/components/MicroHotpatchStudio";
+import { CASRedTeamStudio } from "@/components/CASRedTeamStudio";
+import { APTAttributionCenter } from "@/components/APTAttributionCenter";
+import { CloudForensicsVault } from "@/components/CloudForensicsVault";
+import { CrossPlaneMeshStudio } from "@/components/CrossPlaneMeshStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "micro-hotpatch", label: "Micro-Hotpatch", icon: Cpu },
+  { id: "cas-redteam", label: "CAS Red-Team", icon: Flame },
+  { id: "apt-attribution", label: "APT Attribution", icon: Globe2 },
+  { id: "cloud-forensics", label: "Forensic Vault", icon: HardDrive },
+  { id: "crossplane-mesh", label: "Cross-Plane Mesh", icon: Network },
   { id: "deobfuscator", label: "De-Obfuscator", icon: Code2 },
   { id: "workload-identity", label: "Workload SPIFFE", icon: Fingerprint },
   { id: "hunting-swarm", label: "Hunter Swarm", icon: Bot },
@@ -206,6 +218,11 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "micro-hotpatch" && <MicroHotpatchStudio />}
+          {activeTab === "cas-redteam" && <CASRedTeamStudio />}
+          {activeTab === "apt-attribution" && <APTAttributionCenter />}
+          {activeTab === "cloud-forensics" && <CloudForensicsVault />}
+          {activeTab === "crossplane-mesh" && <CrossPlaneMeshStudio />}
           {activeTab === "deobfuscator" && <SymbolicDeobfuscatorStudio />}
           {activeTab === "workload-identity" && <WorkloadIdentityStudio />}
           {activeTab === "hunting-swarm" && <ThreatHuntingSwarmStudio />}
