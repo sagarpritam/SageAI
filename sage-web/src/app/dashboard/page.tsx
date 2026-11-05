@@ -43,6 +43,7 @@ import {
   Skull,
   FileCheck2,
   Grid3X3,
+  Code2,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -98,9 +99,13 @@ import { D3FENDMatrixViewer } from "@/components/D3FENDMatrixViewer";
 import { HardwareEnclaveStudio } from "@/components/HardwareEnclaveStudio";
 import { ThreatHuntingSwarmStudio } from "@/components/ThreatHuntingSwarmStudio";
 import { CanaryFabricCenter } from "@/components/CanaryFabricCenter";
+import { SymbolicDeobfuscatorStudio } from "@/components/SymbolicDeobfuscatorStudio";
+import { WorkloadIdentityStudio } from "@/components/WorkloadIdentityStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "deobfuscator", label: "De-Obfuscator", icon: Code2 },
+  { id: "workload-identity", label: "Workload SPIFFE", icon: Fingerprint },
   { id: "hunting-swarm", label: "Hunter Swarm", icon: Bot },
   { id: "canary-fabric", label: "Canary Fabric", icon: Radio },
   { id: "hardware-enclave", label: "Hardware Enclave", icon: Cpu },
@@ -201,6 +206,8 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "deobfuscator" && <SymbolicDeobfuscatorStudio />}
+          {activeTab === "workload-identity" && <WorkloadIdentityStudio />}
           {activeTab === "hunting-swarm" && <ThreatHuntingSwarmStudio />}
           {activeTab === "canary-fabric" && <CanaryFabricCenter />}
           {activeTab === "hardware-enclave" && <HardwareEnclaveStudio />}

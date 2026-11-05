@@ -32,6 +32,7 @@ from app.routers import (
     atomic_redteam_routes,
     auth_routes,
     autofix_routes,
+    binary_deobfuscator_routes,
     billing_routes,
     bloodhound_routes,
     canary_fabric_routes,
@@ -87,6 +88,7 @@ from app.routers import (
     threat_modeling_routes,
     web3_security_routes,
     webhook_routes,
+    workload_identity_routes,
     ws_routes,
     zkp_routes,
     ztna_routes,
@@ -272,6 +274,8 @@ app.include_router(d3fend_routes.router)
 app.include_router(enclave_attestation_routes.router)
 app.include_router(threat_hunting_swarm_routes.router)
 app.include_router(canary_fabric_routes.router)
+app.include_router(binary_deobfuscator_routes.router)
+app.include_router(workload_identity_routes.router)
 
 
 # ---------------------
