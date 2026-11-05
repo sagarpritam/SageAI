@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-396%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Routes](https://img.shields.io/badge/Next.js-128%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-115%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-2.7.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-402%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Routes](https://img.shields.io/badge/Next.js-138%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-125%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-2.8.0%20Enterprise-blueviolet?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -179,6 +179,37 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 - **OASIS STIX 2.1 Serialization**: Constructs and parses valid STIX 2.1 JSON bundles linking threat actors, indicators of compromise, attack patterns, and campaigns.
 - **Nation-State Threat Actor Profiles**: Pre-calibrated dossiers covering **APT28 (Fancy Bear)**, **Lazarus Group**, **Scattered Spider**, and **LockBit 3.0**.
 - **TAXII 2.1 Collection Server**: Provides standard TAXII 2.1 `/taxii2/collections/` endpoints for seamless threat intelligence ingestion into Splunk, Microsoft Sentinel, and Cortex XSOAR.
+
+### ⚔️ 19. Autonomous Red Team Adversary Emulation (MITRE Caldera & Atomic Red Team)
+- **Atomic Red Team Automation**: Pre-calibrated execution catalog covering **T1059.001** (PowerShell), **T1003.001** (LSASS Dump), **T1547.001** (Run Keys), **T1078.004** (Cloud Accounts), **T1021.002** (SMB Shares), and **T1486** (Ransomware Impact).
+- **Caldera-Style Autonomous Planner**: Multi-stage attack graph orchestration in unprivileged, zero-egress sandboxes with dependency validation.
+- **Blue Team Telemetry & MTTD Measurement**: Measures detection latency in milliseconds, quantifies defensive coverage percentages, and identifies blindspots.
+- **Automated Detection Engineering**: Synthesizes Sigma YAML, Snort, and YARA rules to proactively remediate uncovered telemetry gaps.
+
+### ☁️ 20. Cloud Infrastructure-as-Code (IaC) Drift & Remediation Engine
+- **Bidirectional IaC vs. Runtime Reconciliation**: Compares declared **Terraform** HCL, **Kubernetes Helm** manifests, and **CloudFormation** templates against live AWS, Azure, and GCP runtime configurations.
+- **Autonomous Drift Classifications**: Pinpoints critical regressions including open ingress (`0.0.0.0/0` on ports 22/3389), disabled storage encryption (S3 SSE-KMS), console-granted IAM wildcards (`AdministratorAccess`), and privileged container flags.
+- **Autonomous Git PR Generation**: Automatically drafts GitHub/GitLab Pull Requests with unified Terraform HCL diffs and zero-trust rollback snapshots.
+- **Instant CLI Reconciliation Scripts**: Emits executable AWS CLI and `kubectl` patches for immediate out-of-band remediation.
+
+### 📦 21. Software Bill of Materials (SBOM) & OpenVEX Attestation Engine
+- **Multi-Standard SBOM Export**: Generates standards-compliant **CycloneDX 1.5 JSON** and **SPDX 2.3 JSON** inventories across Python, Node.js, and container packages.
+- **OpenVEX v0.2.0 Specification Compliance**: Authors machine-readable Vulnerability Exploitability eXchange statements with standard justifications (`inline_mitigations_exist`, `vulnerable_code_not_in_execute_path`, `vulnerable_code_cannot_be_controlled_by_adversary`).
+- **SLSA Level 3 Build Provenance**: Cryptographically signs build definitions, external parameters, and component digests with SHA-256 Merkle root verification.
+
+### 🔑 22. Identity Threat Detection and Response (ITDR)
+- **Multi-IdP Telemetry Ingestion**: Integrates with **Microsoft Entra ID (Azure AD)**, **Okta Universal Directory**, and **AWS IAM**.
+- **High-Fidelity Identity Attack Detectors**:
+  - *Impossible Travel*: Geo-velocity anomaly calculation ($>800\text{ km/h}$) flagging cross-continent logins within minutes.
+  - *MFA Fatigue / Push Bombing*: Detects rapid bursts of denied push notifications ($>5$ in $<120\text{s}$) followed by fraudulent approval (MITRE T1621).
+  - *Shadow Admin Escalation*: Detects stealthy role assignment to `Global Administrator` or `iam:PutUserPolicy`.
+- **Autonomous SOAR Containment Playbooks**: One-click instant revocation of active user sessions, OAuth refresh token invalidation, and mandatory step-up FIDO2/WebAuthn enforcement.
+
+### 🗺️ 23. Continuous Attack Path & Graph Choke-Point Analysis (CART)
+- **Enterprise Attack Graph Modeling**: Directed graph $G = (V, E)$ interconnecting public entrypoints, internal jump-boxes, IAM roles, databases, and Crown Jewels.
+- **Crown Jewel Kill-Chain Traversal**: Traverses all multi-hop attack vectors to high-value assets (Customer PII Database, Active Directory Domain Controller, S3 Master Data Vault).
+- **Graph Centrality & Choke-Point Identification**: Computes path intersection centrality to pinpoint the singular bottleneck node or edge whose severance breaks **80%+ of all attack paths**.
+- **Dynamic Blast Radius Metric & Auto-Severance**: Computes a 0-100 blast radius score and executes automated network microsegmentation and IAM privilege stripping to collapse attack vectors.
 
 ---
 

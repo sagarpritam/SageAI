@@ -27,9 +27,11 @@ from app.routers import (
     apikey_routes,
     asm_routes,
     asset_routes,
+    atomic_redteam_routes,
     auth_routes,
     autofix_routes,
     billing_routes,
+    cart_routes,
     ci_routes,
     consensus_routes,
     copilot_routes,
@@ -45,10 +47,12 @@ from app.routers import (
     enterprise_routes,
     explain_routes,
     gdpr_routes,
+    iac_drift_routes,
     incident_routes,
     integration_routes,
     intelligence_hub_routes,
     intrusion_routes,
+    itdr_routes,
     malware_routes,
     mfa_routes,
     notification_routes,
@@ -61,6 +65,7 @@ from app.routers import (
     redteam_routes,
     report_routes,
     rule_synthesizer_routes,
+    sbom_vex_routes,
     scan_routes,
     schedule_routes,
     simulation_routes,
@@ -236,6 +241,11 @@ app.include_router(threat_hunting_routes.router)
 app.include_router(ransomware_routes.router)
 app.include_router(dspm_routes.router)
 app.include_router(cti_routes.router)
+app.include_router(atomic_redteam_routes.router)
+app.include_router(iac_drift_routes.router)
+app.include_router(sbom_vex_routes.router)
+app.include_router(itdr_routes.router)
+app.include_router(cart_routes.router)
 
 
 # ---------------------

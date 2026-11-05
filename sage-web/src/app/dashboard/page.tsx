@@ -32,6 +32,9 @@ import {
   AlertOctagon,
   Database,
   Share2,
+  GitPullRequest,
+  Fingerprint,
+  PackageCheck,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -69,9 +72,19 @@ import { ThreatHuntingStudio } from "@/components/ThreatHuntingStudio";
 import { AntiRansomwareShield } from "@/components/AntiRansomwareShield";
 import { DSPMHub } from "@/components/DSPMHub";
 import { CTIHub } from "@/components/CTIHub";
+import { AdversaryEmulationStudio } from "@/components/AdversaryEmulationStudio";
+import { IaCDriftEngine } from "@/components/IaCDriftEngine";
+import { SBOMVexStudio } from "@/components/SBOMVexStudio";
+import { ITDRCommandCenter } from "@/components/ITDRCommandCenter";
+import { CARTHub } from "@/components/CARTHub";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "adversary-emulation", label: "Adversary Emulation", icon: Crosshair },
+  { id: "iac-drift", label: "IaC Drift Engine", icon: GitPullRequest },
+  { id: "sbom-vex", label: "SBOM & OpenVEX", icon: PackageCheck },
+  { id: "itdr", label: "Identity (ITDR)", icon: Fingerprint },
+  { id: "cart-paths", label: "Attack Paths (CART)", icon: GitBranch },
   { id: "ai-soc", label: "AI SOC Triage", icon: ShieldAlert },
   { id: "threat-hunting", label: "Threat Hunting", icon: Search },
   { id: "anti-ransomware", label: "Anti-Ransomware", icon: AlertOctagon },
@@ -154,6 +167,11 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "adversary-emulation" && <AdversaryEmulationStudio />}
+          {activeTab === "iac-drift" && <IaCDriftEngine />}
+          {activeTab === "sbom-vex" && <SBOMVexStudio />}
+          {activeTab === "itdr" && <ITDRCommandCenter />}
+          {activeTab === "cart-paths" && <CARTHub />}
           {activeTab === "ai-soc" && <AISOCCommandCenter />}
           {activeTab === "threat-hunting" && <ThreatHuntingStudio />}
           {activeTab === "anti-ransomware" && <AntiRansomwareShield />}
