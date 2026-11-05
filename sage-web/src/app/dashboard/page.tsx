@@ -46,6 +46,7 @@ import {
   Code2,
   Globe2,
   HardDrive,
+  Compass,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -108,6 +109,9 @@ import { CASRedTeamStudio } from "@/components/CASRedTeamStudio";
 import { APTAttributionCenter } from "@/components/APTAttributionCenter";
 import { CloudForensicsVault } from "@/components/CloudForensicsVault";
 import { CrossPlaneMeshStudio } from "@/components/CrossPlaneMeshStudio";
+import { KyberMeshVPNStudio } from "@/components/KyberMeshVPNStudio";
+import { LabyrinthHoneynetStudio } from "@/components/LabyrinthHoneynetStudio";
+import { AirGapLLMGuardStudio } from "@/components/AirGapLLMGuardStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -116,6 +120,9 @@ const tabs = [
   { id: "apt-attribution", label: "APT Attribution", icon: Globe2 },
   { id: "cloud-forensics", label: "Forensic Vault", icon: HardDrive },
   { id: "crossplane-mesh", label: "Cross-Plane Mesh", icon: Network },
+  { id: "kyber-mesh-vpn", label: "Kyber PQC Mesh", icon: Radio },
+  { id: "labyrinth-honeynet", label: "Honeynet Labyrinth", icon: Compass },
+  { id: "airgap-llm-guard", label: "Air-Gapped LLM", icon: Cpu },
   { id: "deobfuscator", label: "De-Obfuscator", icon: Code2 },
   { id: "workload-identity", label: "Workload SPIFFE", icon: Fingerprint },
   { id: "hunting-swarm", label: "Hunter Swarm", icon: Bot },
@@ -223,6 +230,9 @@ export default function DashboardPage() {
           {activeTab === "apt-attribution" && <APTAttributionCenter />}
           {activeTab === "cloud-forensics" && <CloudForensicsVault />}
           {activeTab === "crossplane-mesh" && <CrossPlaneMeshStudio />}
+          {activeTab === "kyber-mesh-vpn" && <KyberMeshVPNStudio />}
+          {activeTab === "labyrinth-honeynet" && <LabyrinthHoneynetStudio />}
+          {activeTab === "airgap-llm-guard" && <AirGapLLMGuardStudio />}
           {activeTab === "deobfuscator" && <SymbolicDeobfuscatorStudio />}
           {activeTab === "workload-identity" && <WorkloadIdentityStudio />}
           {activeTab === "hunting-swarm" && <ThreatHuntingSwarmStudio />}

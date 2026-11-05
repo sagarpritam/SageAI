@@ -25,6 +25,7 @@ from app.routers import (
     ai_command_routes,
     ai_soc_routes,
     ai_spm_routes,
+    airgap_llm_guard_routes,
     api_shield_routes,
     apikey_routes,
     apt_attribution_routes,
@@ -67,6 +68,8 @@ from app.routers import (
     intrusion_routes,
     itdr_routes,
     kms_hsm_routes,
+    kyber_mesh_vpn_routes,
+    labyrinth_honeynet_routes,
     malware_routes,
     mfa_routes,
     micro_hotpatch_routes,
@@ -286,6 +289,9 @@ app.include_router(cas_redteam_swarm_routes.router)
 app.include_router(apt_attribution_routes.router)
 app.include_router(cloud_forensics_routes.router)
 app.include_router(crossplane_mesh_routes.router)
+app.include_router(kyber_mesh_vpn_routes.router)
+app.include_router(labyrinth_honeynet_routes.router)
+app.include_router(airgap_llm_guard_routes.router)
 
 
 # ---------------------
