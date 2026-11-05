@@ -249,3 +249,4 @@ def test_wave8_fastapi_routers(client):
 
     finally:
         app.dependency_overrides.clear()
+

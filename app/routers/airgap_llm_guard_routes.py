@@ -120,3 +120,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves air-gapped sovereign model stats and differential privacy metrics."""
     return {"status": "success", "metrics": airgap_llm_guard_service.get_airgap_metrics()}
+

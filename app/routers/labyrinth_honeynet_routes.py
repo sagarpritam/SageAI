@@ -113,3 +113,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves honeynet engagement and adversary dwell time metrics."""
     return {"status": "success", "metrics": labyrinth_honeynet_service.get_labyrinth_metrics()}
+

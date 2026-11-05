@@ -187,3 +187,4 @@ class AirGappedModelGuard:
 
 # Global singleton instance
 airgap_llm_guard_service = AirGappedModelGuard()
+

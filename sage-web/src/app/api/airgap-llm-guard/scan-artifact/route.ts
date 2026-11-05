@@ -38,3 +38,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: "error", message: "Failed to scan model weights" }, { status: 500 });
   }
 }
+
