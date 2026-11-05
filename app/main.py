@@ -23,6 +23,7 @@ from app.routers import (
     agent_routes,
     ai_chat_routes,
     ai_command_routes,
+    ai_immune_routes,
     ai_soc_routes,
     ai_spm_routes,
     airgap_llm_guard_routes,
@@ -77,6 +78,7 @@ from app.routers import (
     micro_hotpatch_routes,
     notification_routes,
     org_routes,
+    orbital_laser_routes,
     password_routes,
     payment_routes,
     posture_routes,
@@ -93,6 +95,7 @@ from app.routers import (
     simulation_routes,
     sso_routes,
     supply_chain_routes,
+    telecom_5g_routes,
     telemetry_routes,
     threat_hunting_routes,
     threat_hunting_swarm_routes,
@@ -298,6 +301,9 @@ app.include_router(airgap_llm_guard_routes.router)
 app.include_router(firmware_attestation_routes.router)
 app.include_router(industrial_scada_routes.router)
 app.include_router(regulatory_commander_routes.router)
+app.include_router(telecom_5g_routes.router)
+app.include_router(orbital_laser_routes.router)
+app.include_router(ai_immune_routes.router)
 
 
 # ---------------------

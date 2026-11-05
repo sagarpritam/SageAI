@@ -48,6 +48,8 @@ import {
   HardDrive,
   Compass,
   Scale,
+  Antenna,
+  Dna,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -116,9 +118,15 @@ import { AirGapLLMGuardStudio } from "@/components/AirGapLLMGuardStudio";
 import { FirmwareAttestationStudio } from "@/components/FirmwareAttestationStudio";
 import { IndustrialSCADAShieldStudio } from "@/components/IndustrialSCADAShieldStudio";
 import { RegulatoryIncidentCommanderStudio } from "@/components/RegulatoryIncidentCommanderStudio";
+import { Telecom5GSliceStudio } from "@/components/Telecom5GSliceStudio";
+import { OrbitalLaserMeshStudio } from "@/components/OrbitalLaserMeshStudio";
+import { AIImmuneDefenseStudio } from "@/components/AIImmuneDefenseStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "telecom-5g", label: "5G/6G RAN", icon: Antenna },
+  { id: "orbital-laser", label: "Orbital Laser", icon: Globe2 },
+  { id: "ai-immune", label: "AI Immune", icon: Dna },
   { id: "firmware-attestation", label: "Firmware UEFI", icon: Cpu },
   { id: "industrial-scada", label: "SCADA Kinetic", icon: Zap },
   { id: "regulatory-commander", label: "SEC 8-K Legal", icon: Scale },
@@ -232,6 +240,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "telecom-5g" && <Telecom5GSliceStudio />}
+          {activeTab === "orbital-laser" && <OrbitalLaserMeshStudio />}
+          {activeTab === "ai-immune" && <AIImmuneDefenseStudio />}
           {activeTab === "firmware-attestation" && <FirmwareAttestationStudio />}
           {activeTab === "industrial-scada" && <IndustrialSCADAShieldStudio />}
           {activeTab === "regulatory-commander" && <RegulatoryIncidentCommanderStudio />}
