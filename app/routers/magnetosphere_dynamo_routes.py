@@ -34,3 +34,4 @@ async def trigger_decoupling(req: TriggerDecouplingRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return magnetosphere_dynamo_decoupler.get_dynamo_metrics()
+

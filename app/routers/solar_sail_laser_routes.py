@@ -42,3 +42,4 @@ async def fire_pulse(req: FireLaserPulseRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return relativistic_solar_sail_laser_mesh.get_mesh_metrics()
+

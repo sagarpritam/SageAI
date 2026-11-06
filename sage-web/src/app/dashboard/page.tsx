@@ -160,9 +160,17 @@ import { RedTeamClusterStudio } from "@/components/RedTeamClusterStudio";
 import { SolarSailLaserStudio } from "@/components/SolarSailLaserStudio";
 import { MagnetosphereDynamoStudio } from "@/components/MagnetosphereDynamoStudio";
 import { MantleGeoneutrinoStudio } from "@/components/MantleGeoneutrinoStudio";
+import { QuantumGravitationalStudio } from "@/components/QuantumGravitationalStudio";
+import { TachyonHorizonStudio } from "@/components/TachyonHorizonStudio";
+import { SingularityContainmentStudio } from "@/components/SingularityContainmentStudio";
+import { ClusterFederationStudio } from "@/components/ClusterFederationStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "quantum-gravitational", label: "Quantum Gravitational", icon: Radio },
+  { id: "tachyon-horizon", label: "Tachyon Horizon", icon: Clock },
+  { id: "singularity-containment", label: "Singularity Containment", icon: Flame },
+  { id: "cluster-federation", label: "Cluster Federation", icon: Globe2 },
   { id: "solar-sail-laser", label: "Solar Sail Laser", icon: Sun },
   { id: "magnetosphere-dynamo", label: "Magnetosphere Dynamo", icon: Globe },
   { id: "mantle-geoneutrino", label: "Mantle Geoneutrino", icon: Flame },
@@ -307,6 +315,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "quantum-gravitational" && <QuantumGravitationalStudio />}
+          {activeTab === "tachyon-horizon" && <TachyonHorizonStudio />}
+          {activeTab === "singularity-containment" && <SingularityContainmentStudio />}
+          {activeTab === "cluster-federation" && <ClusterFederationStudio />}
           {activeTab === "solar-sail-laser" && <SolarSailLaserStudio />}
           {activeTab === "magnetosphere-dynamo" && <MagnetosphereDynamoStudio />}
           {activeTab === "mantle-geoneutrino" && <MantleGeoneutrinoStudio />}

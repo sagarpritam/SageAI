@@ -30,3 +30,4 @@ export async function GET() {
     status: "CONTINUOUS_MONITORING",
   });
 }
+

@@ -4,3 +4,4 @@ from app.services.magnetosphere_dynamo.magnetosphere_dynamo_engine import (
 )
 
 __all__ = ["MagnetosphereDynamoDecoupler", "magnetosphere_dynamo_decoupler"]
+

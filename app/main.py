@@ -48,6 +48,7 @@ from app.routers import (
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
+    cluster_federation_routes,
     cognitive_ew_routes,
     consensus_routes,
     copilot_routes,
@@ -107,6 +108,7 @@ from app.routers import (
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
+    quantum_gravitational_routes,
     ransomware_routes,
     redteam_routes,
     redteam_cluster_routes,
@@ -118,11 +120,13 @@ from app.routers import (
     schedule_routes,
     sdn_shield_routes,
     simulation_routes,
+    singularity_containment_routes,
     solar_sail_laser_routes,
     space_ground_qkd_routes,
     sso_routes,
     subsea_cable_routes,
     supply_chain_routes,
+    tachyon_horizon_routes,
     telecom_5g_routes,
     telemetry_routes,
     threat_hunting_routes,
@@ -360,6 +364,10 @@ app.include_router(redteam_cluster_routes.router)
 app.include_router(solar_sail_laser_routes.router)
 app.include_router(magnetosphere_dynamo_routes.router)
 app.include_router(mantle_geoneutrino_routes.router)
+app.include_router(quantum_gravitational_routes.router)
+app.include_router(tachyon_horizon_routes.router)
+app.include_router(singularity_containment_routes.router)
+app.include_router(cluster_federation_routes.router)
 
 
 # ---------------------

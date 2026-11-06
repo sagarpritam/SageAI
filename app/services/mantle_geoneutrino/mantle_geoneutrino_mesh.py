@@ -189,3 +189,4 @@ class DeepMantleGeoneutrinoMesh:
 
 
 deep_mantle_geoneutrino_mesh = DeepMantleGeoneutrinoMesh()
+

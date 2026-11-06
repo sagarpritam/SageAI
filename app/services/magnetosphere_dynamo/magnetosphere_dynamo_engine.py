@@ -174,3 +174,4 @@ class MagnetosphereDynamoDecoupler:
 
 
 magnetosphere_dynamo_decoupler = MagnetosphereDynamoDecoupler()
+

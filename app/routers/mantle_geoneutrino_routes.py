@@ -32,3 +32,4 @@ async def reconstruct_tomography(req: ReconstructMantleRequest) -> Dict[str, Any
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return deep_mantle_geoneutrino_mesh.get_mesh_metrics()
+
