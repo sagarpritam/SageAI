@@ -8,3 +8,4 @@ from .geomagnetic_solar_shield import (
 )
 
 __all__ = ["GeomagneticSolarShield", "geomagnetic_solar_shield"]
+

@@ -27,6 +27,7 @@ from app.routers import (
     ai_immune_routes,
     ai_soc_routes,
     ai_spm_routes,
+    airgap_exploit_routes,
     airgap_llm_guard_routes,
     api_shield_routes,
     apikey_routes,
@@ -81,12 +82,14 @@ from app.routers import (
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
     malware_routes,
+    marine_sonar_routes,
     mfa_routes,
     micro_hotpatch_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
     notification_routes,
     org_routes,
+    orbital_debris_routes,
     orbital_laser_routes,
     password_routes,
     payment_routes,
@@ -328,6 +331,9 @@ app.include_router(hypersonic_defense_routes.router)
 app.include_router(photonic_quantum_routes.router)
 app.include_router(geomagnetic_shield_routes.router)
 app.include_router(haps_stratosphere_routes.router)
+app.include_router(marine_sonar_routes.router)
+app.include_router(orbital_debris_routes.router)
+app.include_router(airgap_exploit_routes.router)
 
 
 # ---------------------

@@ -58,6 +58,8 @@ import {
   Satellite,
   Sun,
   Plane,
+  Orbit,
+  Binary,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -141,9 +143,15 @@ import { HypersonicDefenseStudio } from "@/components/HypersonicDefenseStudio";
 import { PhotonicQuantumStudio } from "@/components/PhotonicQuantumStudio";
 import { GeomagneticShieldStudio } from "@/components/GeomagneticShieldStudio";
 import { HAPSStratosphereStudio } from "@/components/HAPSStratosphereStudio";
+import { MarineSonarStudio } from "@/components/MarineSonarStudio";
+import { OrbitalDebrisStudio } from "@/components/OrbitalDebrisStudio";
+import { AirgapExploitStudio } from "@/components/AirgapExploitStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "marine-sonar", label: "Ocean Sonar", icon: Waves },
+  { id: "orbital-debris", label: "Debris Deflector", icon: Orbit },
+  { id: "airgap-exploit-swarm", label: "Zero-Day Swarm", icon: Binary },
   { id: "photonic-quantum", label: "Photonic Quantum", icon: Sparkles },
   { id: "geomagnetic-shield", label: "CME Solar Shield", icon: Sun },
   { id: "haps-stratosphere", label: "HAPS Swarm", icon: Plane },
@@ -272,6 +280,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "marine-sonar" && <MarineSonarStudio />}
+          {activeTab === "orbital-debris" && <OrbitalDebrisStudio />}
+          {activeTab === "airgap-exploit-swarm" && <AirgapExploitStudio />}
           {activeTab === "photonic-quantum" && <PhotonicQuantumStudio />}
           {activeTab === "geomagnetic-shield" && <GeomagneticShieldStudio />}
           {activeTab === "haps-stratosphere" && <HAPSStratosphereStudio />}

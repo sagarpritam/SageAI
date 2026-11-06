@@ -102,3 +102,4 @@ async def get_haps_metrics_endpoint(
 ):
     """Returns fleet telemetry for stratospheric persistent surveillance swarm."""
     return {"status": "success", "metrics": haps_stratosphere_mesh.get_haps_metrics()}
+

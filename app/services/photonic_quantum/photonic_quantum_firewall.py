@@ -162,3 +162,4 @@ class PhotonicQuantumCryptFirewall:
 
 # Singleton instance
 photonic_quantum_firewall = PhotonicQuantumCryptFirewall()
+

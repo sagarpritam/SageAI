@@ -100,3 +100,4 @@ async def get_geomagnetic_metrics_endpoint(
 ):
     """Returns fleet telemetry for planetary geomagnetic CME power grid shielding."""
     return {"status": "success", "metrics": geomagnetic_solar_shield.get_geomagnetic_metrics()}
+

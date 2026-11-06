@@ -100,3 +100,4 @@ async def get_photonic_metrics_endpoint(
 ):
     """Returns fleet telemetry for photonic optical quantum firewall defense."""
     return {"status": "success", "metrics": photonic_quantum_firewall.get_photonic_metrics()}
+

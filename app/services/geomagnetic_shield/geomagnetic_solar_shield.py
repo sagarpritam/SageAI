@@ -172,3 +172,4 @@ class GeomagneticSolarShield:
 
 # Singleton instance
 geomagnetic_solar_shield = GeomagneticSolarShield()
+
