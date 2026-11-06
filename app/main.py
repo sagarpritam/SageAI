@@ -49,6 +49,7 @@ from app.routers import (
     cognitive_ew_routes,
     consensus_routes,
     copilot_routes,
+    counter_quantum_routes,
     cspm_routes,
     crossplane_mesh_routes,
     cti_routes,
@@ -70,6 +71,7 @@ from app.routers import (
     forensics_routes,
     gdpr_routes,
     geomagnetic_shield_routes,
+    gravitational_seismic_routes,
     haps_stratosphere_routes,
     hypersonic_defense_routes,
     iac_drift_routes,
@@ -97,6 +99,7 @@ from app.routers import (
     password_routes,
     payment_routes,
     photonic_quantum_routes,
+    plasma_shield_routes,
     posture_routes,
     pqc_routes,
     ransomware_routes,
@@ -340,6 +343,9 @@ app.include_router(airgap_exploit_routes.router)
 app.include_router(neutrino_array_routes.router)
 app.include_router(cognitive_ew_routes.router)
 app.include_router(atomic_clock_routes.router)
+app.include_router(gravitational_seismic_routes.router)
+app.include_router(counter_quantum_routes.router)
+app.include_router(plasma_shield_routes.router)
 
 
 # ---------------------

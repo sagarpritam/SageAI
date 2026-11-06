@@ -173,3 +173,4 @@ class OpticalAtomicClockMesh:
 
 # Global singleton instance
 optical_atomic_clock_mesh = OpticalAtomicClockMesh()
+

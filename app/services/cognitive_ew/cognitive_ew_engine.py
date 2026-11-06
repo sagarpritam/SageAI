@@ -188,3 +188,4 @@ class CognitiveEWEngine:
 
 # Global singleton instance
 cognitive_ew_engine = CognitiveEWEngine()
+

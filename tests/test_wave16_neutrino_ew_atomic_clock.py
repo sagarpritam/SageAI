@@ -309,3 +309,4 @@ def test_optical_atomic_clock_endpoints(client):
         assert r5.json()["metrics"]["total_optical_lattice_clocks"] >= 4
     finally:
         app.dependency_overrides.clear()
+

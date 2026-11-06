@@ -8,3 +8,4 @@ from app.services.neutrino_array.neutrino_flux_detector import (
 )
 
 __all__ = ["NeutrinoFluxDetectorArray", "neutrino_flux_detector"]
+

@@ -149,9 +149,15 @@ import { AirgapExploitStudio } from "@/components/AirgapExploitStudio";
 import { NeutrinoArrayStudio } from "@/components/NeutrinoArrayStudio";
 import { CognitiveEWStudio } from "@/components/CognitiveEWStudio";
 import { AtomicClockStudio } from "@/components/AtomicClockStudio";
+import { GravitationalSeismicStudio } from "@/components/GravitationalSeismicStudio";
+import { CounterQuantumStudio } from "@/components/CounterQuantumStudio";
+import { PlasmaShieldStudio } from "@/components/PlasmaShieldStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "gravitational-seismic", label: "Gravitational Seismic", icon: Activity },
+  { id: "counter-quantum", label: "Counter-Quantum", icon: Lock },
+  { id: "plasma-shield", label: "Plasma Shield", icon: Sun },
   { id: "neutrino-array", label: "Neutrino Array", icon: Atom },
   { id: "cognitive-ew", label: "Cognitive EW", icon: Radio },
   { id: "atomic-clock", label: "Atomic Clock", icon: Clock },
@@ -286,6 +292,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "gravitational-seismic" && <GravitationalSeismicStudio />}
+          {activeTab === "counter-quantum" && <CounterQuantumStudio />}
+          {activeTab === "plasma-shield" && <PlasmaShieldStudio />}
           {activeTab === "neutrino-array" && <NeutrinoArrayStudio />}
           {activeTab === "cognitive-ew" && <CognitiveEWStudio />}
           {activeTab === "atomic-clock" && <AtomicClockStudio />}

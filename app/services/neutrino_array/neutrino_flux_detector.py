@@ -203,3 +203,4 @@ class NeutrinoFluxDetectorArray:
 
 # Global singleton instance
 neutrino_flux_detector = NeutrinoFluxDetectorArray()
+
