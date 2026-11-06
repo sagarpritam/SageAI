@@ -171,3 +171,4 @@ class KineticDroneShield:
 
 # Singleton instance
 kinetic_drone_shield = KineticDroneShield()
+

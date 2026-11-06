@@ -54,6 +54,8 @@ import {
   Brain,
   Atom,
   Scissors,
+  Rocket,
+  Satellite,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -131,9 +133,15 @@ import { InterGridFailoverStudio } from "@/components/InterGridFailoverStudio";
 import { AIModelDePoisonStudio } from "@/components/AIModelDePoisonStudio";
 import { SpaceGroundQKDStudio } from "@/components/SpaceGroundQKDStudio";
 import { KineticDroneShieldStudio } from "@/components/KineticDroneShieldStudio";
+import { NeuromorphicSNNStudio } from "@/components/NeuromorphicSNNStudio";
+import { DeepSpaceLaserStudio } from "@/components/DeepSpaceLaserStudio";
+import { HypersonicDefenseStudio } from "@/components/HypersonicDefenseStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "neuromorphic-snn", label: "Neuro SNN", icon: Cpu },
+  { id: "deep-space-laser", label: "Deep-Space Laser", icon: Satellite },
+  { id: "hypersonic-defense", label: "Hypersonic Defense", icon: Rocket },
   { id: "ai-depoison", label: "AI De-Poison", icon: Scissors },
   { id: "space-ground-qkd", label: "Space QKD", icon: Atom },
   { id: "drone-swarm-shield", label: "Drone Shield", icon: Crosshair },
@@ -256,6 +264,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "neuromorphic-snn" && <NeuromorphicSNNStudio />}
+          {activeTab === "deep-space-laser" && <DeepSpaceLaserStudio />}
+          {activeTab === "hypersonic-defense" && <HypersonicDefenseStudio />}
           {activeTab === "ai-depoison" && <AIModelDePoisonStudio />}
           {activeTab === "space-ground-qkd" && <SpaceGroundQKDStudio />}
           {activeTab === "drone-swarm-shield" && <KineticDroneShieldStudio />}

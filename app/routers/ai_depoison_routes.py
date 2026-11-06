@@ -90,3 +90,4 @@ async def get_depoison_metrics_endpoint(
 ):
     """Returns AI model de-poisoning and trojan weight ablation metrics."""
     return {"status": "success", "metrics": ai_model_depoison_engine.get_depoison_metrics()}
+

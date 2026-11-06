@@ -264,3 +264,4 @@ def test_wave12_api_routes(client):
         assert res_drone_met.status_code == 200
     finally:
         app.dependency_overrides.clear()
+

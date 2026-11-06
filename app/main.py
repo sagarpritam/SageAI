@@ -53,6 +53,7 @@ from app.routers import (
     darkweb_radar_routes,
     deception_routes,
     deep_analysis_routes,
+    deep_space_laser_routes,
     drone_swarm_shield_routes,
     dspm_routes,
     email_report_routes,
@@ -65,6 +66,7 @@ from app.routers import (
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
+    hypersonic_defense_routes,
     iac_drift_routes,
     incident_routes,
     industrial_scada_routes,
@@ -80,6 +82,7 @@ from app.routers import (
     mfa_routes,
     micro_hotpatch_routes,
     neural_bci_routes,
+    neuromorphic_snn_routes,
     notification_routes,
     org_routes,
     orbital_laser_routes,
@@ -316,6 +319,9 @@ app.include_router(intergrid_failover_routes.router)
 app.include_router(ai_depoison_routes.router)
 app.include_router(space_ground_qkd_routes.router)
 app.include_router(drone_swarm_shield_routes.router)
+app.include_router(neuromorphic_snn_routes.router)
+app.include_router(deep_space_laser_routes.router)
+app.include_router(hypersonic_defense_routes.router)
 
 
 # ---------------------

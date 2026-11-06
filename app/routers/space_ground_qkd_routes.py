@@ -92,3 +92,4 @@ async def get_qkd_metrics_endpoint(
 ):
     """Returns space-ground quantum key distribution fleet metrics."""
     return {"status": "success", "metrics": space_ground_qkd_mesh.get_qkd_metrics()}
+

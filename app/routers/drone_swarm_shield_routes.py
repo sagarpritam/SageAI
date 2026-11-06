@@ -104,3 +104,4 @@ async def get_drone_shield_metrics_endpoint(
 ):
     """Returns kinetic drone swarm air defense metrics."""
     return {"status": "success", "metrics": kinetic_drone_shield.get_drone_shield_metrics()}
+
