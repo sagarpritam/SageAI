@@ -22,6 +22,34 @@ logger = logging.getLogger("SageAI.webhooks")
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
 
+_NAT64_PREFIX = ipaddress.ip_network("64:ff9b::/96")
+
+
+def _is_restricted_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """Checks if an IP address is private, loopback, link-local, reserved, multicast, or unspecified.
+
+    Handles RFC 6052 NAT64 prefixes (64:ff9b::/96) by inspecting the embedded IPv4 address.
+    """
+    if ip.version == 6 and ip in _NAT64_PREFIX:
+        embedded_v4 = ipaddress.IPv4Address(int(ip) & 0xFFFFFFFF)
+        return (
+            embedded_v4.is_private
+            or embedded_v4.is_loopback
+            or embedded_v4.is_link_local
+            or embedded_v4.is_reserved
+            or embedded_v4.is_multicast
+            or embedded_v4.is_unspecified
+        )
+    return (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_reserved
+        or ip.is_multicast
+        or ip.is_unspecified
+    )
+
+
 def is_safe_webhook_url(url: str) -> tuple[bool, str]:
     """Validate that a webhook target URL is safe and not an internal/private endpoint.
 
@@ -60,14 +88,7 @@ def is_safe_webhook_url(url: str) -> tuple[bool, str]:
     # Check IP literal directly
     try:
         ip = ipaddress.ip_address(hostname)
-        if (
-            ip.is_private
-            or ip.is_loopback
-            or ip.is_link_local
-            or ip.is_reserved
-            or ip.is_multicast
-            or ip.is_unspecified
-        ):
+        if _is_restricted_ip(ip):
             return (
                 False,
                 f"Target IP {hostname} is a restricted/private network address",
@@ -82,14 +103,7 @@ def is_safe_webhook_url(url: str) -> tuple[bool, str]:
             ip_str = item[4][0]
             try:
                 ip = ipaddress.ip_address(ip_str)
-                if (
-                    ip.is_private
-                    or ip.is_loopback
-                    or ip.is_link_local
-                    or ip.is_reserved
-                    or ip.is_multicast
-                    or ip.is_unspecified
-                ):
+                if _is_restricted_ip(ip):
                     return (
                         False,
                         f"Target resolves to a restricted/private network ({ip_str})",

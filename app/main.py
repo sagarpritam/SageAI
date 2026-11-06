@@ -23,6 +23,7 @@ from app.routers import (
     agent_routes,
     ai_chat_routes,
     ai_command_routes,
+    ai_depoison_routes,
     ai_immune_routes,
     ai_soc_routes,
     ai_spm_routes,
@@ -52,6 +53,7 @@ from app.routers import (
     darkweb_radar_routes,
     deception_routes,
     deep_analysis_routes,
+    drone_swarm_shield_routes,
     dspm_routes,
     email_report_routes,
     easm_routes,
@@ -95,6 +97,7 @@ from app.routers import (
     schedule_routes,
     sdn_shield_routes,
     simulation_routes,
+    space_ground_qkd_routes,
     sso_routes,
     subsea_cable_routes,
     supply_chain_routes,
@@ -310,6 +313,9 @@ app.include_router(ai_immune_routes.router)
 app.include_router(subsea_cable_routes.router)
 app.include_router(neural_bci_routes.router)
 app.include_router(intergrid_failover_routes.router)
+app.include_router(ai_depoison_routes.router)
+app.include_router(space_ground_qkd_routes.router)
+app.include_router(drone_swarm_shield_routes.router)
 
 
 # ---------------------

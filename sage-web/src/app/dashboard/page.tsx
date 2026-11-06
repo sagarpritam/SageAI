@@ -52,6 +52,8 @@ import {
   Dna,
   Waves,
   Brain,
+  Atom,
+  Scissors,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -126,9 +128,15 @@ import { AIImmuneDefenseStudio } from "@/components/AIImmuneDefenseStudio";
 import { SubseaCableStudio } from "@/components/SubseaCableStudio";
 import { NeuralBCIStudio } from "@/components/NeuralBCIStudio";
 import { InterGridFailoverStudio } from "@/components/InterGridFailoverStudio";
+import { AIModelDePoisonStudio } from "@/components/AIModelDePoisonStudio";
+import { SpaceGroundQKDStudio } from "@/components/SpaceGroundQKDStudio";
+import { KineticDroneShieldStudio } from "@/components/KineticDroneShieldStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "ai-depoison", label: "AI De-Poison", icon: Scissors },
+  { id: "space-ground-qkd", label: "Space QKD", icon: Atom },
+  { id: "drone-swarm-shield", label: "Drone Shield", icon: Crosshair },
   { id: "subsea-cable", label: "Subsea Fiber", icon: Waves },
   { id: "neural-bci", label: "Neural BCI", icon: Brain },
   { id: "intergrid-failover", label: "Inter-Grid", icon: Zap },
@@ -248,6 +256,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "ai-depoison" && <AIModelDePoisonStudio />}
+          {activeTab === "space-ground-qkd" && <SpaceGroundQKDStudio />}
+          {activeTab === "drone-swarm-shield" && <KineticDroneShieldStudio />}
           {activeTab === "subsea-cable" && <SubseaCableStudio />}
           {activeTab === "neural-bci" && <NeuralBCIStudio />}
           {activeTab === "intergrid-failover" && <InterGridFailoverStudio />}
