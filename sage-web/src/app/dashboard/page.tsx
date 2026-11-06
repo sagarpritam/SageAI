@@ -157,9 +157,15 @@ import { CisLunarRelayStudio } from "@/components/CisLunarRelayStudio";
 import { MuonTomographyStudio } from "@/components/MuonTomographyStudio";
 import { AntimatterContainmentStudio } from "@/components/AntimatterContainmentStudio";
 import { RedTeamClusterStudio } from "@/components/RedTeamClusterStudio";
+import { SolarSailLaserStudio } from "@/components/SolarSailLaserStudio";
+import { MagnetosphereDynamoStudio } from "@/components/MagnetosphereDynamoStudio";
+import { MantleGeoneutrinoStudio } from "@/components/MantleGeoneutrinoStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "solar-sail-laser", label: "Solar Sail Laser", icon: Sun },
+  { id: "magnetosphere-dynamo", label: "Magnetosphere Dynamo", icon: Globe },
+  { id: "mantle-geoneutrino", label: "Mantle Geoneutrino", icon: Flame },
   { id: "cislunar-relay", label: "Cis-Lunar Relay", icon: Satellite },
   { id: "muon-tomography", label: "Muon Tomography", icon: Mountain },
   { id: "antimatter-containment", label: "Antimatter Containment", icon: Flame },
@@ -301,6 +307,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "solar-sail-laser" && <SolarSailLaserStudio />}
+          {activeTab === "magnetosphere-dynamo" && <MagnetosphereDynamoStudio />}
+          {activeTab === "mantle-geoneutrino" && <MantleGeoneutrinoStudio />}
           {activeTab === "cislunar-relay" && <CisLunarRelayStudio />}
           {activeTab === "muon-tomography" && <MuonTomographyStudio />}
           {activeTab === "antimatter-containment" && <AntimatterContainmentStudio />}

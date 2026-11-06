@@ -220,3 +220,4 @@ def test_wave18_api_routes():
     )
     assert r_camp.status_code == 200
     assert r_camp.json()["verdict"] == "ALL_VECTORS_DEFLECTED_ZERO_CASCADE"
+

@@ -34,3 +34,4 @@ async def establish_link(req: EstablishLinkRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cislunar_quantum_relay.get_relay_metrics()
+

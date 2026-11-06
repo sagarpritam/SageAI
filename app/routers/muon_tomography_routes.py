@@ -34,3 +34,4 @@ async def execute_scan(req: TomographicScanRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return subsurface_muon_tomography.get_mesh_metrics()
+

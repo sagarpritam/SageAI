@@ -11,3 +11,4 @@ export async function GET() {
     status: "NOMINAL_STABLE",
   });
 }
+

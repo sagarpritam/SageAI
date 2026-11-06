@@ -87,7 +87,9 @@ from app.routers import (
     kms_hsm_routes,
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
+    magnetosphere_dynamo_routes,
     malware_routes,
+    mantle_geoneutrino_routes,
     marine_sonar_routes,
     mfa_routes,
     micro_hotpatch_routes,
@@ -116,6 +118,7 @@ from app.routers import (
     schedule_routes,
     sdn_shield_routes,
     simulation_routes,
+    solar_sail_laser_routes,
     space_ground_qkd_routes,
     sso_routes,
     subsea_cable_routes,
@@ -354,6 +357,9 @@ app.include_router(cislunar_relay_routes.router)
 app.include_router(muon_tomography_routes.router)
 app.include_router(antimatter_containment_routes.router)
 app.include_router(redteam_cluster_routes.router)
+app.include_router(solar_sail_laser_routes.router)
+app.include_router(magnetosphere_dynamo_routes.router)
+app.include_router(mantle_geoneutrino_routes.router)
 
 
 # ---------------------

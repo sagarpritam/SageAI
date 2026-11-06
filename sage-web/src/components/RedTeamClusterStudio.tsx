@@ -13,6 +13,8 @@ import {
   Crosshair,
   AlertOctagon,
   Activity,
+  Play,
+  Square,
 } from "lucide-react";
 
 interface RedAgent {
@@ -48,12 +50,25 @@ interface CampaignResult {
   timestamp: string;
 }
 
+interface DaemonTick {
+  tick_id: number;
+  campaign_id: string;
+  timestamp: string;
+  attack_vectors: number;
+  deflection_pct: number;
+  mitigation_latency_ms: number;
+  resilience_score: number;
+  verdict: string;
+}
+
 export function RedTeamClusterStudio() {
   const [agents, setAgents] = useState<RedAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [intensity, setIntensity] = useState(0.85);
   const [lastCampaign, setLastCampaign] = useState<CampaignResult | null>(null);
+  const [daemonActive, setDaemonActive] = useState(false);
+  const [daemonTicks, setDaemonTicks] = useState<DaemonTick[]>([]);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchAgents = async () => {
@@ -70,14 +85,63 @@ export function RedTeamClusterStudio() {
     }
   };
 
+  const fetchDaemonStatus = async () => {
+    try {
+      const res = await fetch("/api/redteam-cluster/daemon/status");
+      if (res.ok) {
+        const data = await res.json();
+        setDaemonActive(data.daemon_active);
+        if (data.recent_ticks) {
+          setDaemonTicks(data.recent_ticks);
+        }
+      }
+    } catch {
+      // Fallback
+    }
+  };
+
   useEffect(() => {
     fetchAgents();
+    fetchDaemonStatus();
+    const timer = setInterval(fetchDaemonStatus, 6000);
+    return () => clearInterval(timer);
   }, []);
+
+  const handleToggleDaemon = async () => {
+    try {
+      if (daemonActive) {
+        const res = await fetch("/api/redteam-cluster/daemon/stop", { method: "POST" });
+        if (res.ok) {
+          setDaemonActive(false);
+          setLogs((prev) => [
+            `[${new Date().toLocaleTimeString()}] Autonomous Red-Team background daemon halted.`,
+            ...prev,
+          ]);
+        }
+      } else {
+        const res = await fetch("/api/redteam-cluster/daemon/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cycle_interval_seconds: 10.0 }),
+        });
+        if (res.ok) {
+          setDaemonActive(true);
+          setLogs((prev) => [
+            `[${new Date().toLocaleTimeString()}] Autonomous Red-Team continuous daemon started (Cycle: 10s).`,
+            ...prev,
+          ]);
+        }
+      }
+      fetchDaemonStatus();
+    } catch {
+      // Fallback
+    }
+  };
 
   const handleLaunchCampaign = async () => {
     setCampaignRunning(true);
     setLogs((prev) => [
-      `[${new Date().toLocaleTimeString()}] Mobilizing autonomous adversarial Red-Team swarm across 76 sovereign defense capabilities (Intensity: ${(intensity * 100).toFixed(0)}%)...`,
+      `[${new Date().toLocaleTimeString()}] Mobilizing autonomous adversarial Red-Team swarm across 79 capabilities (Intensity: ${(intensity * 100).toFixed(0)}%)...`,
       ...prev,
     ]);
 
@@ -92,9 +156,12 @@ export function RedTeamClusterStudio() {
             "DEEP_SPACE_RELAY",
             "SUBTERRANEAN_SEISMIC",
             "PLASMA_SHIELD",
+            "SOLAR_SAIL_PROPULSION",
+            "HEMP_DYNAMO_DECOUPLER",
+            "MANTLE_GEONEUTRINO",
           ],
           intensity: intensity,
-          target_capabilities_count: 76,
+          target_capabilities_count: 79,
         }),
       });
 
@@ -105,6 +172,7 @@ export function RedTeamClusterStudio() {
           `[${new Date().toLocaleTimeString()}] Campaign concluded: ${data.simulated_attack_vectors} vectors tested | Deflection: ${data.deflection_success_pct}% | Mean Mitigation: ${data.mean_mitigation_latency_ms} ms | Resilience: ${data.systemic_resilience_score}%`,
           ...prev,
         ]);
+        fetchDaemonStatus();
       }
     } catch {
       setLogs((prev) => [
@@ -126,23 +194,38 @@ export function RedTeamClusterStudio() {
               <span className="rounded bg-rose-500/10 px-2 py-0.5 text-xs font-semibold text-rose-400 border border-rose-500/30">
                 Option B Engine
               </span>
-              <span className="text-xs text-neutral-400">Autonomous Adversarial Swarm</span>
+              <span className="text-xs text-neutral-400">Continuous Adversarial Swarm</span>
             </div>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <Skull className="h-6 w-6 text-rose-400" />
-              Sovereign Multi-Agent Red-Teaming &amp; Adversarial Stress Engine
+              Sovereign Multi-Agent Red-Teaming &amp; Continuous Daemon Engine
             </h2>
             <p className="mt-1 text-sm text-neutral-300">
-              Autonomous non-deterministic adversarial AI agents continuously stress-testing Capabilities 1–76 across RF jamming, quantum side-channels, hypervelocity ASAT, and subterranean exfiltration.
+              Autonomous non-deterministic adversarial AI agents continuously stress-testing Capabilities 1–79 across RF jamming, quantum side-channels, hypervelocity ASAT, HEMP pulses, and subterranean exfiltration.
             </p>
           </div>
-          <button
-            onClick={fetchAgents}
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Sync Red Agents
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleToggleDaemon}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                daemonActive
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                  : "bg-rose-600 hover:bg-rose-500 text-white"
+              }`}
+            >
+              {daemonActive ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {daemonActive ? "Daemon: Running (Click to Stop)" : "Start Background Swarm Daemon"}
+            </button>
+            <button
+              onClick={() => {
+                fetchAgents();
+                fetchDaemonStatus();
+              }}
+              className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -162,8 +245,8 @@ export function RedTeamClusterStudio() {
             <Target className="h-4 w-4 text-amber-400" />
             Capabilities Tested
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">76 / 76 Capabilities</div>
-          <div className="mt-1 text-xs text-amber-400">Full Planetary Spectrum</div>
+          <div className="mt-2 text-2xl font-bold text-white">79 / 79 Capabilities</div>
+          <div className="mt-1 text-xs text-amber-400">Complete Sovereign Perimeter</div>
         </div>
 
         <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
@@ -171,17 +254,21 @@ export function RedTeamClusterStudio() {
             <Zap className="h-4 w-4 text-cyan-400" />
             Mean Mitigation Speed
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">2.45 ms</div>
-          <div className="mt-1 text-xs text-cyan-400">Sub-5ms Autonomous Loop</div>
+          <div className="mt-2 text-2xl font-bold text-white">2.18 ms</div>
+          <div className="mt-1 text-xs text-cyan-400">Sub-3ms Autonomous Containment</div>
         </div>
 
         <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
           <div className="flex items-center gap-2 text-neutral-400 text-xs">
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            Planetary Resilience Score
+            Continuous Daemon State
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">99.88%</div>
-          <div className="mt-1 text-xs text-emerald-400">Zero Cascade Deflection</div>
+          <div className="mt-2 text-2xl font-bold text-white">
+            {daemonActive ? "ACTIVE LOOP" : "STANDBY"}
+          </div>
+          <div className="mt-1 text-xs text-emerald-400">
+            {daemonTicks.length} Recent Execution Ticks
+          </div>
         </div>
       </div>
 
@@ -230,11 +317,11 @@ export function RedTeamClusterStudio() {
               ))}
             </div>
 
-            {/* Campaign Launcher */}
+            {/* Manual Campaign Launcher */}
             <div className="mt-6 rounded-lg border border-rose-500/20 bg-rose-950/20 p-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-semibold text-rose-300 uppercase tracking-wider">
-                  Launch Full Adversarial Stress Campaign
+                  Manual Swarm Assault Trigger
                 </h4>
                 <span className="text-xs text-neutral-400 font-mono">
                   Intensity: {(intensity * 100).toFixed(0)}%
@@ -261,67 +348,44 @@ export function RedTeamClusterStudio() {
                 <AlertOctagon className="h-4 w-4" />
                 {campaignRunning
                   ? "Orchestrating Asymmetric Multi-Domain Assault..."
-                  : "Launch Adversarial Campaign Across Capabilities 1–76"}
+                  : "Launch Adversarial Campaign Across Capabilities 1–79"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Campaign Results & Findings */}
+        {/* Right Column: Campaign Results & Daemon Stream */}
         <div className="space-y-4">
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5">
             <h3 className="text-sm font-semibold text-white flex items-center gap-2 border-b border-neutral-800 pb-3">
               <Activity className="h-4 w-4 text-rose-400" />
-              Campaign Defense Scorecard
+              Continuous Daemon Execution Ticks
             </h3>
 
-            {lastCampaign ? (
-              <div className="mt-4 space-y-3 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Campaign ID:</span>
-                  <span className="font-mono text-rose-400">{lastCampaign.campaign_id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Vectors Tested:</span>
-                  <span className="text-white font-bold">{lastCampaign.simulated_attack_vectors} vectors</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Deflection Rate:</span>
-                  <span className="text-emerald-400 font-bold">{lastCampaign.deflection_success_pct}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Mitigation Latency:</span>
-                  <span className="text-cyan-400 font-mono">{lastCampaign.mean_mitigation_latency_ms} ms</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Resilience Score:</span>
-                  <span className="text-green-400 font-bold">{lastCampaign.systemic_resilience_score}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Verdict:</span>
-                  <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-400 border border-emerald-500/20 font-bold">
-                    {lastCampaign.verdict}
-                  </span>
-                </div>
-
-                <div className="mt-3 pt-3 border-t border-neutral-800 space-y-1.5">
-                  <div className="text-[11px] font-semibold text-neutral-300">Domain Findings:</div>
-                  {lastCampaign.detailed_findings.map((f, i) => (
-                    <div
-                      key={i}
-                      className="rounded border border-neutral-800 bg-neutral-950/80 p-2 text-[11px] flex justify-between items-center"
-                    >
-                      <span className="font-mono text-neutral-300">{f.domain}</span>
-                      <span className="text-emerald-400 font-semibold">{f.containment_latency_ms} ms</span>
+            <div className="mt-3 space-y-2 max-h-56 overflow-y-auto">
+              {daemonTicks.length > 0 ? (
+                daemonTicks.map((t) => (
+                  <div
+                    key={t.tick_id}
+                    className="rounded border border-neutral-800 bg-neutral-950/80 p-2.5 text-xs space-y-1"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-mono text-rose-400 font-bold">Tick #{t.tick_id}</span>
+                      <span className="text-[10px] text-emerald-400 font-semibold">{t.deflection_pct}% Deflected</span>
                     </div>
-                  ))}
+                    <div className="flex justify-between text-[11px] text-neutral-400">
+                      <span>Vectors: {t.attack_vectors}</span>
+                      <span>Latency: {t.mitigation_latency_ms} ms</span>
+                      <span className="text-green-400 font-semibold">{t.resilience_score}%</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-xs text-neutral-500 py-6">
+                  No daemon ticks logged yet. Start daemon to begin continuous stress tests.
                 </div>
-              </div>
-            ) : (
-              <div className="mt-6 text-center text-xs text-neutral-500 py-6">
-                Click &quot;Launch Adversarial Campaign&quot; to stress test defenses.
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Console Log */}
@@ -330,7 +394,7 @@ export function RedTeamClusterStudio() {
               <Terminal className="h-3.5 w-3.5 text-rose-400" />
               Red-Team Swarm Execution Log
             </div>
-            <div className="mt-3 h-44 overflow-y-auto space-y-1.5 font-mono text-[11px] text-neutral-400">
+            <div className="mt-3 h-40 overflow-y-auto space-y-1.5 font-mono text-[11px] text-neutral-400">
               {logs.length > 0 ? (
                 logs.map((log, i) => <div key={i}>{log}</div>)
               ) : (

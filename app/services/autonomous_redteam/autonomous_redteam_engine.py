@@ -178,3 +178,4 @@ class AutonomousRedTeamCluster:
 
 
 autonomous_redteam_cluster = AutonomousRedTeamCluster()
+

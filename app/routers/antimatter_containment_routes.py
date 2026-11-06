@@ -56,3 +56,4 @@ async def quench_divert(req: QuenchDivertRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return superconducting_antimatter_containment.get_matrix_metrics()
+
