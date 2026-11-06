@@ -56,6 +56,8 @@ import {
   Scissors,
   Rocket,
   Satellite,
+  Sun,
+  Plane,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -136,9 +138,15 @@ import { KineticDroneShieldStudio } from "@/components/KineticDroneShieldStudio"
 import { NeuromorphicSNNStudio } from "@/components/NeuromorphicSNNStudio";
 import { DeepSpaceLaserStudio } from "@/components/DeepSpaceLaserStudio";
 import { HypersonicDefenseStudio } from "@/components/HypersonicDefenseStudio";
+import { PhotonicQuantumStudio } from "@/components/PhotonicQuantumStudio";
+import { GeomagneticShieldStudio } from "@/components/GeomagneticShieldStudio";
+import { HAPSStratosphereStudio } from "@/components/HAPSStratosphereStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "photonic-quantum", label: "Photonic Quantum", icon: Sparkles },
+  { id: "geomagnetic-shield", label: "CME Solar Shield", icon: Sun },
+  { id: "haps-stratosphere", label: "HAPS Swarm", icon: Plane },
   { id: "neuromorphic-snn", label: "Neuro SNN", icon: Cpu },
   { id: "deep-space-laser", label: "Deep-Space Laser", icon: Satellite },
   { id: "hypersonic-defense", label: "Hypersonic Defense", icon: Rocket },
@@ -264,6 +272,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "photonic-quantum" && <PhotonicQuantumStudio />}
+          {activeTab === "geomagnetic-shield" && <GeomagneticShieldStudio />}
+          {activeTab === "haps-stratosphere" && <HAPSStratosphereStudio />}
           {activeTab === "neuromorphic-snn" && <NeuromorphicSNNStudio />}
           {activeTab === "deep-space-laser" && <DeepSpaceLaserStudio />}
           {activeTab === "hypersonic-defense" && <HypersonicDefenseStudio />}

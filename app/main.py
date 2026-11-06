@@ -66,6 +66,8 @@ from app.routers import (
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
+    geomagnetic_shield_routes,
+    haps_stratosphere_routes,
     hypersonic_defense_routes,
     iac_drift_routes,
     incident_routes,
@@ -88,6 +90,7 @@ from app.routers import (
     orbital_laser_routes,
     password_routes,
     payment_routes,
+    photonic_quantum_routes,
     posture_routes,
     pqc_routes,
     ransomware_routes,
@@ -322,6 +325,9 @@ app.include_router(drone_swarm_shield_routes.router)
 app.include_router(neuromorphic_snn_routes.router)
 app.include_router(deep_space_laser_routes.router)
 app.include_router(hypersonic_defense_routes.router)
+app.include_router(photonic_quantum_routes.router)
+app.include_router(geomagnetic_shield_routes.router)
+app.include_router(haps_stratosphere_routes.router)
 
 
 # ---------------------
