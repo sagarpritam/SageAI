@@ -102,3 +102,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves planetary sub-crustal strain monitoring metrics."""
     return {"status": "success", "metrics": gravitational_seismic_mesh.get_metrics()}
+

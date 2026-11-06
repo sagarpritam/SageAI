@@ -139,3 +139,4 @@ class CounterQuantumHarvestMatrix:
 
 # Global singleton instance
 counter_quantum_harvest_matrix = CounterQuantumHarvestMatrix()
+

@@ -157,3 +157,4 @@ class SpaceborneDirectedEnergyPlasmaShield:
 
 # Global singleton instance
 spaceborne_plasma_shield = SpaceborneDirectedEnergyPlasmaShield()
+

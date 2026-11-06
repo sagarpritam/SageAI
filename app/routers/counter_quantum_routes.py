@@ -98,3 +98,4 @@ async def get_metrics_endpoint(
 ):
     """Retrieves Counter-Quantum Harvest Matrix defense metrics."""
     return {"status": "success", "metrics": counter_quantum_harvest_matrix.get_metrics()}
+

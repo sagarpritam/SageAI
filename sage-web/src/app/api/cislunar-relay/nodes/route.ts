@@ -1,0 +1,58 @@
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  return NextResponse.json([
+    {
+      node_id: "EARTH-OCP-TENERIFE",
+      lagrange_point: "Earth_Ground_Station",
+      distance_km: 0.0,
+      laser_wavelength_nm: 1550.0,
+      beam_divergence_urad: 4.8,
+      aperture_diameter_m: 1.0,
+      pointing_jitter_nrad: 35.0,
+      optical_power_watts: 40.0,
+      qkd_enabled: true,
+      oam_modes: [-2, -1, 0, 1, 2],
+      status: "ALIGNED_TRACKING",
+    },
+    {
+      node_id: "LAGRANGE-L1-HALO-1",
+      lagrange_point: "L1",
+      distance_km: 326400.0,
+      laser_wavelength_nm: 1550.0,
+      beam_divergence_urad: 4.8,
+      aperture_diameter_m: 0.85,
+      pointing_jitter_nrad: 45.0,
+      optical_power_watts: 25.0,
+      qkd_enabled: true,
+      oam_modes: [-2, -1, 0, 1, 2],
+      status: "ALIGNED_TRACKING",
+    },
+    {
+      node_id: "LAGRANGE-L2-HALO-2",
+      lagrange_point: "L2",
+      distance_km: 448900.0,
+      laser_wavelength_nm: 1550.0,
+      beam_divergence_urad: 4.8,
+      aperture_diameter_m: 1.2,
+      pointing_jitter_nrad: 50.0,
+      optical_power_watts: 30.0,
+      qkd_enabled: true,
+      oam_modes: [-2, -1, 0, 1, 2],
+      status: "ALIGNED_TRACKING",
+    },
+    {
+      node_id: "LUNAR-GATEWAY-ORBITER",
+      lagrange_point: "Lunar_Gateway",
+      distance_km: 384400.0,
+      laser_wavelength_nm: 1550.0,
+      beam_divergence_urad: 4.8,
+      aperture_diameter_m: 0.75,
+      pointing_jitter_nrad: 48.0,
+      optical_power_watts: 20.0,
+      qkd_enabled: true,
+      oam_modes: [-2, -1, 0, 1, 2],
+      status: "ALIGNED_TRACKING",
+    },
+  ]);
+}

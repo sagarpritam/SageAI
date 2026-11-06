@@ -29,6 +29,7 @@ from app.routers import (
     ai_spm_routes,
     airgap_exploit_routes,
     airgap_llm_guard_routes,
+    antimatter_containment_routes,
     api_shield_routes,
     apikey_routes,
     apt_attribution_routes,
@@ -45,6 +46,7 @@ from app.routers import (
     cart_routes,
     cas_redteam_swarm_routes,
     ci_routes,
+    cislunar_relay_routes,
     cloud_forensics_routes,
     cognitive_ew_routes,
     consensus_routes,
@@ -89,6 +91,7 @@ from app.routers import (
     marine_sonar_routes,
     mfa_routes,
     micro_hotpatch_routes,
+    muon_tomography_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
     neutrino_array_routes,
@@ -104,6 +107,7 @@ from app.routers import (
     pqc_routes,
     ransomware_routes,
     redteam_routes,
+    redteam_cluster_routes,
     regulatory_commander_routes,
     report_routes,
     rule_synthesizer_routes,
@@ -346,6 +350,10 @@ app.include_router(atomic_clock_routes.router)
 app.include_router(gravitational_seismic_routes.router)
 app.include_router(counter_quantum_routes.router)
 app.include_router(plasma_shield_routes.router)
+app.include_router(cislunar_relay_routes.router)
+app.include_router(muon_tomography_routes.router)
+app.include_router(antimatter_containment_routes.router)
+app.include_router(redteam_cluster_routes.router)
 
 
 # ---------------------

@@ -191,3 +191,4 @@ class GravitationalWaveSeismicMesh:
 
 # Global singleton instance
 gravitational_seismic_mesh = GravitationalWaveSeismicMesh()
+

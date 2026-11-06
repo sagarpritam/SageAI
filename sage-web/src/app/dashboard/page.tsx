@@ -60,6 +60,7 @@ import {
   Plane,
   Orbit,
   Binary,
+  Mountain,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -152,9 +153,17 @@ import { AtomicClockStudio } from "@/components/AtomicClockStudio";
 import { GravitationalSeismicStudio } from "@/components/GravitationalSeismicStudio";
 import { CounterQuantumStudio } from "@/components/CounterQuantumStudio";
 import { PlasmaShieldStudio } from "@/components/PlasmaShieldStudio";
+import { CisLunarRelayStudio } from "@/components/CisLunarRelayStudio";
+import { MuonTomographyStudio } from "@/components/MuonTomographyStudio";
+import { AntimatterContainmentStudio } from "@/components/AntimatterContainmentStudio";
+import { RedTeamClusterStudio } from "@/components/RedTeamClusterStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "cislunar-relay", label: "Cis-Lunar Relay", icon: Satellite },
+  { id: "muon-tomography", label: "Muon Tomography", icon: Mountain },
+  { id: "antimatter-containment", label: "Antimatter Containment", icon: Flame },
+  { id: "redteam-cluster", label: "Red-Team Cluster", icon: Skull },
   { id: "gravitational-seismic", label: "Gravitational Seismic", icon: Activity },
   { id: "counter-quantum", label: "Counter-Quantum", icon: Lock },
   { id: "plasma-shield", label: "Plasma Shield", icon: Sun },
@@ -292,6 +301,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "cislunar-relay" && <CisLunarRelayStudio />}
+          {activeTab === "muon-tomography" && <MuonTomographyStudio />}
+          {activeTab === "antimatter-containment" && <AntimatterContainmentStudio />}
+          {activeTab === "redteam-cluster" && <RedTeamClusterStudio />}
           {activeTab === "gravitational-seismic" && <GravitationalSeismicStudio />}
           {activeTab === "counter-quantum" && <CounterQuantumStudio />}
           {activeTab === "plasma-shield" && <PlasmaShieldStudio />}

@@ -425,3 +425,4 @@ export function GravitationalSeismicStudio() {
     </div>
   );
 }
+

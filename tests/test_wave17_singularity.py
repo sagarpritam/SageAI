@@ -280,3 +280,4 @@ def test_spaceborne_plasma_shield_endpoints(client):
         assert r5.json()["metrics"]["total_shield_platforms"] >= 3
     finally:
         app.dependency_overrides.clear()
+
