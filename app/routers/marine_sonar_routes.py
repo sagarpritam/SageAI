@@ -102,3 +102,4 @@ async def get_sonar_metrics_endpoint(
 ):
     """Returns fleet telemetry for marine acoustic ocean floor defense."""
     return {"status": "success", "metrics": marine_acoustic_sonar_mesh.get_sonar_metrics()}
+

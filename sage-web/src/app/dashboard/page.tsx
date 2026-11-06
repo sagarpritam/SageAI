@@ -146,9 +146,15 @@ import { HAPSStratosphereStudio } from "@/components/HAPSStratosphereStudio";
 import { MarineSonarStudio } from "@/components/MarineSonarStudio";
 import { OrbitalDebrisStudio } from "@/components/OrbitalDebrisStudio";
 import { AirgapExploitStudio } from "@/components/AirgapExploitStudio";
+import { NeutrinoArrayStudio } from "@/components/NeutrinoArrayStudio";
+import { CognitiveEWStudio } from "@/components/CognitiveEWStudio";
+import { AtomicClockStudio } from "@/components/AtomicClockStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "neutrino-array", label: "Neutrino Array", icon: Atom },
+  { id: "cognitive-ew", label: "Cognitive EW", icon: Radio },
+  { id: "atomic-clock", label: "Atomic Clock", icon: Clock },
   { id: "marine-sonar", label: "Ocean Sonar", icon: Waves },
   { id: "orbital-debris", label: "Debris Deflector", icon: Orbit },
   { id: "airgap-exploit-swarm", label: "Zero-Day Swarm", icon: Binary },
@@ -280,6 +286,9 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "neutrino-array" && <NeutrinoArrayStudio />}
+          {activeTab === "cognitive-ew" && <CognitiveEWStudio />}
+          {activeTab === "atomic-clock" && <AtomicClockStudio />}
           {activeTab === "marine-sonar" && <MarineSonarStudio />}
           {activeTab === "orbital-debris" && <OrbitalDebrisStudio />}
           {activeTab === "airgap-exploit-swarm" && <AirgapExploitStudio />}

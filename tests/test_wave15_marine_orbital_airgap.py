@@ -306,3 +306,4 @@ def test_wave15_fastapi_endpoints(client):
 
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+

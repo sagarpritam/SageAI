@@ -104,3 +104,4 @@ async def get_debris_metrics_endpoint(
 ):
     """Returns fleet telemetry for orbital kinetic debris laser deflector."""
     return {"status": "success", "metrics": orbital_asat_debris_deflector.get_debris_metrics()}
+

@@ -167,3 +167,4 @@ class OrbitalASATDebrisDeflector:
 
 # Singleton instance
 orbital_asat_debris_deflector = OrbitalASATDebrisDeflector()
+

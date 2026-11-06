@@ -34,6 +34,7 @@ from app.routers import (
     apt_attribution_routes,
     asm_routes,
     asset_routes,
+    atomic_clock_routes,
     atomic_redteam_routes,
     auth_routes,
     autofix_routes,
@@ -45,6 +46,7 @@ from app.routers import (
     cas_redteam_swarm_routes,
     ci_routes,
     cloud_forensics_routes,
+    cognitive_ew_routes,
     consensus_routes,
     copilot_routes,
     cspm_routes,
@@ -87,6 +89,7 @@ from app.routers import (
     micro_hotpatch_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
+    neutrino_array_routes,
     notification_routes,
     org_routes,
     orbital_debris_routes,
@@ -334,6 +337,9 @@ app.include_router(haps_stratosphere_routes.router)
 app.include_router(marine_sonar_routes.router)
 app.include_router(orbital_debris_routes.router)
 app.include_router(airgap_exploit_routes.router)
+app.include_router(neutrino_array_routes.router)
+app.include_router(cognitive_ew_routes.router)
+app.include_router(atomic_clock_routes.router)
 
 
 # ---------------------

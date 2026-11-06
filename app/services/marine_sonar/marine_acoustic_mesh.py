@@ -167,3 +167,4 @@ class MarineAcousticSonarMesh:
 
 # Singleton instance
 marine_acoustic_sonar_mesh = MarineAcousticSonarMesh()
+
