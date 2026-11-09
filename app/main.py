@@ -75,7 +75,10 @@ from app.routers import (
     enclave_attestation_routes,
     enclave_routes,
     enterprise_routes,
+    er_bridge_routes,
+    everett_branch_routes,
     explain_routes,
+    false_vacuum_routes,
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
@@ -108,6 +111,7 @@ from app.routers import (
     notification_routes,
     org_routes,
     orbital_debris_routes,
+    orbital_hpm_routes,
     orbital_laser_routes,
     password_routes,
     payment_routes,
@@ -384,6 +388,10 @@ app.include_router(desitter_repulsion_routes.router)
 app.include_router(calabi_yau_routes.router)
 app.include_router(cauchy_chronology_routes.router)
 app.include_router(hyperspectral_interceptor_routes.router)
+app.include_router(everett_branch_routes.router)
+app.include_router(er_bridge_routes.router)
+app.include_router(false_vacuum_routes.router)
+app.include_router(orbital_hpm_routes.router)
 
 
 # ---------------------

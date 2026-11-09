@@ -173,9 +173,17 @@ import { DeSitterRepulsionStudio } from "@/components/DeSitterRepulsionStudio";
 import { CalabiYauModuliStudio } from "@/components/CalabiYauModuliStudio";
 import { CauchyChronologyStudio } from "@/components/CauchyChronologyStudio";
 import { HyperspectralInterceptorStudio } from "@/components/HyperspectralInterceptorStudio";
+import { EverettBranchStudio } from "@/components/EverettBranchStudio";
+import { ERBridgeSiphonStudio } from "@/components/ERBridgeSiphonStudio";
+import { FalseVacuumShieldStudio } from "@/components/FalseVacuumShieldStudio";
+import { OrbitalHPMStudio } from "@/components/OrbitalHPMStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "everett-branch", label: "Everett Multiverse", icon: GitBranch },
+  { id: "er-bridge", label: "ER=EPR Bridge Siphon", icon: Atom },
+  { id: "false-vacuum", label: "False Vacuum Shield", icon: ShieldAlert },
+  { id: "orbital-hpm", label: "Orbital HPM Grid", icon: Radio },
   { id: "desitter-repulsion", label: "de Sitter Repulsion", icon: Globe },
   { id: "calabi-yau", label: "Calabi-Yau 10D", icon: Layers },
   { id: "cauchy-chronology", label: "Cauchy Chronology", icon: Clock },
@@ -332,6 +340,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "everett-branch" && <EverettBranchStudio />}
+          {activeTab === "er-bridge" && <ERBridgeSiphonStudio />}
+          {activeTab === "false-vacuum" && <FalseVacuumShieldStudio />}
+          {activeTab === "orbital-hpm" && <OrbitalHPMStudio />}
           {activeTab === "desitter-repulsion" && <DeSitterRepulsionStudio />}
           {activeTab === "calabi-yau" && <CalabiYauModuliStudio />}
           {activeTab === "cauchy-chronology" && <CauchyChronologyStudio />}
