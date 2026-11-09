@@ -8,3 +8,4 @@ from app.services.noncommutative_spacetime.noncommutative_spacetime import (
 )
 
 __all__ = ["NonCommutativeSpacetimeProtector", "get_noncommutative_spacetime_protector"]
+

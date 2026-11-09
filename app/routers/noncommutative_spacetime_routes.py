@@ -46,3 +46,4 @@ async def get_noncommutative_metrics():
     """Retrieve aggregate non-commutative spacetime metrics."""
     protector = get_noncommutative_spacetime_protector()
     return protector.get_noncommutative_metrics()
+

@@ -11,3 +11,4 @@ export async function GET() {
     capability: "102 - Spin-Foam Quantum Geometry Area-Spectra Quantizer",
   });
 }
+

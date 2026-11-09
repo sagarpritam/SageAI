@@ -8,3 +8,4 @@ from app.services.spin_foam_quantizer.spin_foam_quantizer import (
 )
 
 __all__ = ["SpinFoamGeometryQuantizer", "get_spin_foam_geometry_quantizer"]
+

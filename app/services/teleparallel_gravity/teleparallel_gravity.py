@@ -134,3 +134,4 @@ _teleparallel_gravity_engine = TeleparallelGravityEngine()
 def get_teleparallel_gravity_engine() -> TeleparallelGravityEngine:
     """Return the global TeleparallelGravityEngine singleton instance."""
     return _teleparallel_gravity_engine
+

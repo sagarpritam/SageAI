@@ -46,3 +46,4 @@ async def get_spin_foam_metrics():
     """Retrieve aggregate spin-foam quantum geometry metrics."""
     quantizer = get_spin_foam_geometry_quantizer()
     return quantizer.get_spin_foam_metrics()
+

@@ -48,3 +48,4 @@ async def get_antimatter_fusion_metrics():
     """Retrieve aggregate ACF rocket propulsion metrics."""
     rocket = get_antimatter_catalyzed_fusion_rocket()
     return rocket.get_antimatter_fusion_metrics()
+

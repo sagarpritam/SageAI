@@ -11,3 +11,4 @@ export async function GET() {
     capability: "101 - Topological Torsion Teleparallel Gravity Engine",
   });
 }
+

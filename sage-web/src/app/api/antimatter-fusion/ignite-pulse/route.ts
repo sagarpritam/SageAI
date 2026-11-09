@@ -33,3 +33,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to ignite antimatter-catalyzed fusion pulse" }, { status: 500 });
   }
 }
+

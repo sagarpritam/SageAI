@@ -153,3 +153,4 @@ _antimatter_catalyzed_fusion_rocket = AntimatterCatalyzedFusionRocket()
 def get_antimatter_catalyzed_fusion_rocket() -> AntimatterCatalyzedFusionRocket:
     """Return the global AntimatterCatalyzedFusionRocket singleton instance."""
     return _antimatter_catalyzed_fusion_rocket
+

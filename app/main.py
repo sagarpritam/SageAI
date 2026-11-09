@@ -85,6 +85,7 @@ from app.routers import (
     everett_branch_routes,
     explain_routes,
     false_vacuum_routes,
+    fibonacci_anyon_routes,
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
@@ -108,12 +109,14 @@ from app.routers import (
     labyrinth_honeynet_routes,
     magnetosphere_dynamo_routes,
     magneto_inertial_fusion_routes,
+    monopole_battery_routes,
     malware_routes,
     mantle_geoneutrino_routes,
     marine_sonar_routes,
     mfa_routes,
     micro_hotpatch_routes,
     mhd_plasma_stealth_routes,
+    mirror_symmetry_routes,
     muon_tomography_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
@@ -151,6 +154,7 @@ from app.routers import (
     space_ground_qkd_routes,
     spin_foam_routes,
     sso_routes,
+    string_field_theory_routes,
     subsea_cable_routes,
     supply_chain_routes,
     tachyon_horizon_routes,
@@ -424,6 +428,10 @@ app.include_router(teleparallel_gravity_routes.router)
 app.include_router(spin_foam_routes.router)
 app.include_router(noncommutative_spacetime_routes.router)
 app.include_router(antimatter_fusion_routes.router)
+app.include_router(string_field_theory_routes.router)
+app.include_router(mirror_symmetry_routes.router)
+app.include_router(fibonacci_anyon_routes.router)
+app.include_router(monopole_battery_routes.router)
 
 
 # ---------------------

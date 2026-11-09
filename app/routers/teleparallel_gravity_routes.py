@@ -44,3 +44,4 @@ async def get_teleparallel_metrics():
     """Retrieve aggregate teleparallel gravity metrics."""
     engine = get_teleparallel_gravity_engine()
     return engine.get_teleparallel_metrics()
+

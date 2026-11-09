@@ -11,3 +11,4 @@ export async function GET() {
     capability: "103 - Non-Commutative Moyal-Weyl Spacetime Phase Space Protector",
   });
 }
+

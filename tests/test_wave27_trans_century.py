@@ -230,3 +230,4 @@ def test_antimatter_fusion_api(client):
     metrics_res = client.get("/api/antimatter-fusion/metrics")
     assert metrics_res.status_code == 200
     assert metrics_res.json()["trans_solar_intercept_readiness"] is True
+

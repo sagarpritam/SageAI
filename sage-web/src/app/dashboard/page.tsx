@@ -69,6 +69,8 @@ import {
   Award,
   Box,
   Maximize2,
+  FlipHorizontal,
+  BatteryCharging,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -200,9 +202,17 @@ import TeleparallelGravityStudio from "@/components/TeleparallelGravityStudio";
 import SpinFoamStudio from "@/components/SpinFoamStudio";
 import NonCommutativeSpacetimeStudio from "@/components/NonCommutativeSpacetimeStudio";
 import AntimatterFusionStudio from "@/components/AntimatterFusionStudio";
+import StringFieldTheoryStudio from "@/components/StringFieldTheoryStudio";
+import MirrorSymmetryStudio from "@/components/MirrorSymmetryStudio";
+import FibonacciAnyonStudio from "@/components/FibonacciAnyonStudio";
+import MonopoleBatteryStudio from "@/components/MonopoleBatteryStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "string-field-theory", label: "String Field Theory (Cap 104)", icon: GitPullRequest },
+  { id: "mirror-symmetry", label: "Mirror Symmetry (Cap 105)", icon: FlipHorizontal },
+  { id: "fibonacci-anyon", label: "Fibonacci Anyons (Cap 106)", icon: Network },
+  { id: "monopole-battery", label: "Monopole Battery (Option B)", icon: BatteryCharging },
   { id: "teleparallel-gravity", label: "Teleparallel Gravity (Cap 101)", icon: Compass },
   { id: "spin-foam", label: "Spin-Foam Quantizer (Cap 102)", icon: Box },
   { id: "noncommutative-spacetime", label: "Non-Commutative Spacetime (Cap 103)", icon: Maximize2 },
@@ -379,6 +389,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "string-field-theory" && <StringFieldTheoryStudio />}
+          {activeTab === "mirror-symmetry" && <MirrorSymmetryStudio />}
+          {activeTab === "fibonacci-anyon" && <FibonacciAnyonStudio />}
+          {activeTab === "monopole-battery" && <MonopoleBatteryStudio />}
           {activeTab === "teleparallel-gravity" && <TeleparallelGravityStudio />}
           {activeTab === "spin-foam" && <SpinFoamStudio />}
           {activeTab === "noncommutative-spacetime" && <NonCommutativeSpacetimeStudio />}

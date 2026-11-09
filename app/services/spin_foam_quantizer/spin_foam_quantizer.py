@@ -144,3 +144,4 @@ _spin_foam_geometry_quantizer = SpinFoamGeometryQuantizer()
 def get_spin_foam_geometry_quantizer() -> SpinFoamGeometryQuantizer:
     """Return the global SpinFoamGeometryQuantizer singleton instance."""
     return _spin_foam_geometry_quantizer
+

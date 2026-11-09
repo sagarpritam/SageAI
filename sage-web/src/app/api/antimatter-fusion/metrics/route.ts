@@ -11,3 +11,4 @@ export async function GET() {
     capability: "Option B Wave 27 - Sovereign Planetary Antimatter-Catalyzed Fusion Rocket",
   });
 }
+

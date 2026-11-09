@@ -140,3 +140,4 @@ _noncommutative_spacetime_protector = NonCommutativeSpacetimeProtector()
 def get_noncommutative_spacetime_protector() -> NonCommutativeSpacetimeProtector:
     """Return the global NonCommutativeSpacetimeProtector singleton instance."""
     return _noncommutative_spacetime_protector
+
