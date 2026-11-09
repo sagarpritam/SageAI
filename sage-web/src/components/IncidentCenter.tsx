@@ -55,6 +55,35 @@ export function IncidentCenter() {
   const [reSampleText, setReSampleText] = useState("powershell.exe -ExecutionPolicy Bypass -enc SQBFAFgA\nVirtualAllocEx WriteProcessMemory CreateRemoteThread\nhttp://evil-c2.internal/beacon");
   const [reLoading, setReLoading] = useState(false);
   const [reResult, setReResult] = useState<ReverseEngResult | null>(null);
+  const [ingesting, setIngesting] = useState(false);
+
+  const handleIngestSimulatedAlert = async () => {
+    setIngesting(true);
+    setMessage(null);
+    try {
+      const res = await axios.post("/api/incidents", {
+        title: "Autonomous NIDS Alert: Lateral SMB Credential Access Attempt",
+        severity: "CRITICAL",
+        source: "NIDSMonitor",
+        details: {
+          attacker_ip: "198.51.100.88",
+          port: 445,
+          smb_share: "\\\\finance-vault\\payroll$",
+          rule: "ET_EXPLOIT_MS17_010_PROBE",
+        },
+      });
+      if (res.data?.incident) {
+        setMessage(`Incident ingested: ${res.data.incident.incident_id} (Automated zero-risk playbooks executed)`);
+        await fetchIncidents();
+        setSelectedIncident(res.data.incident);
+      }
+    } catch (err: any) {
+      const detail = err.response?.data?.detail || err.message;
+      setMessage(`Ingestion failed: ${detail}`);
+    } finally {
+      setIngesting(false);
+    }
+  };
 
   const fetchIncidents = async () => {
     setLoading(true);
@@ -158,13 +187,23 @@ export function IncidentCenter() {
             Prioritized security incidents with automated virtual patching and role-guarded containment actions.
           </p>
         </div>
-        <button
-          onClick={fetchIncidents}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleIngestSimulatedAlert}
+            disabled={ingesting}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-800/80 text-xs font-mono text-red-200 hover:text-white hover:bg-red-900/60 transition disabled:opacity-50"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+            {ingesting ? "Ingesting..." : "Ingest Detector Alert"}
+          </button>
+          <button
+            onClick={fetchIncidents}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {message && (

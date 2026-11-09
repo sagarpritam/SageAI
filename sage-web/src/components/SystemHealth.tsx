@@ -7,8 +7,21 @@ import axios from "axios";
 interface HealthData {
   api: string;
   database: string;
+  database_latency_ms?: number;
+  database_pool?: {
+    pool_type: string;
+    dialect: string;
+    driver: string;
+    status: string;
+    pooling_enabled: boolean;
+    size?: number;
+    checked_in?: number;
+    checked_out?: number;
+  } | null;
   scan_queue: number;
   uptime_seconds: number;
+  version?: string;
+  environment?: string;
 }
 
 const formatUptime = (seconds: number) => {
@@ -61,9 +74,15 @@ export function SystemHealth() {
     },
     {
       label: "Database",
-      status: health?.database || "unknown",
+      status:
+        health?.database === "connected" || health?.database === "healthy"
+          ? "connected"
+          : health?.database || "unknown",
       icon: Database,
-      detail: health?.database === "healthy" ? "Connected" : "Status unknown",
+      detail:
+        health?.database === "connected" || health?.database === "healthy"
+          ? `${health.database_pool?.dialect?.toUpperCase() || "DB"} • ${health.database_latency_ms ?? 0}ms latency • ${health.database_pool?.pool_type || "Active"}`
+          : "Status unknown",
     },
     {
       label: "Scan Queue",

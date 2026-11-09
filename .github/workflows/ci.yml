@@ -20,7 +20,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: pip install ruff bandit mypy safety
-      - run: ruff check app/ tests/
+      - run: ruff check app/ tests/ scripts/
+      - run: ruff format --check app/ tests/ scripts/
       - run: mypy app/ --ignore-missing-imports || true
       - run: safety check --full-report || true # Don't fail yet, just report
       - run: bandit -r app/ -f json -o bandit-report.json --severity-level medium || true
@@ -83,6 +84,7 @@ jobs:
           SECRET_KEY: "test-secret-key-for-ci"
           ALGORITHM: "HS256"
           ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+          REFRESH_TOKEN_EXPIRE_DAYS: "7"
 
   # ––– Frontend Build –––
   test-frontend:
