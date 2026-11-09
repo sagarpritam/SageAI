@@ -61,6 +61,7 @@ import {
   Orbit,
   Binary,
   Mountain,
+  Layers,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -168,9 +169,17 @@ import { DarkEnergyStudio } from "@/components/DarkEnergyStudio";
 import { CasimirVacuumStudio } from "@/components/CasimirVacuumStudio";
 import { AnyonBraidingStudio } from "@/components/AnyonBraidingStudio";
 import { QKDSpaceMeshStudio } from "@/components/QKDSpaceMeshStudio";
+import { DeSitterRepulsionStudio } from "@/components/DeSitterRepulsionStudio";
+import { CalabiYauModuliStudio } from "@/components/CalabiYauModuliStudio";
+import { CauchyChronologyStudio } from "@/components/CauchyChronologyStudio";
+import { HyperspectralInterceptorStudio } from "@/components/HyperspectralInterceptorStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "desitter-repulsion", label: "de Sitter Repulsion", icon: Globe },
+  { id: "calabi-yau", label: "Calabi-Yau 10D", icon: Layers },
+  { id: "cauchy-chronology", label: "Cauchy Chronology", icon: Clock },
+  { id: "hyperspectral-interceptor", label: "Hyperspectral Swarm", icon: Satellite },
   { id: "dark-energy", label: "Dark Energy Harvester", icon: Sparkles },
   { id: "casimir-vacuum", label: "Casimir Vacuum", icon: Zap },
   { id: "anyon-braiding", label: "Anyon Braiding Matrix", icon: Binary },
@@ -323,6 +332,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "desitter-repulsion" && <DeSitterRepulsionStudio />}
+          {activeTab === "calabi-yau" && <CalabiYauModuliStudio />}
+          {activeTab === "cauchy-chronology" && <CauchyChronologyStudio />}
+          {activeTab === "hyperspectral-interceptor" && <HyperspectralInterceptorStudio />}
           {activeTab === "dark-energy" && <DarkEnergyStudio />}
           {activeTab === "casimir-vacuum" && <CasimirVacuumStudio />}
           {activeTab === "anyon-braiding" && <AnyonBraidingStudio />}

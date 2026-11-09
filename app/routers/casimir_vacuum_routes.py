@@ -35,3 +35,4 @@ async def harvest_flux(req: HarvestVacuumFluxRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return casimir_vacuum_harvester.get_resonator_metrics()
+

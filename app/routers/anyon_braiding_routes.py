@@ -37,3 +37,4 @@ async def execute_braid(req: ExecuteBraidRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return anyon_topological_braiding.get_topological_metrics()
+

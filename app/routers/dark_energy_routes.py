@@ -35,3 +35,4 @@ async def stabilize_field(req: StabilizeInflatonFieldRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return dark_energy_harvester.get_harvest_metrics()
+

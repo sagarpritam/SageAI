@@ -1,0 +1,58 @@
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  return NextResponse.json([
+    {
+      satellite_id: "HYPER-SAT-POLAR-01",
+      satellite_name: "Sovereign Eye-1 (Sun-Synchronous Polar)",
+      orbit_type: "SUN_SYNCHRONOUS_POLAR",
+      altitude_km: 520.0,
+      spectral_bands_count: 288,
+      wavelength_range_nm: "400 - 14,000 nm (VNIR / SWIR / LWIR)",
+      ground_sample_distance_m: 0.42,
+      signal_to_noise_ratio: 540.0,
+      swath_width_km: 42.0,
+      on_orbit_neural_tpu_tops: 380.0,
+      status: "HYPERSPECTRAL_SURVEILLANCE_ACTIVE",
+    },
+    {
+      satellite_id: "HYPER-SAT-MOLNIYA-02",
+      satellite_name: "Sovereign Eye-2 (Molniya High Arctic)",
+      orbit_type: "MOLNIYA_HIGH_INCLINATION",
+      altitude_km: 39800.0,
+      spectral_bands_count: 288,
+      wavelength_range_nm: "400 - 14,000 nm (VNIR / SWIR / LWIR)",
+      ground_sample_distance_m: 1.20,
+      signal_to_noise_ratio: 490.0,
+      swath_width_km: 180.0,
+      on_orbit_neural_tpu_tops: 420.0,
+      status: "HYPERSPECTRAL_SURVEILLANCE_ACTIVE",
+    },
+    {
+      satellite_id: "HYPER-SAT-EQUATORIAL-03",
+      satellite_name: "Sovereign Eye-3 (LEO Equatorial Corridor)",
+      orbit_type: "LEO_EQUATORIAL",
+      altitude_km: 480.0,
+      spectral_bands_count: 288,
+      wavelength_range_nm: "400 - 14,000 nm (VNIR / SWIR / LWIR)",
+      ground_sample_distance_m: 0.38,
+      signal_to_noise_ratio: 560.0,
+      swath_width_km: 38.0,
+      on_orbit_neural_tpu_tops: 350.0,
+      status: "HYPERSPECTRAL_SURVEILLANCE_ACTIVE",
+    },
+    {
+      satellite_id: "HYPER-SAT-EURASIA-04",
+      satellite_name: "Sovereign Eye-4 (Sun-Synchronous Mid-Latitude)",
+      orbit_type: "SUN_SYNCHRONOUS_POLAR",
+      altitude_km: 510.0,
+      spectral_bands_count: 288,
+      wavelength_range_nm: "400 - 14,000 nm (VNIR / SWIR / LWIR)",
+      ground_sample_distance_m: 0.40,
+      signal_to_noise_ratio: 530.0,
+      swath_width_km: 45.0,
+      on_orbit_neural_tpu_tops: 390.0,
+      status: "HYPERSPECTRAL_SURVEILLANCE_ACTIVE",
+    },
+  ]);
+}

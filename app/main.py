@@ -43,10 +43,12 @@ from app.routers import (
     binary_deobfuscator_routes,
     billing_routes,
     bloodhound_routes,
+    calabi_yau_routes,
     canary_fabric_routes,
     cart_routes,
     cas_redteam_swarm_routes,
     casimir_vacuum_routes,
+    cauchy_chronology_routes,
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
@@ -64,6 +66,7 @@ from app.routers import (
     deception_routes,
     deep_analysis_routes,
     deep_space_laser_routes,
+    desitter_repulsion_routes,
     drone_swarm_shield_routes,
     dspm_routes,
     email_report_routes,
@@ -80,6 +83,7 @@ from app.routers import (
     gravitational_seismic_routes,
     haps_stratosphere_routes,
     hypersonic_defense_routes,
+    hyperspectral_interceptor_routes,
     iac_drift_routes,
     incident_routes,
     industrial_scada_routes,
@@ -376,6 +380,10 @@ app.include_router(dark_energy_routes.router)
 app.include_router(casimir_vacuum_routes.router)
 app.include_router(anyon_braiding_routes.router)
 app.include_router(qkd_space_mesh_routes.router)
+app.include_router(desitter_repulsion_routes.router)
+app.include_router(calabi_yau_routes.router)
+app.include_router(cauchy_chronology_routes.router)
+app.include_router(hyperspectral_interceptor_routes.router)
 
 
 # ---------------------

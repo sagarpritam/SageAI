@@ -35,3 +35,4 @@ async def swap_entanglement(req: SwapEntanglementRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return qkd_space_mesh_relay.get_mesh_metrics()
+
