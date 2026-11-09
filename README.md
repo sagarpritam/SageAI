@@ -620,48 +620,38 @@ Frontend Command Center will be live at `http://localhost:3000`.
 
 ## 🧪 Comprehensive Verification & Test Suite
 
-The SageAI test suite enforces rigorous quality assurance across all 10 pillars, tenant isolation, and cryptographic auditing:
+The SageAI test suite enforces rigorous quality assurance across all capabilities, tenant isolation, and cryptographic auditing:
 
 ```bash
-# Activate virtual environment
-venv\Scripts\activate
+# 1. Run the unified developer health check (Linter + Formatter + Test Suite)
+python scripts/dev_check.py
 
-# Run the complete test suite (349 tests)
-pytest -v
+# 2. Or run individual tools:
+# Linting & Style Check
+python -m ruff check app/ tests/ scripts/
 
-# Run enterprise security orchestrator tests
-pytest tests/test_enterprise_orchestrator_drill.py -v
+# Code Formatting Check
+python -m ruff format --check app/ tests/ scripts/
 
-# Run AI red-team & guardrail tests
-pytest tests/test_pillar8_redteam_adversarial_battery.py -v
+# Full Test Suite (573 tests across 55 suites)
+pytest -q
 
-# Run SagePatch AST remediation tests
-pytest tests/test_phase04_sagepatch.py -v
+# Frontend Production Compilation Check (Next.js Turbopack)
+cd sage-web && npx next build
 ```
 
 ### Test Suite Summary:
 ```text
-======================== 509 passed, 50 warnings in 0.09s ========================
-- 10-Capability Enterprise Security Drill Suite: 4/4 passed (100%)
-- AI Red-Teaming & Adversarial Guardrails: 8/8 passed (100%)
-- War Room Telemetry & Distributed Events: 2/2 passed (100%)
-- SagePatch Sandboxed AST Remediation: 10/10 passed (100%)
-- Multi-Tenant Isolation & RLS Security: 5/5 passed (100%)
-- Zero Egress Enclaves & Tokenizer: 8/8 passed (100%)
-- Threat Modeling STRIDE/DREAD Engine: 8/8 passed (100%)
-- Post-Quantum Hybrid Cryptography (Kyber + Dilithium): 14/14 passed (100%)
-- Decentralized SIEM & eBPF Telemetry: 7/7 passed (100%)
-- Unified Defense Wave 1 (CSPM, SBOM, ZTNA, MITRE BAS, EASM): 8/8 passed (100%)
-- Unified Defense Wave 2 (AI SOC, Threat Hunting, Anti-Ransomware, DSPM, CTI): 6/6 passed (100%)
-- Wave 19 Deep Physics & Planetary Deflection (Solar Sail, Dynamo, Geoneutrino): 5/5 passed (100%)
-- Wave 20 Grand Singularity Milestone (Capabilities 80-82 & Cluster Federation): 8/8 passed (100%)
-- Total Pytest Test Suite: 509 / 509 passing (100%)
-- Next.js Turbopack Build: 319 / 319 routes compiled with 0 errors
+======================== 573 passed, 36 warnings in 68.12s ========================
+- Total Pytest Test Suite: 573 / 573 passing across 55 test suites (100% pass rate)
+- Next.js Turbopack Build: 416 / 416 routes compiled with 0 errors
+- FastAPI Microservices: 638 endpoints registered
+- Code Quality: 100% Ruff lint and format compliant
 ```
 
 ---
 
-## 📡 API Reference Overview (115+ Endpoints)
+## 📡 API Reference Overview (638 Endpoints)
 
 ### 1. Enterprise Security Grid & Orchestrator
 | Method | Endpoint | Description |
