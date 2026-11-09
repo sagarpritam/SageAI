@@ -71,6 +71,7 @@ import {
   Maximize2,
   FlipHorizontal,
   BatteryCharging,
+  X,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -346,8 +347,102 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
+const CORE_TAB_IDS = new Set([
+  "overview",
+  "incidents",
+  "observability",
+  "posture",
+  "copilot",
+  "intel",
+  "redteam",
+  "schedules",
+  "asm",
+  "autofix",
+  "compliance",
+  "health",
+  "threats",
+  "warroom",
+  "ai-soc",
+  "threat-hunting",
+  "defense-grid",
+  "cyber-range",
+]);
+
+const CLOUD_TAB_IDS = new Set([
+  "cspm",
+  "supply-chain",
+  "ztna",
+  "easm",
+  "dspm",
+  "cti-hub",
+  "enterprise",
+  "enclave",
+  "threat-modeling",
+  "quantum-safe",
+  "ebpf-telemetry",
+  "kms-hsm",
+  "bloodhound",
+  "api-shield",
+  "iac-drift",
+  "sbom-vex",
+  "itdr",
+  "cart-paths",
+  "ai-spm",
+  "crossplane-mesh",
+  "workload-identity",
+  "hardware-enclave",
+  "web3-security",
+  "sdn-shield",
+  "zkp-compliance",
+  "d3fend-matrix",
+  "cloud-forensics",
+  "regulatory-commander",
+  "anti-ransomware",
+]);
+
+const OFFENSIVE_TAB_IDS = new Set([
+  "adversary-matrix",
+  "adversary-emulation",
+  "forensics",
+  "consensus",
+  "deep-analysis",
+  "detonation",
+  "rules",
+  "deception",
+  "labyrinth-honeynet",
+  "canary-fabric",
+  "hunting-swarm",
+  "deobfuscator",
+  "micro-hotpatch",
+  "cas-redteam",
+  "apt-attribution",
+  "darkweb-radar",
+  "redteam-cluster",
+  "airgap-exploit-swarm",
+]);
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "core" | "cloud" | "offensive" | "frontier">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTabs = tabs.filter((tab) => {
+    if (selectedCategory === "core" && !CORE_TAB_IDS.has(tab.id)) return false;
+    if (selectedCategory === "cloud" && !CLOUD_TAB_IDS.has(tab.id)) return false;
+    if (selectedCategory === "offensive" && !OFFENSIVE_TAB_IDS.has(tab.id)) return false;
+    if (
+      selectedCategory === "frontier" &&
+      (CORE_TAB_IDS.has(tab.id) || CLOUD_TAB_IDS.has(tab.id) || OFFENSIVE_TAB_IDS.has(tab.id))
+    )
+      return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      return tab.label.toLowerCase().includes(q) || tab.id.toLowerCase().includes(q);
+    }
+
+    return true;
+  });
 
   return (
     <main className="min-h-screen bg-black text-emerald-50 font-sans selection:bg-emerald-500/30">
@@ -355,35 +450,109 @@ export default function DashboardPage() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-emerald-900/30 rounded-lg">
-            <Shield className="w-6 h-6 text-emerald-400" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-900/30 rounded-lg">
+              <Shield className="w-6 h-6 text-emerald-400" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
+              <p className="text-xs text-zinc-500 font-mono">SageAI Enterprise Defense Grid &bull; 94 Active Modules</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
-            <p className="text-xs text-zinc-500 font-mono">SageAI Enterprise Defense Grid</p>
+
+          {/* Quick Search */}
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search 94 modules..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-zinc-900/80 border border-zinc-800 rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 text-xs scrollbar-none">
+          {(
+            [
+              { id: "all", label: "All Modules", count: tabs.length },
+              { id: "core", label: "Core SOC & Ops", count: tabs.filter((t) => CORE_TAB_IDS.has(t.id)).length },
+              { id: "cloud", label: "Cloud & Identity", count: tabs.filter((t) => CLOUD_TAB_IDS.has(t.id)).length },
+              { id: "offensive", label: "Offensive & Deception", count: tabs.filter((t) => OFFENSIVE_TAB_IDS.has(t.id)).length },
+              {
+                id: "frontier",
+                label: "Frontier Systems",
+                count: tabs.filter(
+                  (t) => !CORE_TAB_IDS.has(t.id) && !CLOUD_TAB_IDS.has(t.id) && !OFFENSIVE_TAB_IDS.has(t.id)
+                ).length,
+              },
+            ] as const
+          ).map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-3 py-1.5 rounded-full font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                  isSelected
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/60 shadow-sm shadow-emerald-950"
+                    : "bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:bg-zinc-900"
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-zinc-800/80 text-zinc-400 font-mono">
+                  {cat.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab Navigation */}
         <div className="flex gap-1 mb-8 overflow-x-auto pb-1 border-b border-zinc-800">
-          {tabs.map((tab) => {
+          {filteredTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-t-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive
                     ? "bg-emerald-900/30 text-emerald-400 border-b-2 border-emerald-500"
                     : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/40"
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-3.5 h-3.5" />
                 {tab.label}
               </button>
             );
           })}
+          {filteredTabs.length === 0 && (
+            <div className="py-2.5 px-3 text-xs text-zinc-500 italic flex items-center gap-2">
+              No modules match &quot;{searchQuery}&quot;.
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                }}
+                className="text-emerald-400 underline font-mono ml-2 hover:text-emerald-300 not-italic"
+              >
+                Reset search filter
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tab Content */}
