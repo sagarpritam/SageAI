@@ -30,6 +30,7 @@ from app.routers import (
     airgap_exploit_routes,
     airgap_llm_guard_routes,
     antimatter_containment_routes,
+    anyon_braiding_routes,
     api_shield_routes,
     apikey_routes,
     apt_attribution_routes,
@@ -45,6 +46,7 @@ from app.routers import (
     canary_fabric_routes,
     cart_routes,
     cas_redteam_swarm_routes,
+    casimir_vacuum_routes,
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
@@ -57,6 +59,7 @@ from app.routers import (
     crossplane_mesh_routes,
     cti_routes,
     d3fend_routes,
+    dark_energy_routes,
     darkweb_radar_routes,
     deception_routes,
     deep_analysis_routes,
@@ -108,6 +111,7 @@ from app.routers import (
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
+    qkd_space_mesh_routes,
     quantum_gravitational_routes,
     ransomware_routes,
     redteam_routes,
@@ -368,6 +372,10 @@ app.include_router(quantum_gravitational_routes.router)
 app.include_router(tachyon_horizon_routes.router)
 app.include_router(singularity_containment_routes.router)
 app.include_router(cluster_federation_routes.router)
+app.include_router(dark_energy_routes.router)
+app.include_router(casimir_vacuum_routes.router)
+app.include_router(anyon_braiding_routes.router)
+app.include_router(qkd_space_mesh_routes.router)
 
 
 # ---------------------

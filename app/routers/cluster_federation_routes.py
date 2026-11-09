@@ -53,3 +53,4 @@ async def trigger_failover(req: AutomatedFailoverRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cluster_federation_engine.get_federation_metrics()
+

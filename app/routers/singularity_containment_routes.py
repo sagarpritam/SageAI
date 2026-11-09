@@ -41,3 +41,4 @@ async def adjust_feed(req: AdjustMatterFeedRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return micro_singularity_containment.get_matrix_metrics()
+

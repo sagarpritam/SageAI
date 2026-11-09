@@ -172,3 +172,4 @@ class TachyonHorizonCerenkovSentinel:
 
 
 tachyon_horizon_sentinel = TachyonHorizonCerenkovSentinel()
+

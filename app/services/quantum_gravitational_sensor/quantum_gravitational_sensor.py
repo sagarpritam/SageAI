@@ -187,3 +187,4 @@ class QuantumGravitationalEntanglementSensor:
 
 
 quantum_gravitational_sensor = QuantumGravitationalEntanglementSensor()
+

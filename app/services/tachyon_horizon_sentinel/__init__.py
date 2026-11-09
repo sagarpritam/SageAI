@@ -7,3 +7,4 @@ __all__ = [
     "TachyonHorizonCerenkovSentinel",
     "tachyon_horizon_sentinel",
 ]
+

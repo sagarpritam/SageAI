@@ -187,3 +187,4 @@ class MicroSingularityHawkingContainment:
 
 
 micro_singularity_containment = MicroSingularityHawkingContainment()
+

@@ -35,3 +35,4 @@ async def sample_horizon(req: SamplePrecausalHorizonRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return tachyon_horizon_sentinel.get_sentinel_metrics()
+

@@ -164,9 +164,17 @@ import { QuantumGravitationalStudio } from "@/components/QuantumGravitationalStu
 import { TachyonHorizonStudio } from "@/components/TachyonHorizonStudio";
 import { SingularityContainmentStudio } from "@/components/SingularityContainmentStudio";
 import { ClusterFederationStudio } from "@/components/ClusterFederationStudio";
+import { DarkEnergyStudio } from "@/components/DarkEnergyStudio";
+import { CasimirVacuumStudio } from "@/components/CasimirVacuumStudio";
+import { AnyonBraidingStudio } from "@/components/AnyonBraidingStudio";
+import { QKDSpaceMeshStudio } from "@/components/QKDSpaceMeshStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "dark-energy", label: "Dark Energy Harvester", icon: Sparkles },
+  { id: "casimir-vacuum", label: "Casimir Vacuum", icon: Zap },
+  { id: "anyon-braiding", label: "Anyon Braiding Matrix", icon: Binary },
+  { id: "qkd-space-mesh", label: "Interstellar QKD Mesh", icon: Network },
   { id: "quantum-gravitational", label: "Quantum Gravitational", icon: Radio },
   { id: "tachyon-horizon", label: "Tachyon Horizon", icon: Clock },
   { id: "singularity-containment", label: "Singularity Containment", icon: Flame },
@@ -315,6 +323,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "dark-energy" && <DarkEnergyStudio />}
+          {activeTab === "casimir-vacuum" && <CasimirVacuumStudio />}
+          {activeTab === "anyon-braiding" && <AnyonBraidingStudio />}
+          {activeTab === "qkd-space-mesh" && <QKDSpaceMeshStudio />}
           {activeTab === "quantum-gravitational" && <QuantumGravitationalStudio />}
           {activeTab === "tachyon-horizon" && <TachyonHorizonStudio />}
           {activeTab === "singularity-containment" && <SingularityContainmentStudio />}

@@ -35,3 +35,4 @@ async def measure_distortion(req: MeasureDistortionRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return quantum_gravitational_sensor.get_sensor_metrics()
+
