@@ -4,10 +4,10 @@ Monitors cryogenic Strontium-87 and Ytterbium-171 optical lattice atomic clocks 
 disseminates White Rabbit PTP coherent optical frequency comb signals, and issues ML-DSA-87 authenticated timestamps.
 """
 
-from typing import Dict, Any, List, Optional
+import hashlib
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class OpticalAtomicClockMesh:

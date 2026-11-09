@@ -10,3 +10,4 @@ export async function GET() {
     capability: "105 - Calabi-Yau Mirror Symmetry Hodge Diamond Inverter",
   });
 }
+

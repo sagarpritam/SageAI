@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.antimatter_containment import superconducting_antimatter_containment
 
 router = APIRouter(prefix="/api/antimatter-containment", tags=["Antimatter Containment (Cap 76)"])

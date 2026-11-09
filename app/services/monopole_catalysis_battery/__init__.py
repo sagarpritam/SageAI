@@ -8,3 +8,4 @@ from app.services.monopole_catalysis_battery.monopole_catalysis_battery import (
 )
 
 __all__ = ["MagneticMonopoleCatalyzedBattery", "get_magnetic_monopole_catalyzed_battery"]
+

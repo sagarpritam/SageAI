@@ -6,11 +6,10 @@ canceling tadpole anomalies (sum_a N_a Q_a + Q_O = 0) and neutralizing chiral ga
 via the Green-Schwarz mechanism to filter out tachyonic decay modes and destabilizing bulk fluxes.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

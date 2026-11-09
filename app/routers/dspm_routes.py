@@ -2,7 +2,8 @@
 FastAPI Router for Autonomous Cloud Data Security Posture Management (DSPM).
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

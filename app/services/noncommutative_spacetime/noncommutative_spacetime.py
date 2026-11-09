@@ -8,7 +8,7 @@ generalized spacetime coordinate uncertainty bounds.
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class NonCommutativeSpacetimeProtector:

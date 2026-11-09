@@ -7,9 +7,8 @@ Provides f(T) modified gravity modulation, cosmological torsion dark energy
 equivalence, and metric inertia decoupling.
 """
 
-import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class TeleparallelGravityEngine:

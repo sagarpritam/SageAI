@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.solar_sail_laser import relativistic_solar_sail_laser_mesh
 
 router = APIRouter(prefix="/api/solar-sail-laser", tags=["Relativistic Solar Sail Laser (Cap 77)"])

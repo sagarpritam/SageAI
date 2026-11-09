@@ -3,6 +3,7 @@ FastAPI Router for Cyber Threat Intelligence (CTI) STIX 2.1 & TAXII 2.1 Hub.
 """
 
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

@@ -6,11 +6,11 @@ using superconducting quantum interference devices (SQUIDs) in microwave coplana
 to convert ground-state vacuum fluctuations into correlated real photon pairs.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

@@ -17,9 +17,6 @@ Provides:
 5. Cryptographic Merkle Audit Hash Chain Anchoring.
 """
 
-import collections
-import hashlib
-import json
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional

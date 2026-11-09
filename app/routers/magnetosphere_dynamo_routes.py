@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.magnetosphere_dynamo import magnetosphere_dynamo_decoupler
 
 router = APIRouter(prefix="/api/magnetosphere-dynamo", tags=["Magnetosphere Dynamo & HEMP Decoupler (Cap 78)"])

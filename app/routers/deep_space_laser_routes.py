@@ -3,6 +3,7 @@ FastAPI Router for Deep-Space Interplanetary Optical Laser Telemetry Cryptograph
 """
 
 from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

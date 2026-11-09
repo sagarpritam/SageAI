@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from app.core.rate_limit import limiter
-from app.core.security import get_current_user, require_role
+from app.core.security import get_current_user
 from app.routers.webhook_routes import is_safe_webhook_url
 from app.services.ai_resilience import (
     evaluate_adversarial_input,

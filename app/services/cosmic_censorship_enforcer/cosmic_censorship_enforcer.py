@@ -7,11 +7,11 @@ angular momentum damping torques and topological flux to cloak naked singulariti
 trapped causal event horizons (r_+ = M + sqrt(M^2 - a^2 - Q^2)).
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

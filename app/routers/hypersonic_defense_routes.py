@@ -3,12 +3,15 @@ FastAPI Router for Autonomous Multi-Sensor Hypersonic Glide Vehicle (HGV) Trajec
 """
 
 from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.hypersonic_defense.hypersonic_interceptor import hypersonic_interceptor
+from app.services.hypersonic_defense.hypersonic_interceptor import (
+    hypersonic_interceptor,
+)
 
 router = APIRouter(
     prefix="/hypersonic-defense",

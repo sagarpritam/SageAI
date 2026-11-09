@@ -20,7 +20,7 @@ import json
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from app.services.audit_chain import audit_chain
 
@@ -440,7 +440,8 @@ class ThreatModelingEngine:
                         dread_base["discoverability"] = min(10, dread_base["discoverability"] + 2)
 
                     dread_metric = self.calculate_dread_score(dread_base)
-                    threat_id = f"THREAT-{hashlib.sha256(f'{comp_name}:{kb['title']}'.encode()).hexdigest()[:8].upper()}"
+                    threat_key = f"{comp_name}:{kb['title']}".encode()
+                    threat_id = f"THREAT-{hashlib.sha256(threat_key).hexdigest()[:8].upper()}"
 
                     threats.append({
                         "threat_id": threat_id,

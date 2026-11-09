@@ -6,10 +6,9 @@ multi-vector asymmetric assaults across all 76 sovereign defense, quantum, and o
 Computes containment scores, cascade mitigation latency, and planetary resilience indices.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import math
 import random
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 

@@ -8,3 +8,4 @@ from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import (
 )
 
 __all__ = ["FibonacciAnyonCompiler", "get_fibonacci_anyon_compiler"]
+

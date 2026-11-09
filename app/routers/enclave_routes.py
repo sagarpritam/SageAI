@@ -8,7 +8,8 @@ Provides endpoints for:
 4. Autonomous multi-region sovereignty verification drills anchored to the Merkle audit chain.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

@@ -4,10 +4,10 @@ Manages Free-Space Optical (FSO) laser mesh topologies across Low Earth Orbit (L
 enforces 60-second ephemeral PQC session key rotation, and secures CCSDS telecommand uplinks.
 """
 
-from typing import Dict, Any, List, Optional
+import hashlib
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class OrbitalLaserMeshGuard:

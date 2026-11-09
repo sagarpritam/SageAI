@@ -4,9 +4,9 @@ Automates legal, CISO, and regulatory reporting during high-severity enterprise 
 generates SEC Form 8-K Item 1.05 disclosures, EU NIS2 Article 23 early warnings, and GDPR Art 33 filings.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class RegulatoryIncidentCommander:

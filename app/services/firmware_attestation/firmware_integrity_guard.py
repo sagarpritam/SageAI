@@ -5,10 +5,8 @@ UEFI Secure Boot db/dbx databases, and SPI Flash cryptographic hashes to detect 
 neutralize bootkits and rootkits (BlackLotus, CosmicStrand, MoonBounce, ESPecter).
 """
 
-from typing import Dict, Any, List, Optional
 import time
-import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class FirmwareIntegrityGuard:

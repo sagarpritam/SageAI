@@ -5,10 +5,8 @@ Orchestrates simulated multi-vector red team attacks against SageAI's defense gr
 to demonstrate autonomous detection, correlation, and response across all 10 capabilities.
 """
 
-import base64
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 from app.services.deception.honeypot_service import deception_service

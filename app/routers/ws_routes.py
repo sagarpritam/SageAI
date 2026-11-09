@@ -10,7 +10,7 @@ import asyncio
 import json
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from uuid import UUID
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect

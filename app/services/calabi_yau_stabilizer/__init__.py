@@ -1,8 +1,8 @@
 from .calabi_yau_stabilizer import (
-    CalabiYauModuliStabilizer,
-    calabi_yau_stabilizer,
     CalabiYauManifoldNode,
+    CalabiYauModuliStabilizer,
     ModuliStabilizationResult,
+    calabi_yau_stabilizer,
 )
 
 __all__ = [

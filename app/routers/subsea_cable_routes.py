@@ -2,7 +2,8 @@
 FastAPI Router for Deep-Sea Subsea Fiber-Optic Cable Acoustic & Optical Tap Sensor Interceptor.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

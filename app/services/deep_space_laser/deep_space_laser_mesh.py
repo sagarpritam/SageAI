@@ -4,9 +4,9 @@ Manages Deep-Space Optical Communications (DSOC) between Earth, Lunar Gateway, a
 performing relativistic Doppler tracking, sub-micro-radian point-ahead steering, and ML-KEM-1024 / LDPC framing.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class DeepSpaceLaserMesh:

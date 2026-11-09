@@ -11,10 +11,9 @@ Provides:
 """
 
 import hashlib
-import json
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 
@@ -138,8 +137,10 @@ class CSPMService:
 
                     if is_violation:
                         failed_count += 1
+                        finding_key = f"{asset_name}:{rule['rule_id']}".encode()
+                        finding_id = f"FIND-{hashlib.sha256(finding_key).hexdigest()[:8].upper()}"
                         findings.append({
-                            "finding_id": f"FIND-{hashlib.sha256(f'{asset_name}:{rule['rule_id']}'.encode()).hexdigest()[:8].upper()}",
+                            "finding_id": finding_id,
                             "rule_id": rule["rule_id"],
                             "framework": rule["framework"],
                             "title": rule["title"],

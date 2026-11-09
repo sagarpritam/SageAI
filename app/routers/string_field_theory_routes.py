@@ -2,11 +2,13 @@
 FastAPI Router for Capability 104: Open-Closed String Field Theory Vertex Integrator.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.string_field_theory.string_field_theory import get_string_field_theory_integrator
+from app.services.string_field_theory.string_field_theory import (
+    get_string_field_theory_integrator,
+)
 
 router = APIRouter(prefix="/api/string-field-theory", tags=["Capability 104: String Field Theory"])
 
@@ -46,3 +48,4 @@ async def get_sft_metrics():
     """Retrieve aggregate string field theory metrics."""
     integrator = get_string_field_theory_integrator()
     return integrator.get_sft_metrics()
+

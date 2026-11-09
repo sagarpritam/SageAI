@@ -5,12 +5,11 @@ Monitors real-time latency, request throughput, error rates, token cost,
 and circuit breaker availability across all AI Council frontier models.
 """
 
-from collections import deque
-from datetime import datetime, timezone
 import logging
 import statistics
-import time
-from typing import Any, Dict, List, Optional
+from collections import deque
+from datetime import datetime, timezone
+from typing import Any, Dict
 
 logger = logging.getLogger("SageAI.llm.telemetry")
 
@@ -74,9 +73,9 @@ class CouncilModelTelemetry:
     def __init__(self):
         # provider -> deque of recent latencies in ms (last 50 requests)
         self._latencies: Dict[str, deque] = {p: deque(maxlen=50) for p in self.COUNCIL_MODELS}
-        self._success_counts: Dict[str, int] = {p: 0 for p in self.COUNCIL_MODELS}
-        self._failure_counts: Dict[str, int] = {p: 0 for p in self.COUNCIL_MODELS}
-        self._total_tokens: Dict[str, int] = {p: 0 for p in self.COUNCIL_MODELS}
+        self._success_counts: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
+        self._failure_counts: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
+        self._total_tokens: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
 
     def record_call(
         self,

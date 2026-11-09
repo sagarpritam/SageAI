@@ -3,12 +3,15 @@ FastAPI Router for Photonic Optical Quantum Computing Cryptanalytic Co-Processor
 """
 
 from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.photonic_quantum.photonic_quantum_firewall import photonic_quantum_firewall
+from app.services.photonic_quantum.photonic_quantum_firewall import (
+    photonic_quantum_firewall,
+)
 
 router = APIRouter(
     prefix="/photonic-quantum",

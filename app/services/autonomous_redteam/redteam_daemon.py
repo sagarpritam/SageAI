@@ -6,14 +6,14 @@ adversarial stress tests across all 79 defense capabilities, maintaining a live 
 of deflection results, mitigation latencies, and resilience indices.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
 import threading
 import time
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
+
 from app.services.autonomous_redteam.autonomous_redteam_engine import (
     autonomous_redteam_cluster,
-    RedTeamCampaignResult,
 )
 
 

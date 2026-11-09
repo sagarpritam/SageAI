@@ -6,17 +6,17 @@ Provides endpoints for real-time WAF payload inspection, Network Intrusion Detec
 Behavioral UEBA Anomaly evaluation, and Immutable Cryptographic Audit Chain verification.
 """
 
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.audit_chain import audit_chain
+from app.services.detection.anomaly_engine import anomaly_engine
 from app.services.detection.attack_detector import AttackDetector
 from app.services.detection.nids_monitor import NIDSMonitor
-from app.services.detection.anomaly_engine import anomaly_engine
-from app.services.incident_response.soar_engine import soar_engine
 
 router = APIRouter(prefix="/intrusion", tags=["Enterprise Intrusion & Defense Grid"])
 

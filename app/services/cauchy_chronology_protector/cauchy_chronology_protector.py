@@ -6,11 +6,11 @@ Monitors divergent renormalized vacuum stress-energy tensors <T_mu_nu>_ren and a
 backreaction counter-pulses to disperse closed timelike curves and preserve global chronology.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

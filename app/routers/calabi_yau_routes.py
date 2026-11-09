@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.calabi_yau_stabilizer import calabi_yau_stabilizer
 
 router = APIRouter(

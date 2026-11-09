@@ -6,11 +6,10 @@ Scintillator telescope arrays to perform 3D radiographic density contrast invers
 subterranean geological overburden, revealing clandestine void chambers and high-Z shielded materials.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

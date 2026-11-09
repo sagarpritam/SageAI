@@ -4,9 +4,9 @@ Operates solar-electric stratospheric UAVs (18-24km altitude), sub-millimeter Sy
 inter-HAPS optical laser meshes, and autonomous jet stream station-keeping against 40m/s winds.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class HAPSStratosphereMesh:

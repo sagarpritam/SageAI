@@ -2,8 +2,9 @@
 FastAPI Router for Web3 & Smart Contract Security Audit Engine.
 """
 
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter

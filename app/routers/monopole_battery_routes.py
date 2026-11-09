@@ -2,9 +2,9 @@
 FastAPI Router for Option B Wave 28: Sovereign Planetary Magnetic Monopole Proton Decay Battery.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
 from app.services.monopole_catalysis_battery.monopole_catalysis_battery import (
     get_magnetic_monopole_catalyzed_battery,
@@ -48,3 +48,4 @@ async def get_monopole_metrics():
     """Retrieve aggregate magnetic monopole battery metrics."""
     battery = get_magnetic_monopole_catalyzed_battery()
     return battery.get_monopole_metrics()
+

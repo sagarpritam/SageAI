@@ -4,9 +4,9 @@ Models continuous-variable squeezed light interferometers, Mach-Zehnder (MZI) ph
 and sub-picosecond optical gates to defend ML-KEM-1024 and ML-DSA-87 against photonic quantum cryptanalysis.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class PhotonicQuantumCryptFirewall:

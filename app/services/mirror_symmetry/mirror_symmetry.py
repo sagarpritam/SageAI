@@ -9,7 +9,7 @@ category Fuk(X) to the derived category of coherent sheaves D^b(Coh(W)).
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class CalabiYauMirrorSymmetryInverter:
@@ -149,3 +149,4 @@ _calabi_yau_mirror_symmetry_inverter = CalabiYauMirrorSymmetryInverter()
 def get_calabi_yau_mirror_symmetry_inverter() -> CalabiYauMirrorSymmetryInverter:
     """Return the global CalabiYauMirrorSymmetryInverter singleton instance."""
     return _calabi_yau_mirror_symmetry_inverter
+

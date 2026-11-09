@@ -3,6 +3,7 @@ FastAPI Router for Autonomous Multi-Agent Threat Hunting Swarm.
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

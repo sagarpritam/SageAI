@@ -5,11 +5,11 @@ NIST FIPS 203 (ML-KEM-768 / Kyber) and NIST FIPS 204 (ML-DSA-65 / Dilithium)
 with 120-second ephemeral session key rotation and quantum-safe Perfect Forward Secrecy.
 """
 
-from typing import Dict, Any, List, Optional
-import time
-import uuid
 import hashlib
 import os
+import time
+import uuid
+from typing import Any, Dict, List, Optional
 
 
 class KyberMeshVPNService:
@@ -129,7 +129,7 @@ class KyberMeshVPNService:
         # Simulate ML-KEM-768 encapsulation
         ciphertext_bytes = os.urandom(1088)
         shared_secret = hashlib.sha3_256(ciphertext_bytes + peer["kyber_public_key"].encode()).hexdigest()
-        
+
         # Simulate ML-DSA-65 signature over handshake transcript
         handshake_transcript = f"{peer_id}:{shared_secret}:{now}".encode()
         dilithium_signature = hashlib.sha3_512(handshake_transcript).hexdigest()

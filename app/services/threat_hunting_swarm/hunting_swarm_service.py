@@ -8,8 +8,6 @@ Coordinates 4 specialized AI reasoning agents:
 4. ArbiterAgent: Authorizes automated SOAR containment and process neutralization.
 """
 
-import hashlib
-import json
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional

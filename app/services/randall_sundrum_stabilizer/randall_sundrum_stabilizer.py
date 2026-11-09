@@ -7,11 +7,11 @@ Stabilizes extra 5th dimension on an S^1/Z_2 orbifold bounded by Planck (UV) and
 trans-dimensional metric leakage and bulk gravitational fluctuations.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

@@ -6,11 +6,10 @@ magnetized thermonuclear targets, achieving breakeven (Q > 10, >2.5 GW_th yield)
 magnetic expansion nozzles (>120,000s specific impulse) for deep-space laser array power and sovereign propulsion.
 """
 
+import random
 from dataclasses import dataclass
 from datetime import datetime, timezone
-import math
-import random
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 @dataclass

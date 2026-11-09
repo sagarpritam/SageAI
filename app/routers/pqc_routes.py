@@ -2,7 +2,8 @@
 FastAPI Router for Post-Quantum Cryptography (PQC) & Hybrid Migration Layer.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

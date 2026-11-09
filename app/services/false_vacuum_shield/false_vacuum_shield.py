@@ -6,11 +6,10 @@ into a true vacuum state. Computes Coleman-De Luccia Euclidean bounce actions an
 scalar counter-bias pulses to quench bubble nucleation seeds and decouple local spacetime from decay.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.cosmic_censorship_enforcer import cosmic_censorship_enforcer
 
 router = APIRouter(

@@ -2,11 +2,13 @@
 FastAPI Router for Capability 101: Topological Torsion Teleparallel Gravity Engine.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.teleparallel_gravity.teleparallel_gravity import get_teleparallel_gravity_engine
+from app.services.teleparallel_gravity.teleparallel_gravity import (
+    get_teleparallel_gravity_engine,
+)
 
 router = APIRouter(prefix="/api/teleparallel-gravity", tags=["Capability 101: Teleparallel Gravity"])
 

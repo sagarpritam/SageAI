@@ -2,7 +2,8 @@
 FastAPI Router for Continuous Attack Path & Graph Choke-Point Analysis (CART).
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

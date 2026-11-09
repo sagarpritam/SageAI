@@ -4,10 +4,10 @@ Enables live in-memory eBPF kprobe/uprobe hotpatching of vulnerable C, Rust, Go,
 with 0.00ms downtime, verified assembly trampolines, and memory invariant enforcement.
 """
 
-from typing import Dict, Any, List, Optional
+import hashlib
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class MicroHotpatchService:

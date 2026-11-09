@@ -1,8 +1,8 @@
 from .orbital_hpm_grid import (
+    HPMPulseDischargeResult,
+    HPMSatelliteNode,
     OrbitalHPMDirectedEnergyGrid,
     orbital_hpm_grid,
-    HPMSatelliteNode,
-    HPMPulseDischargeResult,
 )
 
 __all__ = [

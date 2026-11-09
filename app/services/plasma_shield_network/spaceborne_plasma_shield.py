@@ -5,10 +5,9 @@ generating dense plasma windows (ne ~ 10^15 cm^-3) and relativistic electron bea
 to deflect and vaporize hypervelocity kinetic kill vehicles (KKVs) in <10 ms.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
-import math
+from typing import Any, Dict, List, Optional
 
 
 class SpaceborneDirectedEnergyPlasmaShield:

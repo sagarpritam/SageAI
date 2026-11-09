@@ -2,11 +2,13 @@
 FastAPI Router for Capability 102: Spin-Foam Quantum Geometry Area-Spectra Quantizer.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.spin_foam_quantizer.spin_foam_quantizer import get_spin_foam_geometry_quantizer
+from app.services.spin_foam_quantizer.spin_foam_quantizer import (
+    get_spin_foam_geometry_quantizer,
+)
 
 router = APIRouter(prefix="/api/spin-foam", tags=["Capability 102: Spin-Foam Quantizer"])
 

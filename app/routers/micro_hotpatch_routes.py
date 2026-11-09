@@ -3,6 +3,7 @@ FastAPI Router for Autonomous Kernel & Bytecode Micro-Hotpatching.
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

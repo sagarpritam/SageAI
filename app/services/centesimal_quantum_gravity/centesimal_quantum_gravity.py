@@ -7,11 +7,10 @@ non-local corrections to synthesize regular, geodesically complete Riemannian sp
 with strictly finite curvature invariants (Kretschmann scalar R_abcd R^abcd < infinity) and zero singularities.
 """
 
+import random
 from dataclasses import dataclass
 from datetime import datetime, timezone
-import math
-import random
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 @dataclass

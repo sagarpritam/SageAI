@@ -2,9 +2,9 @@
 FastAPI Router for Option B Wave 27: Sovereign Planetary Antimatter-Catalyzed Fusion Rocket.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
 from app.services.antimatter_catalyzed_fusion.antimatter_catalyzed_fusion import (
     get_antimatter_catalyzed_fusion_rocket,

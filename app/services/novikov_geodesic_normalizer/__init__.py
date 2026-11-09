@@ -1,8 +1,8 @@
 """Chrono-Topological Novikov Self-Consistency Geodesic Loop Normalizer Package."""
 from .novikov_geodesic_normalizer import (
     NovikovGeodesicNormalizer,
-    TemporalLoopNode,
     NovikovNormalizationResult,
+    TemporalLoopNode,
     get_novikov_geodesic_normalizer,
 )
 

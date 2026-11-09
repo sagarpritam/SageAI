@@ -5,8 +5,9 @@ Provides endpoints to trigger full-spectrum automated red-vs-blue attack drills,
 demonstrating autonomous defense across all 10 platform capabilities.
 """
 
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter

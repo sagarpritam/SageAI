@@ -31,3 +31,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to catalyze monopole proton decay" }, { status: 500 });
   }
 }
+

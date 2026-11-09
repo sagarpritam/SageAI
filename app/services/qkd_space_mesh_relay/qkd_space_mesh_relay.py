@@ -6,11 +6,10 @@ across Earth sovereign ground stations, Lunar Gateway, Lagrange L1/L2 relays, an
 spacecraft, compensating for atmospheric turbulence, Doppler drift, and relativistic Shapiro delays.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

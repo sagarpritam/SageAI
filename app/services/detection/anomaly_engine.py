@@ -7,7 +7,6 @@ credential stuffing spikes, and unauthorized data exfiltration via Z-score analy
 Fulfills Pillar VI and Capability 6 of the Enterprise Security Roadmap.
 """
 
-import math
 import statistics
 import time
 from collections import defaultdict

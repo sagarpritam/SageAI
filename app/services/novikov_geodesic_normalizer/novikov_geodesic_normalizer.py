@@ -7,11 +7,10 @@ have identically vanishing probability (P(paradox) = 0), normalizing self-inters
 trajectories with attosecond topological phase adjustments.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

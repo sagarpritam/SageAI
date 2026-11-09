@@ -4,9 +4,9 @@ Manages 3GPP Release 17/18 Network Slice Isolation (URLLC, eMBB, mMTC), monitors
 Near-RT RIC xApps over E2 interfaces, and triangulates rogue gNodeBs / IMSI catchers.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class Telecom5GSliceGuard:

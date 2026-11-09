@@ -4,10 +4,10 @@ Monitors subterranean antineutrino fluxes via Inverse Beta Decay (IBD) and Chere
 across deep-underground liquid argon and water Cherenkov observatories.
 """
 
-from typing import Dict, Any, List, Optional
+import math
 import time
 import uuid
-import math
+from typing import Any, Dict, List, Optional
 
 
 class NeutrinoFluxDetectorArray:

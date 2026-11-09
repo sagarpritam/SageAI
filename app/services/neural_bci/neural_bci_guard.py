@@ -4,10 +4,10 @@ Validates brainwave event-related potentials (P300/N400), detects cognitive dure
 and eliminates raw brainwave storage via Zero-Knowledge neural intent proofs and ephemeral PQC tokens.
 """
 
-from typing import Dict, Any, List, Optional
+import hashlib
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class NeuralBCIGuard:

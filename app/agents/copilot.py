@@ -394,7 +394,9 @@ class CopilotAgent:
         # ── Tool 5: Threat Detection Rule Synthesis ──
         if any(term in user_msg.lower() for term in ["yara", "sigma", "nuclei", "waf", "detection rule", "synthesize rule", "rule forge"]):
             try:
-                from app.services.threat_feed.pattern_synthesizer import ThreatPatternSynthesizer
+                from app.services.threat_feed.pattern_synthesizer import (
+                    ThreatPatternSynthesizer,
+                )
                 synth = ThreatPatternSynthesizer()
                 cve_target = cve_match.group(0).upper() if cve_match else "CVE-2024-DEFENSE"
                 rules = synth.synthesize_rules(

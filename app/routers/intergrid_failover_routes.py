@@ -2,13 +2,16 @@
 FastAPI Router for Sovereign Nation-State Critical Infrastructure Inter-Grid Autonomous Failover.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.intergrid_failover.intergrid_failover_guard import intergrid_failover_guard
+from app.services.intergrid_failover.intergrid_failover_guard import (
+    intergrid_failover_guard,
+)
 
 router = APIRouter(
     prefix="/intergrid-failover",

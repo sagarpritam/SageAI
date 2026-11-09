@@ -2,13 +2,16 @@
 FastAPI Router for Spaceborne Satellite Laser Inter-Link (ISL) Cryptographic Ephemeral Rekeying.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.orbital_laser_mesh.orbital_laser_mesh_guard import orbital_laser_mesh_guard
+from app.services.orbital_laser_mesh.orbital_laser_mesh_guard import (
+    orbital_laser_mesh_guard,
+)
 
 router = APIRouter(
     prefix="/orbital-laser",

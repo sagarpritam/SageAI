@@ -3,7 +3,8 @@ FastAPI Router for Dynamic Synthetic Honeytoken & Active Canary Fabric.
 """
 
 from typing import Any, Dict, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter

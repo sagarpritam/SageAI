@@ -7,11 +7,10 @@ phased-array radar avionics, neutralize drone swarm microcontrollers, and inject
 surges into C4ISR bunkers via front-door and back-door electromagnetic coupling.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

@@ -2,8 +2,9 @@
 FastAPI Router for Autonomous Cloud Security Posture Management (CSPM) & CIEM.
 """
 
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter

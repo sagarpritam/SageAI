@@ -1,7 +1,7 @@
 """Sovereign Sub-Atmospheric Magnetohydrodynamic (MHD) Aerodynamic Plasma Stealth Package."""
 from .mhd_plasma_stealth import (
-    MHDPlasmaStealth,
     MHDAeroPlatformNode,
+    MHDPlasmaStealth,
     MHDStealthEngagementResult,
     get_mhd_plasma_stealth,
 )

@@ -8,7 +8,7 @@ evaluating boundary SU(2) spin network representations and Lorentz intertwiner a
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class SpinFoamGeometryQuantizer:

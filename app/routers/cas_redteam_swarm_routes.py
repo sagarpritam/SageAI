@@ -3,12 +3,15 @@ FastAPI Router for Multi-Agent Autonomous Red-Team Swarm (Continuous Adversary S
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.cas_redteam_swarm.cas_redteam_swarm_service import cas_redteam_swarm_service
+from app.services.cas_redteam_swarm.cas_redteam_swarm_service import (
+    cas_redteam_swarm_service,
+)
 
 router = APIRouter(
     prefix="/cas-redteam",

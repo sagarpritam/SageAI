@@ -6,11 +6,10 @@ with real-time on-orbit neural spectral unmixing to detect covert nuclear enrich
 and camouflaged mobile ballistic launchers, autonomously cross-cueing kinetic and directed-energy interceptors.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

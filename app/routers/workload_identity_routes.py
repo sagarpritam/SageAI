@@ -3,6 +3,7 @@ FastAPI Router for Zero-Trust Workload Identity Fabric (SPIFFE/SPIRE & Cilium eB
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

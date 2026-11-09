@@ -3,6 +3,7 @@ FastAPI Router for Sovereign KMS HSM & Shamir's Secret Sharing Quorum.
 """
 
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

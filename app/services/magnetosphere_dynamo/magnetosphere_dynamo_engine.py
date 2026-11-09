@@ -6,11 +6,10 @@ and ultra-low frequency (ULF) Alfvén wave resonance injection (0.1 - 5.0 Hz). P
 decoupling against High-Altitude Electromagnetic Pulse (HEMP: E1, E2, E3) and CME solar storm compression.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

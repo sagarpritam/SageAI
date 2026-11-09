@@ -4,9 +4,9 @@ Inspects industrial OT network packets (Modbus TCP, DNP3, IEC-104), enforces out
 physical kinetic safety envelopes, and neutralizes destructive ICS attacks (Stuxnet, Industroyer, Triton).
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class IndustrialKineticShield:

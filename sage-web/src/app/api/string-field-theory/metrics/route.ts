@@ -11,3 +11,4 @@ export async function GET() {
     capability: "104 - Open-Closed String Field Theory Vertex Integrator",
   });
 }
+

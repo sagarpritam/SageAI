@@ -24,12 +24,10 @@ Provides:
 4. Cryptographic Merkle Audit Hash Chain Anchoring.
 """
 
-import hashlib
-import json
 import logging
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 
@@ -192,13 +190,13 @@ class AtomicAdversaryEmulator:
         start_time = time.time()
         # Simulated execution in controlled zero-egress sandbox
         simulated_execution_status = "SUCCESS_SAFE_CONTAINED" if dry_run else "EXECUTED_IN_SANDBOX"
-        
+
         # Telemetry verification: 85-95% simulated detection probability
         telemetry_caught = True
         detection_latency_ms = 420.5
-        
+
         duration_ms = round((time.time() - start_time) * 1000 + 120, 2)
-        
+
         result = {
             "test_id": f"atomic-{int(time.time())}-{technique_id.replace('.', '_')}",
             "technique_id": technique["technique_id"],
@@ -272,7 +270,7 @@ class AtomicAdversaryEmulator:
         detection_gaps = [
             r["technique_id"] for r in chain_results if not r["blue_team_detected"]
         ]
-        
+
         # Synthesize automated recommendations
         gap_remediations = []
         for gap in detection_gaps:

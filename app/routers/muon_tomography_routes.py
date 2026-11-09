@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.muon_tomography import subsurface_muon_tomography
 
 router = APIRouter(prefix="/api/muon-tomography", tags=["Subsurface Muon Tomography (Cap 75)"])

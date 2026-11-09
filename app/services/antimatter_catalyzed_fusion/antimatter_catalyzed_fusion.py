@@ -9,7 +9,7 @@ planetary interceptor defense sorties across the solar system.
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class AntimatterCatalyzedFusionRocket:

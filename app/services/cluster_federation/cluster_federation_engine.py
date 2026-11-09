@@ -7,12 +7,12 @@ distributed Merkle state proof exchange, and sub-12ms automated failover rerouti
 regional EMP or cyber isolation.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
 import hashlib
 import random
 import time
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

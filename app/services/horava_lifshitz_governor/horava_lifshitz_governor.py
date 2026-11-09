@@ -6,11 +6,11 @@ Enforces dynamical critical exponent z=3 in the ultraviolet for power-counting r
 while recovering standard general relativistic Lorentz invariance (z=1) in the infrared with zero ghost states.
 """
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

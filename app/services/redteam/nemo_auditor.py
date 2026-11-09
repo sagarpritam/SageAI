@@ -10,7 +10,6 @@ from app.core.config import settings
 from app.services.ai_resilience import (
     evaluate_adversarial_input,
     evaluate_llm_output,
-    generate_colang_rule,
 )
 from app.services.audit_chain import audit_chain
 

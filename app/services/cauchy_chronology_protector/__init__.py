@@ -1,8 +1,8 @@
 from .cauchy_chronology_protector import (
     CauchyHorizonChronologyProtector,
-    cauchy_chronology_protector,
     CauchyHorizonNode,
     ChronologyProtectionResult,
+    cauchy_chronology_protector,
 )
 
 __all__ = [

@@ -2,11 +2,13 @@
 FastAPI Router for Capability 105: Calabi-Yau Mirror Symmetry Hodge Diamond Inverter.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.mirror_symmetry.mirror_symmetry import get_calabi_yau_mirror_symmetry_inverter
+from app.services.mirror_symmetry.mirror_symmetry import (
+    get_calabi_yau_mirror_symmetry_inverter,
+)
 
 router = APIRouter(prefix="/api/mirror-symmetry", tags=["Capability 105: Calabi-Yau Mirror Symmetry"])
 
@@ -46,3 +48,4 @@ async def get_mirror_metrics():
     """Retrieve aggregate mirror symmetry metrics."""
     inverter = get_calabi_yau_mirror_symmetry_inverter()
     return inverter.get_mirror_metrics()
+

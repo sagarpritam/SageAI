@@ -14,11 +14,10 @@ Unified end-to-end orchestration across all 10 core enterprise security capabili
 10. Enterprise Security Dashboard & Cryptographic Merkle Audit Proof Anchoring
 """
 
-import asyncio
 import logging
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.ai_resilience import (
     evaluate_adversarial_input,
@@ -368,7 +367,7 @@ class EnterpriseSecurityOrchestrator:
             "port_scan_detected": nids_scan_alert is not None,
             "c2_beacon_detected": c2_alert is not None,
             "dns_tunneling_detected": dns_alert is not None,
-            "summary": f"NIDS flagged port scanning burst, periodic C2 beaconing (jitter CV < 0.25), and DNS exfiltration tunneling.",
+            "summary": "NIDS flagged port scanning burst, periodic C2 beaconing (jitter CV < 0.25), and DNS exfiltration tunneling.",
         })
 
         # ── Capability 5: Continuous Threat Intelligence Hub ──
@@ -481,7 +480,7 @@ class EnterpriseSecurityOrchestrator:
             "status": "PASS",
             "kill_chain_steps_covered": len(cyber_range_metrics["mitre_kill_chain_stages"]),
             "containment_efficiency": cyber_range_metrics["containment_rate"],
-            "summary": f"Completed 6-stage APT kill chain simulation; all 6 adversary vectors intercepted autonomously.",
+            "summary": "Completed 6-stage APT kill chain simulation; all 6 adversary vectors intercepted autonomously.",
         })
 
         # ── Capability 10: Enterprise Security Dashboard & Cryptographic Merkle Audit Proof ──
@@ -601,7 +600,7 @@ The results in this assessment have been immutably hashed and cryptographically 
         for s in stages:
             report += f"| {s.get('stage')} | **{s.get('capability')}** | <span style=\"color:green;\">PASS</span> | {s.get('summary')} |\n"
 
-        report += f"""
+        report += """
 ---
 
 ## 3. Compliance Framework Mapping

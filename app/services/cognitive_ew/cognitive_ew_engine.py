@@ -4,10 +4,9 @@ Operates across 1-40 GHz (L, S, C, X, Ku, Ka bands) extracting Pulse Descriptor 
 synthesizing agile DRFM waveforms (RGPO/VGPO, Coherent False Targets), and neutralizing AESA/PESA radars in <5 μs.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
-import math
+from typing import Any, Dict, List, Optional
 
 
 class CognitiveEWEngine:

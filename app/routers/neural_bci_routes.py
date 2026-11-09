@@ -3,6 +3,7 @@ FastAPI Router for Autonomous Biometric & Neural Interface (BCI) Zero-Trust Cryp
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

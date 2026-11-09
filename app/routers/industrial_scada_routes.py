@@ -3,12 +3,15 @@ FastAPI Router for Autonomous ICS/SCADA Modbus/DNP3 Micro-Firewall & Actuator Sa
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.industrial_scada.industrial_kinetic_shield import industrial_kinetic_shield
+from app.services.industrial_scada.industrial_kinetic_shield import (
+    industrial_kinetic_shield,
+)
 
 router = APIRouter(
     prefix="/industrial-scada",

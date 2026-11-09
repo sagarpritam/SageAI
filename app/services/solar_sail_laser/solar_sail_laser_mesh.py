@@ -6,11 +6,11 @@ for relativistic light-sail acceleration (0.15 - 0.20 c) and hazardous near-Eart
 kinetic deflection using adaptive optics with high Strehl ratios.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

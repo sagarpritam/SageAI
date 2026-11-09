@@ -1,8 +1,8 @@
 from .desitter_repulsion_grid import (
     CosmologicalDeSitterRepulsionGrid,
-    desitter_repulsion_grid,
-    DeSitterRepulsionNode,
     DeSitterRepulsionEvent,
+    DeSitterRepulsionNode,
+    desitter_repulsion_grid,
 )
 
 __all__ = [

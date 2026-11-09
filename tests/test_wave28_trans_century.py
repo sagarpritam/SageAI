@@ -237,3 +237,4 @@ def test_monopole_battery_api(client):
     metrics_res = client.get("/api/monopole-battery/metrics")
     assert metrics_res.status_code == 200
     assert metrics_res.json()["zero_carbon_zero_actinide_waste"] is True
+

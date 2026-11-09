@@ -4,9 +4,9 @@ Emulates event-driven Leaky Integrate-and-Fire (LIF) spiking neurons running on 
 (Intel Loihi 2, SynSense DynapCNN) to detect nanosecond fault injection and bus hijacking with sub-450ns latency.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class NeuromorphicSNNGuard:

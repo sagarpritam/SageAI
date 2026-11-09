@@ -3,12 +3,15 @@ FastAPI Router for Autonomous Self-Evolving Defensive AI Immune System with Dyna
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.ai_immune_defense.ai_immune_mutation_guard import ai_immune_mutation_guard
+from app.services.ai_immune_defense.ai_immune_mutation_guard import (
+    ai_immune_mutation_guard,
+)
 
 router = APIRouter(
     prefix="/ai-immune",

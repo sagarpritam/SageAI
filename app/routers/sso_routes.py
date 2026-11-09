@@ -359,6 +359,7 @@ async def oidc_callback(
             await db.flush()
 
         import secrets
+
         from app.core.security import hash_password
 
         user = User(

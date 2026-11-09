@@ -5,7 +5,8 @@ Fulfills Pillar V of the Master Plan.
 """
 
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.core.security import get_current_user

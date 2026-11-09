@@ -7,11 +7,11 @@ rotating wall electric fields to suppress diocotron plasma instabilities, and mi
 fail-safe divertor quench dump protocols to prevent uncontrolled annihilation blowouts.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

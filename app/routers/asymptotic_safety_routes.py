@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.asymptotic_safety_stabilizer import get_asymptotic_safety_stabilizer
 
 router = APIRouter(

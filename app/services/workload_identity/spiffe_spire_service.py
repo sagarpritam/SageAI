@@ -9,12 +9,10 @@ Provides:
 5. Cryptographic Merkle Audit Hash Chain Anchoring.
 """
 
-import hashlib
-import json
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 

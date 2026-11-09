@@ -3,6 +3,7 @@ FastAPI Router for Active Directory & BloodHound Attack Graph Engine.
 """
 
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

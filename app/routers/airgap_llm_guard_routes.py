@@ -3,12 +3,15 @@ FastAPI Router for Sovereign Air-Gapped Offline LLM Ingestion & Model Fine-Tunin
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.airgap_llm_guard.airgap_llm_guard_service import airgap_llm_guard_service
+from app.services.airgap_llm_guard.airgap_llm_guard_service import (
+    airgap_llm_guard_service,
+)
 
 router = APIRouter(
     prefix="/airgap-llm-guard",

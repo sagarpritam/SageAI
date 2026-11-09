@@ -10,11 +10,10 @@ Implements:
 6. Cryptographic Merkle Hash Chain Anchoring.
 """
 
-import hashlib
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 

@@ -1,10 +1,10 @@
 """Horava-Lifshitz Anisotropic Spacetime Lifshitz Scaling Governor Package."""
 from .horava_lifshitz_governor import (
-    HoravaLifshitzGovernor,
     HoravaDomainNode,
+    HoravaLifshitzGovernor,
     HoravaScalingResult,
-    horava_lifshitz_governor,
     get_horava_lifshitz_governor,
+    horava_lifshitz_governor,
 )
 
 __all__ = [

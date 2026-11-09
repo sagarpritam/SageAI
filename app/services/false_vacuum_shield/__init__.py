@@ -1,8 +1,8 @@
 from .false_vacuum_shield import (
     FalseVacuumDecayShield,
-    false_vacuum_decay_shield,
     VacuumChamberNode,
     VacuumQuenchEvent,
+    false_vacuum_decay_shield,
 )
 
 __all__ = [

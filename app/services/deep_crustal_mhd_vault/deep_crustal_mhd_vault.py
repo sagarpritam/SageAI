@@ -8,11 +8,10 @@ ultra-hardened deep-crustal subterranean data vaults isolated by acoustic phonon
 Faradaic EMP seals, and sub-nanosecond optical air-gap interfaces.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

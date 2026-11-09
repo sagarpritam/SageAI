@@ -1,7 +1,11 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from app.services.centesimal_quantum_gravity import get_centesimal_quantum_gravity_synthesizer
+
+from app.services.centesimal_quantum_gravity import (
+    get_centesimal_quantum_gravity_synthesizer,
+)
 
 router = APIRouter(
     prefix="/api/centesimal-quantum-gravity",

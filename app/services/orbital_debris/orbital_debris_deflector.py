@@ -4,9 +4,9 @@ Detects hypervelocity untracked space debris (1-10cm at 7.8km/s), calculates orb
 and discharges high-energy pulsed laser ablation to create vaporization recoil pressure (delta-v >= 2.5 cm/s).
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class OrbitalASATDebrisDeflector:

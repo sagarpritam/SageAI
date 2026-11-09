@@ -7,6 +7,7 @@ Nuclei YAML templates, and WAF Virtual Patches from emerging CVEs and threat int
 """
 
 from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 

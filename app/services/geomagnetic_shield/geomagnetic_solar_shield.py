@@ -4,9 +4,9 @@ Monitors planetary magnetosphere space weather (Kp index, dB/dt), detects quasi-
 saturating extra-high-voltage (EHV) transformer cores, and triggers sub-12ms series capacitor / NGR blocking.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class GeomagneticSolarShield:

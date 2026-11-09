@@ -7,9 +7,8 @@ catalyst with strong-force cross section sigma ~ 10^-27 cm^2, unlocking 100% E =
 conversion and generating >100 GW of continuous clean electrical baseload power.
 """
 
-import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class MagneticMonopoleCatalyzedBattery:

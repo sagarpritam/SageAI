@@ -1,6 +1,8 @@
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.cislunar_quantum_relay import cislunar_quantum_relay
 
 router = APIRouter(prefix="/api/cislunar-relay", tags=["Cis-Lunar Quantum Relay (Cap 74)"])

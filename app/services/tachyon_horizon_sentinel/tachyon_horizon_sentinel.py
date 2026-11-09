@@ -7,11 +7,11 @@ negative-delay timing correlations (Δt = -150 to -420 μs) prior to causal elec
 enabling pre-causal anticipatory shield engagement.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 @dataclass

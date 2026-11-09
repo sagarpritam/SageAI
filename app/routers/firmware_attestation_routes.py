@@ -3,12 +3,15 @@ FastAPI Router for UEFI Secure Boot & SPI Flash Hash Attestor.
 """
 
 from typing import Any, Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.firmware_attestation.firmware_integrity_guard import firmware_integrity_guard
+from app.services.firmware_attestation.firmware_integrity_guard import (
+    firmware_integrity_guard,
+)
 
 router = APIRouter(
     prefix="/firmware-attestation",

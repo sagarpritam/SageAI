@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.mantle_geoneutrino import deep_mantle_geoneutrino_mesh
 
 router = APIRouter(prefix="/api/mantle-geoneutrino", tags=["Deep Mantle Geoneutrino Tomography (Cap 79)"])

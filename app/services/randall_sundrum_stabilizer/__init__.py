@@ -1,7 +1,7 @@
 from app.services.randall_sundrum_stabilizer.randall_sundrum_stabilizer import (
+    RadionStabilizationResult,
     RandallSundrumStabilizer,
     RSBraneNode,
-    RadionStabilizationResult,
     randall_sundrum_stabilizer,
 )
 

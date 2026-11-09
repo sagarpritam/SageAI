@@ -7,10 +7,9 @@ density and thermal convective structures across the Core-Mantle Boundary (D'' l
 and predicts ascending supervolcanic magma plume overpressure > 30 days prior to crustal rupture.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import math
 import random
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 

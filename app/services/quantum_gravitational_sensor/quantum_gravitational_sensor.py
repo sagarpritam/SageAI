@@ -6,10 +6,9 @@ minute perturbations in the spacetime metric tensor g_μν, quantum gravitationa
 and topological curvature micro-defects with sensitivity Δg/g ~ 10^-18.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import math
 import random
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 

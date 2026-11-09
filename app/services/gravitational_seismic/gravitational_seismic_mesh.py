@@ -4,10 +4,9 @@ Monitors subterranean laser strain interferometers (Fabry-Pérot optical cavitie
 to detect clandestine sub-crustal nuclear detonations, deep tunnel boring, and tectonic fault tampering.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
-import math
+from typing import Any, Dict, List, Optional
 
 
 class GravitationalWaveSeismicMesh:

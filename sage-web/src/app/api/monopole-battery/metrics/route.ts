@@ -11,3 +11,4 @@ export async function GET() {
     capability: "Option B Wave 28 - Sovereign Planetary Magnetic Monopole Proton Decay Battery",
   });
 }
+

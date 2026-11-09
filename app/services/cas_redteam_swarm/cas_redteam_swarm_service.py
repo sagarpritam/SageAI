@@ -4,10 +4,9 @@ Orchestrates a collaborative 4-agent offensive swarm (ReconAgent, ExploitCrafter
 PrivilegeEscalationAgent, EvasionAgent) for continuous automated adversarial simulations.
 """
 
-from typing import Dict, Any, List, Optional
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class CASRedTeamSwarmService:

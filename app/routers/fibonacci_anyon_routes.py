@@ -2,11 +2,13 @@
 FastAPI Router for Capability 106: Fibonacci Anyon Braid Compiler & Topological Fault-Tolerance Synthesizer.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import get_fibonacci_anyon_compiler
+from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import (
+    get_fibonacci_anyon_compiler,
+)
 
 router = APIRouter(prefix="/api/fibonacci-anyon", tags=["Capability 106: Fibonacci Anyon Compiler"])
 
@@ -46,3 +48,4 @@ async def get_fibonacci_metrics():
     """Retrieve aggregate Fibonacci anyon compiler metrics."""
     compiler = get_fibonacci_anyon_compiler()
     return compiler.get_fibonacci_metrics()
+

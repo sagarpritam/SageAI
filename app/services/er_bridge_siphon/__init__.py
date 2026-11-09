@@ -1,8 +1,8 @@
 from .er_bridge_siphon import (
     ERBridgeMetricSiphon,
-    er_bridge_metric_siphon,
     ERBridgeThroatNode,
     ERSiphonEvent,
+    er_bridge_metric_siphon,
 )
 
 __all__ = [

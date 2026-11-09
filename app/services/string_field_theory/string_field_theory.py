@@ -9,7 +9,7 @@ with 100% unstable D-brane energy annihilation into closed string radiation.
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class StringFieldTheoryIntegrator:

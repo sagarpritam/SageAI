@@ -1,8 +1,8 @@
 from .everett_branch_resolver import (
-    EverettWheelerBranchResolver,
-    everett_branch_resolver,
-    QuantumBranchNode,
     EverettResolutionResult,
+    EverettWheelerBranchResolver,
+    QuantumBranchNode,
+    everett_branch_resolver,
 )
 
 __all__ = [

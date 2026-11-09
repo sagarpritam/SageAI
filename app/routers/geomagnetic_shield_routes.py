@@ -3,12 +3,15 @@ FastAPI Router for Autonomous Geomagnetic Solar Storm (CME) Induced GIC Power Gr
 """
 
 from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.services.geomagnetic_shield.geomagnetic_solar_shield import geomagnetic_solar_shield
+from app.services.geomagnetic_shield.geomagnetic_solar_shield import (
+    geomagnetic_solar_shield,
+)
 
 router = APIRouter(
     prefix="/geomagnetic-shield",

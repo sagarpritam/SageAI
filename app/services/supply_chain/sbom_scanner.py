@@ -20,7 +20,7 @@ import json
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 

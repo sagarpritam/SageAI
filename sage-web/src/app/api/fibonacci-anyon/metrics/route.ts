@@ -11,3 +11,4 @@ export async function GET() {
     capability: "106 - Fibonacci Anyon Braid Compiler & Topological Fault-Tolerance Synthesizer",
   });
 }
+

@@ -4,10 +4,10 @@ Emulates biological immune responses against adversarial prompt injection, jailb
 and sleeper agent triggers via latent space inspection and dynamic weight micro-perturbation.
 """
 
-from typing import Dict, Any, List, Optional
+import hashlib
 import time
 import uuid
-import hashlib
+from typing import Any, Dict, List, Optional
 
 
 class AIImmuneMutationGuard:

@@ -2,11 +2,13 @@
 FastAPI Router for Capability 103: Non-Commutative Moyal-Weyl Spacetime Phase Space Protector.
 """
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
 
-from app.services.noncommutative_spacetime.noncommutative_spacetime import get_noncommutative_spacetime_protector
+from app.services.noncommutative_spacetime.noncommutative_spacetime import (
+    get_noncommutative_spacetime_protector,
+)
 
 router = APIRouter(prefix="/api/noncommutative-spacetime", tags=["Capability 103: Non-Commutative Spacetime"])
 

@@ -9,7 +9,7 @@ with hardware-level topological fault-tolerance and >125 dB decoherence suppress
 
 import math
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class FibonacciAnyonCompiler:
@@ -134,3 +134,4 @@ _fibonacci_anyon_compiler = FibonacciAnyonCompiler()
 def get_fibonacci_anyon_compiler() -> FibonacciAnyonCompiler:
     """Return the global FibonacciAnyonCompiler singleton instance."""
     return _fibonacci_anyon_compiler
+

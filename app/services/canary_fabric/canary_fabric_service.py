@@ -8,8 +8,6 @@ Provides:
 4. Cryptographic Merkle Audit Hash Chain Anchoring.
 """
 
-import hashlib
-import json
 import logging
 import secrets
 from datetime import datetime, timezone

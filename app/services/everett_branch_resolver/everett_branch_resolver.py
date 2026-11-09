@@ -6,11 +6,11 @@ in Everett's Many-Worlds formulation, computing von Neumann branch entropy and s
 threat trajectories to project high-probability defensive countermeasures into the consensus reality branch.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import math
 import random
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 
 @dataclass

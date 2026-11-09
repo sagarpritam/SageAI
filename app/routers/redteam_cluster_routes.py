@@ -1,6 +1,8 @@
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+
 from app.services.autonomous_redteam import (
     autonomous_redteam_cluster,
     autonomous_redteam_daemon,
