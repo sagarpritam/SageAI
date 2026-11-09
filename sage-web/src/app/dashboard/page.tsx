@@ -177,9 +177,17 @@ import { EverettBranchStudio } from "@/components/EverettBranchStudio";
 import { ERBridgeSiphonStudio } from "@/components/ERBridgeSiphonStudio";
 import { FalseVacuumShieldStudio } from "@/components/FalseVacuumShieldStudio";
 import { OrbitalHPMStudio } from "@/components/OrbitalHPMStudio";
+import { InflatonReheatingStudio } from "@/components/InflatonReheatingStudio";
+import { RandallSundrumStudio } from "@/components/RandallSundrumStudio";
+import { CosmicCensorshipStudio } from "@/components/CosmicCensorshipStudio";
+import { DeepCrustalMHDStudio } from "@/components/DeepCrustalMHDStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "inflaton-reheating", label: "Inflaton Reheating", icon: Flame },
+  { id: "randall-sundrum", label: "Randall-Sundrum 5D", icon: Layers },
+  { id: "cosmic-censorship", label: "Cosmic Censorship", icon: ShieldAlert },
+  { id: "deep-crustal-mhd", label: "Deep-Crustal MHD", icon: Mountain },
   { id: "everett-branch", label: "Everett Multiverse", icon: GitBranch },
   { id: "er-bridge", label: "ER=EPR Bridge Siphon", icon: Atom },
   { id: "false-vacuum", label: "False Vacuum Shield", icon: ShieldAlert },
@@ -340,6 +348,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "inflaton-reheating" && <InflatonReheatingStudio />}
+          {activeTab === "randall-sundrum" && <RandallSundrumStudio />}
+          {activeTab === "cosmic-censorship" && <CosmicCensorshipStudio />}
+          {activeTab === "deep-crustal-mhd" && <DeepCrustalMHDStudio />}
           {activeTab === "everett-branch" && <EverettBranchStudio />}
           {activeTab === "er-bridge" && <ERBridgeSiphonStudio />}
           {activeTab === "false-vacuum" && <FalseVacuumShieldStudio />}

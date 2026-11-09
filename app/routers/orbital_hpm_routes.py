@@ -37,3 +37,4 @@ async def fire_pulse(req: FireHPMPulseRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return orbital_hpm_grid.get_grid_metrics()
+

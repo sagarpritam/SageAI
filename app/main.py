@@ -56,6 +56,7 @@ from app.routers import (
     cognitive_ew_routes,
     consensus_routes,
     copilot_routes,
+    cosmic_censorship_routes,
     counter_quantum_routes,
     cspm_routes,
     crossplane_mesh_routes,
@@ -65,6 +66,7 @@ from app.routers import (
     darkweb_radar_routes,
     deception_routes,
     deep_analysis_routes,
+    deep_crustal_mhd_routes,
     deep_space_laser_routes,
     desitter_repulsion_routes,
     drone_swarm_shield_routes,
@@ -90,6 +92,7 @@ from app.routers import (
     iac_drift_routes,
     incident_routes,
     industrial_scada_routes,
+    inflaton_reheating_routes,
     intergrid_failover_routes,
     integration_routes,
     intelligence_hub_routes,
@@ -121,6 +124,7 @@ from app.routers import (
     pqc_routes,
     qkd_space_mesh_routes,
     quantum_gravitational_routes,
+    randall_sundrum_routes,
     ransomware_routes,
     redteam_routes,
     redteam_cluster_routes,
@@ -392,6 +396,10 @@ app.include_router(everett_branch_routes.router)
 app.include_router(er_bridge_routes.router)
 app.include_router(false_vacuum_routes.router)
 app.include_router(orbital_hpm_routes.router)
+app.include_router(inflaton_reheating_routes.router)
+app.include_router(randall_sundrum_routes.router)
+app.include_router(cosmic_censorship_routes.router)
+app.include_router(deep_crustal_mhd_routes.router)
 
 
 # ---------------------

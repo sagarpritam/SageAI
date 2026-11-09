@@ -175,3 +175,4 @@ class EverettWheelerBranchResolver:
 
 
 everett_branch_resolver = EverettWheelerBranchResolver()
+

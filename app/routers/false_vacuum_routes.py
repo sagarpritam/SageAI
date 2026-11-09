@@ -38,3 +38,4 @@ async def quench_nucleation(req: QuenchNucleationRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return false_vacuum_decay_shield.get_shield_metrics()
+

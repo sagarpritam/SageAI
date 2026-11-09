@@ -162,3 +162,4 @@ class FalseVacuumDecayShield:
 
 
 false_vacuum_decay_shield = FalseVacuumDecayShield()
+

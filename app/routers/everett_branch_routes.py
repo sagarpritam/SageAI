@@ -33,3 +33,4 @@ async def resolve_entropy(req: ResolveBranchEntropyRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return everett_branch_resolver.get_resolution_metrics()
+

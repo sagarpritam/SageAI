@@ -35,3 +35,4 @@ async def siphon_metric_flux(req: SiphonMetricFluxRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return er_bridge_metric_siphon.get_siphon_metrics()
+

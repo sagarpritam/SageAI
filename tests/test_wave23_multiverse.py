@@ -211,3 +211,4 @@ def test_orbital_hpm_api():
     r_met = client.get("/api/orbital-hpm/metrics")
     assert r_met.status_code == 200
     assert r_met.json()["active_hpm_satellites"] >= 4
+
