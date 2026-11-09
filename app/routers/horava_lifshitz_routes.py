@@ -38,3 +38,4 @@ async def govern_scaling(req: GovernScalingRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     governor = get_horava_lifshitz_governor()
     return governor.get_governor_metrics()
+

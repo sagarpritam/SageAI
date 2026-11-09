@@ -14,3 +14,4 @@ __all__ = [
     "centesimal_quantum_gravity_synthesizer",
     "get_centesimal_quantum_gravity_synthesizer",
 ]
+

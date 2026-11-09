@@ -38,3 +38,4 @@ async def stabilize_flow(req: StabilizeFlowRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     stabilizer = get_asymptotic_safety_stabilizer()
     return stabilizer.get_stabilizer_metrics()
+

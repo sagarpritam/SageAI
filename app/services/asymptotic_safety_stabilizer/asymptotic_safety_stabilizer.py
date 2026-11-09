@@ -174,3 +174,4 @@ asymptotic_safety_stabilizer = AsymptoticSafetyFlowStabilizer()
 
 def get_asymptotic_safety_stabilizer() -> AsymptoticSafetyFlowStabilizer:
     return asymptotic_safety_stabilizer
+

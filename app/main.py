@@ -30,6 +30,7 @@ from app.routers import (
     airgap_exploit_routes,
     airgap_llm_guard_routes,
     antimatter_containment_routes,
+    antimatter_fusion_routes,
     anyon_braiding_routes,
     api_shield_routes,
     apikey_routes,
@@ -117,6 +118,7 @@ from app.routers import (
     neural_bci_routes,
     neuromorphic_snn_routes,
     neutrino_array_routes,
+    noncommutative_spacetime_routes,
     notification_routes,
     novikov_geodesic_routes,
     org_routes,
@@ -147,11 +149,13 @@ from app.routers import (
     singularity_containment_routes,
     solar_sail_laser_routes,
     space_ground_qkd_routes,
+    spin_foam_routes,
     sso_routes,
     subsea_cable_routes,
     supply_chain_routes,
     tachyon_horizon_routes,
     telecom_5g_routes,
+    teleparallel_gravity_routes,
     telemetry_routes,
     threat_hunting_routes,
     threat_hunting_swarm_routes,
@@ -416,6 +420,10 @@ app.include_router(asymptotic_safety_routes.router)
 app.include_router(horava_lifshitz_routes.router)
 app.include_router(centesimal_quantum_gravity_routes.router)
 app.include_router(magneto_inertial_fusion_routes.router)
+app.include_router(teleparallel_gravity_routes.router)
+app.include_router(spin_foam_routes.router)
+app.include_router(noncommutative_spacetime_routes.router)
+app.include_router(antimatter_fusion_routes.router)
 
 
 # ---------------------

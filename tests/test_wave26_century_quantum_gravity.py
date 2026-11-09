@@ -222,3 +222,4 @@ def test_magneto_inertial_fusion_api():
     r_metrics = client.get("/api/magneto-inertial-fusion/metrics")
     assert r_metrics.status_code == 200
     assert r_metrics.json()["confinement_scheme"] == "CYLINDRICAL_METALLIC_LINER_MAGNETO_INERTIAL"
+

@@ -179,3 +179,4 @@ magneto_inertial_fusion = MagnetoInertialFusion()
 
 def get_magneto_inertial_fusion() -> MagnetoInertialFusion:
     return magneto_inertial_fusion
+

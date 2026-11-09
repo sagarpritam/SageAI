@@ -38,3 +38,4 @@ async def synthesize_metric(req: SynthesizeMetricRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     synthesizer = get_centesimal_quantum_gravity_synthesizer()
     return synthesizer.get_centesimal_metrics()
+

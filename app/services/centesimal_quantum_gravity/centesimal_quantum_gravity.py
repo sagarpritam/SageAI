@@ -169,3 +169,4 @@ centesimal_quantum_gravity_synthesizer = CentesimalQuantumGravitySynthesizer()
 
 def get_centesimal_quantum_gravity_synthesizer() -> CentesimalQuantumGravitySynthesizer:
     return centesimal_quantum_gravity_synthesizer
+

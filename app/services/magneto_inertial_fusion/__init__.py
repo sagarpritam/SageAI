@@ -14,3 +14,4 @@ __all__ = [
     "magneto_inertial_fusion",
     "get_magneto_inertial_fusion",
 ]
+

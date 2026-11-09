@@ -67,6 +67,8 @@ import {
   Filter,
   TrendingDown,
   Award,
+  Box,
+  Maximize2,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -194,9 +196,17 @@ import { AsymptoticSafetyStudio } from "@/components/AsymptoticSafetyStudio";
 import { HoravaLifshitzStudio } from "@/components/HoravaLifshitzStudio";
 import { CentesimalQuantumGravityStudio } from "@/components/CentesimalQuantumGravityStudio";
 import { MagnetoInertialFusionStudio } from "@/components/MagnetoInertialFusionStudio";
+import TeleparallelGravityStudio from "@/components/TeleparallelGravityStudio";
+import SpinFoamStudio from "@/components/SpinFoamStudio";
+import NonCommutativeSpacetimeStudio from "@/components/NonCommutativeSpacetimeStudio";
+import AntimatterFusionStudio from "@/components/AntimatterFusionStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "teleparallel-gravity", label: "Teleparallel Gravity (Cap 101)", icon: Compass },
+  { id: "spin-foam", label: "Spin-Foam Quantizer (Cap 102)", icon: Box },
+  { id: "noncommutative-spacetime", label: "Non-Commutative Spacetime (Cap 103)", icon: Maximize2 },
+  { id: "antimatter-fusion", label: "Antimatter Fusion Rocket (Option B)", icon: Rocket },
   { id: "centesimal-quantum-gravity", label: "Centesimal Quantum Gravity (Century Cap 100)", icon: Award },
   { id: "asymptotic-safety", label: "Asymptotic Safety RG", icon: TrendingDown },
   { id: "horava-lifshitz", label: "Horava-Lifshitz Scaling", icon: Compass },
@@ -369,6 +379,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "teleparallel-gravity" && <TeleparallelGravityStudio />}
+          {activeTab === "spin-foam" && <SpinFoamStudio />}
+          {activeTab === "noncommutative-spacetime" && <NonCommutativeSpacetimeStudio />}
+          {activeTab === "antimatter-fusion" && <AntimatterFusionStudio />}
           {activeTab === "centesimal-quantum-gravity" && <CentesimalQuantumGravityStudio />}
           {activeTab === "asymptotic-safety" && <AsymptoticSafetyStudio />}
           {activeTab === "horava-lifshitz" && <HoravaLifshitzStudio />}

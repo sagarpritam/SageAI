@@ -38,3 +38,4 @@ async def pulse_fusion(req: PulseFusionRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     mif = get_magneto_inertial_fusion()
     return mif.get_fusion_metrics()
+
