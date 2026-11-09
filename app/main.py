@@ -440,24 +440,20 @@ app.include_router(monopole_battery_routes.router)
 @app.get("/", tags=["Health"])
 @app.get("/health", tags=["Health"])
 async def health_check():
-    """Production-grade health check with DB connectivity."""
-    db_ok = True
-    try:
-        from sqlalchemy import text
+    """Production-grade health check with DB connectivity and connection pool telemetry."""
+    from app.core.database import check_db_connectivity
 
-        from app.core.database import AsyncSessionLocal
-
-        async with AsyncSessionLocal() as session:
-            await session.execute(text("SELECT 1"))
-    except Exception:
-        db_ok = False
+    db_health = await check_db_connectivity()
+    db_ok = db_health["database"] == "connected"
 
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": "2.0.0",
         "environment": settings.ENV,
-        "database": "connected" if db_ok else "unreachable",
+        "database": db_health["database"],
+        "database_latency_ms": db_health["latency_ms"],
+        "database_pool": db_health["pool"],
         "scanners": 11,
         "intelligence_modules": 10,
         "endpoints": 65,
@@ -483,3 +479,12 @@ async def health_check():
             "Deep Search: The Abyss",
         ],
     }
+
+
+@app.get("/health/ready", tags=["Health"])
+@app.get("/health/db", tags=["Health"])
+async def database_readiness_probe():
+    """Kubernetes/container readiness probe checking database connection and query latency."""
+    from app.core.database import check_db_connectivity
+
+    return await check_db_connectivity()

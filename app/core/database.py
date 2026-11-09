@@ -59,3 +59,63 @@ async def init_db():
         import app.models  # noqa: F401
 
         await conn.run_sync(Base.metadata.create_all)
+
+
+# ---------------------
+# Observability & Health
+# ---------------------
+def get_db_pool_status() -> dict[str, Any]:
+    """Retrieve connection pool telemetry and runtime health metrics."""
+    pool = engine.pool
+    is_null_pool = isinstance(pool, NullPool)
+
+    if is_null_pool:
+        return {
+            "pool_type": "NullPool",
+            "dialect": engine.dialect.name,
+            "driver": engine.dialect.driver,
+            "status": "active",
+            "pooling_enabled": False,
+        }
+
+    return {
+        "pool_type": pool.__class__.__name__,
+        "dialect": engine.dialect.name,
+        "driver": engine.dialect.driver,
+        "status": "active",
+        "pooling_enabled": True,
+        "size": getattr(pool, "size", lambda: 0)(),
+        "checked_in": getattr(pool, "checkedin", lambda: 0)(),
+        "checked_out": getattr(pool, "checkedout", lambda: 0)(),
+        "overflow": getattr(pool, "overflow", lambda: 0)(),
+        "max_overflow": getattr(pool, "_max_overflow", settings.DB_MAX_OVERFLOW),
+        "timeout": getattr(pool, "_timeout", settings.DB_POOL_TIMEOUT),
+    }
+
+
+async def check_db_connectivity() -> dict[str, Any]:
+    """Execute a low-overhead probe against the database and measure round-trip latency in ms."""
+    import time
+
+    from sqlalchemy import text
+
+    start_time = time.perf_counter()
+    ok = True
+    error_msg = None
+    try:
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+    except Exception as exc:
+        ok = False
+        error_msg = str(exc)
+
+    latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+    pool_stats = get_db_pool_status()
+
+    return {
+        "database": "connected" if ok else "unreachable",
+        "status": "healthy" if ok else "unhealthy",
+        "latency_ms": latency_ms,
+        "pool": pool_stats,
+        "error": error_msg,
+    }

@@ -25,6 +25,19 @@ class ActionExecutionRequest(BaseModel):
     action: str = Field(..., description="Action name to execute")
 
 
+class IngestAlertRequest(BaseModel):
+    title: str = Field(..., description="Alert or incident title")
+    severity: str = Field(
+        ..., description="Severity level: CRITICAL, HIGH, MEDIUM, LOW"
+    )
+    source: str = Field(
+        ..., description="Detection source: NIDS, WAF, Honeypot, CloudTrail, etc."
+    )
+    details: dict = Field(
+        default_factory=dict, description="Arbitrary context key-value pairs"
+    )
+
+
 class ReverseEngineerRequest(BaseModel):
     filename: str = Field("payload.bin", description="Name of sample")
     base64_data: str = Field(..., description="Base64-encoded raw binary data")
@@ -54,6 +67,46 @@ async def get_incident(
         raise HTTPException(status_code=404, detail=f"Incident {incident_id} not found")
     return {
         "status": "success",
+        "incident": incident,
+    }
+
+
+@router.post("/ingest", status_code=201)
+async def ingest_alert(
+    payload: IngestAlertRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Ingest a security event or detector alert into the SOAR engine.
+    Automatically correlates events, executes zero-risk safety containment actions,
+    queues guarded high-impact playbooks, and records to the cryptographic audit chain.
+    """
+    org_id = current_user.get("org") or current_user.get("org_id") or "system"
+    incident = soar_engine.create_incident(
+        title=payload.title,
+        severity=payload.severity,
+        source=payload.source,
+        details=payload.details,
+        org_id=org_id,
+    )
+
+    try:
+        audit_chain.append(
+            event_type="INCIDENT_INGESTED",
+            actor=current_user.get("email", "system"),
+            payload={
+                "incident_id": incident["incident_id"],
+                "title": incident["title"],
+                "severity": incident["severity"],
+                "source": incident["source"],
+            },
+        )
+    except Exception:
+        pass
+
+    return {
+        "status": "success",
+        "message": f"Alert correlated into incident {incident['incident_id']}",
         "incident": incident,
     }
 

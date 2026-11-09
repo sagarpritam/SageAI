@@ -142,6 +142,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production-use-a-real-secret-key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Rate limiting (Elevated for enterprise workloads, CI testing, and microservice traffic)
     RATE_LIMIT: str = "1200/minute"

@@ -6,13 +6,15 @@ from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.core.security import (
     create_access_token,
+    create_refresh_token,
     hash_password,
     needs_rehash,
     verify_password,
+    verify_refresh_token,
 )
 from app.models.organization import Organization
 from app.models.user import User
-from app.schemas.auth import TokenResponse, UserCreate, UserLogin
+from app.schemas.auth import RefreshTokenRequest, TokenResponse, UserCreate, UserLogin
 from app.services.mfa_service import verify_totp
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -51,17 +53,17 @@ async def register(
     await db.commit()
     await db.refresh(user)
 
-    # Generate JWT
-    token = create_access_token(
-        {
-            "sub": user.id,
-            "email": user.email,
-            "org": user.organization_id,
-            "role": user.role,
-        }
-    )
+    # Generate JWT pair
+    claims = {
+        "sub": user.id,
+        "email": user.email,
+        "org": user.organization_id,
+        "role": user.role,
+    }
+    access_token = create_access_token(claims)
+    refresh_token = create_refresh_token(claims)
 
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -69,7 +71,7 @@ async def register(
 async def login(
     request: Request, payload: UserLogin, db: AsyncSession = Depends(get_db)
 ):
-    """Authenticate and return a JWT token."""
+    """Authenticate and return an access and refresh JWT token pair."""
 
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
@@ -97,13 +99,47 @@ async def login(
                 detail="Invalid MFA code",
             )
 
-    token = create_access_token(
-        {
-            "sub": user.id,
-            "email": user.email,
-            "org": user.organization_id,
-            "role": user.role,
-        }
-    )
+    claims = {
+        "sub": user.id,
+        "email": user.email,
+        "org": user.organization_id,
+        "role": user.role,
+    }
+    access_token = create_access_token(claims)
+    refresh_token = create_refresh_token(claims)
 
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("60/minute")
+async def refresh_session(
+    request: Request,
+    payload: RefreshTokenRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Rotate and refresh an active user session using a valid refresh token."""
+    token_claims = verify_refresh_token(payload.refresh_token)
+    user_id = token_claims.get("sub")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account associated with this session no longer exists",
+        )
+
+    claims = {
+        "sub": user.id,
+        "email": user.email,
+        "org": user.organization_id,
+        "role": user.role,
+    }
+    new_access_token = create_access_token(claims)
+    new_refresh_token = create_refresh_token(claims)
+
+    return TokenResponse(
+        access_token=new_access_token,
+        refresh_token=new_refresh_token,
+    )

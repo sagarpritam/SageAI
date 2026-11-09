@@ -78,3 +78,12 @@ class TokenResponse(BaseModel):
 
     access_token: str
     token_type: str = "bearer"
+    refresh_token: str | None = None
+
+
+class RefreshTokenRequest(BaseModel):
+    """Token refresh request body."""
+
+    refresh_token: str
+
+    model_config = ConfigDict(extra="forbid")

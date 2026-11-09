@@ -10,6 +10,7 @@ Provides:
 
 import ipaddress
 import logging
+import uuid
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -134,9 +135,60 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
             "iss": JWT_ISSUER,
             "aud": JWT_AUDIENCE,
             "iat": datetime.now(timezone.utc),
+            "jti": str(uuid.uuid4()),
+            "type": "access",
         }
     )
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    """Create a cryptographically signed JWT refresh token with unique jti and expiry."""
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    to_encode.update(
+        {
+            "exp": expire,
+            "iss": JWT_ISSUER,
+            "aud": JWT_AUDIENCE,
+            "iat": datetime.now(timezone.utc),
+            "jti": str(uuid.uuid4()),
+            "type": "refresh",
+        }
+    )
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def verify_refresh_token(token: str) -> dict:
+    """Verify and decode a JWT refresh token, rejecting non-refresh tokens."""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type: expected refresh token",
+            )
+        if not payload.get("sub"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing subject claim in refresh token",
+            )
+        return payload
+    except HTTPException:
+        raise
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid or expired refresh token: {e}",
+        )
 
 
 def create_service_token(user_id: str, org_id: str, role: str = "member") -> str:
