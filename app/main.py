@@ -36,6 +36,7 @@ from app.routers import (
     apt_attribution_routes,
     asm_routes,
     asset_routes,
+    asymptotic_safety_routes,
     atomic_clock_routes,
     atomic_redteam_routes,
     auth_routes,
@@ -49,6 +50,7 @@ from app.routers import (
     cas_redteam_swarm_routes,
     casimir_vacuum_routes,
     cauchy_chronology_routes,
+    centesimal_quantum_gravity_routes,
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
@@ -88,6 +90,7 @@ from app.routers import (
     geomagnetic_shield_routes,
     gravitational_seismic_routes,
     haps_stratosphere_routes,
+    horava_lifshitz_routes,
     hypersonic_defense_routes,
     hyperspectral_interceptor_routes,
     iac_drift_routes,
@@ -103,6 +106,7 @@ from app.routers import (
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
     magnetosphere_dynamo_routes,
+    magneto_inertial_fusion_routes,
     malware_routes,
     mantle_geoneutrino_routes,
     marine_sonar_routes,
@@ -408,6 +412,10 @@ app.include_router(ryu_takayanagi_routes.router)
 app.include_router(dbrane_tadpole_routes.router)
 app.include_router(novikov_geodesic_routes.router)
 app.include_router(mhd_plasma_stealth_routes.router)
+app.include_router(asymptotic_safety_routes.router)
+app.include_router(horava_lifshitz_routes.router)
+app.include_router(centesimal_quantum_gravity_routes.router)
+app.include_router(magneto_inertial_fusion_routes.router)
 
 
 # ---------------------

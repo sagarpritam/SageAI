@@ -238,3 +238,4 @@ def get_mhd_plasma_stealth() -> MHDPlasmaStealth:
     if _mhd_plasma_stealth_instance is None:
         _mhd_plasma_stealth_instance = MHDPlasmaStealth()
     return _mhd_plasma_stealth_instance
+

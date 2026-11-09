@@ -65,6 +65,8 @@ import {
   Wind,
   RotateCcw,
   Filter,
+  TrendingDown,
+  Award,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -188,9 +190,17 @@ import { RyuTakayanagiStudio } from "@/components/RyuTakayanagiStudio";
 import { DBraneTadpoleStudio } from "@/components/DBraneTadpoleStudio";
 import { NovikovGeodesicStudio } from "@/components/NovikovGeodesicStudio";
 import { MHDPlasmaStealthStudio } from "@/components/MHDPlasmaStealthStudio";
+import { AsymptoticSafetyStudio } from "@/components/AsymptoticSafetyStudio";
+import { HoravaLifshitzStudio } from "@/components/HoravaLifshitzStudio";
+import { CentesimalQuantumGravityStudio } from "@/components/CentesimalQuantumGravityStudio";
+import { MagnetoInertialFusionStudio } from "@/components/MagnetoInertialFusionStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "centesimal-quantum-gravity", label: "Centesimal Quantum Gravity (Century Cap 100)", icon: Award },
+  { id: "asymptotic-safety", label: "Asymptotic Safety RG", icon: TrendingDown },
+  { id: "horava-lifshitz", label: "Horava-Lifshitz Scaling", icon: Compass },
+  { id: "magneto-inertial-fusion", label: "Magneto-Inertial Fusion", icon: Flame },
   { id: "ryu-takayanagi", label: "Ryu-Takayanagi Siphon", icon: Globe },
   { id: "dbrane-tadpole", label: "D-Brane Tadpole", icon: Filter },
   { id: "novikov-geodesic", label: "Novikov Geodesic", icon: RotateCcw },
@@ -359,6 +369,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "centesimal-quantum-gravity" && <CentesimalQuantumGravityStudio />}
+          {activeTab === "asymptotic-safety" && <AsymptoticSafetyStudio />}
+          {activeTab === "horava-lifshitz" && <HoravaLifshitzStudio />}
+          {activeTab === "magneto-inertial-fusion" && <MagnetoInertialFusionStudio />}
           {activeTab === "ryu-takayanagi" && <RyuTakayanagiStudio />}
           {activeTab === "dbrane-tadpole" && <DBraneTadpoleStudio />}
           {activeTab === "novikov-geodesic" && <NovikovGeodesicStudio />}

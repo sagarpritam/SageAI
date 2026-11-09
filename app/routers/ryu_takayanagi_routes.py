@@ -38,3 +38,4 @@ async def siphon_entropy(req: SiphonEntropyRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     siphon = get_ryu_takayanagi_siphon()
     return siphon.get_siphon_metrics()
+

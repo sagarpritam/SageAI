@@ -38,3 +38,4 @@ async def engage_stealth(req: EngageStealthRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     mhd = get_mhd_plasma_stealth()
     return mhd.get_stealth_metrics()
+

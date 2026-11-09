@@ -36,3 +36,4 @@ async def normalize_loop(req: NormalizeLoopRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     norm = get_novikov_geodesic_normalizer()
     return norm.get_normalizer_metrics()
+

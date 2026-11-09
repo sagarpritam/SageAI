@@ -38,3 +38,4 @@ async def cancel_tadpole(req: CancelTadpoleRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     filt = get_dbrane_tadpole_filter()
     return filt.get_filter_metrics()
+
