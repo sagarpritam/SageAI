@@ -4,4 +4,3 @@ from .industrial_kinetic_shield import (
 )
 
 __all__ = ["IndustrialKineticShield", "industrial_kinetic_shield"]
-

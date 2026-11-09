@@ -11,4 +11,3 @@ __all__ = [
     "RadionStabilizationResult",
     "randall_sundrum_stabilizer",
 ]
-

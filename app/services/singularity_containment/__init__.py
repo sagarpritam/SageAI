@@ -7,4 +7,3 @@ __all__ = [
     "MicroSingularityHawkingContainment",
     "micro_singularity_containment",
 ]
-

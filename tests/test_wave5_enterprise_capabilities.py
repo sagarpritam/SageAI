@@ -11,11 +11,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.web3_security.smart_contract_auditor import smart_contract_auditor
-from app.services.sdn_shield.sdn_isolation_engine import sdn_isolation_engine
-from app.services.infostealer.darkweb_radar import darkweb_radar_service
-from app.services.zkp.zkp_attestation_service import zkp_attestation_service
 from app.services.d3fend.d3fend_matrix_service import d3fend_matrix_service
+from app.services.infostealer.darkweb_radar import darkweb_radar_service
+from app.services.sdn_shield.sdn_isolation_engine import sdn_isolation_engine
+from app.services.web3_security.smart_contract_auditor import smart_contract_auditor
+from app.services.zkp.zkp_attestation_service import zkp_attestation_service
 
 
 @pytest.fixture
@@ -112,7 +112,11 @@ def test_d3fend_service():
 
 def test_wave5_routers(client):
     from app.core.security import get_current_user
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "SecOpsDirector", "org": "enterprise"}
+
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "SecOpsDirector",
+        "org": "enterprise",
+    }
 
     try:
         # Web3
@@ -141,4 +145,3 @@ def test_wave5_routers(client):
         assert "matrix" in res.json()
     finally:
         app.dependency_overrides.clear()
-

@@ -8,4 +8,3 @@ from app.services.string_field_theory.string_field_theory import (
 )
 
 __all__ = ["StringFieldTheoryIntegrator", "get_string_field_theory_integrator"]
-

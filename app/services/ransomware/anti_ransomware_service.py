@@ -21,7 +21,11 @@ logger = logging.getLogger("SageAI.ransomware")
 
 STANDARD_CANARY_FILES = [
     {"name": "passwords_vault_2026.docx", "type": "DOCX", "size_bytes": 48210},
-    {"name": "financial_audit_q4_confidential.xlsx", "type": "XLSX", "size_bytes": 98450},
+    {
+        "name": "financial_audit_q4_confidential.xlsx",
+        "type": "XLSX",
+        "size_bytes": 98450,
+    },
     {"name": "enterprise_merger_contracts.pdf", "type": "PDF", "size_bytes": 142090},
     {"name": "db_master_credentials.kdbx", "type": "KDBX", "size_bytes": 32800},
 ]
@@ -75,7 +79,11 @@ class AntiRansomwareService:
         Deploys transparent honeytoken canary files across designated directory paths.
         Any modification, encryption, or deletion of these files triggers instant containment.
         """
-        directories = target_directories or ["/shared/finance", "/home/corp/documents", "C:\\Users\\Public\\Documents"]
+        directories = target_directories or [
+            "/shared/finance",
+            "/home/corp/documents",
+            "C:\\Users\\Public\\Documents",
+        ]
         deployed: List[Dict[str, Any]] = []
 
         for directory in directories:
@@ -87,7 +95,9 @@ class AntiRansomwareService:
                     "filename": template["name"],
                     "path": canary_path,
                     "file_type": template["type"],
-                    "baseline_hash": hashlib.sha256(f"honeytoken_seed_{canary_id}".encode()).hexdigest(),
+                    "baseline_hash": hashlib.sha256(
+                        f"honeytoken_seed_{canary_id}".encode()
+                    ).hexdigest(),
                     "deployed_at": datetime.now(timezone.utc).isoformat(),
                     "status": "ARMED_AND_MONITORING",
                 }
@@ -115,7 +125,15 @@ class AntiRansomwareService:
         canary_tripped: List[Dict[str, Any]] = []
         vss_tamper_detected: List[str] = []
 
-        suspicious_extensions = [".locked", ".crypto", ".enc", ".crypted", ".dark", ".sage_lock", ".ransom"]
+        suspicious_extensions = [
+            ".locked",
+            ".crypto",
+            ".enc",
+            ".crypted",
+            ".dark",
+            ".sage_lock",
+            ".ransom",
+        ]
 
         # 1. Analyze File Events
         for evt in events:
@@ -126,14 +144,20 @@ class AntiRansomwareService:
                 sample_content = sample_content.encode("utf-8")
 
             # Check entropy
-            entropy = self.calculate_entropy(sample_content) if sample_content else evt.get("entropy", 4.2)
+            entropy = (
+                self.calculate_entropy(sample_content)
+                if sample_content
+                else evt.get("entropy", 4.2)
+            )
             if entropy >= 7.5 and action in ("WRITE", "MODIFY"):
-                high_entropy_events.append({
-                    "path": path,
-                    "entropy": entropy,
-                    "pid": evt.get("pid", 9999),
-                    "process_name": evt.get("process_name", "unknown.exe"),
-                })
+                high_entropy_events.append(
+                    {
+                        "path": path,
+                        "entropy": entropy,
+                        "pid": evt.get("pid", 9999),
+                        "process_name": evt.get("process_name", "unknown.exe"),
+                    }
+                )
 
             # Check extension rename
             for ext in suspicious_extensions:
@@ -142,14 +166,22 @@ class AntiRansomwareService:
 
             # Check Canary files
             for canary_id, canary in self._active_canaries.items():
-                if canary["filename"] in path and action in ("WRITE", "DELETE", "RENAME"):
-                    canary_tripped.append({
-                        "canary_id": canary_id,
-                        "path": path,
-                        "action": action,
-                        "tampered_by_pid": evt.get("pid", 9999),
-                        "tampered_by_process": evt.get("process_name", "malicious_encryptor.exe"),
-                    })
+                if canary["filename"] in path and action in (
+                    "WRITE",
+                    "DELETE",
+                    "RENAME",
+                ):
+                    canary_tripped.append(
+                        {
+                            "canary_id": canary_id,
+                            "path": path,
+                            "action": action,
+                            "tampered_by_pid": evt.get("pid", 9999),
+                            "tampered_by_process": evt.get(
+                                "process_name", "malicious_encryptor.exe"
+                            ),
+                        }
+                    )
 
         # 2. Analyze Executed Commands for VSS Destruction
         if executed_commands:
@@ -160,12 +192,21 @@ class AntiRansomwareService:
                         vss_tamper_detected.append(cmd)
 
         # 3. Determine Threat Level & Containment
-        is_attack_active = bool(canary_tripped or vss_tamper_detected or (len(high_entropy_events) >= 5 and ransomware_extensions_detected))
+        is_attack_active = bool(
+            canary_tripped
+            or vss_tamper_detected
+            or (len(high_entropy_events) >= 5 and ransomware_extensions_detected)
+        )
 
         if is_attack_active:
             threat_level = "CRITICAL_RANSOMWARE_ATTACK"
             containment_action = "AUTONOMOUS_CONTAINMENT_EXECUTED"
-            offending_pids = list(set([e["pid"] for e in high_entropy_events] + [c["tampered_by_pid"] for c in canary_tripped]))
+            offending_pids = list(
+                set(
+                    [e["pid"] for e in high_entropy_events]
+                    + [c["tampered_by_pid"] for c in canary_tripped]
+                )
+            )
         elif high_entropy_events or vss_tamper_detected:
             threat_level = "ELEVATED_SUSPICIOUS_WRITE_BURST"
             containment_action = "MONITORING_RATE_LIMIT"
@@ -225,9 +266,27 @@ class AntiRansomwareService:
         sample_canary = list(self._active_canaries.values())[0]
 
         mock_events = [
-            {"path": "/data/report.pdf", "action": "WRITE", "entropy": 7.8, "pid": 4128, "process_name": "mimikatz_dropper.exe"},
-            {"path": "/data/report.pdf.locked", "action": "RENAME", "entropy": 7.9, "pid": 4128, "process_name": "mimikatz_dropper.exe"},
-            {"path": sample_canary["path"], "action": "WRITE", "entropy": 7.95, "pid": 4128, "process_name": "mimikatz_dropper.exe"},
+            {
+                "path": "/data/report.pdf",
+                "action": "WRITE",
+                "entropy": 7.8,
+                "pid": 4128,
+                "process_name": "mimikatz_dropper.exe",
+            },
+            {
+                "path": "/data/report.pdf.locked",
+                "action": "RENAME",
+                "entropy": 7.9,
+                "pid": 4128,
+                "process_name": "mimikatz_dropper.exe",
+            },
+            {
+                "path": sample_canary["path"],
+                "action": "WRITE",
+                "entropy": 7.95,
+                "pid": 4128,
+                "process_name": "mimikatz_dropper.exe",
+            },
         ]
         mock_commands = ["vssadmin delete shadows /all /quiet"]
 
@@ -241,4 +300,3 @@ class AntiRansomwareService:
 
 # Global singleton
 anti_ransomware_service = AntiRansomwareService()
-

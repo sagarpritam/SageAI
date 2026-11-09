@@ -2,7 +2,6 @@
 Tests for SageAI Wave 6 Phase 6.2: Autonomous Multi-Agent Threat Hunting Swarm.
 """
 
-import pytest
 from app.services.threat_hunting_swarm.hunting_swarm_service import (
     threat_hunting_swarm_service,
 )
@@ -38,7 +37,10 @@ def test_launch_hunt_active_directory_dcsync():
     assert res["status"] == "success"
     hunt = res["hunt"]
     assert "T1003.006" in hunt["technique"]
-    assert hunt["agents"]["telemetry_agent"]["findings"][0]["target_process"] == "lsass.exe"
+    assert (
+        hunt["agents"]["telemetry_agent"]["findings"][0]["target_process"]
+        == "lsass.exe"
+    )
 
 
 def test_execute_hunt_containment():
@@ -58,5 +60,6 @@ def test_execute_hunt_containment():
     # Verify updated status
     updated_hunt = threat_hunting_swarm_service.active_hunts[hunt_id]
     assert updated_hunt["status"] == "CONTAINMENT_ENFORCED"
-    assert updated_hunt["enforced_action"] == "TERMINATE_HOLLOWED_PROCESS_AND_CONTAIN_HOST"
-
+    assert (
+        updated_hunt["enforced_action"] == "TERMINATE_HOLLOWED_PROCESS_AND_CONTAIN_HOST"
+    )

@@ -37,7 +37,9 @@ class VercelGatewayClient(BaseLLM):
         **kwargs,
     ) -> Dict[str, Any]:
         if vercel_breaker.is_open():
-            raise RuntimeError("Vercel AI Gateway is currently unavailable (Circuit Open)")
+            raise RuntimeError(
+                "Vercel AI Gateway is currently unavailable (Circuit Open)"
+            )
 
         api_key = settings.AI_GATEWAY_API_KEY
         if not api_key:
@@ -68,7 +70,9 @@ class VercelGatewayClient(BaseLLM):
 
         gateway_url = f"{settings.AI_GATEWAY_URL}/chat/completions"
 
-        async with httpx.AsyncClient(timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)) as client:
+        async with httpx.AsyncClient(
+            timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)
+        ) as client:
             try:
                 response = await client.post(gateway_url, json=payload, headers=headers)
 
@@ -87,7 +91,9 @@ class VercelGatewayClient(BaseLLM):
                     "content": content,
                     "usage": {
                         "prompt_tokens": usage.get("prompt_tokens", len(prompt) // 4),
-                        "completion_tokens": usage.get("completion_tokens", len(content) // 4),
+                        "completion_tokens": usage.get(
+                            "completion_tokens", len(content) // 4
+                        ),
                     },
                 }
             except httpx.RequestError as e:
@@ -96,4 +102,3 @@ class VercelGatewayClient(BaseLLM):
             except Exception:
                 vercel_breaker.record_failure()
                 raise
-

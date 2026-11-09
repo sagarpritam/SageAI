@@ -1,4 +1,5 @@
 """Chrono-Topological Novikov Self-Consistency Geodesic Loop Normalizer Package."""
+
 from .novikov_geodesic_normalizer import (
     NovikovGeodesicNormalizer,
     NovikovNormalizationResult,
@@ -12,4 +13,3 @@ __all__ = [
     "NovikovNormalizationResult",
     "get_novikov_geodesic_normalizer",
 ]
-

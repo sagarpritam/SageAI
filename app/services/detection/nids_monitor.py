@@ -28,14 +28,18 @@ class NIDSMonitor:
         self._c2_streams: Dict[tuple[str, str], List[float]] = defaultdict(list)
 
     def record_connection_probe(
-        self, source_ip: str, destination_port: int, destination_ip: str = "internal_host"
+        self,
+        source_ip: str,
+        destination_port: int,
+        destination_ip: str = "internal_host",
     ) -> Optional[Dict[str, Any]]:
         """
         Records an inbound connection attempt and checks for port scanning.
         """
         now = time.time()
         probes = [
-            (p, t) for (p, t) in self._port_probes[source_ip]
+            (p, t)
+            for (p, t) in self._port_probes[source_ip]
             if now - t <= self.scan_window_seconds
         ]
         probes.append((destination_port, now))
@@ -71,7 +75,7 @@ class NIDSMonitor:
 
         # Keep last 15 timestamps
         recent = timestamps[-15:]
-        intervals = [recent[i] - recent[i-1] for i in range(1, len(recent))]
+        intervals = [recent[i] - recent[i - 1] for i in range(1, len(recent))]
 
         mean_interval = statistics.mean(intervals)
         std_dev = statistics.stdev(intervals) if len(intervals) > 1 else 0.0
@@ -101,7 +105,7 @@ class NIDSMonitor:
         Detects DNS tunneling, exfiltration, and C2 domain generation algorithms (DGA).
         Analyzes label length, character entropy, and anomalous query types.
         """
-        labels = [l for l in query_name.strip(".").split(".") if l]
+        labels = [lbl for lbl in query_name.strip(".").split(".") if lbl]
         if not labels:
             return None
 
@@ -110,7 +114,9 @@ class NIDSMonitor:
         label_len = len(subdomain_label)
 
         # Calculate Shannon entropy of the label
-        prob = [float(subdomain_label.count(c)) / label_len for c in set(subdomain_label)]
+        prob = [
+            float(subdomain_label.count(c)) / label_len for c in set(subdomain_label)
+        ]
         entropy = -sum(p * math.log2(p) for p in prob) if label_len > 0 else 0.0
 
         is_tunneling = False

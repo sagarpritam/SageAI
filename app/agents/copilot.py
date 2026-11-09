@@ -392,13 +392,27 @@ class CopilotAgent:
             logger.debug(f"RAG search error: {e}")
 
         # ── Tool 5: Threat Detection Rule Synthesis ──
-        if any(term in user_msg.lower() for term in ["yara", "sigma", "nuclei", "waf", "detection rule", "synthesize rule", "rule forge"]):
+        if any(
+            term in user_msg.lower()
+            for term in [
+                "yara",
+                "sigma",
+                "nuclei",
+                "waf",
+                "detection rule",
+                "synthesize rule",
+                "rule forge",
+            ]
+        ):
             try:
                 from app.services.threat_feed.pattern_synthesizer import (
                     ThreatPatternSynthesizer,
                 )
+
                 synth = ThreatPatternSynthesizer()
-                cve_target = cve_match.group(0).upper() if cve_match else "CVE-2024-DEFENSE"
+                cve_target = (
+                    cve_match.group(0).upper() if cve_match else "CVE-2024-DEFENSE"
+                )
                 rules = synth.synthesize_rules(
                     cve_id=cve_target,
                     title=f"Exploit pattern for {cve_target}",
@@ -410,14 +424,20 @@ class CopilotAgent:
                     f"Virtual WAF (ModSecurity):\n```apache\n{rules.get('waf_rule', '')}\n```\n"
                     f"Sigma Rule:\n```yaml\n{rules.get('sigma_rule', '')}\n```"
                 )
-                sources.append({"title": f"Rule Forge: {cve_target}", "type": "rule_synthesizer"})
+                sources.append(
+                    {"title": f"Rule Forge: {cve_target}", "type": "rule_synthesizer"}
+                )
             except Exception as e:
                 logger.debug(f"Rule synthesis error: {e}")
 
         # ── Tool 6: Deception Mesh & Honeypots ──
-        if any(term in user_msg.lower() for term in ["honeypot", "canary", "deception", "decoy", "tripwire"]):
+        if any(
+            term in user_msg.lower()
+            for term in ["honeypot", "canary", "deception", "decoy", "tripwire"]
+        ):
             try:
                 from app.services.deception.honeypot_service import honeypot_service
+
                 tokens = honeypot_service.list_tokens(org_id=org_id)
                 tool_artifacts.append(
                     f"ACTIVE DECEPTION MESH & HONEYTOKENS:\n"
@@ -430,9 +450,19 @@ class CopilotAgent:
                 logger.debug(f"Honeypot lookup error: {e}")
 
         # ── Tool 7: Adversarial Prompt Guardrails ──
-        if any(term in user_msg.lower() for term in ["guardrail", "jailbreak", "prompt injection", "is this prompt safe", "adversarial"]):
+        if any(
+            term in user_msg.lower()
+            for term in [
+                "guardrail",
+                "jailbreak",
+                "prompt injection",
+                "is this prompt safe",
+                "adversarial",
+            ]
+        ):
             try:
                 from app.services.ai_resilience import evaluate_adversarial_input
+
                 eval_res = evaluate_adversarial_input(user_msg)
                 tool_artifacts.append(
                     f"ADVERSARIAL GUARDRAIL EVALUATION:\n"

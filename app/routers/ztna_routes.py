@@ -11,11 +11,15 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.ztna.microsegmentation_service import ztna_service
 
-router = APIRouter(prefix="/ztna", tags=["Zero-Trust Network Access & Micro-Segmentation"])
+router = APIRouter(
+    prefix="/ztna", tags=["Zero-Trust Network Access & Micro-Segmentation"]
+)
 
 
 class ContextualTrustRequest(BaseModel):
-    session_context: Dict[str, Any] = Field(..., description="Device posture, authentication, and behavioral signals")
+    session_context: Dict[str, Any] = Field(
+        ..., description="Device posture, authentication, and behavioral signals"
+    )
 
 
 class MicrosegmentationPolicyRequest(BaseModel):
@@ -64,4 +68,3 @@ async def synthesize_microsegmentation_policy(
         "status": "success",
         "policy": policy,
     }
-

@@ -85,17 +85,21 @@ class CalabiYauMirrorSymmetryInverter:
         gain = max(0.8, min(float(duality_coupling_gain), 2.5))
 
         # Classical Picard-Fuchs period Pi_0(z) ~ 1 + 120*z + 151200*z^2
-        period_pi_0 = 1.0 + (120.0 * z) + (151200.0 * (z ** 2))
+        period_pi_0 = 1.0 + (120.0 * z) + (151200.0 * (z**2))
 
         # Mirror map q(z) = exp(2*pi*i * t(z)) ~ z * exp(770*z)
         mirror_q = z * math.exp(770.0 * z * 0.01)
 
         # Gromov-Witten curve invariants: N_1 = 2875, N_2 = 609250, N_3 = 317206375
         gw_invariants = [2875, 609250, 317206375, 242467530000, 229305888887625]
-        instanton_sum = sum(
-            gw_invariants[min(d - 1, len(gw_invariants) - 1)] * ((mirror_q ** d) / max(1e-12, (1.0 - mirror_q ** d) ** 3))
-            for d in range(1, d_max + 1)
-        ) * gain
+        instanton_sum = (
+            sum(
+                gw_invariants[min(d - 1, len(gw_invariants) - 1)]
+                * ((mirror_q**d) / max(1e-12, (1.0 - mirror_q**d) ** 3))
+                for d in range(1, d_max + 1)
+            )
+            * gain
+        )
 
         # Hodge numbers
         h11_orig = pair["h_1_1_original"]
@@ -149,4 +153,3 @@ _calabi_yau_mirror_symmetry_inverter = CalabiYauMirrorSymmetryInverter()
 def get_calabi_yau_mirror_symmetry_inverter() -> CalabiYauMirrorSymmetryInverter:
     """Return the global CalabiYauMirrorSymmetryInverter singleton instance."""
     return _calabi_yau_mirror_symmetry_inverter
-

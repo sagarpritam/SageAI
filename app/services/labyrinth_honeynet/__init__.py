@@ -4,4 +4,3 @@ from .labyrinth_honeynet_service import (
 )
 
 __all__ = ["LabyrinthDeceptionEngine", "labyrinth_honeynet_service"]
-

@@ -36,7 +36,14 @@ def test_stride_24_vector_catalog():
     """Verify comprehensive 24-vector STRIDE enterprise knowledge base (4 per category)."""
     assert len(STRIDE_KNOWLEDGE_BASE) == 24
     categories = [t["category"] for t in STRIDE_KNOWLEDGE_BASE]
-    for expected in ["Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service", "Elevation of Privilege"]:
+    for expected in [
+        "Spoofing",
+        "Tampering",
+        "Repudiation",
+        "Information Disclosure",
+        "Denial of Service",
+        "Elevation of Privilege",
+    ]:
         assert categories.count(expected) == 4
 
     for t in STRIDE_KNOWLEDGE_BASE:
@@ -50,25 +57,57 @@ def test_dread_calculation():
     engine = ThreatModelingEngine()
 
     # Critical threat (score >= 40)
-    crit = engine.calculate_dread_score({"damage": 9, "reproducibility": 9, "exploitability": 8, "affected_users": 9, "discoverability": 8})
+    crit = engine.calculate_dread_score(
+        {
+            "damage": 9,
+            "reproducibility": 9,
+            "exploitability": 8,
+            "affected_users": 9,
+            "discoverability": 8,
+        }
+    )
     assert crit["dread_total"] == 43
     assert crit["dread_average"] == 8.6
     assert crit["severity"] == "CRITICAL"
 
     # High threat (30 - 39)
-    high = engine.calculate_dread_score({"damage": 7, "reproducibility": 7, "exploitability": 6, "affected_users": 7, "discoverability": 6})
+    high = engine.calculate_dread_score(
+        {
+            "damage": 7,
+            "reproducibility": 7,
+            "exploitability": 6,
+            "affected_users": 7,
+            "discoverability": 6,
+        }
+    )
     assert high["dread_total"] == 33
     assert high["dread_average"] == 6.6
     assert high["severity"] == "HIGH"
 
     # Medium threat (20 - 29)
-    med = engine.calculate_dread_score({"damage": 5, "reproducibility": 5, "exploitability": 4, "affected_users": 5, "discoverability": 4})
+    med = engine.calculate_dread_score(
+        {
+            "damage": 5,
+            "reproducibility": 5,
+            "exploitability": 4,
+            "affected_users": 5,
+            "discoverability": 4,
+        }
+    )
     assert med["dread_total"] == 23
     assert med["dread_average"] == 4.6
     assert med["severity"] == "MEDIUM"
 
     # Low threat (< 20)
-    low = engine.calculate_dread_score({"damage": 3, "reproducibility": 3, "exploitability": 2, "affected_users": 3, "discoverability": 3})
+    low = engine.calculate_dread_score(
+        {
+            "damage": 3,
+            "reproducibility": 3,
+            "exploitability": 2,
+            "affected_users": 3,
+            "discoverability": 3,
+        }
+    )
     assert low["dread_total"] == 14
     assert low["dread_average"] == 2.8
     assert low["severity"] == "LOW"
@@ -78,9 +117,24 @@ def test_threat_modeling_analysis_and_remediation():
     """Verify STRIDE decomposition, mitigation ticket generation, and Merkle seal."""
     engine = ThreatModelingEngine()
     components = [
-        {"id": "comp-1", "name": "Public API Gateway", "type": "API_GATEWAY", "exposure": "PUBLIC"},
-        {"id": "comp-2", "name": "Auth Microservice", "type": "CORE_SERVICE", "exposure": "PRIVATE"},
-        {"id": "comp-3", "name": "Postgres Database", "type": "DATA_STORE", "exposure": "ISOLATED"},
+        {
+            "id": "comp-1",
+            "name": "Public API Gateway",
+            "type": "API_GATEWAY",
+            "exposure": "PUBLIC",
+        },
+        {
+            "id": "comp-2",
+            "name": "Auth Microservice",
+            "type": "CORE_SERVICE",
+            "exposure": "PRIVATE",
+        },
+        {
+            "id": "comp-3",
+            "name": "Postgres Database",
+            "type": "DATA_STORE",
+            "exposure": "ISOLATED",
+        },
     ]
 
     result = engine.analyze_architecture(
@@ -196,13 +250,26 @@ def test_report_and_patch_generation():
     engine = ThreatModelingEngine()
     analysis = engine.analyze_architecture(
         components=[
-            {"id": "gw", "name": "API Gateway", "type": "API_GATEWAY", "exposure": "PUBLIC"},
-            {"id": "db", "name": "Postgres DB", "type": "DATA_STORE", "exposure": "ISOLATED"},
+            {
+                "id": "gw",
+                "name": "API Gateway",
+                "type": "API_GATEWAY",
+                "exposure": "PUBLIC",
+            },
+            {
+                "id": "db",
+                "name": "Postgres DB",
+                "type": "DATA_STORE",
+                "exposure": "ISOLATED",
+            },
         ]
     )
 
     report_md = engine.generate_threat_model_report(analysis)
-    assert "# 🛡️ SageAI Enterprise Threat Modeling & Security Architecture Audit" in report_md
+    assert (
+        "# 🛡️ SageAI Enterprise Threat Modeling & Security Architecture Audit"
+        in report_md
+    )
     assert "Cryptographic Merkle Seal" in report_md
     assert "STRIDE Threat Distribution" in report_md
 
@@ -217,7 +284,9 @@ async def test_threat_modeling_api_routes():
     """Verify FastAPI /threat-modeling endpoints with bearer token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"})
+        token = create_access_token(
+            {"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"}
+        )
         auth_headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Unauthenticated request should be rejected
@@ -234,8 +303,18 @@ async def test_threat_modeling_api_routes():
             "/threat-modeling/analyze",
             json={
                 "components": [
-                    {"id": "c1", "name": "API Gateway", "type": "API_GATEWAY", "exposure": "PUBLIC"},
-                    {"id": "c2", "name": "Core Vault", "type": "DATA_STORE", "exposure": "ISOLATED"},
+                    {
+                        "id": "c1",
+                        "name": "API Gateway",
+                        "type": "API_GATEWAY",
+                        "exposure": "PUBLIC",
+                    },
+                    {
+                        "id": "c2",
+                        "name": "Core Vault",
+                        "type": "DATA_STORE",
+                        "exposure": "ISOLATED",
+                    },
                 ]
             },
             headers=auth_headers,

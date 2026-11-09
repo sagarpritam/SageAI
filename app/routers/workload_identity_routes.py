@@ -21,7 +21,9 @@ router = APIRouter(
 
 class IssueSvidRequest(BaseModel):
     namespace: Optional[str] = "prod"
-    service_account: str = Field(..., description="Kubernetes service account or workload identifier")
+    service_account: str = Field(
+        ..., description="Kubernetes service account or workload identifier"
+    )
     enclave_attested: Optional[bool] = True
 
 
@@ -57,7 +59,9 @@ async def issue_svid_endpoint(
     return spiffe_spire_service.issue_svid(
         namespace=payload.namespace or "prod",
         service_account=payload.service_account,
-        enclave_attested=payload.enclave_attested if payload.enclave_attested is not None else True,
+        enclave_attested=payload.enclave_attested
+        if payload.enclave_attested is not None
+        else True,
         operator=current_user.get("email", "SPIREServer"),
     )
 
@@ -93,4 +97,3 @@ async def revoke_svid_endpoint(
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-

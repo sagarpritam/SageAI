@@ -81,17 +81,19 @@ class MagneticMonopoleCatalyzedBattery:
         feed_mg = kwargs.get("proton_feed_ug_s", proton_feed_mg_s)
         feed_mg_s = max(0.1, min(float(feed_mg), 5.0))
         c_boost = max(0.8, min(float(confinement_boost), 2.0))
-        demand_gw = max(10.0, min(float(load_demand_gw), 300.0))
+        max(10.0, min(float(load_demand_gw), 300.0))
 
         # Mass converted per second in kg: 1 mg = 1e-6 kg
         mass_rate_kg_s = (feed_mg_s * 1e-6) * c_boost
 
         # E = m * c^2 gross thermal power in Watts
-        gross_thermal_power_w = mass_rate_kg_s * (self.SPEED_OF_LIGHT ** 2)
+        gross_thermal_power_w = mass_rate_kg_s * (self.SPEED_OF_LIGHT**2)
         gross_thermal_gw = gross_thermal_power_w / 1e9
 
         # Conversion efficiency
-        efficiency_pct = min(96.5, trap["conversion_efficiency_pct"] * (1.0 + 0.005 * (c_boost - 1.0)))
+        efficiency_pct = min(
+            96.5, trap["conversion_efficiency_pct"] * (1.0 + 0.005 * (c_boost - 1.0))
+        )
 
         # Net continuous electrical baseload power in GW
         net_electrical_gw = gross_thermal_gw * (efficiency_pct / 100.0)
@@ -129,7 +131,9 @@ class MagneticMonopoleCatalyzedBattery:
         """Return aggregate magnetic monopole battery metrics."""
         return {
             "active_monopole_traps": len(self._traps),
-            "total_monopoles_confined": sum(t["monopoles_confined_count"] for t in self._traps.values()),
+            "total_monopoles_confined": sum(
+                t["monopoles_confined_count"] for t in self._traps.values()
+            ),
             "mean_net_baseload_gw": 115.4,
             "mass_energy_efficiency": "100% E=mc^2 COMPLETE CONVERSION",
             "zero_carbon_zero_actinide_waste": True,

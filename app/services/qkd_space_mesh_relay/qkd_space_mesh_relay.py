@@ -126,15 +126,25 @@ class SovereignQKDSpaceMeshRelay:
         nr = self.nodes.get(relay_node_id)
         n2 = self.nodes.get(destination_node_id)
         if not n1 or not nr or not n2:
-            raise ValueError(f"Invalid QKD node IDs: {origin_node_id}, {relay_node_id}, {destination_node_id}")
+            raise ValueError(
+                f"Invalid QKD node IDs: {origin_node_id}, {relay_node_id}, {destination_node_id}"
+            )
 
-        total_distance_km = max(n1.distance_from_earth_km, n2.distance_from_earth_km) - min(n1.distance_from_earth_km, n2.distance_from_earth_km)
+        total_distance_km = max(
+            n1.distance_from_earth_km, n2.distance_from_earth_km
+        ) - min(n1.distance_from_earth_km, n2.distance_from_earth_km)
         if total_distance_km == 0.0:
             total_distance_km = nr.distance_from_earth_km
 
         fidelity = round(0.965 + random.uniform(0.005, 0.025), 4)
-        key_rate = round(min(n1.raw_key_generation_rate_kbps, n2.raw_key_generation_rate_kbps) * 0.72, 2)
-        shapiro_ms = round((total_distance_km / self.SPEED_OF_LIGHT_KM_S) * 0.000004 * 1000.0, 4)
+        key_rate = round(
+            min(n1.raw_key_generation_rate_kbps, n2.raw_key_generation_rate_kbps)
+            * 0.72,
+            2,
+        )
+        shapiro_ms = round(
+            (total_distance_km / self.SPEED_OF_LIGHT_KM_S) * 0.000004 * 1000.0, 4
+        )
 
         swap_id = f"QKD-SWAP-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         event = QKDEntanglementSwapEvent(
@@ -169,8 +179,14 @@ class SovereignQKDSpaceMeshRelay:
     def get_mesh_metrics(self) -> Dict[str, Any]:
         return {
             "active_space_mesh_nodes": len(self.nodes),
-            "max_quantum_reach_km": max([n.distance_from_earth_km for n in self.nodes.values()]),
-            "mean_qber_pct": round(sum([n.quantum_bit_error_rate_pct for n in self.nodes.values()]) / len(self.nodes), 2),
+            "max_quantum_reach_km": max(
+                [n.distance_from_earth_km for n in self.nodes.values()]
+            ),
+            "mean_qber_pct": round(
+                sum([n.quantum_bit_error_rate_pct for n in self.nodes.values()])
+                / len(self.nodes),
+                2,
+            ),
             "completed_entanglement_swaps": len(self.swap_events),
             "protocol": "DECOY_STATE_BB84_CONTINUOUS_VARIABLE_CVQKD",
             "status": "OPERATIONAL",
@@ -178,4 +194,3 @@ class SovereignQKDSpaceMeshRelay:
 
 
 qkd_space_mesh_relay = SovereignQKDSpaceMeshRelay()
-

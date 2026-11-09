@@ -13,8 +13,12 @@ router = APIRouter(
 
 class GenerateRepulsionRequest(BaseModel):
     grid_id: str = Field(..., description="Target de Sitter repulsion grid ID")
-    target_metric_region: str = Field(default="LOCAL_INERTIAL_FRAME_SEC_1", description="Target metric region")
-    coupling_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Coupling gain")
+    target_metric_region: str = Field(
+        default="LOCAL_INERTIAL_FRAME_SEC_1", description="Target metric region"
+    )
+    coupling_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Coupling gain"
+    )
 
 
 @router.get("/grids")

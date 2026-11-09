@@ -1,6 +1,7 @@
 """Unit & Integration Tests for WarRoom Real-Time Telemetry and Event Broadcasting."""
 
 import pytest
+
 from app.services.warroom_service import warroom_manager
 
 
@@ -55,4 +56,3 @@ async def test_warroom_rest_endpoints(client):
     post_data = res_post.json()
     assert post_data["status"] == "success"
     assert post_data["event"]["source"] == "NIDSSweeper"
-

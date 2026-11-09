@@ -8,4 +8,3 @@ from app.services.atomic_clock_mesh.optical_atomic_clock_mesh import (
 )
 
 __all__ = ["OpticalAtomicClockMesh", "optical_atomic_clock_mesh"]
-

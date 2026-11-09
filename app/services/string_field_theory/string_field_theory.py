@@ -81,17 +81,25 @@ class StringFieldTheoryIntegrator:
         gain = max(0.8, min(float(damping_gain), 2.5))
 
         # Sen's non-perturbative vacuum energy depth: E_vac = -1 / (2 * pi^2 * g0^2)
-        sen_exact_depth_j = 1.0 / (2.0 * (math.pi ** 2) * (g0 ** 2))
+        sen_exact_depth_j = 1.0 / (2.0 * (math.pi**2) * (g0**2))
 
         # Level truncation approximation: converges exponentially towards unity
         convergence_factor = 1.0 - (math.exp(-0.85 * level) * 0.05)
-        achieved_depth_pct = min(99.999, vertex["tachyon_potential_depth_pct"] * convergence_factor * (1.0 + 0.00005 * (gain - 1.0)))
+        achieved_depth_pct = min(
+            99.999,
+            vertex["tachyon_potential_depth_pct"]
+            * convergence_factor
+            * (1.0 + 0.00005 * (gain - 1.0)),
+        )
 
         # BRST nilpotency check: ||Q_B^2 Psi||
         brst_error = vertex["brst_nilpotency_error"] * (1.0 / level)
 
         # D-brane tension cancellation percentage
-        annihilation_pct = min(99.999, vertex["brane_energy_annihilation_pct"] * (1.0 + 0.00003 * (gain - 1.0)))
+        annihilation_pct = min(
+            99.999,
+            vertex["brane_energy_annihilation_pct"] * (1.0 + 0.00003 * (gain - 1.0)),
+        )
 
         # Star product 3-string vertex overlap integral V_3(1, 2, 3)
         star_vertex_coupling = (3.0 * math.sqrt(3.0) / 4.0) ** 3 * (g0 * gain)

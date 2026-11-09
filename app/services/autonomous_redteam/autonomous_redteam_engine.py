@@ -55,7 +55,11 @@ class AutonomousRedTeamCluster:
                 codename="Specter-RF",
                 specialization="Intersite RF/AESA Jamming & GPS Optical Drift Injection",
                 aggression_level=0.92,
-                evasion_techniques=["Frequency-Hopping DRFM", "Relativistic Phase Deception", "Chirp Inversion"],
+                evasion_techniques=[
+                    "Frequency-Hopping DRFM",
+                    "Relativistic Phase Deception",
+                    "Chirp Inversion",
+                ],
                 active_payload_vectors=4,
             ),
             RedTeamAgentProfile(
@@ -63,7 +67,11 @@ class AutonomousRedTeamCluster:
                 codename="Lattice-Shatter",
                 specialization="Quantum Lattice Side-Channel & HNDL Harvest Exfiltration",
                 aggression_level=0.96,
-                evasion_techniques=["SMT Fault Injection", "Optical Power Side-Channel", "Decoherence Exploitation"],
+                evasion_techniques=[
+                    "SMT Fault Injection",
+                    "Optical Power Side-Channel",
+                    "Decoherence Exploitation",
+                ],
                 active_payload_vectors=6,
             ),
             RedTeamAgentProfile(
@@ -71,7 +79,11 @@ class AutonomousRedTeamCluster:
                 codename="Orbital-Kinetic",
                 specialization="Hypervelocity ASAT Kinetic & Spaceborne Plasma Penetration",
                 aggression_level=0.98,
-                evasion_techniques=["Hypervelocity Gliding (Mach 28)", "Ablation Shielding", "Chaff Decoy Swarm"],
+                evasion_techniques=[
+                    "Hypervelocity Gliding (Mach 28)",
+                    "Ablation Shielding",
+                    "Chaff Decoy Swarm",
+                ],
                 active_payload_vectors=5,
             ),
             RedTeamAgentProfile(
@@ -79,7 +91,11 @@ class AutonomousRedTeamCluster:
                 codename="Borehole-Wraith",
                 specialization="Subterranean Acoustic Cavitation & Tectonic Strain Masking",
                 aggression_level=0.88,
-                evasion_techniques=["Seismic Reverberation Damping", "Muon Attenuation Camouflage", "Laser Meter Nulling"],
+                evasion_techniques=[
+                    "Seismic Reverberation Damping",
+                    "Muon Attenuation Camouflage",
+                    "Laser Meter Nulling",
+                ],
                 active_payload_vectors=3,
             ),
         ]
@@ -110,7 +126,13 @@ class AutonomousRedTeamCluster:
         Executes a randomized multi-agent adversarial stress campaign across selected defense capabilities.
         Evaluates autonomous defense response latencies and resilience scores.
         """
-        domains = target_domains or ["ORBITAL_PNT", "QUANTUM_NETWORK", "DEEP_SPACE_RELAY", "SUBTERRANEAN_SEISMIC", "PLASMA_SHIELD"]
+        domains = target_domains or [
+            "ORBITAL_PNT",
+            "QUANTUM_NETWORK",
+            "DEEP_SPACE_RELAY",
+            "SUBTERRANEAN_SEISMIC",
+            "PLASMA_SHIELD",
+        ]
         engaged_agents = list(self.agents.keys())
         simulated_vectors = len(domains) * random.randint(3, 5)
 
@@ -122,14 +144,16 @@ class AutonomousRedTeamCluster:
 
         findings = []
         for d in domains:
-            findings.append({
-                "domain": d,
-                "adversary_vector": f"Non-Deterministic Assault on {d}",
-                "mitigation_service": "Autonomous Sovereign Defense Loop",
-                "containment_latency_ms": round(random.uniform(1.1, 2.8), 2),
-                "residual_risk": "NEGLIGIBLE",
-                "status": "THREAT_NEUTRALIZED",
-            })
+            findings.append(
+                {
+                    "domain": d,
+                    "adversary_vector": f"Non-Deterministic Assault on {d}",
+                    "mitigation_service": "Autonomous Sovereign Defense Loop",
+                    "containment_latency_ms": round(random.uniform(1.1, 2.8), 2),
+                    "residual_risk": "NEGLIGIBLE",
+                    "status": "THREAT_NEUTRALIZED",
+                }
+            )
 
         campaign_id = f"REDTEAM-CAMP-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
         verdict = "ALL_VECTORS_DEFLECTED_ZERO_CASCADE"
@@ -168,8 +192,12 @@ class AutonomousRedTeamCluster:
             "active_red_agents": len(self.agents),
             "completed_campaigns_count": len(self.campaigns),
             "mean_resilience_score": round(
-                sum([c.systemic_resilience_score for c in self.campaigns]) / len(self.campaigns), 2
-            ) if self.campaigns else 99.85,
+                sum([c.systemic_resilience_score for c in self.campaigns])
+                / len(self.campaigns),
+                2,
+            )
+            if self.campaigns
+            else 99.85,
             "swarm_mode": "AUTONOMOUS_ADVERSARIAL_SIMULATION",
             "coverage_capabilities": 76,
             "status": "OPERATIONAL",
@@ -177,4 +205,3 @@ class AutonomousRedTeamCluster:
 
 
 autonomous_redteam_cluster = AutonomousRedTeamCluster()
-

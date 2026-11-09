@@ -86,8 +86,8 @@ class CognitiveEWEngine:
             raise ValueError(f"Emitter {emitter_id} not recognized.")
 
         freq = pulse_descriptor.get("carrier_frequency_ghz", emitter["frequency_ghz"])
-        pw = pulse_descriptor.get("pulse_width_us", emitter["pulse_width_us"])
-        snr_db = pulse_descriptor.get("snr_db", 24.5)
+        pulse_descriptor.get("pulse_width_us", emitter["pulse_width_us"])
+        pulse_descriptor.get("snr_db", 24.5)
 
         # DRFM synthesis timing and pull-off parameters
         synthesis_latency_us = 3.4  # Sub-5 microsecond closed-loop DRFM turnaround
@@ -172,8 +172,14 @@ class CognitiveEWEngine:
         return engagement
 
     def get_metrics(self) -> Dict[str, Any]:
-        total_attempts = sum(e["jamming_attempts"] for e in self._tracked_emitters.values())
-        neutralized = sum(1 for e in self._tracked_emitters.values() if e["threat_priority"] == "NEUTRALIZED")
+        total_attempts = sum(
+            e["jamming_attempts"] for e in self._tracked_emitters.values()
+        )
+        neutralized = sum(
+            1
+            for e in self._tracked_emitters.values()
+            if e["threat_priority"] == "NEUTRALIZED"
+        )
 
         return {
             "total_emitters_monitored": len(self._tracked_emitters),
@@ -187,4 +193,3 @@ class CognitiveEWEngine:
 
 # Global singleton instance
 cognitive_ew_engine = CognitiveEWEngine()
-

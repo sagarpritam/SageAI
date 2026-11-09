@@ -27,8 +27,12 @@ class TelecommandRequest(BaseModel):
     satellite_id: str = Field(..., description="Target satellite identifier")
     ground_station_id: str = Field(..., description="Uplinking Ground Station ID")
     command_code: int = Field(..., description="CCSDS telecommand code")
-    anti_replay_counter: int = Field(..., description="Strict monotonically increasing sequence counter")
-    telecommand_mac_hex: str = Field(..., description="Cryptographic MAC authentication tag")
+    anti_replay_counter: int = Field(
+        ..., description="Strict monotonically increasing sequence counter"
+    )
+    telecommand_mac_hex: str = Field(
+        ..., description="Cryptographic MAC authentication tag"
+    )
 
 
 @router.get("/satellites")
@@ -38,7 +42,10 @@ async def list_satellites_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all satellites in the orbital laser mesh constellation."""
-    return {"status": "success", "satellites": orbital_laser_mesh_guard.list_satellites()}
+    return {
+        "status": "success",
+        "satellites": orbital_laser_mesh_guard.list_satellites(),
+    }
 
 
 @router.get("/satellites/{satellite_id}")
@@ -98,5 +105,7 @@ async def get_orbital_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns orbital laser mesh and constellation telemetry metrics."""
-    return {"status": "success", "metrics": orbital_laser_mesh_guard.get_orbital_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": orbital_laser_mesh_guard.get_orbital_metrics(),
+    }

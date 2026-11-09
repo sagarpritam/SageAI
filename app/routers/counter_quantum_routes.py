@@ -19,14 +19,24 @@ router = APIRouter(
 
 class InjectHoneyChaffRequest(BaseModel):
     interceptor_id: str = Field(..., description="Target egress harvest interceptor ID")
-    burst_count: int = Field(100, description="Number of synthetic honey-ciphertexts to inject")
-    lattice_dimension: int = Field(1024, description="Lattice dimension for simulated post-quantum scheme")
-    entropy_sink_type: str = Field("TRAPDOOR_EXPONENTIAL_BRANCH_SINK", description="Complexity sink strategy")
+    burst_count: int = Field(
+        100, description="Number of synthetic honey-ciphertexts to inject"
+    )
+    lattice_dimension: int = Field(
+        1024, description="Lattice dimension for simulated post-quantum scheme"
+    )
+    entropy_sink_type: str = Field(
+        "TRAPDOOR_EXPONENTIAL_BRANCH_SINK", description="Complexity sink strategy"
+    )
 
 
 class TriggerDecoherenceRequest(BaseModel):
-    interceptor_id: str = Field(..., description="Target egress interceptor to trip decoherence")
-    target_quantum_algorithm: str = Field("SHOR_DISCRETE_LOG_OR_LATTICE_BKZ", description="Target algorithm to foil")
+    interceptor_id: str = Field(
+        ..., description="Target egress interceptor to trip decoherence"
+    )
+    target_quantum_algorithm: str = Field(
+        "SHOR_DISCRETE_LOG_OR_LATTICE_BKZ", description="Target algorithm to foil"
+    )
 
 
 @router.get("/interceptors")
@@ -36,7 +46,10 @@ async def list_interceptors_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all registered counter-quantum harvest interceptors."""
-    return {"status": "success", "interceptors": counter_quantum_harvest_matrix.list_interceptors()}
+    return {
+        "status": "success",
+        "interceptors": counter_quantum_harvest_matrix.list_interceptors(),
+    }
 
 
 @router.get("/interceptors/{interceptor_id}")
@@ -49,7 +62,9 @@ async def get_interceptor_endpoint(
     """Retrieves status of a specific counter-quantum egress interceptor."""
     it = counter_quantum_harvest_matrix.get_interceptor(interceptor_id)
     if not it:
-        raise HTTPException(status_code=404, detail=f"Interceptor {interceptor_id} not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Interceptor {interceptor_id} not found."
+        )
     return {"status": "success", "interceptor": it}
 
 
@@ -98,5 +113,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves Counter-Quantum Harvest Matrix defense metrics."""
-    return {"status": "success", "metrics": counter_quantum_harvest_matrix.get_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": counter_quantum_harvest_matrix.get_metrics(),
+    }

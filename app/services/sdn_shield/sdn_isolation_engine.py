@@ -71,14 +71,14 @@ class SDNIsolationEngine:
                 "platform": "Kubernetes Cilium / Calico",
                 "action": "APPLY_CILIUM_NETWORK_POLICY",
                 "policy_yaml": (
-                    "apiVersion: \"cilium.io/v2\"\n"
+                    'apiVersion: "cilium.io/v2"\n'
                     "kind: CiliumNetworkPolicy\n"
                     "metadata:\n"
-                    f"  name: \"quarantine-{asset_id}\"\n"
+                    f'  name: "quarantine-{asset_id}"\n'
                     "spec:\n"
                     f"  endpointSelector:\n"
                     f"    matchLabels:\n"
-                    f"      app: \"{asset_id}\"\n"
+                    f'      app: "{asset_id}"\n'
                     "  ingress: []\n"
                     "  egress: []\n"
                 ),
@@ -151,4 +151,3 @@ class SDNIsolationEngine:
 
 # Global instance
 sdn_isolation_engine = SDNIsolationEngine()
-

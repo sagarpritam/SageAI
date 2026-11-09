@@ -15,13 +15,21 @@ router = APIRouter(prefix="/iac-drift", tags=["Cloud IaC Drift & Remediation"])
 
 
 class ScanDriftRequest(BaseModel):
-    declared_resources: Optional[List[Dict[str, Any]]] = Field(None, description="Custom declared IaC resources")
-    live_resources: Optional[List[Dict[str, Any]]] = Field(None, description="Custom live cloud runtime assets")
+    declared_resources: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Custom declared IaC resources"
+    )
+    live_resources: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Custom live cloud runtime assets"
+    )
 
 
 class GeneratePRRequest(BaseModel):
-    drift_ids: List[str] = Field(..., description="List of drift IDs to include in remediation PR")
-    branch_name: Optional[str] = Field("sageai/iac-auto-remediation", description="Target Git branch name")
+    drift_ids: List[str] = Field(
+        ..., description="List of drift IDs to include in remediation PR"
+    )
+    branch_name: Optional[str] = Field(
+        "sageai/iac-auto-remediation", description="Target Git branch name"
+    )
 
 
 @router.get("/scan")
@@ -66,4 +74,3 @@ async def generate_pr_endpoint(
         return {"status": "success", "pull_request": pr_result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

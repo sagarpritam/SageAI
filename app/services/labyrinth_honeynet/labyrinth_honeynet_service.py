@@ -31,8 +31,8 @@ class LabyrinthDeceptionEngine:
                 "simulated_services": [
                     {"port": 443, "service": "SWIFT Alliance Access Portal"},
                     {"port": 50051, "service": "ISO-20022 gRPC Clearing Pipeline"},
-                    {"port": 5432, "service": "Synthetic Fedwire Ledger DB"}
-                ]
+                    {"port": 5432, "service": "Synthetic Fedwire Ledger DB"},
+                ],
             },
             {
                 "labyrinth_id": "maze-k8s-apiserver",
@@ -44,10 +44,13 @@ class LabyrinthDeceptionEngine:
                 "adversaries_trapped": 7,
                 "total_dwell_time_sec": 9140,
                 "simulated_services": [
-                    {"port": 6443, "service": "Decoy Kube-APIServer with synthetic RBAC"},
+                    {
+                        "port": 6443,
+                        "service": "Decoy Kube-APIServer with synthetic RBAC",
+                    },
                     {"port": 2379, "service": "Honeypot etcd v3 Key-Value Store"},
-                    {"port": 10250, "service": "Simulated Kubelet with Canary Pods"}
-                ]
+                    {"port": 10250, "service": "Simulated Kubelet with Canary Pods"},
+                ],
             },
             {
                 "labyrinth_id": "maze-ai-weights",
@@ -59,11 +62,14 @@ class LabyrinthDeceptionEngine:
                 "adversaries_trapped": 2,
                 "total_dwell_time_sec": 3120,
                 "simulated_services": [
-                    {"port": 9000, "service": "Decoy MinIO / AWS S3 Model Weights Bucket"},
+                    {
+                        "port": 9000,
+                        "service": "Decoy MinIO / AWS S3 Model Weights Bucket",
+                    },
                     {"port": 8000, "service": "Triton Inference Server Honeypot"},
-                    {"port": 22, "service": "Isolated Bastion Host with Honey-Tokens"}
-                ]
-            }
+                    {"port": 22, "service": "Isolated Bastion Host with Honey-Tokens"},
+                ],
+            },
         ]
 
         for m in default_mazes:
@@ -82,7 +88,7 @@ class LabyrinthDeceptionEngine:
         name: str,
         architecture_type: str = "FINANCIAL_CORE",
         depth_levels: int = 5,
-        deception_persona: str = "High-Value Enterprise Target"
+        deception_persona: str = "High-Value Enterprise Target",
     ) -> Dict[str, Any]:
         """Synthesizes a new recursive deception labyrinth."""
         labyrinth_id = f"maze-{uuid.uuid4().hex[:6]}"
@@ -98,9 +104,9 @@ class LabyrinthDeceptionEngine:
             "simulated_services": [
                 {"port": 443, "service": "Synthetic Enterprise Web Ingress"},
                 {"port": 22, "service": "Instrumented SSH Honeypot"},
-                {"port": 8080, "service": "Fake Microservice API Gateway"}
+                {"port": 8080, "service": "Fake Microservice API Gateway"},
             ],
-            "created_at": time.time()
+            "created_at": time.time(),
         }
 
         self._mazes[labyrinth_id] = maze_entry
@@ -111,7 +117,7 @@ class LabyrinthDeceptionEngine:
         labyrinth_id: str,
         adversary_ip: str,
         probe_command: str,
-        protocol: str = "SSH"
+        protocol: str = "SSH",
     ) -> Dict[str, Any]:
         """State-mirroring engine: captures attacker command, introduces latency, and serves realistic fake response."""
         maze = self._mazes.get(labyrinth_id)
@@ -130,13 +136,15 @@ class LabyrinthDeceptionEngine:
                 "depth_reached": 1,
                 "commands_executed": [],
                 "canary_tokens_touched": [],
-                "total_delay_injected_sec": 0.0
+                "total_delay_injected_sec": 0.0,
             }
             self._adversary_sessions[adversary_ip] = session
             maze["adversaries_trapped"] += 1
 
         session["last_seen"] = now
-        session["depth_reached"] = min(maze["depth_levels"], session["depth_reached"] + 1)
+        session["depth_reached"] = min(
+            maze["depth_levels"], session["depth_reached"] + 1
+        )
 
         # Dynamic state mirroring responses
         clean_cmd = probe_command.strip().lower()
@@ -161,13 +169,15 @@ class LabyrinthDeceptionEngine:
         session["total_delay_injected_sec"] += delay_sec
         maze["total_dwell_time_sec"] += int(delay_sec * 10)
 
-        session["commands_executed"].append({
-            "command": probe_command,
-            "protocol": protocol,
-            "timestamp": now,
-            "delay_injected_sec": delay_sec,
-            "depth": session["depth_reached"]
-        })
+        session["commands_executed"].append(
+            {
+                "command": probe_command,
+                "protocol": protocol,
+                "timestamp": now,
+                "delay_injected_sec": delay_sec,
+                "depth": session["depth_reached"],
+            }
+        )
 
         if canary_token not in session["canary_tokens_touched"]:
             session["canary_tokens_touched"].append(canary_token)
@@ -180,7 +190,7 @@ class LabyrinthDeceptionEngine:
             "state_mirrored_response": simulated_response,
             "delay_injected_sec": delay_sec,
             "canary_token_seeded": canary_token,
-            "neutralized": True
+            "neutralized": True,
         }
 
     def get_adversary_session(self, adversary_ip: str) -> Optional[Dict[str, Any]]:
@@ -189,18 +199,21 @@ class LabyrinthDeceptionEngine:
 
     def get_labyrinth_metrics(self) -> Dict[str, Any]:
         """Returns labyrinth engagement, trapped bot sessions, and stall metrics."""
-        total_trapped = sum(m.get("adversaries_trapped", 0) for m in self._mazes.values())
-        total_dwell = sum(m.get("total_dwell_time_sec", 0) for m in self._mazes.values())
+        total_trapped = sum(
+            m.get("adversaries_trapped", 0) for m in self._mazes.values()
+        )
+        total_dwell = sum(
+            m.get("total_dwell_time_sec", 0) for m in self._mazes.values()
+        )
         return {
             "total_active_labyrinths": len(self._mazes),
             "total_adversaries_trapped": total_trapped,
             "cumulative_adversary_dwell_time_hours": round(total_dwell / 3600.0, 1),
             "mean_maze_depth": 5.0,
             "state_mirroring_accuracy": "99.8%",
-            "adversary_scanner_exhaustion_rate": "100.0%"
+            "adversary_scanner_exhaustion_rate": "100.0%",
         }
 
 
 # Global singleton instance
 labyrinth_honeynet_service = LabyrinthDeceptionEngine()
-

@@ -12,8 +12,12 @@ router = APIRouter(
 
 
 class ResolveBranchEntropyRequest(BaseModel):
-    primary_branch_id: str = Field(default="EVERETT-BRANCH-PRIME-01", description="Primary consensus branch ID")
-    phase_alignment_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Inter-branch phase alignment gain")
+    primary_branch_id: str = Field(
+        default="EVERETT-BRANCH-PRIME-01", description="Primary consensus branch ID"
+    )
+    phase_alignment_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Inter-branch phase alignment gain"
+    )
 
 
 @router.get("/branches")
@@ -35,4 +39,3 @@ async def resolve_entropy(req: ResolveBranchEntropyRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return everett_branch_resolver.get_resolution_metrics()
-

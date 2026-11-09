@@ -122,8 +122,13 @@ class RyuTakayanagiSiphon:
         Calculates the Ryu-Takayanagi minimal geodesic area gamma_A and siphons boundary
         entanglement entropy into the dual bulk spacetime.
         """
-        if "boundary_subsystem_length_l" in kwargs and boundary_subsystem_fraction == 0.5:
-            boundary_subsystem_fraction = min(1.0, max(0.1, kwargs["boundary_subsystem_length_l"] / 300.0))
+        if (
+            "boundary_subsystem_length_l" in kwargs
+            and boundary_subsystem_fraction == 0.5
+        ):
+            boundary_subsystem_fraction = min(
+                1.0, max(0.1, kwargs["boundary_subsystem_length_l"] / 300.0)
+            )
         if "siphon_flow_rate_gb_s" in kwargs and coupling_gain == 1.0:
             coupling_gain = min(5.0, max(0.2, kwargs["siphon_flow_rate_gb_s"] / 40.0))
         node = self.nodes.get(node_id)
@@ -131,10 +136,18 @@ class RyuTakayanagiSiphon:
             raise ValueError(f"Holographic node {node_id} not registered.")
 
         # Minimal geodesic area gamma_A ~ L^(d-2) * ln(L/eps)
-        minimal_area = round(node.bulk_minimal_surface_area_m2 * (0.85 + 0.3 * boundary_subsystem_fraction), 30)
+        minimal_area = round(
+            node.bulk_minimal_surface_area_m2
+            * (0.85 + 0.3 * boundary_subsystem_fraction),
+            30,
+        )
 
         # Entanglement entropy S_A = (c / 3) * ln(L / eps)
-        s_entanglement = round(node.entanglement_entropy_nats * math.log(1.0 + boundary_subsystem_fraction * math.e), 4)
+        s_entanglement = round(
+            node.entanglement_entropy_nats
+            * math.log(1.0 + boundary_subsystem_fraction * math.e),
+            4,
+        )
         siphoned = round(s_entanglement * 0.985 * coupling_gain, 4)
 
         fidelity = round(99.92 + 0.07 * math.tanh(coupling_gain), 3)
@@ -184,4 +197,3 @@ ryu_takayanagi_siphon = RyuTakayanagiSiphon()
 
 def get_ryu_takayanagi_siphon() -> RyuTakayanagiSiphon:
     return ryu_takayanagi_siphon
-

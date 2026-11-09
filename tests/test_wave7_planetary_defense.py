@@ -11,11 +11,13 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.micro_hotpatch.micro_hotpatch_service import micro_hotpatch_service
-from app.services.cas_redteam_swarm.cas_redteam_swarm_service import cas_redteam_swarm_service
 from app.services.apt_attribution.apt_attribution_service import apt_attribution_service
+from app.services.cas_redteam_swarm.cas_redteam_swarm_service import (
+    cas_redteam_swarm_service,
+)
 from app.services.cloud_forensics.cloud_forensics_service import cloud_forensics_service
 from app.services.crossplane_mesh.crossplane_mesh_service import crossplane_mesh_service
+from app.services.micro_hotpatch.micro_hotpatch_service import micro_hotpatch_service
 
 
 @pytest.fixture
@@ -40,7 +42,7 @@ def test_micro_hotpatch_service_catalog_and_generation():
         target_binary="/usr/lib/x86_64-linux-gnu/liblzma.so.5",
         target_function="_get_cpuid",
         patch_strategy="UPROBE_TRAMPOLINE",
-        severity="CRITICAL"
+        severity="CRITICAL",
     )
     assert new_patch["cve_id"] == "CVE-2024-3094"
     assert new_patch["status"] == "VALIDATED"
@@ -85,7 +87,7 @@ def test_cas_redteam_swarm_service():
         name="Automated Supply Chain Infiltration Test",
         target_scope="github.com/sageai/core-monorepo",
         scenario_type="CI_CD_PIVOT",
-        intensity="AGGRESSIVE"
+        intensity="AGGRESSIVE",
     )
     assert new_camp["status"] == "RUNNING"
     camp_id = new_camp["campaign_id"]
@@ -128,7 +130,7 @@ def test_apt_attribution_service():
     # Analyze by JA4 fingerprint
     res_ja4 = apt_attribution_service.analyze_ioc_attribution(
         indicator="unknown-suspicious-c2.xyz",
-        ja4_fingerprint="t12d190800_28a939459392_8ef902b4a102"
+        ja4_fingerprint="t12d190800_28a939459392_8ef902b4a102",
     )
     assert "Lazarus Group" in res_ja4["attributed_actor"]
 
@@ -144,9 +146,9 @@ def test_apt_attribution_service():
             {
                 "type": "indicator",
                 "name": "malicious-domain-probe.org",
-                "x_ja4_fingerprint": "t13d_custom_ja4"
+                "x_ja4_fingerprint": "t13d_custom_ja4",
             }
-        ]
+        ],
     }
     ingest_res = apt_attribution_service.ingest_stix_bundle(bundle)
     assert ingest_res["status"] == "INGESTED_SUCCESSFULLY"
@@ -170,7 +172,7 @@ def test_cloud_forensics_service():
         resource_id="/subscriptions/sub1/disks/db-os-disk",
         incident_id="INC-2026-9041",
         volume_size_gb=256,
-        memory_capture=True
+        memory_capture=True,
     )
     assert new_snap["cloud_provider"] == "AZURE"
     assert len(new_snap["sha256"]) == 64
@@ -218,7 +220,7 @@ def test_crossplane_mesh_service():
         name="Strict AI Inference Pipeline mTLS",
         intent_description="Allow only attested LLM Gateway pods to reach GPU worker enclaves on port 8000.",
         target_clouds=["AWS", "AZURE", "CILIUM_K8S"],
-        target_port=8000
+        target_port=8000,
     )
     assert new_pol["status"] == "SYNCHRONIZED"
     assert "AWS" in new_pol["translations"]
@@ -227,7 +229,9 @@ def test_crossplane_mesh_service():
     # Drift check & reconcile
     drifts = crossplane_mesh_service.list_drifts()
     assert len(drifts) >= 1
-    unresolved_drift = [d for d in drifts if d.get("remediation_status") != "RECONCILED"][0]
+    unresolved_drift = [
+        d for d in drifts if d.get("remediation_status") != "RECONCILED"
+    ][0]
     rec_res = crossplane_mesh_service.reconcile_drift(unresolved_drift["drift_id"])
     assert rec_res["status"] == "RECONCILED"
 
@@ -242,7 +246,12 @@ def test_crossplane_mesh_service():
 # ----------------------------------------------------
 def test_wave7_fastapi_routers(client):
     from app.core.security import get_current_user
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "SecOpsDirector", "org": "enterprise", "email": "director@sageai.internal"}
+
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "SecOpsDirector",
+        "org": "enterprise",
+        "email": "director@sageai.internal",
+    }
 
     try:
         # Micro-hotpatch routes
@@ -250,11 +259,14 @@ def test_wave7_fastapi_routers(client):
         assert res.status_code == 200
         assert "patches" in res.json()
 
-        res_gen = client.post("/micro-hotpatch/generate", json={
-            "cve_id": "CVE-2023-44487",
-            "target_binary": "/usr/sbin/envoy",
-            "target_function": "Http2Connection::onRstStream"
-        })
+        res_gen = client.post(
+            "/micro-hotpatch/generate",
+            json={
+                "cve_id": "CVE-2023-44487",
+                "target_binary": "/usr/sbin/envoy",
+                "target_function": "Http2Connection::onRstStream",
+            },
+        )
         assert res_gen.status_code == 200
         patch_id = res_gen.json()["patch"]["patch_id"]
 
@@ -273,15 +285,20 @@ def test_wave7_fastapi_routers(client):
         assert res.status_code == 200
         assert "campaigns" in res.json()
 
-        res_launch = client.post("/cas-redteam/launch", json={
-            "name": "API Gateway Penetration Test",
-            "target_scope": "gateway.sageai.io",
-            "scenario_type": "CLOUD_INGRESS_AND_CONTAINER_ESCAPE"
-        })
+        res_launch = client.post(
+            "/cas-redteam/launch",
+            json={
+                "name": "API Gateway Penetration Test",
+                "target_scope": "gateway.sageai.io",
+                "scenario_type": "CLOUD_INGRESS_AND_CONTAINER_ESCAPE",
+            },
+        )
         assert res_launch.status_code == 200
         camp_id = res_launch.json()["campaign"]["campaign_id"]
 
-        res_round = client.post("/cas-redteam/execute-round", json={"campaign_id": camp_id})
+        res_round = client.post(
+            "/cas-redteam/execute-round", json={"campaign_id": camp_id}
+        )
         assert res_round.status_code == 200
 
         res_mitre = client.get("/cas-redteam/mitre-matrix")
@@ -292,7 +309,9 @@ def test_wave7_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["actors"]) >= 3
 
-        res_ioc = client.post("/apt-attribution/analyze-ioc", json={"indicator": "194.26.29.112"})
+        res_ioc = client.post(
+            "/apt-attribution/analyze-ioc", json={"indicator": "194.26.29.112"}
+        )
         assert res_ioc.status_code == 200
         assert "attribution" in res_ioc.json()
 
@@ -305,19 +324,26 @@ def test_wave7_fastapi_routers(client):
         assert res.status_code == 200
         first_snap_id = res.json()["snapshots"][0]["snapshot_id"]
 
-        res_create = client.post("/cloud-forensics/create-snapshot", json={
-            "cloud_provider": "GCP",
-            "resource_id": "projects/sage-sec/zones/us-central1-a/disks/k8s-master-os",
-            "incident_id": "INC-2026-9999"
-        })
+        res_create = client.post(
+            "/cloud-forensics/create-snapshot",
+            json={
+                "cloud_provider": "GCP",
+                "resource_id": "projects/sage-sec/zones/us-central1-a/disks/k8s-master-os",
+                "incident_id": "INC-2026-9999",
+            },
+        )
         assert res_create.status_code == 200
         gcp_snap_id = res_create.json()["snapshot"]["snapshot_id"]
 
-        res_ver_snap = client.post("/cloud-forensics/verify", json={"snapshot_id": gcp_snap_id})
+        res_ver_snap = client.post(
+            "/cloud-forensics/verify", json={"snapshot_id": gcp_snap_id}
+        )
         assert res_ver_snap.status_code == 200
         assert res_ver_snap.json()["verification"]["integrity_verified"] is True
 
-        res_manifest = client.post("/cloud-forensics/export-manifest", json={"snapshot_id": first_snap_id})
+        res_manifest = client.post(
+            "/cloud-forensics/export-manifest", json={"snapshot_id": first_snap_id}
+        )
         assert res_manifest.status_code == 200
         assert "CERTIFICATE" in res_manifest.json()["manifest"]["certificate_title"]
 
@@ -326,12 +352,15 @@ def test_wave7_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["nodes"]) >= 3
 
-        res_trans = client.post("/crossplane-mesh/translate-policy", json={
-            "name": "Egress Isolation for LLM Enclave",
-            "intent_description": "Deny all outbound direct internet access; route strictly through egress inspection proxy.",
-            "target_clouds": ["AWS", "GCP"],
-            "target_port": 443
-        })
+        res_trans = client.post(
+            "/crossplane-mesh/translate-policy",
+            json={
+                "name": "Egress Isolation for LLM Enclave",
+                "intent_description": "Deny all outbound direct internet access; route strictly through egress inspection proxy.",
+                "target_clouds": ["AWS", "GCP"],
+                "target_port": 443,
+            },
+        )
         assert res_trans.status_code == 200
         assert "AWS" in res_trans.json()["policy"]["translations"]
 
@@ -341,4 +370,3 @@ def test_wave7_fastapi_routers(client):
 
     finally:
         app.dependency_overrides.clear()
-

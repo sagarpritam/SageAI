@@ -62,7 +62,9 @@ class KMSHSMService:
         """Lists all managed HSM cryptographic keys and their status."""
         return list(self.key_store.values())
 
-    def rotate_key(self, key_id: str, operator: str = "SecOpsDirector") -> Dict[str, Any]:
+    def rotate_key(
+        self, key_id: str, operator: str = "SecOpsDirector"
+    ) -> Dict[str, Any]:
         """
         Rotates an HSM cryptographic key, increments version, and zeroes out legacy memory.
         """
@@ -73,7 +75,9 @@ class KMSHSMService:
         old_version = key["version"]
         key["version"] = old_version + 1
         key["rotated_at"] = datetime.now(timezone.utc).isoformat()
-        key["new_key_fingerprint"] = hashlib.sha256(secrets.token_bytes(32)).hexdigest()[:16]
+        key["new_key_fingerprint"] = hashlib.sha256(
+            secrets.token_bytes(32)
+        ).hexdigest()[:16]
 
         # Audit Record
         audit_chain.record_action(
@@ -96,7 +100,9 @@ class KMSHSMService:
             "timestamp": key["rotated_at"],
         }
 
-    def zeroize_key(self, key_id: str, operator: str = "CISO-CryptographicOfficer") -> Dict[str, Any]:
+    def zeroize_key(
+        self, key_id: str, operator: str = "CISO-CryptographicOfficer"
+    ) -> Dict[str, Any]:
         """
         Cryptographically zeroizes (destroys) a sensitive key in the HSM enclave.
         """
@@ -144,7 +150,9 @@ class KMSHSMService:
 
         # Generate random polynomial coefficients: f(x) = a0 + a1*x + a2*x^2 + ... + a_{k-1}*x^{k-1}
         # where a0 = secret_int
-        coefficients = [secret_int] + [secrets.randbelow(PRIME_MODULUS) for _ in range(k_threshold - 1)]
+        coefficients = [secret_int] + [
+            secrets.randbelow(PRIME_MODULUS) for _ in range(k_threshold - 1)
+        ]
 
         default_custodians = custodians or [
             "CISO (Officer A)",
@@ -162,12 +170,18 @@ class KMSHSMService:
                 y = (y + coeff * (i**power)) % PRIME_MODULUS
 
             share_payload = f"{i}-{hex(y)[2:]}"
-            shares.append({
-                "share_index": i,
-                "custodian": default_custodians[i - 1] if i - 1 < len(default_custodians) else f"Custodian #{i}",
-                "share_data": share_payload,
-                "share_hash": hashlib.sha256(share_payload.encode()).hexdigest()[:16],
-            })
+            shares.append(
+                {
+                    "share_index": i,
+                    "custodian": default_custodians[i - 1]
+                    if i - 1 < len(default_custodians)
+                    else f"Custodian #{i}",
+                    "share_data": share_payload,
+                    "share_hash": hashlib.sha256(share_payload.encode()).hexdigest()[
+                        :16
+                    ],
+                }
+            )
 
         result = {
             "secret_id": f"shamir-{int(datetime.now().timestamp())}",
@@ -214,7 +228,9 @@ class KMSHSMService:
                     numerator = (numerator * (-xj)) % PRIME_MODULUS
                     denominator = (denominator * (xi - xj)) % PRIME_MODULUS
 
-            lagrange_coeff = (numerator * pow(denominator, -1, PRIME_MODULUS)) % PRIME_MODULUS
+            lagrange_coeff = (
+                numerator * pow(denominator, -1, PRIME_MODULUS)
+            ) % PRIME_MODULUS
             secret_int = (secret_int + yi * lagrange_coeff) % PRIME_MODULUS
 
         # Convert back to bytes
@@ -223,7 +239,9 @@ class KMSHSMService:
             recovered_bytes = secret_int.to_bytes(byte_length, "big")
             recovered_secret = recovered_bytes.decode("utf-8")
         except Exception as e:
-            raise ValueError(f"Decryption failed — invalid or insufficient threshold shares: {e}")
+            raise ValueError(
+                f"Decryption failed — invalid or insufficient threshold shares: {e}"
+            )
 
         # Audit Record
         audit_chain.record_action(

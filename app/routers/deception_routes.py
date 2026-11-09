@@ -17,8 +17,12 @@ router = APIRouter(prefix="/deception", tags=["Deception & Honeypots"])
 
 
 class CanaryTokenCreateRequest(BaseModel):
-    token_type: str = Field("api_key", description="api_key, aws_key, jwt_token, db_uri, dns_token")
-    label: str = Field("Production Database API Key", description="Description/location of lure")
+    token_type: str = Field(
+        "api_key", description="api_key, aws_key, jwt_token, db_uri, dns_token"
+    )
+    label: str = Field(
+        "Production Database API Key", description="Description/location of lure"
+    )
 
 
 class DecoyHitRequest(BaseModel):

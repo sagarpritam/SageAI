@@ -20,18 +20,26 @@ from app.services.orbital_hpm_grid import orbital_hpm_grid
 def main():
     print("=" * 80)
     print("     SAGEAI OPTION B: SOVEREIGN ORBITAL HIGH-POWER MICROWAVE (HPM) GRID")
-    print("   Directed Energy Electronics Neutralization — Gigawatt Relativistic Magnetrons")
+    print(
+        "   Directed Energy Electronics Neutralization — Gigawatt Relativistic Magnetrons"
+    )
     print("=" * 80)
 
     # 1. Constellation Overview
-    print("\n[ORBITAL HPM GRID] Querying Active Tactical & Strategic Directed Energy Satellites...")
+    print(
+        "\n[ORBITAL HPM GRID] Querying Active Tactical & Strategic Directed Energy Satellites..."
+    )
     satellites = orbital_hpm_grid.list_satellites()
     print(f"  > Operational HPM Constellation Satellites: {len(satellites)}")
     for s in satellites:
-        print(f"    - {s['satellite_id']} ({s['satellite_name']}): Orbit {s['altitude_km']} km ({s['orbit_type'].split('_')[0]}), Source {s['microwave_source_type']}, Freq {s['center_frequency_ghz']} GHz, Peak Power {s['peak_pulse_power_gw']} GW, Field {s['field_intensity_at_target_kv_m']} kV/m")
+        print(
+            f"    - {s['satellite_id']} ({s['satellite_name']}): Orbit {s['altitude_km']} km ({s['orbit_type'].split('_')[0]}), Source {s['microwave_source_type']}, Freq {s['center_frequency_ghz']} GHz, Peak Power {s['peak_pulse_power_gw']} GW, Field {s['field_intensity_at_target_kv_m']} kV/m"
+        )
 
     # 2. Strike 1: SAM Phased Array Radar Frontend Burnout
-    print("\n[HPM ENGAGEMENT 1] Neutralizing Phased Array Radar Receiver Front-End (LNA Burnout)...")
+    print(
+        "\n[HPM ENGAGEMENT 1] Neutralizing Phased Array Radar Receiver Front-End (LNA Burnout)..."
+    )
     start_t = time.time()
     res1 = orbital_hpm_grid.fire_hpm_pulse(
         satellite_id="HPM-SAT-LEO-ALPHA-01",
@@ -43,15 +51,21 @@ def main():
 
     print(f"  > Discharge ID: {res1['discharge_id']} from {res1['satellite_id']}")
     print(f"  > Target: {res1['target_identifier']} ({res1['target_category']})")
-    print(f"  > Center Frequency: {res1['emitted_frequency_ghz']} GHz | Peak Power: {res1['peak_power_gw']} GW")
+    print(
+        f"  > Center Frequency: {res1['emitted_frequency_ghz']} GHz | Peak Power: {res1['peak_power_gw']} GW"
+    )
     print(f"  > Target Footprint Diameter: {res1['target_footprint_diameter_m']} m")
-    print(f"  > Induced Semiconductor Junction Voltage: {res1['induced_voltage_spike_volts']:.1f} V")
+    print(
+        f"  > Induced Semiconductor Junction Voltage: {res1['induced_voltage_spike_volts']:.1f} V"
+    )
     print(f"  > Burnout Verified: {res1['semiconductor_burnout_verified']}")
     print(f"  > Kill Assessment: {res1['kill_assessment']}")
     print(f"  > Engagement Status: {res1['status']} ({t1_ms:.2f} ms)")
 
     # 3. Strike 2: Autonomous Drone Swarm Microcontroller Paralysis
-    print("\n[HPM ENGAGEMENT 2] Paralyzing Hypersonic Drone Swarm Flight Avionics (Microcontroller Latchup)...")
+    print(
+        "\n[HPM ENGAGEMENT 2] Paralyzing Hypersonic Drone Swarm Flight Avionics (Microcontroller Latchup)..."
+    )
     start_t = time.time()
     res2 = orbital_hpm_grid.fire_hpm_pulse(
         satellite_id="HPM-SAT-LEO-BRAVO-02",
@@ -63,7 +77,9 @@ def main():
 
     print(f"  > Discharge ID: {res2['discharge_id']} from {res2['satellite_id']}")
     print(f"  > Target: {res2['target_identifier']} ({res2['target_category']})")
-    print(f"  > Induced Semiconductor Junction Voltage: {res2['induced_voltage_spike_volts']:.1f} V")
+    print(
+        f"  > Induced Semiconductor Junction Voltage: {res2['induced_voltage_spike_volts']:.1f} V"
+    )
     print(f"  > Burnout Verified: {res2['semiconductor_burnout_verified']}")
     print(f"  > Kill Assessment: {res2['kill_assessment']}")
     print(f"  > Engagement Status: {res2['status']} ({t2_ms:.2f} ms)")
@@ -72,10 +88,14 @@ def main():
     print("\n[HPM GRID TELEMETRY] Constellation Aggregate Status:")
     metrics = orbital_hpm_grid.get_grid_metrics()
     print(f"  > Total Satellites: {metrics['active_hpm_satellites']}")
-    print(f"  > Peak Constellation Power: {metrics['aggregate_peak_microwave_power_gw']:.1f} GW")
+    print(
+        f"  > Peak Constellation Power: {metrics['aggregate_peak_microwave_power_gw']:.1f} GW"
+    )
     print(f"  > Total Discharges Executed: {metrics['total_hpm_discharges']}")
     print(f"  > Mean Field Intensity: {metrics['mean_field_intensity_kv_m']:.1f} kV/m")
-    print(f"  > Electronics Burnout Success: {metrics['electronics_burnout_success_pct']:.1f}%")
+    print(
+        f"  > Electronics Burnout Success: {metrics['electronics_burnout_success_pct']:.1f}%"
+    )
     print(f"  > Status: {metrics['constellation_status']}")
 
     print("\n" + "=" * 80)

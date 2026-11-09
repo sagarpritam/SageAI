@@ -39,7 +39,10 @@ async def list_patches_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all registered micro-hotpatches."""
-    return {"status": "success", "patches": micro_hotpatch_service.list_patches(status=status)}
+    return {
+        "status": "success",
+        "patches": micro_hotpatch_service.list_patches(status=status),
+    }
 
 
 @router.get("/patches/{patch_id}")
@@ -71,7 +74,7 @@ async def generate_patch_endpoint(
         patch_strategy=payload.patch_strategy or "UPROBE_TRAMPOLINE",
         memory_bounds=payload.memory_bounds,
         binary_type=payload.binary_type or "ELF_C",
-        severity=payload.severity or "HIGH"
+        severity=payload.severity or "HIGH",
     )
     return {"status": "success", "patch": res}
 
@@ -129,4 +132,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves micro-hotpatch execution telemetry and metrics."""
     return {"status": "success", "metrics": micro_hotpatch_service.get_metrics()}
-

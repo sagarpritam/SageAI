@@ -12,15 +12,24 @@ router = APIRouter(
 
 
 class SyncClusterStateRequest(BaseModel):
-    initiating_cluster_id: str = Field(default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01")
-    target_cluster_id: str = Field(default="CLUSTER-EU-CENTRAL-02", example="CLUSTER-EU-CENTRAL-02")
+    initiating_cluster_id: str = Field(
+        default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01"
+    )
+    target_cluster_id: str = Field(
+        default="CLUSTER-EU-CENTRAL-02", example="CLUSTER-EU-CENTRAL-02"
+    )
     capabilities_count: int = Field(default=82, ge=1, le=100)
 
 
 class AutomatedFailoverRequest(BaseModel):
     failing_cluster_id: str = Field(..., example="CLUSTER-EU-CENTRAL-02")
-    backup_cluster_id: str = Field(default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01")
-    reason: str = Field(default="SIMULATED_REGIONAL_EMP_ISOLATION", example="SIMULATED_REGIONAL_EMP_ISOLATION")
+    backup_cluster_id: str = Field(
+        default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01"
+    )
+    reason: str = Field(
+        default="SIMULATED_REGIONAL_EMP_ISOLATION",
+        example="SIMULATED_REGIONAL_EMP_ISOLATION",
+    )
 
 
 @router.get("/clusters")
@@ -55,4 +64,3 @@ async def trigger_failover(req: AutomatedFailoverRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cluster_federation_engine.get_federation_metrics()
-

@@ -120,8 +120,15 @@ class LLMGateway:
                     usage = result.get("usage", {})
 
                     # Record council telemetry
-                    tokens_used = usage.get("prompt_tokens", 0) + usage.get("completion_tokens", 0)
-                    council_telemetry.record_call(current_provider, latency_ms, success=True, tokens_used=tokens_used)
+                    tokens_used = usage.get("prompt_tokens", 0) + usage.get(
+                        "completion_tokens", 0
+                    )
+                    council_telemetry.record_call(
+                        current_provider,
+                        latency_ms,
+                        success=True,
+                        tokens_used=tokens_used,
+                    )
 
                     # Global token tracking
                     if track_tokens and org_id:
@@ -138,7 +145,9 @@ class LLMGateway:
                 except Exception as e:
                     last_error = e
                     latency_ms = (time.time() - t0) * 1000
-                    council_telemetry.record_call(current_provider, latency_ms, success=False)
+                    council_telemetry.record_call(
+                        current_provider, latency_ms, success=False
+                    )
                     logger.warning(
                         f"LLM {client.provider} attempt {attempt + 1} failed: {str(e)}"
                     )
@@ -165,6 +174,7 @@ class LLMGateway:
         Runs the 3-model Red-vs-Blue consensus engine.
         """
         from .consensus_engine import consensus_engine
+
         return await consensus_engine.evaluate_vulnerability(
             vulnerability_title=vulnerability_title,
             target=target,

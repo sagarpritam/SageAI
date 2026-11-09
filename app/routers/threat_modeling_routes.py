@@ -17,25 +17,39 @@ router = APIRouter(prefix="/threat-modeling", tags=["Threat Modeling & STRIDE En
 
 
 class AnalyzeArchitectureRequest(BaseModel):
-    components: List[Dict[str, Any]] = Field(..., description="System components, gateways, and data stores")
-    data_flows: Optional[List[Dict[str, Any]]] = Field(None, description="Data flows and protocols")
-    trust_boundaries: Optional[List[Dict[str, Any]]] = Field(None, description="Trust boundary definitions")
+    components: List[Dict[str, Any]] = Field(
+        ..., description="System components, gateways, and data stores"
+    )
+    data_flows: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Data flows and protocols"
+    )
+    trust_boundaries: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Trust boundary definitions"
+    )
 
 
 class ParseOpenAPIRequest(BaseModel):
-    spec_text: str = Field(..., description="OpenAPI / Swagger JSON or YAML specification text")
+    spec_text: str = Field(
+        ..., description="OpenAPI / Swagger JSON or YAML specification text"
+    )
 
 
 class ParseIaCRequest(BaseModel):
-    manifest_text: str = Field(..., description="Terraform HCL or Kubernetes YAML manifest text")
+    manifest_text: str = Field(
+        ..., description="Terraform HCL or Kubernetes YAML manifest text"
+    )
 
 
 class ParseMermaidRequest(BaseModel):
-    mermaid_text: str = Field(..., description="Mermaid diagram text (graph TD, flowchart, etc.)")
+    mermaid_text: str = Field(
+        ..., description="Mermaid diagram text (graph TD, flowchart, etc.)"
+    )
 
 
 class ExportReportRequest(BaseModel):
-    threat_model: Dict[str, Any] = Field(..., description="Completed threat model data dictionary")
+    threat_model: Dict[str, Any] = Field(
+        ..., description="Completed threat model data dictionary"
+    )
 
 
 class GeneratePatchRequest(BaseModel):
@@ -120,7 +134,9 @@ async def export_threat_model_report(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Generates an executive CISO Markdown Threat Modeling report with Merkle seal."""
-    report_md = threat_modeling_engine.generate_threat_model_report(payload.threat_model)
+    report_md = threat_modeling_engine.generate_threat_model_report(
+        payload.threat_model
+    )
     return {
         "status": "success",
         "markdown_report": report_md,

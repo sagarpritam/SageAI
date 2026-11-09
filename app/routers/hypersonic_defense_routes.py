@@ -23,14 +23,22 @@ class TrackGlidePathRequest(BaseModel):
     threat_id: str = Field(..., description="Target hypersonic threat identifier")
     measured_mach: float = Field(..., description="Measured flight velocity in Mach")
     altitude_km: float = Field(..., description="Flight altitude in kilometers")
-    skip_glide_detected: bool = Field(..., description="Whether non-ballistic skip-glide bounce is detected")
-    plasma_blackout_active: bool = Field(..., description="Whether plasma sheath ionization blackout is detected")
+    skip_glide_detected: bool = Field(
+        ..., description="Whether non-ballistic skip-glide bounce is detected"
+    )
+    plasma_blackout_active: bool = Field(
+        ..., description="Whether plasma sheath ionization blackout is detected"
+    )
 
 
 class FireHypersonicInterceptorRequest(BaseModel):
     threat_id: str = Field(..., description="Target hypersonic threat identifier")
-    interceptor_type: str = Field("DIRECTED_ENERGY_OPTICAL_LASER_EKV", description="Interceptor weapon type")
-    fire_control_latency_ms: float = Field(2.1, description="Fire-control solution latency in milliseconds")
+    interceptor_type: str = Field(
+        "DIRECTED_ENERGY_OPTICAL_LASER_EKV", description="Interceptor weapon type"
+    )
+    fire_control_latency_ms: float = Field(
+        2.1, description="Fire-control solution latency in milliseconds"
+    )
 
 
 @router.get("/threats")
@@ -104,5 +112,7 @@ async def get_hypersonic_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns hypersonic glide vehicle defense metrics."""
-    return {"status": "success", "metrics": hypersonic_interceptor.get_hypersonic_defense_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": hypersonic_interceptor.get_hypersonic_defense_metrics(),
+    }

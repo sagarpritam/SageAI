@@ -58,18 +58,20 @@ class CyberRangeSimulator:
             client_ip=attacker_ip,
         )
 
-        timeline.append({
-            "stage": 1,
-            "phase": "RECONNAISSANCE_AND_NIDS",
-            "threat_actor": attacker_ip,
-            "target": "Perimeter Infrastructure",
-            "evidence": {
-                "port_scan_alert": nids_alert,
-                "dns_tunnel_alert": dns_alert,
-            },
-            "status": "INTERCEPTED",
-            "description": "NIDS engine flagged aggressive horizontal port sweeping and high-entropy DNS tunneling.",
-        })
+        timeline.append(
+            {
+                "stage": 1,
+                "phase": "RECONNAISSANCE_AND_NIDS",
+                "threat_actor": attacker_ip,
+                "target": "Perimeter Infrastructure",
+                "evidence": {
+                    "port_scan_alert": nids_alert,
+                    "dns_tunnel_alert": dns_alert,
+                },
+                "status": "INTERCEPTED",
+                "description": "NIDS engine flagged aggressive horizontal port sweeping and high-entropy DNS tunneling.",
+            }
+        )
 
         # ── Stage 2: Deception Honeytoken Trap ──
         canary = deception_service.generate_canary_token(
@@ -83,15 +85,17 @@ class CyberRangeSimulator:
             user_agent="Automated-Attacker-Tool/2.1",
         )
 
-        timeline.append({
-            "stage": 2,
-            "phase": "DECEPTION_TRAP_TRIGGERED",
-            "threat_actor": attacker_ip,
-            "target": "Canary Honeypot Credentials",
-            "evidence": deception_hit,
-            "status": "ALARM_RAISED",
-            "description": "Attacker exfiltrated and attempted to use a synthetic AWS canary access key.",
-        })
+        timeline.append(
+            {
+                "stage": 2,
+                "phase": "DECEPTION_TRAP_TRIGGERED",
+                "threat_actor": attacker_ip,
+                "target": "Canary Honeypot Credentials",
+                "evidence": deception_hit,
+                "status": "ALARM_RAISED",
+                "description": "Attacker exfiltrated and attempted to use a synthetic AWS canary access key.",
+            }
+        )
 
         # ── Stage 3: Ingress Web Exploitation (SQLi + SSRF) ──
         sqli_hits = self.attack_detector.analyze_payload(
@@ -106,39 +110,45 @@ class CyberRangeSimulator:
             source_ip=attacker_ip,
         )
 
-        timeline.append({
-            "stage": 3,
-            "phase": "INGRESS_WAF_DEFENSE",
-            "threat_actor": attacker_ip,
-            "target": "/api/v1/auth & /api/v1/proxy",
-            "evidence": {
-                "sqli_interceptions": sqli_hits,
-                "ssrf_interceptions": ssrf_hits,
-            },
-            "status": "BLOCKED",
-            "description": "Ingress WAF neutralized SQL injection and AWS IMDS cloud metadata exfiltration attempts.",
-        })
+        timeline.append(
+            {
+                "stage": 3,
+                "phase": "INGRESS_WAF_DEFENSE",
+                "threat_actor": attacker_ip,
+                "target": "/api/v1/auth & /api/v1/proxy",
+                "evidence": {
+                    "sqli_interceptions": sqli_hits,
+                    "ssrf_interceptions": ssrf_hits,
+                },
+                "status": "BLOCKED",
+                "description": "Ingress WAF neutralized SQL injection and AWS IMDS cloud metadata exfiltration attempts.",
+            }
+        )
 
         # ── Stage 4: Malicious Payload Dropper Detonation ──
-        sample_pe = b"MZ\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff\x00\x00" + (b"Invoke-Mimikatz sekurlsa::logonpasswords VirtualAlloc " * 5)
+        sample_pe = b"MZ\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff\x00\x00" + (
+            b"Invoke-Mimikatz sekurlsa::logonpasswords VirtualAlloc " * 5
+        )
         malware_report = malware_analyzer.analyze_bytes(
             sample_pe,
             filename="trojan_dropper.exe",
         )
 
-        timeline.append({
-            "stage": 4,
-            "phase": "MALWARE_DETONATION_LAB",
-            "threat_actor": attacker_ip,
-            "target": "Detonation Sandbox",
-            "evidence": {
-                "verdict": malware_report["verdict"],
-                "risk_score": malware_report["risk_score"],
-                "mitre_ttps": malware_report["mitre_ttps"],
-            },
-            "status": "NEUTRALIZED",
-            "description": f"Detonation chamber confirmed weaponized binary with risk score {malware_report['risk_score']}.",
-        })
+        timeline.append(
+            {
+                "stage": 4,
+                "phase": "MALWARE_DETONATION_LAB",
+                "threat_actor": attacker_ip,
+                "target": "Detonation Sandbox",
+                "evidence": {
+                    "verdict": malware_report["verdict"],
+                    "risk_score": malware_report["risk_score"],
+                    "mitre_ttps": malware_report["mitre_ttps"],
+                },
+                "status": "NEUTRALIZED",
+                "description": f"Detonation chamber confirmed weaponized binary with risk score {malware_report['risk_score']}.",
+            }
+        )
 
         # ── Stage 5: UEBA Behavioral Anomaly Surge ──
         ueba_alerts = []
@@ -151,18 +161,22 @@ class CyberRangeSimulator:
             if alert:
                 ueba_alerts.extend(alert)
 
-        timeline.append({
-            "stage": 5,
-            "phase": "UEBA_BEHAVIORAL_ANOMALY",
-            "threat_actor": attacker_ip,
-            "target": "/api/v1/admin/export",
-            "evidence": {
-                "anomalies_detected": len(ueba_alerts),
-                "peak_z_score": max((a.get("z_score", 0.0) for a in ueba_alerts), default=4.2),
-            },
-            "status": "CORRELATED",
-            "description": "Statistical baseline deviation detected abnormal call frequency and oversized payload volumes.",
-        })
+        timeline.append(
+            {
+                "stage": 5,
+                "phase": "UEBA_BEHAVIORAL_ANOMALY",
+                "threat_actor": attacker_ip,
+                "target": "/api/v1/admin/export",
+                "evidence": {
+                    "anomalies_detected": len(ueba_alerts),
+                    "peak_z_score": max(
+                        (a.get("z_score", 0.0) for a in ueba_alerts), default=4.2
+                    ),
+                },
+                "status": "CORRELATED",
+                "description": "Statistical baseline deviation detected abnormal call frequency and oversized payload volumes.",
+            }
+        )
 
         # ── Stage 6: SOAR Automated Containment & Immutable Merkle Sealing ──
         rules = self.pattern_synthesizer.synthesize_from_cve_id("CVE-2024-21887")
@@ -194,27 +208,31 @@ class CyberRangeSimulator:
                 "scenario": scenario_name,
                 "attacker_ip": attacker_ip,
                 "stages_executed": 6,
-                "total_attacks_blocked": len(sqli_hits) + len(ssrf_hits) + len(ueba_alerts),
+                "total_attacks_blocked": len(sqli_hits)
+                + len(ssrf_hits)
+                + len(ueba_alerts),
                 "malware_verdict": malware_report["verdict"],
                 "containment_action": block_action,
             },
             org_id=org_id,
         )
 
-        timeline.append({
-            "stage": 6,
-            "phase": "SOAR_CONTAINMENT_AND_MERKLE_SEAL",
-            "threat_actor": attacker_ip,
-            "target": "Global Defense Perimeter",
-            "evidence": {
-                "incident_id": incident["incident_id"],
-                "containment_action": block_action,
-                "virtual_patch": rules["waf_patch"]["cloudflare_rule"][:80],
-                "merkle_index": audit_record["index"],
-            },
-            "status": "CONTAINED_AND_SEALED",
-            "description": "SOAR engine quarantined adversary IP, deployed virtual WAF patch, and anchored cryptographic proof into the Merkle audit chain.",
-        })
+        timeline.append(
+            {
+                "stage": 6,
+                "phase": "SOAR_CONTAINMENT_AND_MERKLE_SEAL",
+                "threat_actor": attacker_ip,
+                "target": "Global Defense Perimeter",
+                "evidence": {
+                    "incident_id": incident["incident_id"],
+                    "containment_action": block_action,
+                    "virtual_patch": rules["waf_patch"]["cloudflare_rule"][:80],
+                    "merkle_index": audit_record["index"],
+                },
+                "status": "CONTAINED_AND_SEALED",
+                "description": "SOAR engine quarantined adversary IP, deployed virtual WAF patch, and anchored cryptographic proof into the Merkle audit chain.",
+            }
+        )
 
         duration_ms = round((time.time() - start_time) * 1000, 2)
 
@@ -227,7 +245,8 @@ class CyberRangeSimulator:
             "stages_completed": 6,
             "timeline": timeline,
             "containment": {
-                "virtual_patch_generated": rules["waf_patch"]["cloudflare_rule"][:80] + "...",
+                "virtual_patch_generated": rules["waf_patch"]["cloudflare_rule"][:80]
+                + "...",
                 "soar_action": block_action,
             },
             "cryptographic_proof": {

@@ -147,7 +147,9 @@ class NeuralBCIGuard:
 
     def get_bci_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for all neural BCI zero-trust gates."""
-        total_coercion = sum(o["coercion_attacks_blocked"] for o in self._operators.values())
+        total_coercion = sum(
+            o["coercion_attacks_blocked"] for o in self._operators.values()
+        )
         return {
             "enrolled_bci_operators": len(self._operators),
             "total_neural_evaluations": len(self._verifications) + 840,
@@ -159,4 +161,3 @@ class NeuralBCIGuard:
 
 # Singleton instance
 neural_bci_guard = NeuralBCIGuard()
-

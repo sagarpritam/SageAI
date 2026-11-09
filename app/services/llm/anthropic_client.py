@@ -65,7 +65,9 @@ class AnthropicClient(BaseLLM):
             "content-type": "application/json",
         }
 
-        async with httpx.AsyncClient(timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)) as client:
+        async with httpx.AsyncClient(
+            timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)
+        ) as client:
             try:
                 response = await client.post(
                     "https://api.anthropic.com/v1/messages",
@@ -82,7 +84,9 @@ class AnthropicClient(BaseLLM):
 
                 data = response.json()
                 content_blocks = data.get("content", [])
-                text_content = "".join(b.get("text", "") for b in content_blocks if b.get("type") == "text")
+                text_content = "".join(
+                    b.get("text", "") for b in content_blocks if b.get("type") == "text"
+                )
 
                 usage = data.get("usage", {})
                 return {

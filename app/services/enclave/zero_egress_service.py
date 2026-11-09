@@ -155,7 +155,9 @@ class ZeroEgressEnclaveService:
         key = self.derive_key(enclave_key, salt)
 
         # Regional cryptographic binding (associated authenticated data)
-        associated_data = f"region:{region_code}|sovereignty:enforced|v:2.5".encode("utf-8")
+        associated_data = f"region:{region_code}|sovereignty:enforced|v:2.5".encode(
+            "utf-8"
+        )
 
         aesgcm = AESGCM(key)
         ciphertext = aesgcm.encrypt(nonce, plaintext.encode("utf-8"), associated_data)
@@ -229,13 +231,19 @@ class ZeroEgressEnclaveService:
                 fingerprint = hashlib.sha256(secret_val.encode("utf-8")).hexdigest()[:8]
                 token = f"[{token_prefix}:{fingerprint}]"
                 sanitized = sanitized.replace(secret_val, token)
-                redactions.append({
-                    "type": label,
-                    "token": token,
-                    "fingerprint": fingerprint,
-                })
+                redactions.append(
+                    {
+                        "type": label,
+                        "token": token,
+                        "fingerprint": fingerprint,
+                    }
+                )
 
-        risk_before = "CRITICAL" if any("Key" in r["type"] or "URI" in r["type"] for r in redactions) else ("HIGH" if redactions else "LOW")
+        risk_before = (
+            "CRITICAL"
+            if any("Key" in r["type"] or "URI" in r["type"] for r in redactions)
+            else ("HIGH" if redactions else "LOW")
+        )
 
         return {
             "sanitized_text": sanitized,
@@ -269,22 +277,26 @@ class ZeroEgressEnclaveService:
 
             # Cross-region tampering test: verify that changing associated_data breaks decryption
             tampered_env = envelope.copy()
-            tampered_env["associated_data"] = "region:unauthorized-region|sovereignty:enforced|v:2.5"
+            tampered_env["associated_data"] = (
+                "region:unauthorized-region|sovereignty:enforced|v:2.5"
+            )
             tamper_blocked = False
             try:
                 self.decrypt_payload(tampered_env, passphrase)
             except ValueError:
                 tamper_blocked = True
 
-            results.append({
-                "region_id": region_id,
-                "name": meta["name"],
-                "jurisdiction": meta["jurisdiction"],
-                "envelope_hash": envelope["envelope_hash"][:16] + "...",
-                "encryption_verified": True,
-                "cross_region_tamper_blocked": tamper_blocked,
-                "compliance_status": "COMPLIANT",
-            })
+            results.append(
+                {
+                    "region_id": region_id,
+                    "name": meta["name"],
+                    "jurisdiction": meta["jurisdiction"],
+                    "envelope_hash": envelope["envelope_hash"][:16] + "...",
+                    "encryption_verified": True,
+                    "cross_region_tamper_blocked": tamper_blocked,
+                    "compliance_status": "COMPLIANT",
+                }
+            )
 
         # Step 2: Test zero-egress scrubbing
         scrub_result = self.sanitize_and_tokenize(test_secret)

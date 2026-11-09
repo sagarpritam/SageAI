@@ -4,4 +4,3 @@ from app.services.subsea_telecom.subsea_cable_guard import (
 )
 
 __all__ = ["SubseaCableGuard", "subsea_cable_guard"]
-

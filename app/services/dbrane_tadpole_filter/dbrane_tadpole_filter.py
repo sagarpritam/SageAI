@@ -123,7 +123,9 @@ class DBraneTadpoleFilter:
         pre_excess = stack.net_tadpole_charge_excess
         post_excess = max(0, pre_excess - compensatory_flux_quanta)
 
-        gs_counterterm = round(stack.green_schwarz_axion_coupling * green_schwarz_boost * 1.85, 8)
+        gs_counterterm = round(
+            stack.green_schwarz_axion_coupling * green_schwarz_boost * 1.85, 8
+        )
         tachyons_excised = pre_excess * 4 + random.randint(1, 3)
 
         cancellation_id = f"TADPOLE-FILTER-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
@@ -175,4 +177,3 @@ dbrane_tadpole_filter = DBraneTadpoleFilter()
 
 def get_dbrane_tadpole_filter() -> DBraneTadpoleFilter:
     return dbrane_tadpole_filter
-

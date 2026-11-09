@@ -15,15 +15,25 @@ router = APIRouter(prefix="/sdn-shield", tags=["SDN Ephemeral Network Isolation"
 
 
 class IsolateAssetRequest(BaseModel):
-    asset_id: str = Field(..., description="Target asset ID, EC2 instance ID, or Pod name")
-    asset_type: Optional[str] = Field("AWS_EC2", description="Asset type (AWS_EC2, AZURE_VM, K8S_POD)")
-    reason: Optional[str] = Field("Active C2 beaconing detected", description="Isolation justification")
-    redirect_to_honeynet: Optional[bool] = Field(True, description="Redirect traffic to deceptive honeynet")
+    asset_id: str = Field(
+        ..., description="Target asset ID, EC2 instance ID, or Pod name"
+    )
+    asset_type: Optional[str] = Field(
+        "AWS_EC2", description="Asset type (AWS_EC2, AZURE_VM, K8S_POD)"
+    )
+    reason: Optional[str] = Field(
+        "Active C2 beaconing detected", description="Isolation justification"
+    )
+    redirect_to_honeynet: Optional[bool] = Field(
+        True, description="Redirect traffic to deceptive honeynet"
+    )
     ttl_minutes: Optional[int] = Field(60, description="Quarantine duration in minutes")
 
 
 class ReleaseAssetRequest(BaseModel):
-    isolation_id: str = Field(..., description="Isolation record ID to release and restore")
+    isolation_id: str = Field(
+        ..., description="Isolation record ID to release and restore"
+    )
 
 
 @router.get("/isolations")
@@ -33,7 +43,10 @@ async def list_isolations_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Lists all active network quarantine isolations across AWS, Azure, and Kubernetes."""
-    return {"status": "success", "active_isolations": sdn_isolation_engine.list_active_isolations()}
+    return {
+        "status": "success",
+        "active_isolations": sdn_isolation_engine.list_active_isolations(),
+    }
 
 
 @router.post("/isolate")
@@ -50,7 +63,9 @@ async def isolate_asset_endpoint(
             asset_id=payload.asset_id,
             asset_type=payload.asset_type or "AWS_EC2",
             reason=payload.reason or "Active security anomaly detected",
-            redirect_to_honeynet=payload.redirect_to_honeynet if payload.redirect_to_honeynet is not None else True,
+            redirect_to_honeynet=payload.redirect_to_honeynet
+            if payload.redirect_to_honeynet is not None
+            else True,
             ttl_minutes=payload.ttl_minutes or 60,
             operator=user_id,
         )
@@ -76,4 +91,3 @@ async def release_asset_endpoint(
         return {"status": "success", "result": res}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

@@ -4,4 +4,3 @@ from app.services.drone_swarm_shield.kinetic_drone_shield import (
 )
 
 __all__ = ["KineticDroneShield", "kinetic_drone_shield"]
-

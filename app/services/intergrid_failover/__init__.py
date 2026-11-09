@@ -4,4 +4,3 @@ from app.services.intergrid_failover.intergrid_failover_guard import (
 )
 
 __all__ = ["InterGridFailoverGuard", "intergrid_failover_guard"]
-

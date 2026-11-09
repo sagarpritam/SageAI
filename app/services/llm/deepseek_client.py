@@ -65,7 +65,9 @@ class DeepSeekClient(BaseLLM):
             "Content-Type": "application/json",
         }
 
-        async with httpx.AsyncClient(timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)) as client:
+        async with httpx.AsyncClient(
+            timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)
+        ) as client:
             try:
                 response = await client.post(
                     "https://api.deepseek.com/chat/completions",
@@ -82,14 +84,18 @@ class DeepSeekClient(BaseLLM):
 
                 data = response.json()
                 choices = data.get("choices", [])
-                content = choices[0].get("message", {}).get("content", "") if choices else ""
+                content = (
+                    choices[0].get("message", {}).get("content", "") if choices else ""
+                )
                 usage = data.get("usage", {})
 
                 return {
                     "content": content,
                     "usage": {
                         "prompt_tokens": usage.get("prompt_tokens", len(prompt) // 4),
-                        "completion_tokens": usage.get("completion_tokens", len(content) // 4),
+                        "completion_tokens": usage.get(
+                            "completion_tokens", len(content) // 4
+                        ),
                     },
                 }
             except httpx.RequestError as e:
@@ -98,4 +104,3 @@ class DeepSeekClient(BaseLLM):
             except Exception:
                 deepseek_breaker.record_failure()
                 raise
-

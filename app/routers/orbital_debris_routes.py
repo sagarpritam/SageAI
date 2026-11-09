@@ -21,17 +21,31 @@ router = APIRouter(
 
 class CalculateConjunctionRequest(BaseModel):
     platform_id: str = Field(..., description="Target spaceborne laser platform ID")
-    debris_size_cm: float = Field(..., description="Hypervelocity debris diameter in centimeters")
-    relative_velocity_km_s: float = Field(7.8, description="Relative collision closing velocity in km/s")
-    miss_distance_meters: float = Field(..., description="Predicted unmitigated miss distance in meters")
-    collision_probability: float = Field(..., description="Calculated orbital collision probability")
+    debris_size_cm: float = Field(
+        ..., description="Hypervelocity debris diameter in centimeters"
+    )
+    relative_velocity_km_s: float = Field(
+        7.8, description="Relative collision closing velocity in km/s"
+    )
+    miss_distance_meters: float = Field(
+        ..., description="Predicted unmitigated miss distance in meters"
+    )
+    collision_probability: float = Field(
+        ..., description="Calculated orbital collision probability"
+    )
 
 
 class FireLaserDeflectorRequest(BaseModel):
-    platform_id: str = Field(..., description="Target platform to discharge pulsed laser")
-    target_debris_id: str = Field("DEBRIS-LEO-8821", description="Catalog ID of targeted space debris")
+    platform_id: str = Field(
+        ..., description="Target platform to discharge pulsed laser"
+    )
+    target_debris_id: str = Field(
+        "DEBRIS-LEO-8821", description="Catalog ID of targeted space debris"
+    )
     pulse_count: int = Field(50, description="Laser burst pulse count")
-    laser_fluence_j_cm2: float = Field(12.5, description="Optical laser fluence in J/cm2")
+    laser_fluence_j_cm2: float = Field(
+        12.5, description="Optical laser fluence in J/cm2"
+    )
 
 
 @router.get("/platforms")
@@ -41,7 +55,10 @@ async def list_platforms_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all monitored spaceborne laser debris deflector platforms."""
-    return {"status": "success", "platforms": orbital_asat_debris_deflector.list_platforms()}
+    return {
+        "status": "success",
+        "platforms": orbital_asat_debris_deflector.list_platforms(),
+    }
 
 
 @router.get("/platforms/{platform_id}")
@@ -106,5 +123,7 @@ async def get_debris_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet telemetry for orbital kinetic debris laser deflector."""
-    return {"status": "success", "metrics": orbital_asat_debris_deflector.get_debris_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": orbital_asat_debris_deflector.get_debris_metrics(),
+    }

@@ -44,7 +44,10 @@ async def list_incidents_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all major security incidents tracked by the Commander."""
-    return {"status": "success", "incidents": regulatory_incident_commander.list_incidents()}
+    return {
+        "status": "success",
+        "incidents": regulatory_incident_commander.list_incidents(),
+    }
 
 
 @router.get("/incidents/{incident_id}")
@@ -73,7 +76,7 @@ async def declare_incident_endpoint(
         title=payload.title,
         severity=payload.severity or "CRITICAL",
         impacted_systems=payload.impacted_systems,
-        records_compromised=payload.records_compromised or 10000
+        records_compromised=payload.records_compromised or 10000,
     )
     return {"status": "success", "incident": inc}
 
@@ -89,8 +92,9 @@ async def generate_sec_8k_endpoint(
     try:
         res = regulatory_incident_commander.generate_sec_8k_filing(
             incident_id=payload.incident_id,
-            registrant_name=payload.registrant_name or "SageAI Sovereign Enterprise Corp",
-            cik_number=payload.cik_number or "0001984210"
+            registrant_name=payload.registrant_name
+            or "SageAI Sovereign Enterprise Corp",
+            cik_number=payload.cik_number or "0001984210",
         )
         return {"status": "success", "filing": res}
     except ValueError as e:
@@ -108,7 +112,8 @@ async def generate_nis2_endpoint(
     try:
         res = regulatory_incident_commander.generate_nis2_early_warning(
             incident_id=payload.incident_id,
-            member_state_csirt=payload.member_state_csirt or "BSI (Germany) / ANSSI (France)"
+            member_state_csirt=payload.member_state_csirt
+            or "BSI (Germany) / ANSSI (France)",
         )
         return {"status": "success", "notice": res}
     except ValueError as e:
@@ -137,5 +142,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves regulatory incident commander metrics."""
-    return {"status": "success", "metrics": regulatory_incident_commander.get_commander_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": regulatory_incident_commander.get_commander_metrics(),
+    }

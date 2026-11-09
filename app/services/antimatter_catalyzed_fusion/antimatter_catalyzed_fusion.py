@@ -90,7 +90,10 @@ class AntimatterCatalyzedFusionRocket:
         thermal_yield_gw = (pulse_energy_mj * rate_hz) / 1000.0
 
         # Magnetic nozzle expansion velocity v_ex = sqrt(2 * eta * E_fusion / m_pellet)
-        collimation_eff = min(98.5, thruster["collimation_efficiency_pct"] * (1.0 + 0.005 * (comp_gain - 1.0)))
+        collimation_eff = min(
+            98.5,
+            thruster["collimation_efficiency_pct"] * (1.0 + 0.005 * (comp_gain - 1.0)),
+        )
         base_isp = thruster["base_isp_s"]
         modulated_isp = base_isp * math.sqrt(comp_gain) * (collimation_eff / 95.0)
 
@@ -105,7 +108,9 @@ class AntimatterCatalyzedFusionRocket:
 
         # Deduct used antiprotons from inventory
         thruster["base_antiproton_inventory_pg"] = max(
-            0.0, thruster["base_antiproton_inventory_pg"] - (pbar_dose * (rate_hz / 30.0) * 0.001)
+            0.0,
+            thruster["base_antiproton_inventory_pg"]
+            - (pbar_dose * (rate_hz / 30.0) * 0.001),
         )
 
         telemetry = {
@@ -122,7 +127,9 @@ class AntimatterCatalyzedFusionRocket:
             "continuous_thrust_kn": round(thrust_kn, 2),
             "magnetic_nozzle_field_tesla": thruster["magnetic_nozzle_field_tesla"],
             "collimation_efficiency_pct": round(collimation_eff, 2),
-            "remaining_antiproton_inventory_pg": round(thruster["base_antiproton_inventory_pg"], 3),
+            "remaining_antiproton_inventory_pg": round(
+                thruster["base_antiproton_inventory_pg"], 3
+            ),
             "trans_solar_relativistic_capability": True,
             "status": "ACF_THRUSTER_FIRING_OPTIMAL",
             "timestamp": time.time(),
@@ -153,4 +160,3 @@ _antimatter_catalyzed_fusion_rocket = AntimatterCatalyzedFusionRocket()
 def get_antimatter_catalyzed_fusion_rocket() -> AntimatterCatalyzedFusionRocket:
     """Return the global AntimatterCatalyzedFusionRocket singleton instance."""
     return _antimatter_catalyzed_fusion_rocket
-

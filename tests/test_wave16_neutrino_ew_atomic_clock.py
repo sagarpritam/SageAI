@@ -8,11 +8,13 @@ Test Suite for Wave 16: Deep-Underground Neutrino Array, Cognitive EW & Optical 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
-from app.services.neutrino_array.neutrino_flux_detector import neutrino_flux_detector
+from app.main import app
+from app.services.atomic_clock_mesh.optical_atomic_clock_mesh import (
+    optical_atomic_clock_mesh,
+)
 from app.services.cognitive_ew.cognitive_ew_engine import cognitive_ew_engine
-from app.services.atomic_clock_mesh.optical_atomic_clock_mesh import optical_atomic_clock_mesh
+from app.services.neutrino_array.neutrino_flux_detector import neutrino_flux_detector
 
 
 @pytest.fixture
@@ -72,7 +74,9 @@ def test_neutrino_array_service():
         },
         estimated_source_distance_km=920.0,
     )
-    assert triang["verification_status"] == "MULTILATERAL_CHERENKOV_CONVERGENCE_CONFIRMED"
+    assert (
+        triang["verification_status"] == "MULTILATERAL_CHERENKOV_CONVERGENCE_CONFIRMED"
+    )
     assert triang["confidence_score"] > 0.95
     assert len(triang["participating_detectors"]) == 2
 
@@ -83,7 +87,10 @@ def test_neutrino_array_service():
 
 
 def test_neutrino_array_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/neutrino-array/detectors")
         assert r1.status_code == 200
@@ -146,7 +153,11 @@ def test_cognitive_ew_service():
     # Synthesize RGPO Waveform
     wf_rgpo = cognitive_ew_engine.synthesize_drfm_waveform(
         emitter_id="emitter-aesa-xband-01",
-        pulse_descriptor={"carrier_frequency_ghz": 9.85, "pulse_width_us": 12.5, "snr_db": 28.0},
+        pulse_descriptor={
+            "carrier_frequency_ghz": 9.85,
+            "pulse_width_us": 12.5,
+            "snr_db": 28.0,
+        },
         technique="RANGE_GATE_PULL_OFF_RGPO",
     )
     assert wf_rgpo["synthesis_latency_us"] < 5.0
@@ -181,7 +192,10 @@ def test_cognitive_ew_service():
 
 
 def test_cognitive_ew_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/cognitive-ew/emitters")
         assert r1.status_code == 200
@@ -272,7 +286,10 @@ def test_optical_atomic_clock_service():
 
 
 def test_optical_atomic_clock_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/atomic-clock/clocks")
         assert r1.status_code == 200
@@ -309,4 +326,3 @@ def test_optical_atomic_clock_endpoints(client):
         assert r5.json()["metrics"]["total_optical_lattice_clocks"] >= 4
     finally:
         app.dependency_overrides.clear()
-

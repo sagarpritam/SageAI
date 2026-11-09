@@ -35,7 +35,7 @@ class KyberMeshVPNService:
                 "rekey_interval_sec": 120,
                 "latency_ms": 14.2,
                 "tx_bytes": 14208910,
-                "rx_bytes": 28410220
+                "rx_bytes": 28410220,
             },
             {
                 "peer_id": "pqc-peer-eu-dc",
@@ -51,7 +51,7 @@ class KyberMeshVPNService:
                 "rekey_interval_sec": 120,
                 "latency_ms": 21.8,
                 "tx_bytes": 8920110,
-                "rx_bytes": 17840112
+                "rx_bytes": 17840112,
             },
             {
                 "peer_id": "pqc-peer-orbital-relay",
@@ -67,8 +67,8 @@ class KyberMeshVPNService:
                 "rekey_interval_sec": 120,
                 "latency_ms": 38.4,
                 "tx_bytes": 3891000,
-                "rx_bytes": 6780000
-            }
+                "rx_bytes": 6780000,
+            },
         ]
 
         for p in default_peers:
@@ -87,7 +87,7 @@ class KyberMeshVPNService:
         node_name: str,
         endpoint: str,
         overlay_ip: str,
-        allowed_ips: Optional[List[str]] = None
+        allowed_ips: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Registers a new post-quantum cryptographic mesh peer."""
         peer_id = f"pqc-peer-{uuid.uuid4().hex[:6]}"
@@ -113,7 +113,7 @@ class KyberMeshVPNService:
             "latency_ms": 15.0,
             "tx_bytes": 0,
             "rx_bytes": 0,
-            "created_at": now
+            "created_at": now,
         }
 
         self._peers[peer_id] = peer_entry
@@ -128,11 +128,13 @@ class KyberMeshVPNService:
         now = time.time()
         # Simulate ML-KEM-768 encapsulation
         ciphertext_bytes = os.urandom(1088)
-        shared_secret = hashlib.sha3_256(ciphertext_bytes + peer["kyber_public_key"].encode()).hexdigest()
+        shared_secret = hashlib.sha3_256(
+            ciphertext_bytes + peer["kyber_public_key"].encode()
+        ).hexdigest()
 
         # Simulate ML-DSA-65 signature over handshake transcript
         handshake_transcript = f"{peer_id}:{shared_secret}:{now}".encode()
-        dilithium_signature = hashlib.sha3_512(handshake_transcript).hexdigest()
+        hashlib.sha3_512(handshake_transcript).hexdigest()
 
         peer["handshake_age_sec"] = 0
         peer["status"] = "ESTABLISHED"
@@ -148,7 +150,7 @@ class KyberMeshVPNService:
             "ciphertext_length_bytes": 1088,
             "signature_length_bytes": 3309,
             "quantum_pfs_guaranteed": True,
-            "wireguard_psk_installed": True
+            "wireguard_psk_installed": True,
         }
         self._handshake_log.append(handshake_record)
 
@@ -159,7 +161,7 @@ class KyberMeshVPNService:
             "dilithium_verified": True,
             "session_ttl_sec": peer["rekey_interval_sec"],
             "quantum_immunity_bits": 192,
-            "handshake_latency_us": 840
+            "handshake_latency_us": 840,
         }
 
     def generate_wireguard_conf(self, peer_id: str) -> str:
@@ -168,22 +170,24 @@ class KyberMeshVPNService:
         if not peer:
             raise ValueError(f"Peer {peer_id} not found.")
 
-        psk = hashlib.sha256(f"kyber_kem_{peer_id}_{time.time()}".encode()).hexdigest()[:44]
+        psk = hashlib.sha256(f"kyber_kem_{peer_id}_{time.time()}".encode()).hexdigest()[
+            :44
+        ]
 
         return f"""# SageAI Sovereign Quantum-Safe WireGuard Interface (ML-KEM-768)
 [Interface]
 PrivateKey = <Local_PQC_Node_Private_Key>
-Address = {peer['overlay_ip']}
+Address = {peer["overlay_ip"]}
 ListenPort = 51820
 PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 [Peer]
-# Peer: {peer['node_name']}
+# Peer: {peer["node_name"]}
 PublicKey = <Base64_Wireguard_Public_Key>
 PresharedKey = {psk}
-Endpoint = {peer['endpoint']}
-AllowedIPs = {", ".join(peer['allowed_ips'])}
+Endpoint = {peer["endpoint"]}
+AllowedIPs = {", ".join(peer["allowed_ips"])}
 PersistentKeepalive = 25
 # Quantum Resistance: NIST FIPS 203 (ML-KEM-768) + NIST FIPS 204 (ML-DSA-65)
 # Rekey Interval: 120 seconds
@@ -192,7 +196,9 @@ PersistentKeepalive = 25
     def get_mesh_metrics(self) -> Dict[str, Any]:
         """Returns quantum mesh tunnel status, peer count, and re-keying velocity."""
         total_peers = len(self._peers)
-        active_peers = sum(1 for p in self._peers.values() if p.get("status") == "ESTABLISHED")
+        active_peers = sum(
+            1 for p in self._peers.values() if p.get("status") == "ESTABLISHED"
+        )
         total_tx = sum(p.get("tx_bytes", 0) for p in self._peers.values())
         total_rx = sum(p.get("rx_bytes", 0) for p in self._peers.values())
 
@@ -203,10 +209,9 @@ PersistentKeepalive = 25
             "ephemeral_rekey_interval_sec": 120,
             "total_throughput_bytes": total_tx + total_rx,
             "quantum_attack_survivability": "PROVABLY_QUANTUM_SAFE_GROVER_AND_SHOR_RESISTANT",
-            "mean_mesh_latency_ms": 24.8
+            "mean_mesh_latency_ms": 24.8,
         }
 
 
 # Global singleton instance
 kyber_mesh_vpn_service = KyberMeshVPNService()
-

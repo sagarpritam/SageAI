@@ -82,7 +82,9 @@ class MarineAcousticSonarMesh:
             raise ValueError(f"Marine sonar node {node_id} not registered.")
 
         now = time.time()
-        is_auv_cavitation = (60.0 <= spectral_peak_hz <= 140.0) and abs(acoustic_doppler_mps) > 6.0
+        is_auv_cavitation = (60.0 <= spectral_peak_hz <= 140.0) and abs(
+            acoustic_doppler_mps
+        ) > 6.0
         is_seismic_tamper = ambient_spl_db > 130.0 and spectral_peak_hz < 35.0
         threat_detected = is_auv_cavitation or is_seismic_tamper
 
@@ -157,7 +159,9 @@ class MarineAcousticSonarMesh:
         total_tracked = sum(n["contacts_tracked"] for n in self._nodes.values())
         return {
             "monitored_ocean_floor_arrays": len(self._nodes),
-            "total_hydrophone_elements": sum(n["hydrophone_elements"] for n in self._nodes.values()),
+            "total_hydrophone_elements": sum(
+                n["hydrophone_elements"] for n in self._nodes.values()
+            ),
             "contacts_triangulated": total_tracked + len(self._triangulation_events),
             "mean_triangulation_latency_ms": 14.2,
             "max_monitored_depth_meters": 3820.0,
@@ -167,4 +171,3 @@ class MarineAcousticSonarMesh:
 
 # Singleton instance
 marine_acoustic_sonar_mesh = MarineAcousticSonarMesh()
-

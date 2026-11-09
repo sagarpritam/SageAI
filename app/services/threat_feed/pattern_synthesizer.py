@@ -111,14 +111,18 @@ class ThreatPatternSynthesizer:
         for i, s in enumerate(strings[:8]):
             # Escape backslashes and double quotes
             safe_s = s.replace("\\", "\\\\").replace('"', '\\"')
-            string_lines.append(f'        $s{i+1} = "{safe_s}" ascii wide nocase')
-            condition_terms.append(f"$s{i+1}")
+            string_lines.append(f'        $s{i + 1} = "{safe_s}" ascii wide nocase')
+            condition_terms.append(f"$s{i + 1}")
 
         if not condition_terms:
             string_lines.append(f'        $s1 = "{ident}" ascii wide')
             condition_terms.append("$s1")
 
-        condition = " or ".join(condition_terms) if len(condition_terms) <= 3 else f"2 of ({', '.join(condition_terms)})"
+        condition = (
+            " or ".join(condition_terms)
+            if len(condition_terms) <= 3
+            else f"2 of ({', '.join(condition_terms)})"
+        )
 
         rule = f"""rule SageAI_{ident} {{
     meta:
@@ -230,7 +234,7 @@ http:
         modsec = (
             f"# SageAI Virtual Patch for {cve_id}\n"
             f'SecRule ARGS:{target_param} "@rx {attack_signature_regex}" '
-            f'"id:990001,phase:2,deny,status:403,log,msg:\'SageAI Virtual Patch blocked exploit for {cve_id}\'"'
+            f"\"id:990001,phase:2,deny,status:403,log,msg:'SageAI Virtual Patch blocked exploit for {cve_id}'\""
         )
 
         return {
@@ -250,7 +254,12 @@ http:
         description = item.get("description") or "Automated threat rule synthesis"
         severity = item.get("severity") or "high"
 
-        strings = [cve_id, item.get("vendor_project", ""), item.get("product", ""), item.get("c2_pattern", "")]
+        strings = [
+            cve_id,
+            item.get("vendor_project", ""),
+            item.get("product", ""),
+            item.get("c2_pattern", ""),
+        ]
         strings = [s for s in strings if s]
 
         yara_rule = self.synthesize_yara_rule(
@@ -343,11 +352,18 @@ http:
             has_rule = "rule " in content
             has_strings = "strings:" in content
             has_cond = "condition:" in content
-            valid = has_rule and has_strings and has_cond and content.count("{") == content.count("}")
+            valid = (
+                has_rule
+                and has_strings
+                and has_cond
+                and content.count("{") == content.count("}")
+            )
             return {
                 "valid": valid,
                 "rule_type": "YARA",
-                "message": "Valid YARA rule syntax structure" if valid else "Missing rule declaration, strings block, or balanced braces",
+                "message": "Valid YARA rule syntax structure"
+                if valid
+                else "Missing rule declaration, strings block, or balanced braces",
             }
         elif rt in ("sigma", "nuclei"):
             try:
@@ -356,7 +372,9 @@ http:
                 return {
                     "valid": has_keys,
                     "rule_type": rt.upper(),
-                    "message": f"Valid {rt.upper()} YAML schema parsed successfully" if has_keys else "Invalid YAML structure",
+                    "message": f"Valid {rt.upper()} YAML schema parsed successfully"
+                    if has_keys
+                    else "Invalid YAML structure",
                 }
             except Exception as e:
                 return {

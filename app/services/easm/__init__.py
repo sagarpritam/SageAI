@@ -8,4 +8,3 @@ from app.services.easm.shadow_it_hunter import (
 )
 
 __all__ = ["ShadowITHunterService", "shadow_it_hunter"]
-

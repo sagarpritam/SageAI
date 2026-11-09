@@ -11,17 +11,28 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.cti.stix_taxii_service import cti_service
 
-router = APIRouter(prefix="/cti", tags=["Cyber Threat Intelligence (CTI) STIX 2.1 & TAXII 2.1"])
+router = APIRouter(
+    prefix="/cti", tags=["Cyber Threat Intelligence (CTI) STIX 2.1 & TAXII 2.1"]
+)
 
 
 class GenerateStixBundleRequest(BaseModel):
-    actor_name: str = Field(..., description="Threat actor name or alias (e.g. APT28, Scattered Spider)")
-    indicators: List[Dict[str, str]] = Field(..., description="List of indicators ({type: 'sha256'|'ip'|'domain', value: '...'})")
-    campaign_name: Optional[str] = Field("Enterprise Targeted Campaign 2026", description="Associated attack campaign")
+    actor_name: str = Field(
+        ..., description="Threat actor name or alias (e.g. APT28, Scattered Spider)"
+    )
+    indicators: List[Dict[str, str]] = Field(
+        ...,
+        description="List of indicators ({type: 'sha256'|'ip'|'domain', value: '...'})",
+    )
+    campaign_name: Optional[str] = Field(
+        "Enterprise Targeted Campaign 2026", description="Associated attack campaign"
+    )
 
 
 class ParseStixBundleRequest(BaseModel):
-    bundle: Dict[str, Any] = Field(..., description="External STIX 2.1 JSON bundle to parse")
+    bundle: Dict[str, Any] = Field(
+        ..., description="External STIX 2.1 JSON bundle to parse"
+    )
 
 
 @router.get("/threat-actors")
@@ -97,4 +108,3 @@ async def get_taxii_collections_endpoint(
     Returns TAXII 2.1 Collection server metadata.
     """
     return cti_service.get_taxii_collections()
-

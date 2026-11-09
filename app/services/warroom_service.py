@@ -65,7 +65,11 @@ class Event:
 
     def to_dict(self):
         etype = self.type.value if hasattr(self.type, "value") else str(self.type)
-        eprio = self.priority.value if hasattr(self.priority, "value") else int(self.priority)
+        eprio = (
+            self.priority.value
+            if hasattr(self.priority, "value")
+            else int(self.priority)
+        )
         return {
             "id": self.id,
             "type": etype,
@@ -87,12 +91,22 @@ logger = logging.getLogger("SageAI.warroom")
 
 # Real-world locations for visual telemetry flair
 SEED_LOCATIONS = [
-    {"lat": 38.8951, "lng": -77.0364, "city": "Washington, D.C.", "country": "United States"},
+    {
+        "lat": 38.8951,
+        "lng": -77.0364,
+        "city": "Washington, D.C.",
+        "country": "United States",
+    },
     {"lat": 51.5074, "lng": -0.1278, "city": "London", "country": "United Kingdom"},
     {"lat": 50.1109, "lng": 8.6821, "city": "Frankfurt", "country": "Germany"},
     {"lat": 35.6762, "lng": 139.6503, "city": "Tokyo", "country": "Japan"},
     {"lat": 1.3521, "lng": 103.8198, "city": "Singapore", "country": "Singapore"},
-    {"lat": 25.2048, "lng": 55.2708, "city": "Dubai", "country": "United Arab Emirates"},
+    {
+        "lat": 25.2048,
+        "lng": 55.2708,
+        "city": "Dubai",
+        "country": "United Arab Emirates",
+    },
     {"lat": -33.8688, "lng": 151.2093, "city": "Sydney", "country": "Australia"},
 ]
 

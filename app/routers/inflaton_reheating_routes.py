@@ -13,8 +13,15 @@ router = APIRouter(
 
 class TriggerReheatingCycleRequest(BaseModel):
     node_id: str = Field(..., description="Target inflaton resonance node ID")
-    initial_amplitude_planck: float = Field(default=0.85, ge=0.01, le=5.0, description="Inflaton field amplitude in Planck units")
-    coupling_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Coupling parameter gain")
+    initial_amplitude_planck: float = Field(
+        default=0.85,
+        ge=0.01,
+        le=5.0,
+        description="Inflaton field amplitude in Planck units",
+    )
+    coupling_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Coupling parameter gain"
+    )
 
 
 @router.get("/nodes")
@@ -37,4 +44,3 @@ async def trigger_reheat_cycle(req: TriggerReheatingCycleRequest) -> Dict[str, A
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return inflaton_reheating_pump.get_pump_metrics()
-

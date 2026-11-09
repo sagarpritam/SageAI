@@ -19,7 +19,9 @@ from typing import Any, Dict, List
 class SovereignFederationCluster:
     cluster_id: str
     region_name: str
-    datacenter_type: str  # "AIRGAPPED_ENCLAVE", "SUBTERRANEAN_BUNKER", "ORBITAL_GATEWAY"
+    datacenter_type: (
+        str  # "AIRGAPPED_ENCLAVE", "SUBTERRANEAN_BUNKER", "ORBITAL_GATEWAY"
+    )
     endpoint_url: str
     active_nodes: int = 12
     round_trip_latency_ms: float = 8.5
@@ -130,15 +132,21 @@ class EnterpriseClusterFederationEngine:
         c1 = self.clusters.get(initiating_cluster_id)
         c2 = self.clusters.get(target_cluster_id)
         if not c1 or not c2:
-            raise ValueError(f"Invalid cluster ids: {initiating_cluster_id}, {target_cluster_id}")
+            raise ValueError(
+                f"Invalid cluster ids: {initiating_cluster_id}, {target_cluster_id}"
+            )
 
-        new_root = hashlib.sha256(f"{initiating_cluster_id}:{target_cluster_id}:{time.time()}".encode()).hexdigest()
+        new_root = hashlib.sha256(
+            f"{initiating_cluster_id}:{target_cluster_id}:{time.time()}".encode()
+        ).hexdigest()
         c1.merkle_state_root_sha256 = new_root
         c2.merkle_state_root_sha256 = new_root
 
         drift_ms = round(random.uniform(0.12, 0.48), 3)
 
-        sync_id = f"FED-SYNC-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        sync_id = (
+            f"FED-SYNC-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         event = CrossClusterSyncEvent(
             sync_id=sync_id,
             initiating_cluster=initiating_cluster_id,
@@ -199,7 +207,9 @@ class EnterpriseClusterFederationEngine:
     def get_federation_metrics(self) -> Dict[str, Any]:
         return {
             "total_federated_clusters": len(self.clusters),
-            "total_federated_nodes": sum([c.active_nodes for c in self.clusters.values()]),
+            "total_federated_nodes": sum(
+                [c.active_nodes for c in self.clusters.values()]
+            ),
             "total_sync_events": len(self.sync_events),
             "quorum_model": "BYZANTINE_FAULT_TOLERANT_4_REGIONS",
             "failover_sla_limit_ms": 12.0,

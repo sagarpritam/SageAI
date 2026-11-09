@@ -8,11 +8,13 @@ Test Suite for Wave 15: Ocean Floor Sonar, Orbital Debris Deflector & Air-Gapped
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
-from app.services.marine_sonar.marine_acoustic_mesh import marine_acoustic_sonar_mesh
-from app.services.orbital_debris.orbital_debris_deflector import orbital_asat_debris_deflector
+from app.main import app
 from app.services.airgap_exploit_swarm.airgap_exploit_swarm import airgap_exploit_swarm
+from app.services.marine_sonar.marine_acoustic_mesh import marine_acoustic_sonar_mesh
+from app.services.orbital_debris.orbital_debris_deflector import (
+    orbital_asat_debris_deflector,
+)
 
 
 @pytest.fixture
@@ -235,7 +237,10 @@ def test_wave15_fastapi_endpoints(client):
             },
         )
         assert r3.status_code == 200
-        assert r3.json()["triangulation_event"]["new_node_status"] == "CONTACT_TRIANGULATED_LOCKED"
+        assert (
+            r3.json()["triangulation_event"]["new_node_status"]
+            == "CONTACT_TRIANGULATED_LOCKED"
+        )
 
         r4 = client.get("/marine-sonar/metrics")
         assert r4.status_code == 200
@@ -306,4 +311,3 @@ def test_wave15_fastapi_endpoints(client):
 
     finally:
         app.dependency_overrides.pop(get_current_user, None)
-

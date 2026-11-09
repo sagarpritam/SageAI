@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 from app.services.solar_sail_laser import relativistic_solar_sail_laser_mesh
 
-router = APIRouter(prefix="/api/solar-sail-laser", tags=["Relativistic Solar Sail Laser (Cap 77)"])
+router = APIRouter(
+    prefix="/api/solar-sail-laser", tags=["Relativistic Solar Sail Laser (Cap 77)"]
+)
 
 
 class FireLaserPulseRequest(BaseModel):
@@ -44,4 +46,3 @@ async def fire_pulse(req: FireLaserPulseRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return relativistic_solar_sail_laser_mesh.get_mesh_metrics()
-

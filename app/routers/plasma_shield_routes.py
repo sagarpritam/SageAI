@@ -18,16 +18,28 @@ router = APIRouter(
 
 
 class EngagePlasmaWindowRequest(BaseModel):
-    platform_id: str = Field(..., description="Target spaceborne plasma shield platform ID")
-    target_threat_id: str = Field(..., description="Identifier of incoming hypervelocity threat")
-    incoming_velocity_km_s: float = Field(8.5, description="Closing velocity of threat in km/s")
-    estimated_threat_mass_kg: float = Field(45.0, description="Estimated projectile mass in kg")
+    platform_id: str = Field(
+        ..., description="Target spaceborne plasma shield platform ID"
+    )
+    target_threat_id: str = Field(
+        ..., description="Identifier of incoming hypervelocity threat"
+    )
+    incoming_velocity_km_s: float = Field(
+        8.5, description="Closing velocity of threat in km/s"
+    )
+    estimated_threat_mass_kg: float = Field(
+        45.0, description="Estimated projectile mass in kg"
+    )
 
 
 class FireDeflectionPulseRequest(BaseModel):
     platform_id: str = Field(..., description="Target spaceborne plasma platform ID")
-    target_threat_id: str = Field(..., description="Target threat ID to ablate and deflect")
-    pulse_energy_mj: float = Field(120.0, description="Discharged beam pulse energy in megajoules")
+    target_threat_id: str = Field(
+        ..., description="Target threat ID to ablate and deflect"
+    )
+    pulse_energy_mj: float = Field(
+        120.0, description="Discharged beam pulse energy in megajoules"
+    )
     beam_diameter_cm: float = Field(15.0, description="Beam optical diameter in cm")
 
 
@@ -51,7 +63,9 @@ async def get_platform_endpoint(
     """Retrieves telemetry of a specific orbital plasma shield platform."""
     platform = spaceborne_plasma_shield.get_platform(platform_id)
     if not platform:
-        raise HTTPException(status_code=404, detail=f"Platform {platform_id} not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Platform {platform_id} not found."
+        )
     return {"status": "success", "platform": platform}
 
 
@@ -103,4 +117,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves spaceborne plasma shield fleet metrics."""
     return {"status": "success", "metrics": spaceborne_plasma_shield.get_metrics()}
-

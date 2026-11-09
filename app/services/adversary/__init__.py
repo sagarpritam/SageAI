@@ -8,4 +8,3 @@ from app.services.adversary.mitre_emulator import (
 )
 
 __all__ = ["MitreAdversaryEmulator", "mitre_emulator"]
-

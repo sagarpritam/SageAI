@@ -19,16 +19,28 @@ router = APIRouter(
 
 class MonitorStratosphericFlightRequest(BaseModel):
     node_id: str = Field(..., description="Target HAPS platform identifier")
-    wind_velocity_mps: float = Field(..., description="Stratospheric jet stream wind velocity in m/s")
-    battery_soc_pct: float = Field(..., description="Solar battery state-of-charge percentage")
-    sar_clutter_ratio_db: float = Field(..., description="SAR background radar clutter ratio in dB")
-    optical_link_jitter_urad: float = Field(..., description="Inter-HAPS laser optical jitter in micro-radians")
+    wind_velocity_mps: float = Field(
+        ..., description="Stratospheric jet stream wind velocity in m/s"
+    )
+    battery_soc_pct: float = Field(
+        ..., description="Solar battery state-of-charge percentage"
+    )
+    sar_clutter_ratio_db: float = Field(
+        ..., description="SAR background radar clutter ratio in dB"
+    )
+    optical_link_jitter_urad: float = Field(
+        ..., description="Inter-HAPS laser optical jitter in micro-radians"
+    )
 
 
 class RelaySARTelemetryRequest(BaseModel):
     node_id: str = Field(..., description="Target HAPS node to downlink from")
-    frame_resolution_meters: float = Field(0.15, description="Synthetic Aperture Radar ground resolution in meters")
-    pqc_cipher: str = Field("ML-DSA-87_AES256GCM", description="Post-quantum signing and encryption cipher")
+    frame_resolution_meters: float = Field(
+        0.15, description="Synthetic Aperture Radar ground resolution in meters"
+    )
+    pqc_cipher: str = Field(
+        "ML-DSA-87_AES256GCM", description="Post-quantum signing and encryption cipher"
+    )
 
 
 @router.get("/nodes")
@@ -103,4 +115,3 @@ async def get_haps_metrics_endpoint(
 ):
     """Returns fleet telemetry for stratospheric persistent surveillance swarm."""
     return {"status": "success", "metrics": haps_stratosphere_mesh.get_haps_metrics()}
-

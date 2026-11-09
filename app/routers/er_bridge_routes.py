@@ -13,8 +13,12 @@ router = APIRouter(
 
 class SiphonMetricFluxRequest(BaseModel):
     throat_id: str = Field(..., description="Target wormhole throat ID")
-    target_energy_surge_source: str = Field(default="PROMPT_NUCLEAR_FIREBALL_SURGE", description="Surge source type")
-    incident_power_gw: float = Field(default=650.0, ge=1.0, le=10000.0, description="Incident power in Gigawatts")
+    target_energy_surge_source: str = Field(
+        default="PROMPT_NUCLEAR_FIREBALL_SURGE", description="Surge source type"
+    )
+    incident_power_gw: float = Field(
+        default=650.0, ge=1.0, le=10000.0, description="Incident power in Gigawatts"
+    )
 
 
 @router.get("/throats")
@@ -37,4 +41,3 @@ async def siphon_metric_flux(req: SiphonMetricFluxRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return er_bridge_metric_siphon.get_siphon_metrics()
-

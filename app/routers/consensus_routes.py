@@ -15,10 +15,17 @@ router = APIRouter(prefix="/consensus", tags=["Multi-AI Consensus & Red-vs-Blue"
 
 
 class ConsensusEvaluationRequest(BaseModel):
-    vulnerability_title: str = Field(..., description="Name of vulnerability (e.g. Remote Code Execution via Deserialization)")
+    vulnerability_title: str = Field(
+        ...,
+        description="Name of vulnerability (e.g. Remote Code Execution via Deserialization)",
+    )
     target: str = Field(..., description="Target domain, IP, or application endpoint")
-    evidence: str = Field(..., description="Technical evidence, HTTP request/response, or code snippet")
-    context: Optional[str] = Field(None, description="Additional environment or framework details")
+    evidence: str = Field(
+        ..., description="Technical evidence, HTTP request/response, or code snippet"
+    )
+    context: Optional[str] = Field(
+        None, description="Additional environment or framework details"
+    )
 
 
 @router.post("/evaluate")
@@ -63,4 +70,3 @@ async def get_ai_council_health(
         "status": "success",
         "matrix": council_telemetry.get_full_council_matrix(),
     }
-

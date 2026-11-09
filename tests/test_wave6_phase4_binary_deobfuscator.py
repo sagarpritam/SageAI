@@ -2,7 +2,6 @@
 Tests for SageAI Wave 6 Phase 6.4: Symbolic Binary Execution & Polymorphic De-Obfuscation.
 """
 
-import pytest
 from app.services.binary_deobfuscator.symbolic_deobfuscator import (
     symbolic_binary_deobfuscator,
 )
@@ -37,7 +36,10 @@ def test_deobfuscate_control_flow():
     assert res["cff_dispatcher_flattened"] is True
     assert len(res["unhashed_apis"]) >= 4
     assert len(res["decrypted_strings"]) >= 3
-    assert "https://c2-darknode.darkmesh-intel.ru/gate.php" in res["decrypted_strings"][0]["plaintext"]
+    assert (
+        "https://c2-darknode.darkmesh-intel.ru/gate.php"
+        in res["decrypted_strings"][0]["plaintext"]
+    )
     assert "rule SageAI_Deobfuscated_" in res["yara_l_rule"]
     assert res["complexity_reduction"] == "85.7%"
 
@@ -46,4 +48,3 @@ def test_get_sample_library():
     samples = symbolic_binary_deobfuscator.get_sample_library()
     assert len(samples) >= 3
     assert any("LummaStealer" in s["sample_name"] for s in samples)
-

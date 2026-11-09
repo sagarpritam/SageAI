@@ -19,7 +19,9 @@ from app.services.hyperspectral_interceptor import hyperspectral_interceptor_swa
 
 def main():
     print("=" * 80)
-    print("     SAGEAI OPTION B: PLANETARY HYPERSPECTRAL OBSERVATION & INTERCEPTOR SWARM")
+    print(
+        "     SAGEAI OPTION B: PLANETARY HYPERSPECTRAL OBSERVATION & INTERCEPTOR SWARM"
+    )
     print("      Sub-Meter 288-Band Tactical Remote Sensing & Autonomous Space Strike")
     print("=" * 80)
 
@@ -29,8 +31,12 @@ def main():
     print(f"  > Active Surveillance Satellites: {len(sats)}")
     for s in sats:
         print(f"    - {s['satellite_id']} | {s['satellite_name']}")
-        print(f"      Orbit: {s['orbit_type']} | Alt: {s['altitude_km']:,.0f} km | GSD: {s['ground_sample_distance_m']} m | Bands: {s['spectral_bands_count']}")
-        print(f"      Neural TPU: {s['on_orbit_neural_tpu_tops']} TOPS | SNR: {s['signal_to_noise_ratio']}:1 | Swath: {s['swath_width_km']} km")
+        print(
+            f"      Orbit: {s['orbit_type']} | Alt: {s['altitude_km']:,.0f} km | GSD: {s['ground_sample_distance_m']} m | Bands: {s['spectral_bands_count']}"
+        )
+        print(
+            f"      Neural TPU: {s['on_orbit_neural_tpu_tops']} TOPS | SNR: {s['signal_to_noise_ratio']}:1 | Swath: {s['swath_width_km']} km"
+        )
 
     # 2. Covert Target Detection & Spectral Unmixing
     print("\n[SECTION 2] Executing Target Acquisition & Neural Spectral Unmixing...")
@@ -45,15 +51,23 @@ def main():
 
     print(f"  > Scan ID: {scan_res['scan_id']}")
     print(f"  > Target Classification: {scan_res['target_classification']}")
-    print(f"  > Spectral Absorption Signature: {scan_res['spectral_absorption_signature']}")
-    print(f"  > Geothermal Effluent Delta T: +{scan_res['thermal_delta_t_kelvin']} K (LWIR Venting Detected)")
-    print(f"  > Sub-Pixel Abundance Fraction: {scan_res['subpixel_abundance_fraction'] * 100:.1f}%")
+    print(
+        f"  > Spectral Absorption Signature: {scan_res['spectral_absorption_signature']}"
+    )
+    print(
+        f"  > Geothermal Effluent Delta T: +{scan_res['thermal_delta_t_kelvin']} K (LWIR Venting Detected)"
+    )
+    print(
+        f"  > Sub-Pixel Abundance Fraction: {scan_res['subpixel_abundance_fraction'] * 100:.1f}%"
+    )
     print(f"  > Neural Confidence Score: {scan_res['confidence_score_pct']}%")
     print(f"  > Geohash Index: {scan_res['target_geohash']}")
     print(f"  > Acquisition Latency: {scan_time_ms:.2f} ms")
 
     # 3. Autonomous Strike Cross-Cueing
-    print("\n[SECTION 3] Autonomous Cross-Cueing to Space-Ground Kinetic Interceptor...")
+    print(
+        "\n[SECTION 3] Autonomous Cross-Cueing to Space-Ground Kinetic Interceptor..."
+    )
     start_t = time.time()
     eng_res = hyperspectral_interceptor_swarm.engage_target(
         scan_id=scan_res["scan_id"],
@@ -64,19 +78,29 @@ def main():
     print(f"  > Engagement ID: {eng_res['engagement_id']}")
     print(f"  > Strike Platform: {eng_res['interceptor_platform']}")
     print(f"  > Target Coordinates: {eng_res['target_coordinates']}")
-    print(f"  > Cross-Cue Handoff Latency: {eng_res['cross_cue_latency_ms']} ms (Target: < 18 ms)")
+    print(
+        f"  > Cross-Cue Handoff Latency: {eng_res['cross_cue_latency_ms']} ms (Target: < 18 ms)"
+    )
     print(f"  > Trajectory Solution: {eng_res['intercept_trajectory_solution']}")
-    print(f"  > Projected Time to Impact: {eng_res['projected_time_to_impact_sec']:.2f} seconds")
+    print(
+        f"  > Projected Time to Impact: {eng_res['projected_time_to_impact_sec']:.2f} seconds"
+    )
     print(f"  > Neutralization Probability: {eng_res['kill_probability_pct']}%")
     print(f"  > Status: {eng_res['status']} ({eng_time_ms:.2f} ms)")
 
     # 4. Swarm Metrics
     print("\n[SECTION 4] Aggregating Global Swarm Mission Telemetry...")
     metrics = hyperspectral_interceptor_swarm.get_swarm_metrics()
-    print(f"  > Active Hyperspectral Satellites: {metrics['active_hyperspectral_satellites']}")
-    print(f"  > Spectral Bands per Satellite: {metrics['total_spectral_bands']} (400-14,000 nm)")
+    print(
+        f"  > Active Hyperspectral Satellites: {metrics['active_hyperspectral_satellites']}"
+    )
+    print(
+        f"  > Spectral Bands per Satellite: {metrics['total_spectral_bands']} (400-14,000 nm)"
+    )
     print(f"  > Total Scans Completed: {metrics['total_scans_completed']}")
-    print(f"  > Interceptor Engagements Dispatched: {metrics['total_interceptor_engagements']}")
+    print(
+        f"  > Interceptor Engagements Dispatched: {metrics['total_interceptor_engagements']}"
+    )
     print(f"  > Mean Cross-Cue Latency: {metrics['mean_cross_cue_latency_ms']} ms")
     print(f"  > Mean AI Confidence Score: {metrics['mean_confidence_score_pct']}%")
     print(f"  > Constellation Posture: {metrics['constellation_status']}")
@@ -84,9 +108,15 @@ def main():
     print("\n" + "=" * 80)
     print("                 PLANETARY HYPERSPECTRAL SWARM VERIFIED")
     print("=" * 80)
-    print("  ✓ Full planetary coverage locked across Polar, Molniya, and Equatorial planes.")
-    print("  ✓ Real-time sub-pixel unmixing successfully detected covert nuclear effluents.")
-    print("  ✓ Sub-18ms autonomous kinetic strike cross-cueing confirmed with > 99% kill probability.")
+    print(
+        "  ✓ Full planetary coverage locked across Polar, Molniya, and Equatorial planes."
+    )
+    print(
+        "  ✓ Real-time sub-pixel unmixing successfully detected covert nuclear effluents."
+    )
+    print(
+        "  ✓ Sub-18ms autonomous kinetic strike cross-cueing confirmed with > 99% kill probability."
+    )
     print("  ✓ Status: 100% OPERATIONAL SUCCESS")
     print("=" * 80 + "\n")
 

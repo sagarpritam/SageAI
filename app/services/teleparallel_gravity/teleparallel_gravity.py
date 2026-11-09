@@ -84,7 +84,9 @@ class TeleparallelGravityEngine:
         f_t_potential = modulated_t + (alpha * (modulated_t**2) * 1e25)
 
         # Inertia decoupling factor
-        decoupling_pct = min(99.999, node["inertia_decoupling_pct"] * (1.0 + 0.0001 * (gain - 1.0)))
+        decoupling_pct = min(
+            99.999, node["inertia_decoupling_pct"] * (1.0 + 0.0001 * (gain - 1.0))
+        )
 
         # Riemann curvature vanishes identically in Weitzenböck spacetime
         riemann_residual = 0.0
@@ -133,4 +135,3 @@ _teleparallel_gravity_engine = TeleparallelGravityEngine()
 def get_teleparallel_gravity_engine() -> TeleparallelGravityEngine:
     """Return the global TeleparallelGravityEngine singleton instance."""
     return _teleparallel_gravity_engine
-

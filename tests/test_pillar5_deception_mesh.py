@@ -8,9 +8,7 @@ Verifies:
 5. Attacker journey simulation and SOAR incident escalation
 """
 
-import pytest
-from app.services.deception.honeypot_service import DeceptionHoneypotService, honeypot_service
-from app.services.incident_response.soar_engine import soar_engine
+from app.services.deception.honeypot_service import DeceptionHoneypotService
 
 
 def test_deception_decoy_endpoints():
@@ -38,7 +36,9 @@ def test_generate_canary_tokens_multiple_types():
     assert jwt_token["canary_value"].startswith("eyJ")
 
     # DB URI
-    db_token = service.generate_canary_token(token_type="db_uri", label="Internal Postgres")
+    db_token = service.generate_canary_token(
+        token_type="db_uri", label="Internal Postgres"
+    )
     assert db_token["canary_value"].startswith("postgresql://")
 
 
@@ -63,11 +63,15 @@ def test_verify_canary_compromised():
     service = DeceptionHoneypotService()
 
     # Generate canary
-    canary = service.generate_canary_token(token_type="api_key", label="Leaked API Token")
+    canary = service.generate_canary_token(
+        token_type="api_key", label="Leaked API Token"
+    )
     token_val = canary["canary_value"]
 
     # Attacker tries to use it
-    alert = service.verify_canary_access(token_val, source_ip="203.0.113.88", user_agent="curl/8.0")
+    alert = service.verify_canary_access(
+        token_val, source_ip="203.0.113.88", user_agent="curl/8.0"
+    )
 
     assert alert is not None
     assert alert["type"] == "CANARY_TOKEN_COMPROMISED"
@@ -101,4 +105,3 @@ def test_simulate_attacker_journey_and_soar_escalation():
     executed_action_names = [a["action"] for a in incident["executed_actions"]]
     assert "GENERATE_VIRTUAL_PATCH" in executed_action_names
     assert "NOTIFY_SOC_WEBHOOK" in executed_action_names
-

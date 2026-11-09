@@ -2,7 +2,6 @@
 FastAPI Router for Option B Wave 28: Sovereign Planetary Magnetic Monopole Proton Decay Battery.
 """
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -10,14 +9,31 @@ from app.services.monopole_catalysis_battery.monopole_catalysis_battery import (
     get_magnetic_monopole_catalyzed_battery,
 )
 
-router = APIRouter(prefix="/api/monopole-battery", tags=["Option B Wave 28: Magnetic Monopole Battery"])
+router = APIRouter(
+    prefix="/api/monopole-battery", tags=["Option B Wave 28: Magnetic Monopole Battery"]
+)
 
 
 class CatalyzeProtonDecayRequest(BaseModel):
     trap_id: str = Field(..., description="ID of the magnetic monopole battery trap")
-    proton_feed_ug_s: float = Field(default=1.2, ge=0.1, le=5.0, description="Proton fuel injection rate in micrograms/sec")
-    confinement_boost: float = Field(default=1.05, ge=0.8, le=2.0, description="Superconducting confinement field boost")
-    load_demand_gw: float = Field(default=100.0, ge=10.0, le=300.0, description="Electrical baseload demand in Gigawatts")
+    proton_feed_ug_s: float = Field(
+        default=1.2,
+        ge=0.1,
+        le=5.0,
+        description="Proton fuel injection rate in micrograms/sec",
+    )
+    confinement_boost: float = Field(
+        default=1.05,
+        ge=0.8,
+        le=2.0,
+        description="Superconducting confinement field boost",
+    )
+    load_demand_gw: float = Field(
+        default=100.0,
+        ge=10.0,
+        le=300.0,
+        description="Electrical baseload demand in Gigawatts",
+    )
 
 
 @router.get("/traps")
@@ -48,4 +64,3 @@ async def get_monopole_metrics():
     """Retrieve aggregate magnetic monopole battery metrics."""
     battery = get_magnetic_monopole_catalyzed_battery()
     return battery.get_monopole_metrics()
-

@@ -148,7 +148,9 @@ class OrbitalLaserMeshGuard:
         """Returns fleet metrics for orbital satellite laser inter-links."""
         return {
             "total_constellation_satellites": len(self._satellites),
-            "active_laser_interlinks": sum(s["isl_links_active"] for s in self._satellites.values()),
+            "active_laser_interlinks": sum(
+                s["isl_links_active"] for s in self._satellites.values()
+            ),
             "optical_throughput_terabits_sec": 4.8,
             "average_pat_pointing_error_urad": 0.45,
             "quantum_safe_rekey_cycles_completed": len(self._rekey_history) + 1420,
@@ -157,4 +159,3 @@ class OrbitalLaserMeshGuard:
 
 # Singleton instance
 orbital_laser_mesh_guard = OrbitalLaserMeshGuard()
-

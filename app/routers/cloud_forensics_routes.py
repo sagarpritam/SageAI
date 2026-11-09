@@ -66,7 +66,9 @@ async def create_snapshot_endpoint(
         resource_id=payload.resource_id,
         incident_id=payload.incident_id,
         volume_size_gb=payload.volume_size_gb or 64,
-        memory_capture=payload.memory_capture if payload.memory_capture is not None else True
+        memory_capture=payload.memory_capture
+        if payload.memory_capture is not None
+        else True,
     )
     return {"status": "success", "snapshot": snap}
 
@@ -108,5 +110,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves forensic vault metrics."""
-    return {"status": "success", "metrics": cloud_forensics_service.get_forensics_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": cloud_forensics_service.get_forensics_metrics(),
+    }

@@ -157,7 +157,9 @@ async def run_interactive_wizard():
         res = await verify_nvidia_key(nv_input)
         if res["valid"]:
             print(f"[OK] Success! ({res.get('latency_ms', 0)}ms)")
-            print(f"   Model: {res.get('model', 'nvidia/llama-3.1-nemotron-70b-instruct')}")
+            print(
+                f"   Model: {res.get('model', 'nvidia/llama-3.1-nemotron-70b-instruct')}"
+            )
             updates["NVIDIA_API_KEY"] = nv_input
         else:
             print(f"[ERROR] Failed: {res.get('error')}")

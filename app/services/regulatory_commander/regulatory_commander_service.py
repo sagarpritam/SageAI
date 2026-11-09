@@ -21,7 +21,11 @@ class RegulatoryIncidentCommander:
             "incident_id": "INC-SEC-2026-001",
             "title": "Unauthorized Cloud Identity Federation Token Escalation",
             "severity": "CRITICAL",
-            "impacted_systems": ["AWS IAM Roles Anywhere", "Azure Entra ID", "Core Billing Database"],
+            "impacted_systems": [
+                "AWS IAM Roles Anywhere",
+                "Azure Entra ID",
+                "Core Billing Database",
+            ],
             "records_compromised": 42000,
             "materiality_verdict": "MATERIAL_CYBERSECURITY_INCIDENT",
             "declared_at": time.time() - 3600 * 24,
@@ -29,8 +33,8 @@ class RegulatoryIncidentCommander:
             "deadlines": {
                 "SEC_8K_DAYS_REMAINING": 3,
                 "NIS2_EARLY_WARNING_HOURS": 0,
-                "GDPR_DPA_HOURS_REMAINING": 48
-            }
+                "GDPR_DPA_HOURS_REMAINING": 48,
+            },
         }
         self._incidents[default_inc["incident_id"]] = default_inc
 
@@ -47,7 +51,7 @@ class RegulatoryIncidentCommander:
         title: str,
         severity: str = "CRITICAL",
         impacted_systems: Optional[List[str]] = None,
-        records_compromised: int = 10000
+        records_compromised: int = 10000,
     ) -> Dict[str, Any]:
         """Spawns an active multi-agent incident commander war room."""
         incident_id = f"INC-SEC-{uuid.uuid4().hex[:6].upper()}"
@@ -58,16 +62,19 @@ class RegulatoryIncidentCommander:
             "incident_id": incident_id,
             "title": title,
             "severity": severity.upper(),
-            "impacted_systems": impacted_systems or ["Customer Data Lake", "API Gateway"],
+            "impacted_systems": impacted_systems
+            or ["Customer Data Lake", "API Gateway"],
             "records_compromised": records_compromised,
-            "materiality_verdict": "MATERIAL_CYBERSECURITY_INCIDENT" if is_material else "NON_MATERIAL_MONITORED",
+            "materiality_verdict": "MATERIAL_CYBERSECURITY_INCIDENT"
+            if is_material
+            else "NON_MATERIAL_MONITORED",
             "declared_at": now,
             "status": "ACTIVE_INVESTIGATION_WAR_ROOM",
             "deadlines": {
                 "SEC_8K_DAYS_REMAINING": 4,
                 "NIS2_EARLY_WARNING_HOURS": 24,
-                "GDPR_DPA_HOURS_REMAINING": 72
-            }
+                "GDPR_DPA_HOURS_REMAINING": 72,
+            },
         }
 
         self._incidents[incident_id] = inc_entry
@@ -77,7 +84,7 @@ class RegulatoryIncidentCommander:
         self,
         incident_id: str,
         registrant_name: str = "SageAI Sovereign Enterprise Corp",
-        cik_number: str = "0001984210"
+        cik_number: str = "0001984210",
     ) -> Dict[str, Any]:
         """Drafts an SEC Form 8-K Item 1.05 Material Cybersecurity Incident disclosure."""
         inc = self._incidents.get(incident_id)
@@ -91,24 +98,24 @@ class RegulatoryIncidentCommander:
 WASHINGTON, D.C. 20549
 FORM 8-K
 CURRENT REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
-Date of Report: {time.strftime('%B %d, %Y', time.gmtime(now))}
+Date of Report: {time.strftime("%B %d, %Y", time.gmtime(now))}
 
 Commission File Number: 001-99812
 Exact Name of Registrant: {registrant_name}
 CIK Number: {cik_number}
 
 Item 1.05 Material Cybersecurity Incidents.
-On {time.strftime('%B %d, %Y', time.gmtime(inc['declared_at']))}, {registrant_name} (the "Company") determined that it experienced a cybersecurity incident involving unauthorized access to portions of its cloud environment ({", ".join(inc['impacted_systems'])}).
+On {time.strftime("%B %d, %Y", time.gmtime(inc["declared_at"]))}, {registrant_name} (the "Company") determined that it experienced a cybersecurity incident involving unauthorized access to portions of its cloud environment ({", ".join(inc["impacted_systems"])}).
 
 Nature and Scope:
-Promptly upon detection, the Company activated its incident response protocols with the SageAI Autonomous Sovereign Defense Grid, quarantined impacted network enclaves, and engaged external legal and forensic advisors. The incident involved access to an estimated {inc['records_compromised']:,} records.
+Promptly upon detection, the Company activated its incident response protocols with the SageAI Autonomous Sovereign Defense Grid, quarantined impacted network enclaves, and engaged external legal and forensic advisors. The incident involved access to an estimated {inc["records_compromised"]:,} records.
 
 Material Impact Assessment:
 As of the date of this filing, the Company has successfully contained the unauthorized access. The incident has not resulted in a material impact on the Company's financial condition or results of operations, though technical containment and system hardening continue.
 
 SIGNATURES
 Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized.
-Dated: {time.strftime('%Y-%m-%d', time.gmtime(now))}
+Dated: {time.strftime("%Y-%m-%d", time.gmtime(now))}
 By: /s/ Chief Legal Officer & CISO
 """
 
@@ -120,7 +127,7 @@ By: /s/ Chief Legal Officer & CISO
             "cik": cik_number,
             "filing_body": filing_body,
             "statutory_deadline_met": True,
-            "generated_at": now
+            "generated_at": now,
         }
         self._filings[filing_id] = filing_entry
         return filing_entry
@@ -128,7 +135,7 @@ By: /s/ Chief Legal Officer & CISO
     def generate_nis2_early_warning(
         self,
         incident_id: str,
-        member_state_csirt: str = "BSI (Germany) / ANSSI (France)"
+        member_state_csirt: str = "BSI (Germany) / ANSSI (France)",
     ) -> Dict[str, Any]:
         """Drafts an EU NIS2 Directive Article 23 Early Warning Notice (24-hour statutory deadline)."""
         inc = self._incidents.get(incident_id)
@@ -145,7 +152,7 @@ By: /s/ Chief Legal Officer & CISO
             "severity_classification": "SIGNIFICANT_INCIDENT",
             "hours_since_detection": round((now - inc["declared_at"]) / 3600.0, 1),
             "deadline_compliance": "COMPLIANT_WITHIN_24_HOURS",
-            "initial_containment_measures": "Autonomous eBPF microsegmentation & key rotation executed."
+            "initial_containment_measures": "Autonomous eBPF microsegmentation & key rotation executed.",
         }
 
     def get_ciso_executive_brief(self, incident_id: str) -> Dict[str, Any]:
@@ -162,17 +169,21 @@ By: /s/ Chief Legal Officer & CISO
             "legal_privilege_marking": "ATTORNEY-CLIENT PRIVILEGED & CONFIDENTIAL // WORK PRODUCT",
             "estimated_financial_exposure": f"${inc['records_compromised'] * 165:,} USD (IBM Ponemon Cost of Data Breach Formula)",
             "containment_status": inc["status"],
-            "regulatory_filing_status": "DRAFTS_GENERATED_PENDING_GENERAL_COUNSEL_SIGN"
+            "regulatory_filing_status": "DRAFTS_GENERATED_PENDING_GENERAL_COUNSEL_SIGN",
         }
 
     def get_commander_metrics(self) -> Dict[str, Any]:
         """Aggregates active war room statistics and regulatory compliance metrics."""
         return {
             "total_incidents_managed": len(self._incidents),
-            "material_incidents_active": sum(1 for i in self._incidents.values() if "MATERIAL" in i.get("materiality_verdict", "")),
+            "material_incidents_active": sum(
+                1
+                for i in self._incidents.values()
+                if "MATERIAL" in i.get("materiality_verdict", "")
+            ),
             "sec_8k_disclosures_drafted": len(self._filings),
             "nis2_compliance_rate": "100.0%",
-            "mean_time_to_regulatory_draft_minutes": 12.4
+            "mean_time_to_regulatory_draft_minutes": 12.4,
         }
 
 

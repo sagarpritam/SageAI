@@ -15,16 +15,25 @@ router = APIRouter(prefix="/ai-spm", tags=["AI Security Posture Management (AI-S
 
 
 class InspectPromptRequest(BaseModel):
-    prompt: str = Field(..., description="Raw prompt to inspect for injection, jailbreak, or sensitive data")
+    prompt: str = Field(
+        ...,
+        description="Raw prompt to inspect for injection, jailbreak, or sensitive data",
+    )
 
 
 class AuditRAGRequest(BaseModel):
-    documents: Optional[List[Dict[str, Any]]] = Field(None, description="Custom RAG chunks to scan for poisoning")
+    documents: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Custom RAG chunks to scan for poisoning"
+    )
 
 
 class AuditPipelineRequest(BaseModel):
-    pipeline_name: Optional[str] = Field("Enterprise-Agent-Pipeline", description="Target agent pipeline name")
-    tools_enabled: Optional[List[str]] = Field(None, description="List of tool names enabled in agentic loop")
+    pipeline_name: Optional[str] = Field(
+        "Enterprise-Agent-Pipeline", description="Target agent pipeline name"
+    )
+    tools_enabled: Optional[List[str]] = Field(
+        None, description="List of tool names enabled in agentic loop"
+    )
 
 
 @router.post("/inspect-prompt")
@@ -64,4 +73,3 @@ async def audit_pipeline_endpoint(
         tools_enabled=payload.tools_enabled,
     )
     return {"status": "success", "pipeline_audit": res}
-

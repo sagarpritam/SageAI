@@ -2,7 +2,7 @@
 Tests for Pillar I: Multi-AI Council Telemetry and Deterministic Sandbox AST Taint Verifier.
 """
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -10,19 +10,23 @@ from app.services.llm.consensus_engine import MultiAIConsensusEngine
 from app.services.llm.council_telemetry import CouncilModelTelemetry
 from app.services.llm.sandbox_verifier import SandboxTaintVerifier
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. Council Telemetry Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_council_telemetry_metrics_and_health():
     telemetry = CouncilModelTelemetry()
 
     # Record normal latency responses
     for _ in range(5):
-        telemetry.record_call("anthropic", latency_ms=210.0, success=True, tokens_used=120)
+        telemetry.record_call(
+            "anthropic", latency_ms=210.0, success=True, tokens_used=120
+        )
     for _ in range(5):
-        telemetry.record_call("deepseek", latency_ms=180.0, success=True, tokens_used=300)
+        telemetry.record_call(
+            "deepseek", latency_ms=180.0, success=True, tokens_used=300
+        )
 
     anthropic_health = telemetry.get_provider_health("anthropic")
     assert anthropic_health["status"] == "HEALTHY"
@@ -38,6 +42,7 @@ def test_council_telemetry_metrics_and_health():
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. Deterministic Sandbox AST Taint Verifier Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_sandbox_ast_taint_sqli_detected():
     verifier = SandboxTaintVerifier()
@@ -108,6 +113,7 @@ def test_sandbox_probe_response_verification():
 # 3. Consensus Engine with Deterministic Sandbox
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_consensus_with_deterministic_sandbox_proof():
     mock_gateway = AsyncMock()
@@ -134,4 +140,3 @@ cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
     assert res["deterministic_sandbox"]["deterministic_proof"] is True
     assert res["consensus"]["consensus_verdict"] == "CONFIRMED_EXPLOITABLE"
     assert res["consensus"]["confidence_score"] >= 95
-

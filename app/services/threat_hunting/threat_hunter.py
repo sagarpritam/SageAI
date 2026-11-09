@@ -26,7 +26,15 @@ HUNT_TEMPLATES = [
         "hypothesis": "Adversaries executing certutil, mshta, or powershell with encoded commands to bypass endpoint inspection.",
         "mitre_technique": "T1059.001 - PowerShell",
         "severity": "HIGH",
-        "keywords": ["powershell", "pwsh", "-enc", "-encodedcommand", "certutil", "mshta", "rundll32"],
+        "keywords": [
+            "powershell",
+            "pwsh",
+            "-enc",
+            "-encodedcommand",
+            "certutil",
+            "mshta",
+            "rundll32",
+        ],
     },
     {
         "id": "HUNT-02-C2-BEACON",
@@ -77,10 +85,16 @@ class ThreatHunterService:
         - Elastic EQL
         """
         hypothesis_lower = hypothesis.lower()
-        extracted_terms = [word for word in re.findall(r"\b[a-zA-Z0-9_\-\.]{3,}\b", hypothesis_lower) if word not in ("the", "and", "for", "with", "from", "that", "this")]
+        extracted_terms = [
+            word
+            for word in re.findall(r"\b[a-zA-Z0-9_\-\.]{3,}\b", hypothesis_lower)
+            if word not in ("the", "and", "for", "with", "from", "that", "this")
+        ]
 
         primary_term = extracted_terms[0] if extracted_terms else "suspicious_process"
-        secondary_term = extracted_terms[1] if len(extracted_terms) > 1 else "external_connection"
+        secondary_term = (
+            extracted_terms[1] if len(extracted_terms) > 1 else "external_connection"
+        )
 
         rule_id = f"sigma-{hashlib.md5(hypothesis.encode()).hexdigest()[:8]}"
 
@@ -92,7 +106,7 @@ description: Proactive hunt rule synthesized from hypothesis: "{hypothesis}"
 references:
     - https://attack.mitre.org/techniques/T1059/
 author: SageAI Autonomous Threat Hunter
-date: {datetime.now(timezone.utc).strftime('%Y/%m/%d')}
+date: {datetime.now(timezone.utc).strftime("%Y/%m/%d")}
 logsource:
     category: process_creation
     product: windows
@@ -173,27 +187,48 @@ DeviceProcessEvents
             event_text = " ".join(str(v) for v in event.values()).lower()
             match_count = sum(1 for ind in indicators if ind in event_text)
 
-            if match_count >= 2 or any(k in event_text for k in ["setns", "-enc", "vssadmin", "c2_beacon", "escape"]):
-                hits.append({
-                    "event_id": event.get("id", f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}"),
-                    "matched_indicators": [ind for ind in indicators if ind in event_text],
-                    "confidence": 0.95,
-                    "event_data": event,
-                    "verdict": "CONFIRMED_THREAT_HIT",
-                })
+            if match_count >= 2 or any(
+                k in event_text
+                for k in ["setns", "-enc", "vssadmin", "c2_beacon", "escape"]
+            ):
+                hits.append(
+                    {
+                        "event_id": event.get(
+                            "id",
+                            f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}",
+                        ),
+                        "matched_indicators": [
+                            ind for ind in indicators if ind in event_text
+                        ],
+                        "confidence": 0.95,
+                        "event_data": event,
+                        "verdict": "CONFIRMED_THREAT_HIT",
+                    }
+                )
             elif match_count == 1:
-                suspicious.append({
-                    "event_id": event.get("id", f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}"),
-                    "matched_indicators": [ind for ind in indicators if ind in event_text],
-                    "confidence": 0.70,
-                    "event_data": event,
-                    "verdict": "SUSPICIOUS_ANOMALY",
-                })
+                suspicious.append(
+                    {
+                        "event_id": event.get(
+                            "id",
+                            f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}",
+                        ),
+                        "matched_indicators": [
+                            ind for ind in indicators if ind in event_text
+                        ],
+                        "confidence": 0.70,
+                        "event_data": event,
+                        "verdict": "SUSPICIOUS_ANOMALY",
+                    }
+                )
             else:
                 benign_count += 1
 
         total_analyzed = len(telemetry_events)
-        hunt_verdict = "THREATS_DETECTED" if hits else ("ANOMALIES_OBSERVED" if suspicious else "CLEAN_BASELINE")
+        hunt_verdict = (
+            "THREATS_DETECTED"
+            if hits
+            else ("ANOMALIES_OBSERVED" if suspicious else "CLEAN_BASELINE")
+        )
 
         # Anchor in Merkle chain
         audit_record = audit_chain.record_action(
@@ -232,4 +267,3 @@ DeviceProcessEvents
 
 # Global singleton
 threat_hunter_service = ThreatHunterService()
-

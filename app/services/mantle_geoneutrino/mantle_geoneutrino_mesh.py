@@ -118,30 +118,42 @@ class DeepMantleGeoneutrinoMesh:
         u_flux = round(32.5 + random.uniform(-1.5, 2.8), 2)
         th_flux = round(8.4 + random.uniform(-0.6, 0.9), 2)
         u_th_ratio = round(u_flux / max(0.1, th_flux), 2)
-        heat_flux_tw = round(21.4 + random.uniform(-0.8, 1.2), 1)  # Earth radiogenic heat ~20-25 TW
+        heat_flux_tw = round(
+            21.4 + random.uniform(-0.8, 1.2), 1
+        )  # Earth radiogenic heat ~20-25 TW
 
-        is_caldera = "YELLOWSTONE" in region_label.upper() or "TOBA" in region_label.upper() or "CAMPANIA" in region_label.upper()
+        is_caldera = (
+            "YELLOWSTONE" in region_label.upper()
+            or "TOBA" in region_label.upper()
+            or "CAMPANIA" in region_label.upper()
+        )
 
         plumes = []
         if is_caldera:
-            plumes.append({
-                "plume_id": f"PLUME-{random.randint(100, 999)}",
-                "classification": "ASCENDING_THERMAL_MANTLE_SUPERPLUME",
-                "core_origin_depth_km": depth_target_km,
-                "magma_ascent_velocity_cm_yr": 18.5,
-                "convective_heat_anomaly_mw_m2": 450.0,
-                "estimated_caldera_overpressure_mpa": 14.2,
-                "risk_tier": "ELEVATED_WATCH",
-            })
+            plumes.append(
+                {
+                    "plume_id": f"PLUME-{random.randint(100, 999)}",
+                    "classification": "ASCENDING_THERMAL_MANTLE_SUPERPLUME",
+                    "core_origin_depth_km": depth_target_km,
+                    "magma_ascent_velocity_cm_yr": 18.5,
+                    "convective_heat_anomaly_mw_m2": 450.0,
+                    "estimated_caldera_overpressure_mpa": 14.2,
+                    "risk_tier": "ELEVATED_WATCH",
+                }
+            )
             overpressure_status = "CRITICAL_CONVECTIVE_OVERPRESSURE_DETECTED"
-            days_to_breach = round(random.uniform(45.0, 95.0), 1)  # > 30 days predictive margin
+            days_to_breach = round(
+                random.uniform(45.0, 95.0), 1
+            )  # > 30 days predictive margin
             confidence = 97.8
         else:
             overpressure_status = "NOMINAL_STABLE_CONVECTION"
             days_to_breach = None
             confidence = 94.2
 
-        inv_id = f"GEON-INV-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        inv_id = (
+            f"GEON-INV-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         inversion = MantleTomographyInversion(
             inversion_id=inv_id,
             observatories_participating=obs_ids,
@@ -176,7 +188,9 @@ class DeepMantleGeoneutrinoMesh:
         }
 
     def get_mesh_metrics(self) -> Dict[str, Any]:
-        total_ktons = sum([o.scintillator_mass_ktons for o in self.observatories.values()])
+        total_ktons = sum(
+            [o.scintillator_mass_ktons for o in self.observatories.values()]
+        )
         return {
             "active_geoneutrino_observatories": len(self.observatories),
             "total_scintillator_mass_ktons": total_ktons,
@@ -188,4 +202,3 @@ class DeepMantleGeoneutrinoMesh:
 
 
 deep_mantle_geoneutrino_mesh = DeepMantleGeoneutrinoMesh()
-

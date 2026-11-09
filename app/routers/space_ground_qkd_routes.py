@@ -19,12 +19,19 @@ router = APIRouter(
 
 class EvaluateQBERRequest(BaseModel):
     link_id: str = Field(..., description="Target space-ground quantum link identifier")
-    measured_qber_pct: float = Field(..., description="Measured Quantum Bit Error Rate percentage")
-    photon_coincidence_window_ns: float = Field(1.2, description="Coincidence resolution window in nanoseconds")
+    measured_qber_pct: float = Field(
+        ..., description="Measured Quantum Bit Error Rate percentage"
+    )
+    photon_coincidence_window_ns: float = Field(
+        1.2, description="Coincidence resolution window in nanoseconds"
+    )
 
 
 class EntanglementSwapRequest(BaseModel):
-    link_id: str = Field(..., description="Target link to execute Bell-State Measurement entanglement swap")
+    link_id: str = Field(
+        ...,
+        description="Target link to execute Bell-State Measurement entanglement swap",
+    )
 
 
 @router.get("/links")
@@ -93,4 +100,3 @@ async def get_qkd_metrics_endpoint(
 ):
     """Returns space-ground quantum key distribution fleet metrics."""
     return {"status": "success", "metrics": space_ground_qkd_mesh.get_qkd_metrics()}
-

@@ -65,7 +65,7 @@ async def inspect_packet_endpoint(
             function_code=payload.function_code,
             target_register=payload.target_register,
             requested_value=payload.requested_value,
-            protocol=payload.protocol or "MODBUS_TCP"
+            protocol=payload.protocol or "MODBUS_TCP",
         )
         return {"status": "success", "inspection": res}
     except ValueError as e:
@@ -80,4 +80,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves ICS/SCADA micro-firewall telemetry and clamped threats."""
     return {"status": "success", "metrics": industrial_kinetic_shield.get_metrics()}
-

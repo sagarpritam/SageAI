@@ -20,8 +20,12 @@ router = APIRouter(
 
 
 class LaunchHuntRequest(BaseModel):
-    hunt_topic: Optional[str] = Field(None, description="Topic or technique name to hunt")
-    hypothesis_focus: Optional[str] = Field(None, description="Custom hypothesis or Sigma rule focus")
+    hunt_topic: Optional[str] = Field(
+        None, description="Topic or technique name to hunt"
+    )
+    hypothesis_focus: Optional[str] = Field(
+        None, description="Custom hypothesis or Sigma rule focus"
+    )
 
 
 class ExecuteHuntActionRequest(BaseModel):
@@ -36,7 +40,10 @@ async def list_hunts_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Lists all active and completed threat hunts."""
-    return {"status": "success", "hunts": threat_hunting_swarm_service.list_active_hunts()}
+    return {
+        "status": "success",
+        "hunts": threat_hunting_swarm_service.list_active_hunts(),
+    }
 
 
 @router.post("/launch")
@@ -70,4 +77,3 @@ async def execute_hunt_action_endpoint(
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-

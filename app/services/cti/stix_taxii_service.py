@@ -37,7 +37,12 @@ STANDARD_THREAT_ACTORS = [
         "origin": "DPRK (Reconnaissance General Bureau)",
         "primary_motivation": "FINANCIAL_AND_ESPIONAGE",
         "sophistication": "EXPERT",
-        "targeted_sectors": ["Cryptocurrency", "Financial Services", "Defense", "Critical Infrastructure"],
+        "targeted_sectors": [
+            "Cryptocurrency",
+            "Financial Services",
+            "Defense",
+            "Critical Infrastructure",
+        ],
         "known_tools": ["Brambul", "Joanap", "Fallchill", "AppleJeus"],
         "mitre_techniques": ["T1190", "T1027", "T1048", "T1486"],
     },
@@ -48,7 +53,12 @@ STANDARD_THREAT_ACTORS = [
         "origin": "Transnational Cybercrime Syndicate",
         "primary_motivation": "EXTORTION_AND_DATA_THEFT",
         "sophistication": "EXPERT",
-        "targeted_sectors": ["Telecommunications", "Technology", "Identity Providers", "Retail"],
+        "targeted_sectors": [
+            "Telecommunications",
+            "Technology",
+            "Identity Providers",
+            "Retail",
+        ],
         "known_tools": ["Sliver", "Mimikatz", "AnyDesk", "Ngrok"],
         "mitre_techniques": ["T1589", "T1556", "T1078.004", "T1562"],
     },
@@ -95,8 +105,17 @@ class StixTaxiiService:
         now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         # Find or create threat actor
-        matched_actor = next((a for a in STANDARD_THREAT_ACTORS if actor_name.lower() in a["name"].lower()), None)
-        actor_id = matched_actor["id"] if matched_actor else f"threat-actor--{uuid.uuid4()}"
+        matched_actor = next(
+            (
+                a
+                for a in STANDARD_THREAT_ACTORS
+                if actor_name.lower() in a["name"].lower()
+            ),
+            None,
+        )
+        actor_id = (
+            matched_actor["id"] if matched_actor else f"threat-actor--{uuid.uuid4()}"
+        )
 
         stix_objects: List[Dict[str, Any]] = [
             {
@@ -107,8 +126,14 @@ class StixTaxiiService:
                 "modified": now_iso,
                 "name": matched_actor["name"] if matched_actor else actor_name,
                 "description": f"Attributed threat actor for campaign '{campaign_name}'.",
-                "threat_actor_types": ["nation-state" if "APT" in actor_name or "Lazarus" in actor_name else "cybercrime-syndicate"],
-                "aliases": matched_actor.get("aliases", [actor_name]) if matched_actor else [actor_name],
+                "threat_actor_types": [
+                    "nation-state"
+                    if "APT" in actor_name or "Lazarus" in actor_name
+                    else "cybercrime-syndicate"
+                ],
+                "aliases": matched_actor.get("aliases", [actor_name])
+                if matched_actor
+                else [actor_name],
             }
         ]
 
@@ -193,7 +218,9 @@ class StixTaxiiService:
         Parses an ingested STIX 2.1 bundle into normalized security intelligence.
         """
         if bundle.get("type") != "bundle" or "objects" not in bundle:
-            raise ValueError("Invalid STIX 2.1 bundle: missing root 'bundle' type or 'objects' array.")
+            raise ValueError(
+                "Invalid STIX 2.1 bundle: missing root 'bundle' type or 'objects' array."
+            )
 
         indicators: List[Dict[str, Any]] = []
         threat_actors: List[Dict[str, Any]] = []
@@ -202,25 +229,31 @@ class StixTaxiiService:
         for obj in bundle.get("objects", []):
             obj_type = obj.get("type")
             if obj_type == "indicator":
-                indicators.append({
-                    "id": obj.get("id"),
-                    "name": obj.get("name"),
-                    "pattern": obj.get("pattern"),
-                    "created": obj.get("created"),
-                })
+                indicators.append(
+                    {
+                        "id": obj.get("id"),
+                        "name": obj.get("name"),
+                        "pattern": obj.get("pattern"),
+                        "created": obj.get("created"),
+                    }
+                )
             elif obj_type == "threat-actor":
-                threat_actors.append({
-                    "id": obj.get("id"),
-                    "name": obj.get("name"),
-                    "aliases": obj.get("aliases", []),
-                    "types": obj.get("threat_actor_types", []),
-                })
+                threat_actors.append(
+                    {
+                        "id": obj.get("id"),
+                        "name": obj.get("name"),
+                        "aliases": obj.get("aliases", []),
+                        "types": obj.get("threat_actor_types", []),
+                    }
+                )
             elif obj_type == "relationship":
-                relationships.append({
-                    "relationship_type": obj.get("relationship_type"),
-                    "source_ref": obj.get("source_ref"),
-                    "target_ref": obj.get("target_ref"),
-                })
+                relationships.append(
+                    {
+                        "relationship_type": obj.get("relationship_type"),
+                        "source_ref": obj.get("source_ref"),
+                        "target_ref": obj.get("target_ref"),
+                    }
+                )
 
         return {
             "status": "PARSED",
@@ -272,4 +305,3 @@ class StixTaxiiService:
 
 # Global singleton
 cti_service = StixTaxiiService()
-

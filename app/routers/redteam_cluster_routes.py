@@ -8,11 +8,15 @@ from app.services.autonomous_redteam import (
     autonomous_redteam_daemon,
 )
 
-router = APIRouter(prefix="/api/redteam-cluster", tags=["Autonomous Red-Team Cluster (Option B)"])
+router = APIRouter(
+    prefix="/api/redteam-cluster", tags=["Autonomous Red-Team Cluster (Option B)"]
+)
 
 
 class LaunchCampaignRequest(BaseModel):
-    target_domains: Optional[List[str]] = Field(default=None, example=["ORBITAL_PNT", "QUANTUM_NETWORK", "PLASMA_SHIELD"])
+    target_domains: Optional[List[str]] = Field(
+        default=None, example=["ORBITAL_PNT", "QUANTUM_NETWORK", "PLASMA_SHIELD"]
+    )
     intensity: float = Field(default=0.85, ge=0.1, le=1.0)
     target_capabilities_count: int = Field(default=79, ge=1, le=100)
 
@@ -39,8 +43,12 @@ async def launch_campaign(req: LaunchCampaignRequest) -> Dict[str, Any]:
 
 
 @router.post("/daemon/start")
-async def start_daemon(req: DaemonStartRequest = DaemonStartRequest()) -> Dict[str, Any]:
-    return autonomous_redteam_daemon.start_daemon(cycle_interval_seconds=req.cycle_interval_seconds)
+async def start_daemon(
+    req: DaemonStartRequest = DaemonStartRequest(),
+) -> Dict[str, Any]:
+    return autonomous_redteam_daemon.start_daemon(
+        cycle_interval_seconds=req.cycle_interval_seconds
+    )
 
 
 @router.post("/daemon/stop")

@@ -26,7 +26,7 @@ class IndustrialKineticShield:
                 "safe_min": 50.0,
                 "safe_max": 350.0,
                 "critical_rupture_threshold": 400.0,
-                "action_on_violation": "ACTUATOR_CLAMP_AND_RELIEF_VENT"
+                "action_on_violation": "ACTUATOR_CLAMP_AND_RELIEF_VENT",
             },
             "TURBINE_ROTATION_RPM": {
                 "metric": "Centrifuge / Turbine Rotation",
@@ -34,7 +34,7 @@ class IndustrialKineticShield:
                 "safe_min": 1200.0,
                 "safe_max": 3600.0,
                 "critical_rupture_threshold": 4200.0,
-                "action_on_violation": "IMMEDIATE_GOVERNOR_CLAMP"
+                "action_on_violation": "IMMEDIATE_GOVERNOR_CLAMP",
             },
             "WATER_LYE_PH_LEVEL": {
                 "metric": "Municipal Water Treatment Lye (NaOH)",
@@ -42,7 +42,7 @@ class IndustrialKineticShield:
                 "safe_min": 6.8,
                 "safe_max": 7.8,
                 "critical_rupture_threshold": 9.5,
-                "action_on_violation": "DOSING_SOLENOID_HARDWARE_LOCKOUT"
+                "action_on_violation": "DOSING_SOLENOID_HARDWARE_LOCKOUT",
             },
             "SUBSTATION_GRID_FREQ_HZ": {
                 "metric": "Power Grid Synchronization Frequency",
@@ -50,8 +50,8 @@ class IndustrialKineticShield:
                 "safe_min": 59.5,
                 "safe_max": 60.5,
                 "critical_rupture_threshold": 62.0,
-                "action_on_violation": "ISLAND_BREAKER_INTERLOCK"
-            }
+                "action_on_violation": "ISLAND_BREAKER_INTERLOCK",
+            },
         }
 
     def _init_monitored_plcs(self):
@@ -66,7 +66,7 @@ class IndustrialKineticShield:
                 "enforced_envelope": "TURBINE_ROTATION_RPM",
                 "current_telemetry": {"RPM": 3200.0, "vibration_mm_s": 1.2},
                 "status": "PROTECTED_ACTIVE",
-                "threats_clamped": 14
+                "threats_clamped": 14,
             },
             {
                 "plc_id": "plc-water-pumping-03",
@@ -77,7 +77,7 @@ class IndustrialKineticShield:
                 "enforced_envelope": "WATER_LYE_PH_LEVEL",
                 "current_telemetry": {"pH": 7.2, "flow_gpm": 450.0},
                 "status": "PROTECTED_ACTIVE",
-                "threats_clamped": 6
+                "threats_clamped": 6,
             },
             {
                 "plc_id": "plc-grid-substation-88",
@@ -88,8 +88,8 @@ class IndustrialKineticShield:
                 "enforced_envelope": "SUBSTATION_GRID_FREQ_HZ",
                 "current_telemetry": {"Hz": 60.01, "megawatts": 240.5},
                 "status": "PROTECTED_ACTIVE",
-                "threats_clamped": 2
-            }
+                "threats_clamped": 2,
+            },
         ]
 
         for p in default_plcs:
@@ -109,7 +109,7 @@ class IndustrialKineticShield:
         function_code: int,
         target_register: int,
         requested_value: float,
-        protocol: str = "MODBUS_TCP"
+        protocol: str = "MODBUS_TCP",
     ) -> Dict[str, Any]:
         """Performs deep packet inspection and physical kinetic safety clamp enforcement."""
         plc = self._plcs.get(plc_id)
@@ -142,12 +142,14 @@ class IndustrialKineticShield:
                 "clamped_value": requested_value,
                 "safety_envelope": envelope_key,
                 "clamped": False,
-                "timestamp": now
+                "timestamp": now,
             }
 
         # Attack or dangerous setpoint detected: Enforce Actuator Safety Clamp
         plc["threats_clamped"] += 1
-        clamped_value = min(envelope["safe_max"], max(envelope["safe_min"], requested_value))
+        clamped_value = min(
+            envelope["safe_max"], max(envelope["safe_min"], requested_value)
+        )
         if requested_value > envelope["safe_max"]:
             clamped_value = envelope["safe_max"]
         elif requested_value < envelope["safe_min"]:
@@ -163,7 +165,7 @@ class IndustrialKineticShield:
             "function_code": function_code,
             "requested_value": requested_value,
             "enforced_clamp_value": clamped_value,
-            "action_taken": envelope["action_on_violation"]
+            "action_taken": envelope["action_on_violation"],
         }
         self._incident_log.append(incident)
 
@@ -178,7 +180,7 @@ class IndustrialKineticShield:
             "clamped": True,
             "severity": "CRITICAL" if is_critical else "HIGH",
             "action_taken": envelope["action_on_violation"],
-            "timestamp": now
+            "timestamp": now,
         }
 
     def get_metrics(self) -> Dict[str, Any]:
@@ -190,11 +192,14 @@ class IndustrialKineticShield:
             "active_safety_envelopes": len(self._safety_envelopes),
             "kinetic_attacks_neutralized": total_clamped,
             "micro_firewall_inspection_latency_us": 420,
-            "supported_ot_protocols": ["Modbus TCP (502)", "DNP3 (20000)", "IEC 60870-5-104 (2404)"],
-            "physical_actuator_clamping_state": "FAIL_SAFE_ENGAGED"
+            "supported_ot_protocols": [
+                "Modbus TCP (502)",
+                "DNP3 (20000)",
+                "IEC 60870-5-104 (2404)",
+            ],
+            "physical_actuator_clamping_state": "FAIL_SAFE_ENGAGED",
         }
 
 
 # Global singleton instance
 industrial_kinetic_shield = IndustrialKineticShield()
-

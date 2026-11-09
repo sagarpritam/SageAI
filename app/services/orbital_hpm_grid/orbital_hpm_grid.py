@@ -19,7 +19,9 @@ class HPMSatelliteNode:
     satellite_name: str
     orbit_type: str  # "LEO_TACTICAL_ORBIT", "MEO_STRATEGIC_CONSTELLATION", "POLAR_FAST_RESPONSE"
     altitude_km: float
-    microwave_source_type: str  # "RELATIVISTIC_MAGNETRON", "VIRTUAL_CATHODE_OSCILLATOR_VIRCATOR"
+    microwave_source_type: (
+        str  # "RELATIVISTIC_MAGNETRON", "VIRTUAL_CATHODE_OSCILLATOR_VIRCATOR"
+    )
     center_frequency_ghz: float  # 1.3 GHz (L-band), 2.8 GHz (S-band)
     peak_pulse_power_gw: float = 2.2  # 2.2 Gigawatts
     pulse_rise_time_ns: float = 0.75  # 750 picoseconds
@@ -149,11 +151,17 @@ class OrbitalHPMDirectedEnergyGrid:
         # Beam diffraction footprint diameter: d_footprint = 1.22 * lambda * R / D
         wavelength = self.SPEED_OF_LIGHT / (sat.center_frequency_ghz * 1e9)
         range_m = sat.altitude_km * 1000.0
-        footprint_m = round(1.22 * wavelength * range_m / sat.antenna_aperture_diameter_m, 1)
+        footprint_m = round(
+            1.22 * wavelength * range_m / sat.antenna_aperture_diameter_m, 1
+        )
 
         # Induced voltage on victim traces
-        induced_v = round(3200.0 * (sat.peak_pulse_power_gw / 2.0) * random.uniform(0.95, 1.05), 1)
-        coupling_attenuation_db = 14.5 if target_category == "C4ISR_BUNKER_ELECTRONICS" else 6.2
+        induced_v = round(
+            3200.0 * (sat.peak_pulse_power_gw / 2.0) * random.uniform(0.95, 1.05), 1
+        )
+        coupling_attenuation_db = (
+            14.5 if target_category == "C4ISR_BUNKER_ELECTRONICS" else 6.2
+        )
 
         discharge_id = f"HPM-FIRE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         res = HPMPulseDischargeResult(
@@ -202,4 +210,3 @@ class OrbitalHPMDirectedEnergyGrid:
 
 
 orbital_hpm_grid = OrbitalHPMDirectedEnergyGrid()
-

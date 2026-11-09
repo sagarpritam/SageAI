@@ -140,7 +140,9 @@ class MultiAgentOrchestrator:
         t0 = datetime.now(timezone.utc)
         logger.info("[MultiAgent] Phase 3: DeepAnalysisAgent starting")
         try:
-            deep_result = await self.deep_analysis_agent.run(target, findings=all_findings)
+            deep_result = await self.deep_analysis_agent.run(
+                target, findings=all_findings
+            )
             deep_findings = deep_result.get("findings", [])
             all_findings.extend(deep_findings)
         except Exception as e:
@@ -167,7 +169,9 @@ class MultiAgentOrchestrator:
         malware_inspections = []
         try:
             # Synthetic inspection of target domain perimeter artifacts
-            perimeter_bytes = f"TargetDomain: {target}\nScanContext: {scan_context}".encode("utf-8")
+            perimeter_bytes = (
+                f"TargetDomain: {target}\nScanContext: {scan_context}".encode("utf-8")
+            )
             sample_analysis = self.malware_analyzer.analyze_bytes(
                 perimeter_bytes, filename=f"{target}_perimeter.log"
             )

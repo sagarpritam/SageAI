@@ -62,7 +62,7 @@ class NeuralTriageEngine:
         for alert in raw_alerts:
             source_ip = alert.get("source_ip", "0.0.0.0")
             target_asset = alert.get("target_asset", "unknown_host")
-            alert_type = alert.get("type", alert.get("category", "generic_alert"))
+            alert.get("type", alert.get("category", "generic_alert"))
 
             # Cluster key combines source entity, target asset, and vector class
             cluster_key = f"{source_ip}::{target_asset}"
@@ -74,21 +74,28 @@ class NeuralTriageEngine:
         incidents: List[Dict[str, Any]] = []
         tier_counts = {"tier_1": 0, "tier_2": 0, "tier_3": 0}
 
-        for idx, (cluster_key, alerts_in_cluster) in enumerate(clusters.items()):
+        for _idx, (cluster_key, alerts_in_cluster) in enumerate(clusters.items()):
             source_ip, target_asset = cluster_key.split("::")
-            alert_types = list(set(a.get("type", a.get("category", "alert")) for a in alerts_in_cluster))
-            severities = [a.get("severity", "MEDIUM").upper() for a in alerts_in_cluster]
+            alert_types = list(
+                {a.get("type", a.get("category", "alert")) for a in alerts_in_cluster}
+            )
+            severities = [
+                a.get("severity", "MEDIUM").upper() for a in alerts_in_cluster
+            ]
 
             # Determine Tier
-            is_critical = any(
-                s in ("CRITICAL", "HIGH")
-                for s in severities
-            ) or any(
+            is_critical = any(s in ("CRITICAL", "HIGH") for s in severities) or any(
                 keyword in " ".join(alert_types).lower()
                 for keyword in [
-                    "escape", "canary", "honeytoken", "exfiltration",
-                    "ransomware", "unauthorized_pqc", "tamper", "zero_egress",
-                    "privilege_escalation"
+                    "escape",
+                    "canary",
+                    "honeytoken",
+                    "exfiltration",
+                    "ransomware",
+                    "unauthorized_pqc",
+                    "tamper",
+                    "zero_egress",
+                    "privilege_escalation",
                 ]
             )
 
@@ -114,30 +121,44 @@ class NeuralTriageEngine:
                 confidence = 0.89
 
             # Synthesize Root-Cause Hypothesis
-            hypothesis = self._generate_hypothesis(source_ip, target_asset, alert_types, tier)
+            hypothesis = self._generate_hypothesis(
+                source_ip, target_asset, alert_types, tier
+            )
 
-            incident_id = f"INC-SOC-{hashlib.md5(cluster_key.encode()).hexdigest()[:8].upper()}"
+            incident_id = (
+                f"INC-SOC-{hashlib.md5(cluster_key.encode()).hexdigest()[:8].upper()}"
+            )
 
-            incidents.append({
-                "incident_id": incident_id,
-                "cluster_key": cluster_key,
-                "source_ip": source_ip,
-                "target_asset": target_asset,
-                "aggregated_alert_count": len(alerts_in_cluster),
-                "distinct_attack_vectors": alert_types,
-                "triage_tier": tier,
-                "confidence_score": confidence,
-                "recommended_action": recommended_action,
-                "root_cause_hypothesis": hypothesis,
-                "mitre_tactics": self._map_to_mitre_tactics(alert_types),
-                "first_seen": alerts_in_cluster[0].get("timestamp", datetime.now(timezone.utc).isoformat()),
-                "last_seen": alerts_in_cluster[-1].get("timestamp", datetime.now(timezone.utc).isoformat()),
-            })
+            incidents.append(
+                {
+                    "incident_id": incident_id,
+                    "cluster_key": cluster_key,
+                    "source_ip": source_ip,
+                    "target_asset": target_asset,
+                    "aggregated_alert_count": len(alerts_in_cluster),
+                    "distinct_attack_vectors": alert_types,
+                    "triage_tier": tier,
+                    "confidence_score": confidence,
+                    "recommended_action": recommended_action,
+                    "root_cause_hypothesis": hypothesis,
+                    "mitre_tactics": self._map_to_mitre_tactics(alert_types),
+                    "first_seen": alerts_in_cluster[0].get(
+                        "timestamp", datetime.now(timezone.utc).isoformat()
+                    ),
+                    "last_seen": alerts_in_cluster[-1].get(
+                        "timestamp", datetime.now(timezone.utc).isoformat()
+                    ),
+                }
+            )
 
         # Calculate noise reduction
         raw_count = len(raw_alerts)
         incident_count = len(incidents)
-        noise_reduction_pct = round(((raw_count - incident_count) / raw_count) * 100, 1) if raw_count > 0 else 0.0
+        noise_reduction_pct = (
+            round(((raw_count - incident_count) / raw_count) * 100, 1)
+            if raw_count > 0
+            else 0.0
+        )
 
         # Anchor in Cryptographic Merkle Ledger
         audit_record = audit_chain.record_action(
@@ -212,7 +233,7 @@ class NeuralTriageEngine:
             tactics.add("TA0011: Command and Control")
         if any(k in v_joined for k in ["exfiltration", "dump", "leak"]):
             tactics.add("TA0010: Exfiltration")
-        return sorted(list(tactics)) if tactics else ["TA0001: Initial Access"]
+        return sorted(tactics) if tactics else ["TA0001: Initial Access"]
 
     def generate_executive_briefing(
         self,
@@ -223,8 +244,12 @@ class NeuralTriageEngine:
         Generates an executive CISO incident briefing and autonomous remediation playbook.
         """
         incidents = triage_report.get("incidents", [])
-        tier_3_incidents = [i for i in incidents if i.get("triage_tier") == "TIER_3_CRITICAL_ESCALATION"]
-        tier_2_incidents = [i for i in incidents if i.get("triage_tier") == "TIER_2_INVESTIGATION"]
+        tier_3_incidents = [
+            i for i in incidents if i.get("triage_tier") == "TIER_3_CRITICAL_ESCALATION"
+        ]
+        tier_2_incidents = [
+            i for i in incidents if i.get("triage_tier") == "TIER_2_INVESTIGATION"
+        ]
 
         executive_summary = (
             f"Autonomous AI SOC evaluated {triage_report.get('raw_alert_count', 0)} raw telemetry signals, "
@@ -235,25 +260,31 @@ class NeuralTriageEngine:
 
         playbook_actions = []
         if tier_3_incidents:
-            playbook_actions.append({
-                "phase": "CONTAINMENT",
-                "priority": "P0_IMMEDIATE",
-                "action": "Enforce automated perimeter firewall quarantine on verified Tier-3 adversarial IPs.",
-                "approval_required": False,
-            })
-            playbook_actions.append({
-                "phase": "ERADICATION",
-                "priority": "P1_URGENT",
-                "action": "Isolate affected container pods and rotate compromised API credentials.",
-                "approval_required": True,
-            })
+            playbook_actions.append(
+                {
+                    "phase": "CONTAINMENT",
+                    "priority": "P0_IMMEDIATE",
+                    "action": "Enforce automated perimeter firewall quarantine on verified Tier-3 adversarial IPs.",
+                    "approval_required": False,
+                }
+            )
+            playbook_actions.append(
+                {
+                    "phase": "ERADICATION",
+                    "priority": "P1_URGENT",
+                    "action": "Isolate affected container pods and rotate compromised API credentials.",
+                    "approval_required": True,
+                }
+            )
         else:
-            playbook_actions.append({
-                "phase": "MONITORING",
-                "priority": "P2_ROUTINE",
-                "action": "Defense grid baseline nominal; continue autonomous 24/7 telemetry monitoring.",
-                "approval_required": False,
-            })
+            playbook_actions.append(
+                {
+                    "phase": "MONITORING",
+                    "priority": "P2_ROUTINE",
+                    "action": "Defense grid baseline nominal; continue autonomous 24/7 telemetry monitoring.",
+                    "approval_required": False,
+                }
+            )
 
         return {
             "title": "SageAI Autonomous AI SOC Executive Briefing",
@@ -270,4 +301,3 @@ class NeuralTriageEngine:
 
 # Global singleton
 ai_soc_engine = NeuralTriageEngine()
-

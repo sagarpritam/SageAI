@@ -37,7 +37,10 @@ async def list_campaigns_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all active and historical red-team campaigns."""
-    return {"status": "success", "campaigns": cas_redteam_swarm_service.list_campaigns()}
+    return {
+        "status": "success",
+        "campaigns": cas_redteam_swarm_service.list_campaigns(),
+    }
 
 
 @router.get("/campaigns/{campaign_id}")
@@ -66,7 +69,7 @@ async def launch_campaign_endpoint(
         name=payload.name,
         target_scope=payload.target_scope,
         scenario_type=payload.scenario_type or "CLOUD_INGRESS_AND_CONTAINER_ESCAPE",
-        intensity=payload.intensity or "BALANCED"
+        intensity=payload.intensity or "BALANCED",
     )
     return {"status": "success", "campaign": camp}
 
@@ -93,7 +96,10 @@ async def get_mitre_matrix_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves the MITRE ATT&CK coverage matrix."""
-    return {"status": "success", "coverage": cas_redteam_swarm_service.get_mitre_coverage_matrix()}
+    return {
+        "status": "success",
+        "coverage": cas_redteam_swarm_service.get_mitre_coverage_matrix(),
+    }
 
 
 @router.get("/metrics")
@@ -103,5 +109,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves red team swarm performance metrics."""
-    return {"status": "success", "metrics": cas_redteam_swarm_service.get_swarm_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": cas_redteam_swarm_service.get_swarm_metrics(),
+    }

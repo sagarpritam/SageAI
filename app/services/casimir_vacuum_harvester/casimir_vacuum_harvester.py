@@ -138,7 +138,12 @@ class DynamicCasimirVacuumHarvester:
         duration_sec = pulse_duration_us * 1e-6
 
         # Number of photon pairs emitted
-        pairs = round(node.photon_pair_flux_per_second * duration_sec * (pump_power_mw / 50.0) * random.uniform(0.98, 1.02))
+        pairs = round(
+            node.photon_pair_flux_per_second
+            * duration_sec
+            * (pump_power_mw / 50.0)
+            * random.uniform(0.98, 1.02)
+        )
         squeezing = round(node.squeezing_factor_db * math.sqrt(pump_power_mw / 50.0), 2)
 
         # Harvested zero point energy in micro-Joules (E = hbar * omega * N)
@@ -179,9 +184,15 @@ class DynamicCasimirVacuumHarvester:
     def get_resonator_metrics(self) -> Dict[str, Any]:
         return {
             "active_casimir_resonators": len(self.resonators),
-            "mean_squeezing_factor_db": round(sum([r.squeezing_factor_db for r in self.resonators.values()]) / len(self.resonators), 1),
+            "mean_squeezing_factor_db": round(
+                sum([r.squeezing_factor_db for r in self.resonators.values()])
+                / len(self.resonators),
+                1,
+            ),
             "total_harvest_discharges": len(self.harvest_results),
-            "lowest_cryo_temp_mk": min([r.cryo_temperature_mk for r in self.resonators.values()]),
+            "lowest_cryo_temp_mk": min(
+                [r.cryo_temperature_mk for r in self.resonators.values()]
+            ),
             "physics_mode": "PARAMETRIC_SQUID_RELATIVISTIC_DYNAMIC_CASIMIR",
             "status": "OPERATIONAL",
         }

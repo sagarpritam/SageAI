@@ -13,8 +13,12 @@ router = APIRouter(
 
 class SiphonEntropyRequest(BaseModel):
     node_id: str = Field(..., description="Target boundary node ID")
-    boundary_subsystem_length_l: float = Field(default=120.0, ge=1.0, le=10000.0, description="Boundary CFT subsystem length")
-    siphon_flow_rate_gb_s: float = Field(default=48.0, ge=0.1, le=1000.0, description="Siphon drainage rate in GB/s")
+    boundary_subsystem_length_l: float = Field(
+        default=120.0, ge=1.0, le=10000.0, description="Boundary CFT subsystem length"
+    )
+    siphon_flow_rate_gb_s: float = Field(
+        default=48.0, ge=0.1, le=1000.0, description="Siphon drainage rate in GB/s"
+    )
 
 
 @router.get("/nodes")
@@ -40,4 +44,3 @@ async def siphon_entropy(req: SiphonEntropyRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     siphon = get_ryu_takayanagi_siphon()
     return siphon.get_siphon_metrics()
-

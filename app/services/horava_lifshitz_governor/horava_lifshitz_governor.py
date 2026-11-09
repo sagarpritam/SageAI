@@ -114,9 +114,13 @@ class HoravaLifshitzGovernor:
         domain.dynamical_critical_exponent_z = target_z
 
         # Compute foliation metric properties
-        foliation_invariance = min(99.999, 99.92 + 0.07 * math.tanh(foliation_damping_gain))
+        foliation_invariance = min(
+            99.999, 99.92 + 0.07 * math.tanh(foliation_damping_gain)
+        )
         ghost_free_modes = 24 + int(target_z * 8)
-        ir_lorentz_fidelity = 100.0 if target_z == 1.0 else round(99.999 - (target_z - 1.0) * 0.001, 4)
+        ir_lorentz_fidelity = (
+            100.0 if target_z == 1.0 else round(99.999 - (target_z - 1.0) * 0.001, 4)
+        )
         suppression_db = round(120.0 * (target_z / 3.0) + random.uniform(1.2, 4.5), 1)
 
         scaling_id = f"HL-SCALE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
@@ -165,4 +169,3 @@ horava_lifshitz_governor = HoravaLifshitzGovernor()
 
 def get_horava_lifshitz_governor() -> HoravaLifshitzGovernor:
     return horava_lifshitz_governor
-

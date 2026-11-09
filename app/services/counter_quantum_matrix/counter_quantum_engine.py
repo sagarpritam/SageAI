@@ -82,7 +82,9 @@ class CounterQuantumHarvestMatrix:
         interceptor["status"] = "HONEY_CHAFF_PIPELINE_ACTIVE"
 
         # Trapdoor hash seed
-        trapdoor_hash = hashlib.sha3_512(f"{interceptor_id}:{time.time()}:{burst_count}".encode()).hexdigest()
+        trapdoor_hash = hashlib.sha3_512(
+            f"{interceptor_id}:{time.time()}:{burst_count}".encode()
+        ).hexdigest()
 
         event = {
             "injection_id": f"CHAFF-{uuid.uuid4().hex[:8].upper()}",
@@ -92,7 +94,9 @@ class CounterQuantumHarvestMatrix:
             "lattice_dimension": lattice_dimension,
             "entropy_sink_type": entropy_sink_type,
             "trapdoor_signature": trapdoor_hash[:32],
-            "injected_data_volume_mb": round(burst_count * 1.56, 2),  # ~1568 bytes per ML-KEM-1024 ct
+            "injected_data_volume_mb": round(
+                burst_count * 1.56, 2
+            ),  # ~1568 bytes per ML-KEM-1024 ct
             "adversary_storage_corrupted_pct": round(min(99.4, burst_count * 0.12), 2),
             "estimated_adversary_qpu_burn_hours": round(burst_count * 18.5, 1),
             "status": "CHAFF_POISON_INJECTED_SUCCESSFULLY",
@@ -127,11 +131,15 @@ class CounterQuantumHarvestMatrix:
         return decoherence_event
 
     def get_metrics(self) -> Dict[str, Any]:
-        total_injected = sum(it["honey_ciphertexts_injected"] for it in self._interceptors.values())
+        total_injected = sum(
+            it["honey_ciphertexts_injected"] for it in self._interceptors.values()
+        )
         return {
             "total_harvest_interceptors": len(self._interceptors),
             "total_honey_ciphertexts_injected": total_injected,
-            "active_chaff_pipelines": sum(1 for it in self._interceptors.values() if "ACTIVE" in it["status"]),
+            "active_chaff_pipelines": sum(
+                1 for it in self._interceptors.values() if "ACTIVE" in it["status"]
+            ),
             "poisoning_events_logged": len(self._poisoning_events),
             "adversary_hndl_vault_status": "ENTROPY_POISONED_AND_BLINDED",
         }
@@ -139,4 +147,3 @@ class CounterQuantumHarvestMatrix:
 
 # Global singleton instance
 counter_quantum_harvest_matrix = CounterQuantumHarvestMatrix()
-

@@ -6,7 +6,7 @@ generate AST-validated code patches that enter the SagePatch review queue for hu
 """
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 from app.services.incident_response.soar_engine import soar_engine
@@ -17,7 +17,10 @@ async def test_incident_to_sagepatch_remediation_pipeline():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         from app.core.security import create_access_token
-        token = create_access_token({"sub": "secops@sageai.io", "role": "admin", "org": "remediation-test-org"})
+
+        token = create_access_token(
+            {"sub": "secops@sageai.io", "role": "admin", "org": "remediation-test-org"}
+        )
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Create a simulated SQLi incident via SOAR engine

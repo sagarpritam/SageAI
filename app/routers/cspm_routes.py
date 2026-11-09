@@ -15,7 +15,9 @@ router = APIRouter(prefix="/cspm", tags=["Cloud Security Posture Management & CI
 
 
 class AuditCloudAssetsRequest(BaseModel):
-    cloud_assets: List[Dict[str, Any]] = Field(..., description="Cloud compute, storage, and IAM resources")
+    cloud_assets: List[Dict[str, Any]] = Field(
+        ..., description="Cloud compute, storage, and IAM resources"
+    )
 
 
 class RemediationScriptRequest(BaseModel):
@@ -60,4 +62,3 @@ async def get_remediation_script(
         "status": "success",
         "remediation": script,
     }
-

@@ -1,4 +1,5 @@
 """Centesimal Quantum Gravity Singularity-Free Spacetime Metric Synthesizer Package."""
+
 from .centesimal_quantum_gravity import (
     CentesimalQuantumGravitySynthesizer,
     MetricSynthesisResult,
@@ -14,4 +15,3 @@ __all__ = [
     "centesimal_quantum_gravity_synthesizer",
     "get_centesimal_quantum_gravity_synthesizer",
 ]
-

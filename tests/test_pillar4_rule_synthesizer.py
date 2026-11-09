@@ -10,9 +10,9 @@ Verifies:
 """
 
 import yaml
+
 from app.services.threat_feed.pattern_synthesizer import (
     ThreatPatternSynthesizer,
-    threat_pattern_synthesizer,
 )
 
 
@@ -27,8 +27,8 @@ def test_synthesize_yara_rule_syntax():
     )
 
     assert "rule SageAI_CVE_2024_21887" in rule
-    assert "description = \"Command injection in Ivanti Connect Secure\"" in rule
-    assert "$s1 = \"/api/v1/totp/user-backup-code\"" in rule
+    assert 'description = "Command injection in Ivanti Connect Secure"' in rule
+    assert '$s1 = "/api/v1/totp/user-backup-code"' in rule
     assert "condition:" in rule
     assert rule.count("{") == rule.count("}")
 
@@ -110,4 +110,3 @@ def test_preloaded_templates_and_bundle():
     cve_ids = [t["cve_id"] for t in synthesizer.PRELOADED_TEMPLATES]
     assert "CVE-2024-21887" in cve_ids
     assert "CVE-2021-44228" in cve_ids
-

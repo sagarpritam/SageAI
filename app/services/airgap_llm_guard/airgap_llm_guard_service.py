@@ -29,9 +29,13 @@ class AirGappedModelGuard:
                 "sha256": "4a982f1b4c901824ef819284ba019284ca901824ef819284ba019284ca901824",
                 "safety_status": "SEALED_AIRGAP_AUTHORIZED",
                 "backdoor_scan_verdict": "CLEAN_ZERO_TROJANS",
-                "differential_privacy": {"epsilon": 0.85, "delta": 1e-6, "dp_guaranteed": True},
+                "differential_privacy": {
+                    "epsilon": 0.85,
+                    "delta": 1e-6,
+                    "dp_guaranteed": True,
+                },
                 "network_egress_policy": "STRICT_AIRGAP_NO_WAN_SOCKETS",
-                "verified_at": time.time() - 3600 * 48
+                "verified_at": time.time() - 3600 * 48,
             },
             {
                 "model_id": "model-deepseek-r1-qwen",
@@ -42,10 +46,14 @@ class AirGappedModelGuard:
                 "sha256": "819284ba019284ca901824ef819284ba4a982f1b4c901824ef819284ca901824",
                 "safety_status": "SEALED_AIRGAP_AUTHORIZED",
                 "backdoor_scan_verdict": "CLEAN_ZERO_TROJANS",
-                "differential_privacy": {"epsilon": 0.92, "delta": 1e-6, "dp_guaranteed": True},
+                "differential_privacy": {
+                    "epsilon": 0.92,
+                    "delta": 1e-6,
+                    "dp_guaranteed": True,
+                },
                 "network_egress_policy": "STRICT_AIRGAP_NO_WAN_SOCKETS",
-                "verified_at": time.time() - 3600 * 24
-            }
+                "verified_at": time.time() - 3600 * 24,
+            },
         ]
 
         for m in trusted_models:
@@ -65,7 +73,7 @@ class AirGappedModelGuard:
         format_type: str = "SAFETENSORS",
         base_architecture: str = "Llama3-8B",
         parameters_billions: float = 8.0,
-        raw_hash_seed: Optional[str] = None
+        raw_hash_seed: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Scans model weights for pickle exploits, latent backdoor triggers, and malicious tensor offsets."""
         model_id = f"model-{uuid.uuid4().hex[:6]}"
@@ -78,14 +86,29 @@ class AirGappedModelGuard:
         # Backdoor Trigger Scanning Emulation
         # Checks for known trojan trigger strings, contaminated vocabulary tokens, and embedding vector poisoning
         is_safe_format = format_type.upper() in ["SAFETENSORS", "GGUF"]
-        scan_verdict = "CLEAN_ZERO_TROJANS" if is_safe_format else "QUARANTINED_UNSAFE_FORMAT"
-        status = "SCANNED_READY_FOR_AIRGAP" if is_safe_format else "REJECTED_ARBITRARY_CODE_RISK"
+        scan_verdict = (
+            "CLEAN_ZERO_TROJANS" if is_safe_format else "QUARANTINED_UNSAFE_FORMAT"
+        )
+        status = (
+            "SCANNED_READY_FOR_AIRGAP"
+            if is_safe_format
+            else "REJECTED_ARBITRARY_CODE_RISK"
+        )
 
         checks = [
-            {"check": "Header Safe Deserialization (No arbitrary code exec)", "passed": is_safe_format},
+            {
+                "check": "Header Safe Deserialization (No arbitrary code exec)",
+                "passed": is_safe_format,
+            },
             {"check": "Vocabulary & Tokenizer Trigger Poisoning Scan", "passed": True},
-            {"check": "Latent Activation Space Trojan Anomaly Detection", "passed": True},
-            {"check": "Layer Norm & Attention Weight Distribution Sanity", "passed": True}
+            {
+                "check": "Latent Activation Space Trojan Anomaly Detection",
+                "passed": True,
+            },
+            {
+                "check": "Layer Norm & Attention Weight Distribution Sanity",
+                "passed": True,
+            },
         ]
 
         model_entry = {
@@ -98,9 +121,13 @@ class AirGappedModelGuard:
             "safety_status": status,
             "backdoor_scan_verdict": scan_verdict,
             "inspection_checks": checks,
-            "differential_privacy": {"epsilon": 0.88, "delta": 1e-6, "dp_guaranteed": True},
+            "differential_privacy": {
+                "epsilon": 0.88,
+                "delta": 1e-6,
+                "dp_guaranteed": True,
+            },
             "network_egress_policy": "STRICT_AIRGAP_NO_WAN_SOCKETS",
-            "verified_at": now
+            "verified_at": now,
         }
 
         self._models[model_id] = model_entry
@@ -111,7 +138,7 @@ class AirGappedModelGuard:
         model_id: str,
         lora_rank: int = 16,
         epsilon: float = 0.85,
-        delta: float = 1e-6
+        delta: float = 1e-6,
     ) -> Dict[str, Any]:
         """Mathematically verifies differential privacy gradient bounds (epsilon < 1.0) on LoRA fine-tuning checkpoints."""
         model = self._models.get(model_id)
@@ -119,14 +146,18 @@ class AirGappedModelGuard:
             raise ValueError(f"Model {model_id} not found.")
 
         is_dp_compliant = epsilon < 1.0 and delta <= 1e-5
-        verdict = "APPROVED_DIFFERENTIAL_PRIVACY_MET" if is_dp_compliant else "REJECTED_PRIVACY_BUDGET_EXCEEDED"
+        verdict = (
+            "APPROVED_DIFFERENTIAL_PRIVACY_MET"
+            if is_dp_compliant
+            else "REJECTED_PRIVACY_BUDGET_EXCEEDED"
+        )
 
         model["differential_privacy"] = {
             "lora_rank": lora_rank,
             "epsilon": epsilon,
             "delta": delta,
             "dp_guaranteed": is_dp_compliant,
-            "verdict": verdict
+            "verdict": verdict,
         }
 
         return {
@@ -135,7 +166,7 @@ class AirGappedModelGuard:
             "delta": delta,
             "dp_compliant": is_dp_compliant,
             "verdict": verdict,
-            "guarantee": "Zero training data extraction feasible through prompt reconstruction"
+            "guarantee": "Zero training data extraction feasible through prompt reconstruction",
         }
 
     def seal_and_authorize_enclave_load(self, model_id: str) -> Dict[str, Any]:
@@ -145,11 +176,15 @@ class AirGappedModelGuard:
             raise ValueError(f"Model {model_id} not found.")
 
         if model["backdoor_scan_verdict"] != "CLEAN_ZERO_TROJANS":
-            raise ValueError("Cannot seal model with unverified or quarantined weights.")
+            raise ValueError(
+                "Cannot seal model with unverified or quarantined weights."
+            )
 
         now = time.time()
         cert_serial = f"0x{uuid.uuid4().hex[:12].upper()}"
-        signature = hashlib.sha3_512(f"{model_id}:{model['sha256']}:{cert_serial}:{now}".encode()).hexdigest()
+        signature = hashlib.sha3_512(
+            f"{model_id}:{model['sha256']}:{cert_serial}:{now}".encode()
+        ).hexdigest()
 
         model["safety_status"] = "SEALED_AIRGAP_AUTHORIZED"
         model["sealed_certificate"] = {
@@ -157,7 +192,7 @@ class AirGappedModelGuard:
             "issued_at": now,
             "signature": signature,
             "enclave_memory_paging": "ENCRYPTED_PAGETABLES_ONLY",
-            "wan_egress": "BLOCKED_BY_HARDWARE_PIN"
+            "wan_egress": "BLOCKED_BY_HARDWARE_PIN",
         }
 
         return {
@@ -166,14 +201,20 @@ class AirGappedModelGuard:
             "cert_serial": cert_serial,
             "signature": signature[:32] + "...",
             "airgap_enforcement": "HARDWARE_ZERO_EGRESS_VERIFIED",
-            "authorized_at": now
+            "authorized_at": now,
         }
 
     def get_airgap_metrics(self) -> Dict[str, Any]:
         """Returns statistics on ingested sovereign weights and differential privacy audits."""
         total_models = len(self._models)
-        authorized = sum(1 for m in self._models.values() if m.get("safety_status") == "SEALED_AIRGAP_AUTHORIZED")
-        total_params = sum(m.get("parameters_billions", 0.0) for m in self._models.values())
+        authorized = sum(
+            1
+            for m in self._models.values()
+            if m.get("safety_status") == "SEALED_AIRGAP_AUTHORIZED"
+        )
+        total_params = sum(
+            m.get("parameters_billions", 0.0) for m in self._models.values()
+        )
 
         return {
             "total_ingested_models": total_models,
@@ -181,10 +222,9 @@ class AirGappedModelGuard:
             "total_parameters_billions": round(total_params, 1),
             "supported_weight_formats": ["SafeTensors", "GGUF", "PyTorch-StateDict"],
             "max_allowed_dp_epsilon": 1.0,
-            "hardware_airgap_status": "ONLINE_ZERO_WAN_EGRESS"
+            "hardware_airgap_status": "ONLINE_ZERO_WAN_EGRESS",
         }
 
 
 # Global singleton instance
 airgap_llm_guard_service = AirGappedModelGuard()
-

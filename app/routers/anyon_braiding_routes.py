@@ -13,7 +13,10 @@ router = APIRouter(
 
 class ExecuteBraidRequest(BaseModel):
     matrix_id: str = Field(..., example="ANYON-CORE-COPENHAGEN-01")
-    braid_word: str = Field(default="sigma_1 * sigma_2^-1 * sigma_1", example="sigma_1 * sigma_2^-1 * sigma_1")
+    braid_word: str = Field(
+        default="sigma_1 * sigma_2^-1 * sigma_1",
+        example="sigma_1 * sigma_2^-1 * sigma_1",
+    )
     target_qubit_id: str = Field(default="TOPO-QUBIT-01", example="TOPO-QUBIT-01")
     gate_type: str = Field(default="HADAMARD", example="HADAMARD")
 
@@ -39,4 +42,3 @@ async def execute_braid(req: ExecuteBraidRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return anyon_topological_braiding.get_topological_metrics()
-

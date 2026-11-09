@@ -93,14 +93,20 @@ class GravitationalWaveSeismicMesh:
             raise ValueError(f"Observatory {observatory_id} not registered.")
 
         # Sub-femtometer displacement: ΔL = h * L
-        displacement_femtometers = round(measured_strain_h * obs["arm_length_km"] * 1e3 * 1e15, 3)
+        displacement_femtometers = round(
+            measured_strain_h * obs["arm_length_km"] * 1e3 * 1e15, 3
+        )
 
         # Event classification based on strain amplitude and frequency
         # Prompt sub-crustal nuclear blast: h > 10^-19, sudden impulsive shock
         # Tunnel Boring Machine (TBM): h ~ 10^-20, continuous narrow-band vibration 15-45 Hz
         # Natural microseism: h < 5x10^-21, broad ocean swell 0.1-1.0 Hz
-        is_nuclear_detonation = (measured_strain_h > 1e-19) and (dominant_frequency_hz > 5.0)
-        is_tunnel_boring = (1e-20 <= measured_strain_h <= 1e-19) and (15.0 <= dominant_frequency_hz <= 50.0)
+        is_nuclear_detonation = (measured_strain_h > 1e-19) and (
+            dominant_frequency_hz > 5.0
+        )
+        is_tunnel_boring = (1e-20 <= measured_strain_h <= 1e-19) and (
+            15.0 <= dominant_frequency_hz <= 50.0
+        )
 
         if is_nuclear_detonation:
             threat_type = "SUBCRUSTAL_PROMPT_NUCLEAR_DETONATION"
@@ -129,7 +135,9 @@ class GravitationalWaveSeismicMesh:
             "measured_strain_h": measured_strain_h,
             "differential_displacement_fm": displacement_femtometers,
             "dominant_frequency_hz": dominant_frequency_hz,
-            "p_s_wave_ratio": round(p_wave_velocity_km_s / (s_wave_velocity_km_s + 1e-6), 2),
+            "p_s_wave_ratio": round(
+                p_wave_velocity_km_s / (s_wave_velocity_km_s + 1e-6), 2
+            ),
             "threat_type": threat_type,
             "threat_level": threat_level,
             "estimated_yield_kilotons": estimated_yield_kilotons,
@@ -148,9 +156,13 @@ class GravitationalWaveSeismicMesh:
         Calculates geodetic coordinates of clandestine sub-crustal activity
         using Time-Difference-of-Arrival (TDOA) across 2 or more subterranean laser strain meters.
         """
-        valid_obs = [o_id for o_id in sensor_arrival_times_ms if o_id in self._observatories]
+        valid_obs = [
+            o_id for o_id in sensor_arrival_times_ms if o_id in self._observatories
+        ]
         if len(valid_obs) < 2:
-            raise ValueError("Triangulation requires at least 2 reporting laser strain observatories.")
+            raise ValueError(
+                "Triangulation requires at least 2 reporting laser strain observatories."
+            )
 
         # High-resolution geodetic inversion
         lat = 36.42 + (sum(sensor_arrival_times_ms.values()) % 5.0) - 2.5
@@ -176,7 +188,9 @@ class GravitationalWaveSeismicMesh:
 
     def get_metrics(self) -> Dict[str, Any]:
         total_arms_km = sum(o["arm_length_km"] for o in self._observatories.values())
-        total_anomalies = sum(o["anomalous_strains_detected"] for o in self._observatories.values())
+        total_anomalies = sum(
+            o["anomalous_strains_detected"] for o in self._observatories.values()
+        )
 
         return {
             "total_laser_observatories": len(self._observatories),
@@ -190,4 +204,3 @@ class GravitationalWaveSeismicMesh:
 
 # Global singleton instance
 gravitational_seismic_mesh = GravitationalWaveSeismicMesh()
-

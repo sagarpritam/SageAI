@@ -11,7 +11,9 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.easm.shadow_it_hunter import shadow_it_hunter
 
-router = APIRouter(prefix="/easm", tags=["External Attack Surface Management & Shadow IT"])
+router = APIRouter(
+    prefix="/easm", tags=["External Attack Surface Management & Shadow IT"]
+)
 
 
 class ScanPerimeterRequest(BaseModel):
@@ -37,4 +39,3 @@ async def scan_external_perimeter(
         actor=user_id,
     )
     return result
-

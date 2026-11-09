@@ -4,4 +4,3 @@ from app.services.orbital_laser_mesh.orbital_laser_mesh_guard import (
 )
 
 __all__ = ["OrbitalLaserMeshGuard", "orbital_laser_mesh_guard"]
-

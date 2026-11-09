@@ -8,4 +8,3 @@ from app.services.sdn_shield.sdn_isolation_engine import (
 )
 
 __all__ = ["SDNIsolationEngine", "sdn_isolation_engine"]
-

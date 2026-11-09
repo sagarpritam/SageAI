@@ -2,7 +2,6 @@
 Tests for SageAI Wave 6 Phase 6.3: Dynamic Synthetic Honeytoken & Active Canary Fabric.
 """
 
-import pytest
 from app.services.canary_fabric.canary_fabric_service import (
     canary_fabric_service,
 )
@@ -71,4 +70,3 @@ def test_get_tripwire_history():
     history = canary_fabric_service.get_tripwire_history()
     assert len(history) >= 1
     assert any(h["attacker_ip"] == "203.0.113.88" for h in history)
-

@@ -116,7 +116,9 @@ class MHDPlasmaStealth:
                 "magnetic_field_tesla": round(p.magnetic_field_tesla, 2),
                 "plasma_density_cm3": p.plasma_density_cm3,
                 "rf_rcs_attenuation_db": round(p.rf_rcs_attenuation_db, 2),
-                "lorentz_bow_shock_damping_pct": round(p.lorentz_bow_shock_damping_pct, 2),
+                "lorentz_bow_shock_damping_pct": round(
+                    p.lorentz_bow_shock_damping_pct, 2
+                ),
                 "drag_reduction_pct": round(p.drag_reduction_pct, 2),
                 "status": p.status,
             }
@@ -151,16 +153,26 @@ class MHDPlasmaStealth:
 
         # Calculate enhanced physics:
         # Field strength increases up to 4.2 T
-        active_magnetic_field = min(4.2, platform.magnetic_field_tesla + abs(field_boost_tesla))
+        active_magnetic_field = min(
+            4.2, platform.magnetic_field_tesla + abs(field_boost_tesla)
+        )
         # Enhanced plasma density due to ionization
-        active_plasma_density = platform.plasma_density_cm3 * (1.0 + (plasma_freq_ghz / 50.0))
+        active_plasma_density = platform.plasma_density_cm3 * (
+            1.0 + (plasma_freq_ghz / 50.0)
+        )
 
         # RCS Attenuation exceeds 45 dB threshold
-        attenuation_db = min(58.5, 45.0 + (active_magnetic_field * 2.4) + random.uniform(1.2, 3.8))
+        attenuation_db = min(
+            58.5, 45.0 + (active_magnetic_field * 2.4) + random.uniform(1.2, 3.8)
+        )
         # Lorentz damping eliminates bow shock (>99%)
-        lorentz_damping = min(99.98, 98.5 + (active_magnetic_field * 0.32) + random.uniform(0.1, 0.4))
+        lorentz_damping = min(
+            99.98, 98.5 + (active_magnetic_field * 0.32) + random.uniform(0.1, 0.4)
+        )
         # Drag and skin friction reduced by >65%
-        drag_reduction = min(78.5, 65.0 + (active_magnetic_field * 2.1) + random.uniform(0.5, 2.5))
+        drag_reduction = min(
+            78.5, 65.0 + (active_magnetic_field * 2.1) + random.uniform(0.5, 2.5)
+        )
         # Sonic boom ground footprint reduced to undetectable ambient murmur (<12 dB)
         sonic_boom_db = max(4.2, 12.0 - (lorentz_damping - 98.0) * 4.0)
         # Radar cross section reduced to sub-insect level (<0.00004 m^2)
@@ -209,11 +221,21 @@ class MHDPlasmaStealth:
 
     def get_stealth_metrics(self) -> Dict[str, Any]:
         total_platforms = len(self.platforms)
-        stealth_active_count = sum(1 for p in self.platforms.values() if p.status == "MHD_FULL_STEALTH_ACTIVE")
-        avg_mach = sum(p.mach_number for p in self.platforms.values()) / max(1, total_platforms)
-        avg_b_field = sum(p.magnetic_field_tesla for p in self.platforms.values()) / max(1, total_platforms)
-        avg_attenuation = sum(p.rf_rcs_attenuation_db for p in self.platforms.values()) / max(1, total_platforms)
-        avg_drag_reduction = sum(p.drag_reduction_pct for p in self.platforms.values()) / max(1, total_platforms)
+        stealth_active_count = sum(
+            1 for p in self.platforms.values() if p.status == "MHD_FULL_STEALTH_ACTIVE"
+        )
+        avg_mach = sum(p.mach_number for p in self.platforms.values()) / max(
+            1, total_platforms
+        )
+        avg_b_field = sum(
+            p.magnetic_field_tesla for p in self.platforms.values()
+        ) / max(1, total_platforms)
+        avg_attenuation = sum(
+            p.rf_rcs_attenuation_db for p in self.platforms.values()
+        ) / max(1, total_platforms)
+        avg_drag_reduction = sum(
+            p.drag_reduction_pct for p in self.platforms.values()
+        ) / max(1, total_platforms)
 
         return {
             "total_platforms": total_platforms,
@@ -237,4 +259,3 @@ def get_mhd_plasma_stealth() -> MHDPlasmaStealth:
     if _mhd_plasma_stealth_instance is None:
         _mhd_plasma_stealth_instance = MHDPlasmaStealth()
     return _mhd_plasma_stealth_instance
-

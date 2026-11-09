@@ -13,13 +13,20 @@ router = APIRouter(
 
 class ScanTargetRegionRequest(BaseModel):
     satellite_id: str = Field(..., description="Target hyperspectral satellite ID")
-    target_coordinates: str = Field(default="34.0522°N, 51.4215°E (Natanz Complex)", description="Target coordinates")
-    suspected_classification: str = Field(default="COVERT_NUCLEAR_ENRICHMENT", description="Target classification")
+    target_coordinates: str = Field(
+        default="34.0522°N, 51.4215°E (Natanz Complex)",
+        description="Target coordinates",
+    )
+    suspected_classification: str = Field(
+        default="COVERT_NUCLEAR_ENRICHMENT", description="Target classification"
+    )
 
 
 class EngageTargetRequest(BaseModel):
     scan_id: str = Field(..., description="Scan event ID")
-    interceptor_platform: str = Field(default="SPACE_GROUND_KINETIC_ROD", description="Interceptor platform type")
+    interceptor_platform: str = Field(
+        default="SPACE_GROUND_KINETIC_ROD", description="Interceptor platform type"
+    )
 
 
 @router.get("/constellation")

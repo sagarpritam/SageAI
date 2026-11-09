@@ -20,7 +20,9 @@ class TopologicalAnyonMatrix:
     active_topological_qubits: int = 16
     braiding_junctions: int = 64
     majorana_modes_count: int = 32
-    decoherence_suppression_ratio_db: float = 85.4  # Exponential topological suppression
+    decoherence_suppression_ratio_db: float = (
+        85.4  # Exponential topological suppression
+    )
     topological_energy_gap_mev: float = 0.45  # Delta_topo in milli-eV
     cryo_temp_mk: float = 20.0
     status: str = "TOPOLOGICAL_GAP_PROTECTED"
@@ -122,7 +124,11 @@ class TopologicalAnyonBraidingMatrix:
             raise ValueError(f"Matrix {matrix_id} not registered.")
 
         fidelity = round(99.999 + random.uniform(0.0001, 0.0008), 5)
-        superposition = "|psi> = 0.7071|0_L> + 0.7071|1_L>" if gate_type == "HADAMARD" else "|psi> = |0_L>"
+        superposition = (
+            "|psi> = 0.7071|0_L> + 0.7071|1_L>"
+            if gate_type == "HADAMARD"
+            else "|psi> = |0_L>"
+        )
 
         op_id = f"ANYON-BRAID-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         op = AnyonBraidOperation(
@@ -153,11 +159,19 @@ class TopologicalAnyonBraidingMatrix:
         }
 
     def get_topological_metrics(self) -> Dict[str, Any]:
-        total_qubits = sum([m.active_topological_qubits for m in self.matrices.values()])
+        total_qubits = sum(
+            [m.active_topological_qubits for m in self.matrices.values()]
+        )
         return {
             "active_topological_matrices": len(self.matrices),
             "total_logical_topological_qubits": total_qubits,
-            "mean_noise_suppression_db": round(sum([m.decoherence_suppression_ratio_db for m in self.matrices.values()]) / len(self.matrices), 1),
+            "mean_noise_suppression_db": round(
+                sum(
+                    [m.decoherence_suppression_ratio_db for m in self.matrices.values()]
+                )
+                / len(self.matrices),
+                1,
+            ),
             "completed_braid_operations": len(self.operations),
             "topological_protection_mode": "NON_ABELIAN_BRAIDING_MONODROMY",
             "status": "OPERATIONAL",
@@ -165,4 +179,3 @@ class TopologicalAnyonBraidingMatrix:
 
 
 anyon_topological_braiding = TopologicalAnyonBraidingMatrix()
-

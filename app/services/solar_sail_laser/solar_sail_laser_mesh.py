@@ -205,7 +205,10 @@ class RelativisticSolarSailLaserMesh:
         return {
             "active_laser_arrays": len(self.arrays),
             "total_phased_power_gw": total_p,
-            "mean_strehl_ratio": round(sum([a.strehl_ratio for a in self.arrays.values()]) / len(self.arrays), 3),
+            "mean_strehl_ratio": round(
+                sum([a.strehl_ratio for a in self.arrays.values()]) / len(self.arrays),
+                3,
+            ),
             "total_propulsion_events": len(self.events),
             "primary_array_mode": "COHERENT_INTERFEROMETRIC_PHASE_LOCK",
             "status": "OPERATIONAL",
@@ -213,4 +216,3 @@ class RelativisticSolarSailLaserMesh:
 
 
 relativistic_solar_sail_laser_mesh = RelativisticSolarSailLaserMesh()
-

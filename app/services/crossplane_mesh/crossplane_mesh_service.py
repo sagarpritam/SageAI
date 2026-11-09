@@ -28,7 +28,10 @@ class CrossPlaneMeshService:
                 "identity_provider": "AWS IAM Roles Anywhere",
                 "status": "HEALTHY",
                 "latency_ms": 12.4,
-                "connected_peers": ["mesh-node-azure-eastus", "mesh-node-gcp-uscentral"]
+                "connected_peers": [
+                    "mesh-node-azure-eastus",
+                    "mesh-node-gcp-uscentral",
+                ],
             },
             {
                 "node_id": "mesh-node-azure-eastus",
@@ -39,7 +42,7 @@ class CrossPlaneMeshService:
                 "identity_provider": "Azure Workload Identity Federation",
                 "status": "HEALTHY",
                 "latency_ms": 14.1,
-                "connected_peers": ["mesh-node-aws-us-east", "mesh-node-gcp-uscentral"]
+                "connected_peers": ["mesh-node-aws-us-east", "mesh-node-gcp-uscentral"],
             },
             {
                 "node_id": "mesh-node-gcp-uscentral",
@@ -50,8 +53,8 @@ class CrossPlaneMeshService:
                 "identity_provider": "GCP Workload Identity Pool",
                 "status": "HEALTHY",
                 "latency_ms": 18.2,
-                "connected_peers": ["mesh-node-aws-us-east", "mesh-node-azure-eastus"]
-            }
+                "connected_peers": ["mesh-node-aws-us-east", "mesh-node-azure-eastus"],
+            },
         ]
 
         for node in mesh_nodes:
@@ -70,30 +73,68 @@ class CrossPlaneMeshService:
                 "AWS": {
                     "sg_id": "sg-091248ac91",
                     "rules": [
-                        {"type": "INGRESS", "protocol": "TCP", "port": 8443, "source": "10.100.0.0/16 (mTLS Mesh Only)"},
-                        {"type": "EGRESS", "protocol": "ALL", "port": 0, "destination": "vpc-endpoints-only"}
-                    ]
+                        {
+                            "type": "INGRESS",
+                            "protocol": "TCP",
+                            "port": 8443,
+                            "source": "10.100.0.0/16 (mTLS Mesh Only)",
+                        },
+                        {
+                            "type": "EGRESS",
+                            "protocol": "ALL",
+                            "port": 0,
+                            "destination": "vpc-endpoints-only",
+                        },
+                    ],
                 },
                 "AZURE": {
                     "nsg_id": "nsg-pci-vault-prod",
                     "rules": [
-                        {"priority": 100, "direction": "Inbound", "access": "Allow", "port": 8443, "source": "VirtualNetwork"},
-                        {"priority": 4096, "direction": "Inbound", "access": "Deny", "port": "*", "source": "Internet"}
-                    ]
+                        {
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "access": "Allow",
+                            "port": 8443,
+                            "source": "VirtualNetwork",
+                        },
+                        {
+                            "priority": 4096,
+                            "direction": "Inbound",
+                            "access": "Deny",
+                            "port": "*",
+                            "source": "Internet",
+                        },
+                    ],
                 },
                 "GCP": {
                     "firewall_rule": "fw-allow-crossplane-mtls",
                     "rules": [
-                        {"action": "ALLOW", "ports": ["8443"], "targetTags": ["pci-vault"], "sourceRanges": ["10.200.0.0/16"]}
-                    ]
+                        {
+                            "action": "ALLOW",
+                            "ports": ["8443"],
+                            "targetTags": ["pci-vault"],
+                            "sourceRanges": ["10.200.0.0/16"],
+                        }
+                    ],
                 },
                 "CILIUM_K8S": {
                     "kind": "CiliumNetworkPolicy",
                     "rules": [
-                        {"fromEndpoints": [{"matchLabels": {"app.kubernetes.io/part-of": "sage-mesh"}}], "toPorts": [{"ports": [{"port": "8443", "protocol": "TCP"}]}]}
-                    ]
-                }
-            }
+                        {
+                            "fromEndpoints": [
+                                {
+                                    "matchLabels": {
+                                        "app.kubernetes.io/part-of": "sage-mesh"
+                                    }
+                                }
+                            ],
+                            "toPorts": [
+                                {"ports": [{"port": "8443", "protocol": "TCP"}]}
+                            ],
+                        }
+                    ],
+                },
+            },
         }
 
         # Simulated minor drift
@@ -106,7 +147,7 @@ class CrossPlaneMeshService:
             "description": "Rogue inbound rule detected allowing port 22 (SSH) from 0.0.0.0/0",
             "severity": "HIGH",
             "detected_at": time.time() - 1800,
-            "remediation_status": "PENDING_AUTO_RECONCILE"
+            "remediation_status": "PENDING_AUTO_RECONCILE",
         }
 
     def list_nodes(self) -> List[Dict[str, Any]]:
@@ -115,7 +156,11 @@ class CrossPlaneMeshService:
 
     def list_policies(self) -> List[Dict[str, Any]]:
         """Returns all translated cross-plane zero-trust policies."""
-        return sorted(list(self._policies.values()), key=lambda p: p.get("created_at") or 0, reverse=True)
+        return sorted(
+            self._policies.values(),
+            key=lambda p: p.get("created_at") or 0,
+            reverse=True,
+        )
 
     def get_policy(self, policy_id: str) -> Optional[Dict[str, Any]]:
         """Returns details of a specific translated policy."""
@@ -126,7 +171,7 @@ class CrossPlaneMeshService:
         name: str,
         intent_description: str,
         target_clouds: Optional[List[str]] = None,
-        target_port: int = 443
+        target_port: int = 443,
     ) -> Dict[str, Any]:
         """Translates a declarative security intent into native cloud firewall & Cilium rules."""
         policy_id = f"pol-zt-{uuid.uuid4().hex[:6]}"
@@ -138,31 +183,64 @@ class CrossPlaneMeshService:
             translations["AWS"] = {
                 "sg_id": f"sg-{uuid.uuid4().hex[:8]}",
                 "rules": [
-                    {"type": "INGRESS", "protocol": "TCP", "port": target_port, "source": "crossplane-vpc-mesh"},
-                    {"type": "EGRESS", "protocol": "TCP", "port": target_port, "destination": "spiffe-workloads"}
-                ]
+                    {
+                        "type": "INGRESS",
+                        "protocol": "TCP",
+                        "port": target_port,
+                        "source": "crossplane-vpc-mesh",
+                    },
+                    {
+                        "type": "EGRESS",
+                        "protocol": "TCP",
+                        "port": target_port,
+                        "destination": "spiffe-workloads",
+                    },
+                ],
             }
         if "AZURE" in clouds:
             translations["AZURE"] = {
                 "nsg_id": f"nsg-{uuid.uuid4().hex[:8]}",
                 "rules": [
-                    {"priority": 110, "direction": "Inbound", "access": "Allow", "port": target_port, "source": "VirtualNetwork"},
-                    {"priority": 4000, "direction": "Inbound", "access": "Deny", "port": "*", "source": "Internet"}
-                ]
+                    {
+                        "priority": 110,
+                        "direction": "Inbound",
+                        "access": "Allow",
+                        "port": target_port,
+                        "source": "VirtualNetwork",
+                    },
+                    {
+                        "priority": 4000,
+                        "direction": "Inbound",
+                        "access": "Deny",
+                        "port": "*",
+                        "source": "Internet",
+                    },
+                ],
             }
         if "GCP" in clouds:
             translations["GCP"] = {
                 "firewall_rule": f"fw-rule-{uuid.uuid4().hex[:6]}",
                 "rules": [
-                    {"action": "ALLOW", "ports": [str(target_port)], "targetTags": ["sage-crossplane"]}
-                ]
+                    {
+                        "action": "ALLOW",
+                        "ports": [str(target_port)],
+                        "targetTags": ["sage-crossplane"],
+                    }
+                ],
             }
         if "CILIUM_K8S" in clouds:
             translations["CILIUM_K8S"] = {
                 "kind": "CiliumNetworkPolicy",
                 "rules": [
-                    {"fromEndpoints": [{"matchLabels": {"security.sageai.io/intent": policy_id}}], "toPorts": [{"ports": [{"port": str(target_port), "protocol": "TCP"}]}]}
-                ]
+                    {
+                        "fromEndpoints": [
+                            {"matchLabels": {"security.sageai.io/intent": policy_id}}
+                        ],
+                        "toPorts": [
+                            {"ports": [{"port": str(target_port), "protocol": "TCP"}]}
+                        ],
+                    }
+                ],
             }
 
         policy_entry = {
@@ -173,7 +251,7 @@ class CrossPlaneMeshService:
             "status": "SYNCHRONIZED",
             "created_at": now,
             "updated_at": now,
-            "translations": translations
+            "translations": translations,
         }
 
         self._policies[policy_id] = policy_entry
@@ -196,15 +274,21 @@ class CrossPlaneMeshService:
             "drift_id": drift_id,
             "status": "RECONCILED",
             "action_taken": f"Revoked rogue permission from {drift['cloud_provider']} {drift['resource']}",
-            "reconciled_at": drift["reconciled_at"]
+            "reconciled_at": drift["reconciled_at"],
         }
 
     def get_mesh_health(self) -> Dict[str, Any]:
         """Calculates multi-cloud cross-plane network health and latency telemetry."""
         total_nodes = len(self._nodes)
-        healthy_nodes = sum(1 for n in self._nodes.values() if n.get("status") == "HEALTHY")
+        healthy_nodes = sum(
+            1 for n in self._nodes.values() if n.get("status") == "HEALTHY"
+        )
         active_policies = len(self._policies)
-        pending_drifts = sum(1 for d in self._drifts.values() if d.get("remediation_status") != "RECONCILED")
+        pending_drifts = sum(
+            1
+            for d in self._drifts.values()
+            if d.get("remediation_status") != "RECONCILED"
+        )
 
         return {
             "mesh_status": "ONLINE" if pending_drifts == 0 else "DEGRADED_BY_DRIFT",
@@ -214,10 +298,9 @@ class CrossPlaneMeshService:
             "active_synchronized_policies": active_policies,
             "pending_drifts": pending_drifts,
             "federated_identities": "SPIFFE / AWS Roles Anywhere / Azure Workload / GCP Pool",
-            "compliance_score": 98.8 if pending_drifts == 0 else 92.4
+            "compliance_score": 98.8 if pending_drifts == 0 else 92.4,
         }
 
 
 # Global singleton instance
 crossplane_mesh_service = CrossPlaneMeshService()
-

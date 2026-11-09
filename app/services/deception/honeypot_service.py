@@ -22,18 +22,78 @@ class DeceptionHoneypotService:
     """
 
     DECOY_ENDPOINTS = [
-        {"path": "/wp-login.php", "type": "WordPress Admin Decoy", "lure": "CMS Login", "category": "web"},
-        {"path": "/.env", "type": "Configuration Decoy", "lure": "Secrets Disclosure", "category": "web"},
-        {"path": "/admin/phpmyadmin", "type": "Database Interface Decoy", "lure": "DB Management", "category": "web"},
-        {"path": "/actuator/env", "type": "Spring Actuator Decoy", "lure": "Microservice Secrets", "category": "web"},
-        {"path": "/.git/config", "type": "Source Code Repo Decoy", "lure": "Git Repository", "category": "web"},
-        {"path": "/api/v1/debug/keys", "type": "API Key Exposure Decoy", "lure": "API Tokens", "category": "web"},
-        {"path": "/.aws/credentials", "type": "Cloud Credentials Decoy", "lure": "AWS Secret Keys", "category": "cloud"},
-        {"path": "/.kube/config", "type": "Kubernetes Cluster Decoy", "lure": "K8s Admin Token", "category": "cloud"},
-        {"path": "/id_rsa", "type": "SSH Private Key Decoy", "lure": "Server Shell Access", "category": "network"},
-        {"path": "tcp://0.0.0.0:2222", "type": "SSH Honeypot Listener", "lure": "Interactive SSH Decoy", "category": "network"},
-        {"path": "tcp://0.0.0.0:6379", "type": "Redis Honeypot Listener", "lure": "Unauthenticated In-Memory DB", "category": "network"},
-        {"path": "tcp://0.0.0.0:5432", "type": "Postgres Honeypot Listener", "lure": "Database Connection Probe", "category": "network"},
+        {
+            "path": "/wp-login.php",
+            "type": "WordPress Admin Decoy",
+            "lure": "CMS Login",
+            "category": "web",
+        },
+        {
+            "path": "/.env",
+            "type": "Configuration Decoy",
+            "lure": "Secrets Disclosure",
+            "category": "web",
+        },
+        {
+            "path": "/admin/phpmyadmin",
+            "type": "Database Interface Decoy",
+            "lure": "DB Management",
+            "category": "web",
+        },
+        {
+            "path": "/actuator/env",
+            "type": "Spring Actuator Decoy",
+            "lure": "Microservice Secrets",
+            "category": "web",
+        },
+        {
+            "path": "/.git/config",
+            "type": "Source Code Repo Decoy",
+            "lure": "Git Repository",
+            "category": "web",
+        },
+        {
+            "path": "/api/v1/debug/keys",
+            "type": "API Key Exposure Decoy",
+            "lure": "API Tokens",
+            "category": "web",
+        },
+        {
+            "path": "/.aws/credentials",
+            "type": "Cloud Credentials Decoy",
+            "lure": "AWS Secret Keys",
+            "category": "cloud",
+        },
+        {
+            "path": "/.kube/config",
+            "type": "Kubernetes Cluster Decoy",
+            "lure": "K8s Admin Token",
+            "category": "cloud",
+        },
+        {
+            "path": "/id_rsa",
+            "type": "SSH Private Key Decoy",
+            "lure": "Server Shell Access",
+            "category": "network",
+        },
+        {
+            "path": "tcp://0.0.0.0:2222",
+            "type": "SSH Honeypot Listener",
+            "lure": "Interactive SSH Decoy",
+            "category": "network",
+        },
+        {
+            "path": "tcp://0.0.0.0:6379",
+            "type": "Redis Honeypot Listener",
+            "lure": "Unauthenticated In-Memory DB",
+            "category": "network",
+        },
+        {
+            "path": "tcp://0.0.0.0:5432",
+            "type": "Postgres Honeypot Listener",
+            "lure": "Database Connection Probe",
+            "category": "network",
+        },
     ]
 
     def __init__(self):
@@ -105,7 +165,9 @@ class DeceptionHoneypotService:
         Records an unauthorized probe against a decoy endpoint.
         """
         timestamp = datetime.now(timezone.utc).isoformat()
-        fingerprint = hashlib.sha256(f"{source_ip}:{user_agent}".encode("utf-8")).hexdigest()[:16]
+        fingerprint = hashlib.sha256(
+            f"{source_ip}:{user_agent}".encode("utf-8")
+        ).hexdigest()[:16]
 
         event = {
             "event_id": f"decoy_{secrets.token_hex(6)}",
@@ -215,10 +277,23 @@ class DeceptionHoneypotService:
         return {
             "status": "SIMULATION_COMPLETE",
             "journey": [
-                {"step": 1, "action": f"Attacker accessed decoy {decoy_path}", "event_id": decoy_hit["event_id"]},
-                {"step": 2, "action": f"Canary token generated & planted ({canary['canary_value'][:12]}...)"},
-                {"step": 3, "action": f"Attacker invoked API using canary token from {attacker_ip}"},
-                {"step": 4, "action": f"SOAR Incident created ({incident['incident_id']}) with automated containment playbooks"},
+                {
+                    "step": 1,
+                    "action": f"Attacker accessed decoy {decoy_path}",
+                    "event_id": decoy_hit["event_id"],
+                },
+                {
+                    "step": 2,
+                    "action": f"Canary token generated & planted ({canary['canary_value'][:12]}...)",
+                },
+                {
+                    "step": 3,
+                    "action": f"Attacker invoked API using canary token from {attacker_ip}",
+                },
+                {
+                    "step": 4,
+                    "action": f"SOAR Incident created ({incident['incident_id']}) with automated containment playbooks",
+                },
             ],
             "incident": incident,
         }

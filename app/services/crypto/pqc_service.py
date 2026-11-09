@@ -75,18 +75,28 @@ class PQCService:
         # 2. Lattice-based ML-KEM-768 seed & parameter generation
         ml_kem_seed = os.urandom(64)  # 512-bit quantum entropy seed
         # Expand seed deterministically via SHA3-512 sponge to construct ML-KEM vector polynomials
-        ml_kem_pub_raw = hashlib.sha3_512(ml_kem_seed + b":ml_kem_public").digest() + os.urandom(1184 - 64)
-        ml_kem_priv_raw = hashlib.sha3_512(ml_kem_seed + b":ml_kem_private").digest() + os.urandom(2400 - 64)
+        ml_kem_pub_raw = hashlib.sha3_512(
+            ml_kem_seed + b":ml_kem_public"
+        ).digest() + os.urandom(1184 - 64)
+        ml_kem_priv_raw = hashlib.sha3_512(
+            ml_kem_seed + b":ml_kem_private"
+        ).digest() + os.urandom(2400 - 64)
 
         return {
             "algorithm": "Hybrid X25519 + ML-KEM-768",
             "standards": ["RFC 7748 (X25519)", "NIST FIPS 203 (ML-KEM)"],
             "security_level": "Post-Quantum 256-bit Hybrid",
-            "classical_public_key": base64.b64encode(classical_pub_bytes).decode("utf-8"),
-            "classical_private_key": base64.b64encode(classical_priv_bytes).decode("utf-8"),
+            "classical_public_key": base64.b64encode(classical_pub_bytes).decode(
+                "utf-8"
+            ),
+            "classical_private_key": base64.b64encode(classical_priv_bytes).decode(
+                "utf-8"
+            ),
             "ml_kem_public_key": base64.b64encode(ml_kem_pub_raw).decode("utf-8"),
             "ml_kem_private_key": base64.b64encode(ml_kem_priv_raw).decode("utf-8"),
-            "public_key_fingerprint": hashlib.sha256(classical_pub_bytes + ml_kem_pub_raw).hexdigest()[:16],
+            "public_key_fingerprint": hashlib.sha256(
+                classical_pub_bytes + ml_kem_pub_raw
+            ).hexdigest()[:16],
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -110,7 +120,9 @@ class PQCService:
 
         # 2. Lattice-based ML-KEM-768 encapsulation
         kem_randomness = os.urandom(32)
-        kem_ciphertext = hashlib.sha3_512(ml_kem_pub_bytes[:64] + kem_randomness).digest() + os.urandom(1088 - 64)
+        kem_ciphertext = hashlib.sha3_512(
+            ml_kem_pub_bytes[:64] + kem_randomness
+        ).digest() + os.urandom(1088 - 64)
         pqc_shared = hashlib.sha3_256(kem_randomness + ml_kem_pub_bytes[:32]).digest()
 
         # 3. Hybrid KDF Combination (NIST SP 800-56C & FIPS 203 Combiner)
@@ -125,11 +137,17 @@ class PQCService:
         hybrid_shared_key = hkdf.derive(combined_entropy)
 
         return {
-            "ephemeral_classical_public": base64.b64encode(ephemeral_pub_bytes).decode("utf-8"),
+            "ephemeral_classical_public": base64.b64encode(ephemeral_pub_bytes).decode(
+                "utf-8"
+            ),
             "ml_kem_ciphertext": base64.b64encode(kem_ciphertext).decode("utf-8"),
-            "kem_randomness_enc": base64.b64encode(kem_randomness).decode("utf-8"),  # for deterministic decapsulation verification
+            "kem_randomness_enc": base64.b64encode(kem_randomness).decode(
+                "utf-8"
+            ),  # for deterministic decapsulation verification
             "shared_key_b64": base64.b64encode(hybrid_shared_key).decode("utf-8"),
-            "shared_key_fingerprint": hashlib.sha256(hybrid_shared_key).hexdigest()[:16],
+            "shared_key_fingerprint": hashlib.sha256(hybrid_shared_key).hexdigest()[
+                :16
+            ],
         }
 
     def decapsulate_secret(
@@ -149,7 +167,9 @@ class PQCService:
         kem_randomness = base64.b64decode(kem_randomness_enc_b64)
 
         # 1. Classical decapsulation
-        recipient_priv = x25519.X25519PrivateKey.from_private_bytes(classical_priv_bytes)
+        recipient_priv = x25519.X25519PrivateKey.from_private_bytes(
+            classical_priv_bytes
+        )
         ephemeral_pub = x25519.X25519PublicKey.from_public_bytes(ephemeral_pub_bytes)
         classical_shared = recipient_priv.exchange(ephemeral_pub)
 
@@ -176,7 +196,9 @@ class PQCService:
         Encrypts a plaintext payload using quantum-safe hybrid encapsulation + AES-256-GCM.
         Protects against Harvest-Now-Decrypt-Later adversaries.
         """
-        encaps = self.encapsulate_secret(classical_public_key_b64, ml_kem_public_key_b64)
+        encaps = self.encapsulate_secret(
+            classical_public_key_b64, ml_kem_public_key_b64
+        )
         shared_key = base64.b64decode(encaps["shared_key_b64"])
 
         nonce = os.urandom(12)
@@ -223,7 +245,9 @@ class PQCService:
             return decrypted.decode("utf-8")
         except Exception as e:
             logger.warning(f"Quantum-safe decryption failed: {e}")
-            raise ValueError(f"PQC Decryption failed: invalid key or corrupted ciphertext: {e}") from e
+            raise ValueError(
+                f"PQC Decryption failed: invalid key or corrupted ciphertext: {e}"
+            ) from e
 
     def generate_hybrid_signing_keypair(self) -> Dict[str, Any]:
         """
@@ -248,11 +272,17 @@ class PQCService:
             "algorithm": "Hybrid Ed25519 + ML-DSA-65",
             "standards": ["RFC 8032 (Ed25519)", "NIST FIPS 204 (ML-DSA)"],
             "security_level": "Post-Quantum 256-bit Hybrid Digital Signature",
-            "classical_public_key": base64.b64encode(classical_pub_bytes).decode("utf-8"),
-            "classical_private_key": base64.b64encode(classical_priv_bytes).decode("utf-8"),
+            "classical_public_key": base64.b64encode(classical_pub_bytes).decode(
+                "utf-8"
+            ),
+            "classical_private_key": base64.b64encode(classical_priv_bytes).decode(
+                "utf-8"
+            ),
             "ml_dsa_public_key": base64.b64encode(ml_dsa_pub_raw).decode("utf-8"),
             "ml_dsa_private_key": base64.b64encode(ml_dsa_priv_raw).decode("utf-8"),
-            "public_key_fingerprint": hashlib.sha256(classical_pub_bytes + ml_dsa_pub_raw).hexdigest()[:16],
+            "public_key_fingerprint": hashlib.sha256(
+                classical_pub_bytes + ml_dsa_pub_raw
+            ).hexdigest()[:16],
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -320,11 +350,13 @@ class PQCService:
             if len(ml_dsa_sig) != 3309 or len(ml_dsa_pub_bytes) != 1952:
                 return False
 
-            msg_digest = hashlib.sha3_512(b"NIST-FIPS-204-ML-DSA-65:" + msg_bytes).digest()
+            msg_digest = hashlib.sha3_512(
+                b"NIST-FIPS-204-ML-DSA-65:" + msg_bytes
+            ).digest()
             c = ml_dsa_sig[:32]
             w1 = ml_dsa_sig[32:64]
-            z = ml_dsa_sig[64:64+2048]
-            rest = ml_dsa_sig[64+2048:]
+            z = ml_dsa_sig[64 : 64 + 2048]
+            rest = ml_dsa_sig[64 + 2048 :]
 
             computed_w1 = hashlib.sha3_256(z + ml_dsa_pub_bytes[:32]).digest()
             if computed_w1 != w1:
@@ -366,7 +398,11 @@ class PQCService:
         if not plaintext:
             raise ValueError("Plaintext cannot be empty")
 
-        region_code = destination_region if destination_region in REGIONAL_ENCLAVES else "eu-central-1"
+        region_code = (
+            destination_region
+            if destination_region in REGIONAL_ENCLAVES
+            else "eu-central-1"
+        )
 
         # 1. Zero-egress sanitization
         enclave_service = ZeroEgressEnclaveService()
@@ -374,14 +410,22 @@ class PQCService:
         clean_payload = sanitization["sanitized_text"]
 
         # 2. Hybrid ML-KEM-768 + X25519 Key Encapsulation
-        kem_envelope = self.encapsulate_secret(recipient_classical_pub_b64, recipient_ml_kem_pub_b64)
+        kem_envelope = self.encapsulate_secret(
+            recipient_classical_pub_b64, recipient_ml_kem_pub_b64
+        )
         shared_key = base64.b64decode(kem_envelope["shared_key_b64"])
 
         # 3. Regional authenticated encryption
         nonce = os.urandom(12)
-        associated_data = f"region:{region_code}|pqc:fips203+204|sovereignty:enforced|v:2.6".encode("utf-8")
+        associated_data = (
+            f"region:{region_code}|pqc:fips203+204|sovereignty:enforced|v:2.6".encode(
+                "utf-8"
+            )
+        )
         aesgcm = AESGCM(shared_key)
-        ciphertext = aesgcm.encrypt(nonce, clean_payload.encode("utf-8"), associated_data)
+        ciphertext = aesgcm.encrypt(
+            nonce, clean_payload.encode("utf-8"), associated_data
+        )
 
         ciphertext_b64 = base64.b64encode(ciphertext).decode("utf-8")
         nonce_b64 = base64.b64encode(nonce).decode("utf-8")
@@ -427,7 +471,9 @@ class PQCService:
             "nonce": nonce_b64,
             "associated_data": associated_data.decode("utf-8"),
             "kem_envelope": {
-                "ephemeral_classical_public": kem_envelope["ephemeral_classical_public"],
+                "ephemeral_classical_public": kem_envelope[
+                    "ephemeral_classical_public"
+                ],
                 "ml_kem_ciphertext": kem_envelope["ml_kem_ciphertext"],
                 "kem_randomness_enc": kem_envelope["kem_randomness_enc"],
             },
@@ -476,7 +522,9 @@ class PQCService:
             ml_dsa_public_key_b64=sender_ml_dsa_pub_b64,
         )
         if not is_signature_valid:
-            raise ValueError("Cryptographic Integrity Failure: Hybrid Ed25519 + ML-DSA-65 signature is invalid or tampered.")
+            raise ValueError(
+                "Cryptographic Integrity Failure: Hybrid Ed25519 + ML-DSA-65 signature is invalid or tampered."
+            )
 
         # 2. Decapsulate Hybrid shared secret
         kem_env = pqc_envelope["kem_envelope"]
@@ -540,20 +588,37 @@ class PQCService:
 
         for suite in ciphersuites:
             suite_upper = suite.upper()
-            is_quantum_broken = any(alg in suite_upper for alg in ["RSA", "ECDHE", "ECDSA", "DHE", "SECP256R1", "ED25519"])
-            has_pqc = any(pqc in suite_upper for pqc in ["KYBER", "ML-KEM", "DILITHIUM", "ML-DSA", "SPHINCS", "FALCON"])
+            is_quantum_broken = any(
+                alg in suite_upper
+                for alg in ["RSA", "ECDHE", "ECDSA", "DHE", "SECP256R1", "ED25519"]
+            )
+            has_pqc = any(
+                pqc in suite_upper
+                for pqc in [
+                    "KYBER",
+                    "ML-KEM",
+                    "DILITHIUM",
+                    "ML-DSA",
+                    "SPHINCS",
+                    "FALCON",
+                ]
+            )
 
             if has_pqc:
                 status = "QUANTUM_SAFE"
                 risk = "NONE"
                 safe_count += 1
-                threat_vector = "Protected against Shor's and Grover's quantum cryptanalysis"
+                threat_vector = (
+                    "Protected against Shor's and Grover's quantum cryptanalysis"
+                )
                 migration_action = "Complies with NIST FIPS 203 / CNSA 2.0 requirements"
             elif is_quantum_broken:
                 status = "CRITICAL_HNDL_VULNERABILITY"
                 risk = "CRITICAL"
                 critical_count += 1
-                threat_vector = "Vulnerable to Shor's algorithm on CRQC (Harvest-Now-Decrypt-Later)"
+                threat_vector = (
+                    "Vulnerable to Shor's algorithm on CRQC (Harvest-Now-Decrypt-Later)"
+                )
                 migration_action = "Migrate to Hybrid X25519 + ML-KEM-768 or pure ML-KEM-1024 before 2030"
             else:
                 status = "CLASSICAL_STRONG"
@@ -561,15 +626,19 @@ class PQCService:
                 threat_vector = "Symmetric cipher (AES-256) halved to 128-bit via Grover's algorithm"
                 migration_action = "Ensure minimum 256-bit symmetric keys are enforced"
 
-            analyzed.append({
-                "ciphersuite": suite,
-                "status": status,
-                "risk_level": risk,
-                "threat_vector": threat_vector,
-                "migration_action": migration_action,
-            })
+            analyzed.append(
+                {
+                    "ciphersuite": suite,
+                    "status": status,
+                    "risk_level": risk,
+                    "threat_vector": threat_vector,
+                    "migration_action": migration_action,
+                }
+            )
 
-        overall_posture = "CRITICAL_EXPOSURE" if critical_count > 0 else "QUANTUM_RESISTANT"
+        overall_posture = (
+            "CRITICAL_EXPOSURE" if critical_count > 0 else "QUANTUM_RESISTANT"
+        )
 
         # Anchor audit record
         audit_record = audit_chain.record_action(
@@ -608,4 +677,3 @@ class PQCService:
 
 # Global singleton
 pqc_service = PQCService()
-

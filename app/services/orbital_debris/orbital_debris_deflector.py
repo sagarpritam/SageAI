@@ -76,9 +76,13 @@ class OrbitalASATDebrisDeflector:
             raise ValueError(f"Orbital platform {platform_id} not registered.")
 
         now = time.time()
-        is_imminent_collision = miss_distance_meters < 450.0 and collision_probability > 1e-4
+        is_imminent_collision = (
+            miss_distance_meters < 450.0 and collision_probability > 1e-4
+        )
         is_hypervelocity = relative_velocity_km_s > 6.0
-        threat_detected = is_imminent_collision or (collision_probability > 5e-4 and is_hypervelocity)
+        threat_detected = is_imminent_collision or (
+            collision_probability > 5e-4 and is_hypervelocity
+        )
 
         threat_type = "NOMINAL_ORBITAL_CONJUNCTION_PASS"
         threat_level = "LOW"
@@ -96,7 +100,9 @@ class OrbitalASATDebrisDeflector:
                 action_recommended = "DISCHARGE_PULSED_LASER_ABLATION_DEFLECTION"
 
         # Calculate required velocity change delta-v in cm/s to achieve 5 km miss distance
-        required_delta_v_cm_s = round(max(1.5, 2.5 * (500.0 / max(10.0, miss_distance_meters))), 2)
+        required_delta_v_cm_s = round(
+            max(1.5, 2.5 * (500.0 / max(10.0, miss_distance_meters))), 2
+        )
 
         return {
             "conjunction_id": f"conj-{uuid.uuid4().hex[:6]}",
@@ -155,10 +161,13 @@ class OrbitalASATDebrisDeflector:
 
     def get_debris_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for orbital kinetic debris laser deflector."""
-        total_deflected = sum(p["debris_deflected_count"] for p in self._platforms.values())
+        total_deflected = sum(
+            p["debris_deflected_count"] for p in self._platforms.values()
+        )
         return {
             "active_orbital_laser_platforms": len(self._platforms),
-            "debris_conjunctions_deflected": total_deflected + len(self._deflection_events),
+            "debris_conjunctions_deflected": total_deflected
+            + len(self._deflection_events),
             "mean_fire_control_latency_ms": 1.6,
             "mean_delta_v_impulse_cm_s": 3.75,
             "satellite_survival_rate_pct": 100.0,
@@ -167,4 +176,3 @@ class OrbitalASATDebrisDeflector:
 
 # Singleton instance
 orbital_asat_debris_deflector = OrbitalASATDebrisDeflector()
-

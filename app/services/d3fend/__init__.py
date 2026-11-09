@@ -8,4 +8,3 @@ from app.services.d3fend.d3fend_matrix_service import (
 )
 
 __all__ = ["D3FENDMatrixService", "d3fend_matrix_service"]
-

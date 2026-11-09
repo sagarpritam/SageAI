@@ -11,18 +11,31 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.redteam.atomic_adversary_emulator import atomic_adversary_emulator
 
-router = APIRouter(prefix="/atomic-redteam", tags=["Atomic Red Team & Adversary Emulation"])
+router = APIRouter(
+    prefix="/atomic-redteam", tags=["Atomic Red Team & Adversary Emulation"]
+)
 
 
 class RunAtomicTestRequest(BaseModel):
-    technique_id: str = Field(..., description="MITRE ATT&CK Technique ID (e.g. T1059.001, T1003.001)")
-    target_host: Optional[str] = Field("sandbox-runner-01", description="Designated execution target or sandbox")
-    dry_run: Optional[bool] = Field(True, description="Safe emulation mode inside unprivileged sandbox")
+    technique_id: str = Field(
+        ..., description="MITRE ATT&CK Technique ID (e.g. T1059.001, T1003.001)"
+    )
+    target_host: Optional[str] = Field(
+        "sandbox-runner-01", description="Designated execution target or sandbox"
+    )
+    dry_run: Optional[bool] = Field(
+        True, description="Safe emulation mode inside unprivileged sandbox"
+    )
 
 
 class RunCampaignRequest(BaseModel):
-    campaign_id: str = Field(..., description="Adversary Campaign ID (e.g. APT29_COZY_BEAR, SCATTERED_SPIDER)")
-    target_network: Optional[str] = Field("prod-vpc-us-east-1", description="Target cloud network or VPC")
+    campaign_id: str = Field(
+        ...,
+        description="Adversary Campaign ID (e.g. APT29_COZY_BEAR, SCATTERED_SPIDER)",
+    )
+    target_network: Optional[str] = Field(
+        "prod-vpc-us-east-1", description="Target cloud network or VPC"
+    )
 
 
 @router.get("/techniques")
@@ -84,4 +97,3 @@ async def run_campaign_endpoint(
         return {"status": "success", "campaign_report": res}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

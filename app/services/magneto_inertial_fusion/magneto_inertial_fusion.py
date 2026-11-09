@@ -121,10 +121,14 @@ class MagnetoInertialFusion:
             raise ValueError(f"MIF reactor {reactor_id} not registered.")
 
         current = reactor.peak_driver_current_ma + current_boost_ma
-        q_val = round(reactor.thermonuclear_q_factor * (1.0 + 0.05 * compression_gain), 2)
-        thermal_gw = round(reactor.thermal_power_output_gw * (1.0 + 0.06 * compression_gain), 2)
+        q_val = round(
+            reactor.thermonuclear_q_factor * (1.0 + 0.05 * compression_gain), 2
+        )
+        thermal_gw = round(
+            reactor.thermal_power_output_gw * (1.0 + 0.06 * compression_gain), 2
+        )
         electrical_mw = round(thermal_gw * 340.0, 1)  # Direct conversion yield
-        pressure_mbar = round(48.5 * (current / 20.0)**2, 1)
+        pressure_mbar = round(48.5 * (current / 20.0) ** 2, 1)
         exhaust_vel = round(1180.0 + current * 4.5, 1)
         isp = round(exhaust_vel * 101.97, 1)
 
@@ -178,4 +182,3 @@ magneto_inertial_fusion = MagnetoInertialFusion()
 
 def get_magneto_inertial_fusion() -> MagnetoInertialFusion:
     return magneto_inertial_fusion
-

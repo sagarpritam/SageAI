@@ -13,7 +13,9 @@ router = APIRouter(
 
 class MeasureDistortionRequest(BaseModel):
     node_id: str = Field(..., example="QGRAV-NODE-GENEVA-01")
-    target_region: str = Field(default="LOCAL_EARTH_GEOID_SECTOR_7", example="LOCAL_EARTH_GEOID_SECTOR_7")
+    target_region: str = Field(
+        default="LOCAL_EARTH_GEOID_SECTOR_7", example="LOCAL_EARTH_GEOID_SECTOR_7"
+    )
     integration_time_sec: float = Field(default=30.0, ge=1.0, le=3600.0)
 
 
@@ -37,4 +39,3 @@ async def measure_distortion(req: MeasureDistortionRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return quantum_gravitational_sensor.get_sensor_metrics()
-

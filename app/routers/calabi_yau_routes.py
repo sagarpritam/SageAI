@@ -13,8 +13,12 @@ router = APIRouter(
 
 class StabilizeModuliRequest(BaseModel):
     manifold_id: str = Field(..., description="Target Calabi-Yau manifold ID")
-    target_volume_string_units: float = Field(default=50.0, ge=1.0, le=500.0, description="Target compactification volume")
-    flux_intensity_factor: float = Field(default=1.0, ge=0.1, le=10.0, description="RR/NS flux factor")
+    target_volume_string_units: float = Field(
+        default=50.0, ge=1.0, le=500.0, description="Target compactification volume"
+    )
+    flux_intensity_factor: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="RR/NS flux factor"
+    )
 
 
 @router.get("/manifolds")

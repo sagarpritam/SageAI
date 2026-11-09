@@ -3,6 +3,7 @@ Unit & Integration Tests for SageAI Post-Quantum Cryptography (PQC) & Hybrid Mig
 """
 
 import base64
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -139,7 +140,9 @@ async def test_pqc_fastapi_endpoints():
     """Verify FastAPI /pqc endpoints with bearer token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"})
+        token = create_access_token(
+            {"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"}
+        )
         auth_headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Unauthenticated request should be rejected
@@ -180,9 +183,13 @@ async def test_pqc_fastapi_endpoints():
         # 5. Scan ciphersuites risk
         scan_res = await client.post(
             "/pqc/scan-risk",
-            json={"ciphersuites": ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "X25519Kyber768Draft00_AES256_GCM"]},
+            json={
+                "ciphersuites": [
+                    "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                    "X25519Kyber768Draft00_AES256_GCM",
+                ]
+            },
             headers=auth_headers,
         )
         assert scan_res.status_code == 200
         assert scan_res.json()["critical_hndl_count"] >= 1
-

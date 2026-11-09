@@ -21,14 +21,22 @@ router = APIRouter(
 
 class EvaluateStabilityRequest(BaseModel):
     grid_id: str = Field(..., description="Target transmission interconnect identifier")
-    frequency_hz: float = Field(..., description="Measured synchrophasor frequency in Hz")
-    phase_angle_delta_deg: float = Field(..., description="Measured phase angle difference in degrees")
-    rocof_hz_s: float = Field(..., description="Rate of Change of Frequency in Hz/second")
+    frequency_hz: float = Field(
+        ..., description="Measured synchrophasor frequency in Hz"
+    )
+    phase_angle_delta_deg: float = Field(
+        ..., description="Measured phase angle difference in degrees"
+    )
+    rocof_hz_s: float = Field(
+        ..., description="Rate of Change of Frequency in Hz/second"
+    )
 
 
 class IslandingRequest(BaseModel):
     grid_id: str = Field(..., description="Grid interconnect to island")
-    reason: str = Field("Imminent cyber-kinetic frequency collapse", description="Reason for islanding")
+    reason: str = Field(
+        "Imminent cyber-kinetic frequency collapse", description="Reason for islanding"
+    )
 
 
 @router.get("/interconnects")
@@ -38,7 +46,10 @@ async def list_interconnects_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all monitored high-voltage transmission interconnections."""
-    return {"status": "success", "interconnects": intergrid_failover_guard.list_interconnects()}
+    return {
+        "status": "success",
+        "interconnects": intergrid_failover_guard.list_interconnects(),
+    }
 
 
 @router.get("/interconnects/{grid_id}")
@@ -84,7 +95,9 @@ async def trigger_islanding_endpoint(
 ):
     """Executes sub-18ms micro-grid islanding to isolate critical infrastructure."""
     try:
-        res = intergrid_failover_guard.trigger_autonomous_islanding(body.grid_id, body.reason)
+        res = intergrid_failover_guard.trigger_autonomous_islanding(
+            body.grid_id, body.reason
+        )
         return {"status": "success", "islanding": res}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -97,5 +110,7 @@ async def get_intergrid_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet metrics for all sovereign transmission interconnects."""
-    return {"status": "success", "metrics": intergrid_failover_guard.get_intergrid_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": intergrid_failover_guard.get_intergrid_metrics(),
+    }

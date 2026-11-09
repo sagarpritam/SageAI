@@ -30,9 +30,27 @@ SAMPLE_VOLATILE_SNAPSHOT = {
     "target_host": "prod-k8s-node-04",
     "os_version": "Linux 6.8.0-31-generic x86_64",
     "processes": [
-        {"pid": 1, "ppid": 0, "name": "systemd", "path": "/usr/lib/systemd/systemd", "anomaly": False},
-        {"pid": 812, "ppid": 1, "name": "dockerd", "path": "/usr/bin/dockerd", "anomaly": False},
-        {"pid": 1420, "ppid": 812, "name": "nginx", "path": "/usr/sbin/nginx", "anomaly": False},
+        {
+            "pid": 1,
+            "ppid": 0,
+            "name": "systemd",
+            "path": "/usr/lib/systemd/systemd",
+            "anomaly": False,
+        },
+        {
+            "pid": 812,
+            "ppid": 1,
+            "name": "dockerd",
+            "path": "/usr/bin/dockerd",
+            "anomaly": False,
+        },
+        {
+            "pid": 1420,
+            "ppid": 812,
+            "name": "nginx",
+            "path": "/usr/sbin/nginx",
+            "anomaly": False,
+        },
         {
             "pid": 3892,
             "ppid": 1420,
@@ -51,8 +69,18 @@ SAMPLE_VOLATILE_SNAPSHOT = {
         },
     ],
     "network_sockets": [
-        {"proto": "TCP", "local_addr": "0.0.0.0:80", "remote_addr": "0.0.0.0:0", "state": "LISTEN"},
-        {"proto": "TCP", "local_addr": "0.0.0.0:443", "remote_addr": "0.0.0.0:0", "state": "LISTEN"},
+        {
+            "proto": "TCP",
+            "local_addr": "0.0.0.0:80",
+            "remote_addr": "0.0.0.0:0",
+            "state": "LISTEN",
+        },
+        {
+            "proto": "TCP",
+            "local_addr": "0.0.0.0:443",
+            "remote_addr": "0.0.0.0:0",
+            "state": "LISTEN",
+        },
         {
             "proto": "TCP",
             "local_addr": "10.0.1.45:49182",
@@ -143,12 +171,30 @@ class ForensicsService:
         Synthesizes an chronological forensic incident timeline based on acquired volatile memory.
         """
         events = [
-            {"time": "2026-11-05T20:10:00Z", "event": "Nginx web server processed external HTTP POST to /api/upload"},
-            {"time": "2026-11-05T20:10:14Z", "event": "Web shell dropper executed in /dev/shm/.beacon (PID 3895)"},
-            {"time": "2026-11-05T20:10:15Z", "event": "Interactive /bin/sh shell spawned as child of worker (PID 3892)"},
-            {"time": "2026-11-05T20:10:18Z", "event": "Unbacked RWX memory buffer allocated (0x7f88a1000000, 256 KB)"},
-            {"time": "2026-11-05T20:10:21Z", "event": "Outbound TCP connection established to 198.51.100.99:8443 (C2 Channel)"},
-            {"time": "2026-11-05T20:10:25Z", "event": "SageAI Forensics Service triggered live snapshot capture"},
+            {
+                "time": "2026-11-05T20:10:00Z",
+                "event": "Nginx web server processed external HTTP POST to /api/upload",
+            },
+            {
+                "time": "2026-11-05T20:10:14Z",
+                "event": "Web shell dropper executed in /dev/shm/.beacon (PID 3895)",
+            },
+            {
+                "time": "2026-11-05T20:10:15Z",
+                "event": "Interactive /bin/sh shell spawned as child of worker (PID 3892)",
+            },
+            {
+                "time": "2026-11-05T20:10:18Z",
+                "event": "Unbacked RWX memory buffer allocated (0x7f88a1000000, 256 KB)",
+            },
+            {
+                "time": "2026-11-05T20:10:21Z",
+                "event": "Outbound TCP connection established to 198.51.100.99:8443 (C2 Channel)",
+            },
+            {
+                "time": "2026-11-05T20:10:25Z",
+                "event": "SageAI Forensics Service triggered live snapshot capture",
+            },
         ]
 
         return {
@@ -161,4 +207,3 @@ class ForensicsService:
 
 # Global instance
 forensics_service = ForensicsService()
-

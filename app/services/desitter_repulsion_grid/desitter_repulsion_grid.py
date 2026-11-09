@@ -48,9 +48,9 @@ class CosmologicalDeSitterRepulsionGrid:
     """
 
     COSMOLOGICAL_LAMBDA_M2 = 1.1056e-52  # Cosmological constant Lambda in m^-2
-    PLANCK_HBAR = 1.054571817e-34       # J*s
-    SPEED_OF_LIGHT = 299792458.0        # m/s
-    BOLTZMANN_K = 1.380649e-23          # J/K
+    PLANCK_HBAR = 1.054571817e-34  # J*s
+    SPEED_OF_LIGHT = 299792458.0  # m/s
+    BOLTZMANN_K = 1.380649e-23  # J/K
 
     def __init__(self):
         self.nodes: Dict[str, DeSitterRepulsionNode] = {}
@@ -132,11 +132,22 @@ class CosmologicalDeSitterRepulsionGrid:
 
         # Gibbons-Hawking temperature of de Sitter horizon: T_dS = hbar*c / (2*pi*k_B) * sqrt(Lambda/3)
         hubble_rate = self.SPEED_OF_LIGHT * math.sqrt(self.COSMOLOGICAL_LAMBDA_M2 / 3.0)
-        t_ds_kelvin = (self.PLANCK_HBAR * hubble_rate) / (2.0 * math.pi * self.BOLTZMANN_K)
+        t_ds_kelvin = (self.PLANCK_HBAR * hubble_rate) / (
+            2.0 * math.pi * self.BOLTZMANN_K
+        )
         t_ds_nk = t_ds_kelvin * 1e9
 
-        polarizability_trace = round(node.resonant_polarizability_alpha0 * 3.0 * coupling_gain * (1.0 + random.uniform(-0.01, 0.01)), 41)
-        repulsion_force = round(node.vacuum_repulsion_force_nn * coupling_gain * random.uniform(0.98, 1.04), 2)
+        polarizability_trace = round(
+            node.resonant_polarizability_alpha0
+            * 3.0
+            * coupling_gain
+            * (1.0 + random.uniform(-0.01, 0.01)),
+            41,
+        )
+        repulsion_force = round(
+            node.vacuum_repulsion_force_nn * coupling_gain * random.uniform(0.98, 1.04),
+            2,
+        )
         potential_ev = round(1.45e-6 * coupling_gain * (repulsion_force / 50.0), 8)
         screening_eff = round(99.4 + random.uniform(0.1, 0.55), 2)
 

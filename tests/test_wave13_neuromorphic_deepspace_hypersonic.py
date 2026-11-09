@@ -8,11 +8,13 @@ Test Suite for Wave 13: Neuromorphic Spiking Chip Defense, Deep-Space Laser Comm
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
-from app.services.neuromorphic_snn.neuromorphic_snn_guard import neuromorphic_snn_guard
+from app.main import app
 from app.services.deep_space_laser.deep_space_laser_mesh import deep_space_laser_mesh
-from app.services.hypersonic_defense.hypersonic_interceptor import hypersonic_interceptor
+from app.services.hypersonic_defense.hypersonic_interceptor import (
+    hypersonic_interceptor,
+)
+from app.services.neuromorphic_snn.neuromorphic_snn_guard import neuromorphic_snn_guard
 
 
 @pytest.fixture
@@ -118,12 +120,14 @@ def test_deep_space_laser_service():
     pointing_err = deep_space_laser_mesh.acquire_deepspace_beam(
         terminal_id="dsoc-terminal-earth-palomar",
         point_ahead_angle_urad=1.48,  # > 1.35 urad
-        doppler_shift_ghz=18.5,       # > 15 GHz
-        photon_snr_db=2.1,            # < 3 dB
+        doppler_shift_ghz=18.5,  # > 15 GHz
+        photon_snr_db=2.1,  # < 3 dB
     )
     assert pointing_err["threat_detected"] is True
     assert pointing_err["threat_type"] == "ASTRONOMICAL_BEAM_POINTING_DESYNC"
-    assert pointing_err["action_recommended"] == "ENGAGE_FAST_STEERING_MIRROR_CLOSED_LOOP"
+    assert (
+        pointing_err["action_recommended"] == "ENGAGE_FAST_STEERING_MIRROR_CLOSED_LOOP"
+    )
 
     # Transmit authenticated DSOC photon frame
     tx = deep_space_laser_mesh.transmit_authenticated_dsoc_frame(
@@ -216,21 +220,27 @@ def test_wave13_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["cores"]) >= 3
 
-        res_snn = client.post("/neuromorphic-snn/classify-spikes", json={
-            "core_id": "core-loihi2-edge-01",
-            "mean_spike_rate_mhz": 125.0,
-            "aer_inter_arrival_jitter_ns": 55.0,
-            "voltage_anomaly_mv": 140.0,
-            "bus_payload_entropy": 7.2,
-        })
+        res_snn = client.post(
+            "/neuromorphic-snn/classify-spikes",
+            json={
+                "core_id": "core-loihi2-edge-01",
+                "mean_spike_rate_mhz": 125.0,
+                "aer_inter_arrival_jitter_ns": 55.0,
+                "voltage_anomaly_mv": 140.0,
+                "bus_payload_entropy": 7.2,
+            },
+        )
         assert res_snn.status_code == 200
         assert res_snn.json()["classification"]["threat_detected"] is True
 
-        res_clamp = client.post("/neuromorphic-snn/inject-clamp", json={
-            "core_id": "core-loihi2-edge-01",
-            "clamp_line": "BUS_LINE_RESET_ISOLATE",
-            "response_latency_ns": 380.0,
-        })
+        res_clamp = client.post(
+            "/neuromorphic-snn/inject-clamp",
+            json={
+                "core_id": "core-loihi2-edge-01",
+                "clamp_line": "BUS_LINE_RESET_ISOLATE",
+                "response_latency_ns": 380.0,
+            },
+        )
         assert res_clamp.status_code == 200
         assert res_clamp.json()["clamp"]["hardware_bus_isolated"] is True
 
@@ -242,20 +252,26 @@ def test_wave13_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["terminals"]) >= 3
 
-        res_dsoc = client.post("/deep-space-laser/acquire-beam", json={
-            "terminal_id": "dsoc-terminal-mars-recon-01",
-            "point_ahead_angle_urad": 1.42,
-            "doppler_shift_ghz": 16.5,
-            "photon_snr_db": 2.5,
-        })
+        res_dsoc = client.post(
+            "/deep-space-laser/acquire-beam",
+            json={
+                "terminal_id": "dsoc-terminal-mars-recon-01",
+                "point_ahead_angle_urad": 1.42,
+                "doppler_shift_ghz": 16.5,
+                "photon_snr_db": 2.5,
+            },
+        )
         assert res_dsoc.status_code == 200
         assert res_dsoc.json()["acquisition"]["threat_detected"] is True
 
-        res_tx = client.post("/deep-space-laser/transmit-frame", json={
-            "terminal_id": "dsoc-terminal-mars-recon-01",
-            "payload_size_kb": 1024,
-            "pqc_cipher": "ML-KEM-1024_LDPC",
-        })
+        res_tx = client.post(
+            "/deep-space-laser/transmit-frame",
+            json={
+                "terminal_id": "dsoc-terminal-mars-recon-01",
+                "payload_size_kb": 1024,
+                "pqc_cipher": "ML-KEM-1024_LDPC",
+            },
+        )
         assert res_tx.status_code == 200
         assert res_tx.json()["transmission"]["frame_delivery_verified"] is True
 
@@ -267,21 +283,27 @@ def test_wave13_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["threats"]) >= 3
 
-        res_hgv = client.post("/hypersonic-defense/track-glide-path", json={
-            "threat_id": "threat-waverider-glide-03",
-            "measured_mach": 18.0,
-            "altitude_km": 55.0,
-            "skip_glide_detected": True,
-            "plasma_blackout_active": True,
-        })
+        res_hgv = client.post(
+            "/hypersonic-defense/track-glide-path",
+            json={
+                "threat_id": "threat-waverider-glide-03",
+                "measured_mach": 18.0,
+                "altitude_km": 55.0,
+                "skip_glide_detected": True,
+                "plasma_blackout_active": True,
+            },
+        )
         assert res_hgv.status_code == 200
         assert res_hgv.json()["tracking"]["threat_detected"] is True
 
-        res_kill = client.post("/hypersonic-defense/fire-interceptor", json={
-            "threat_id": "threat-waverider-glide-03",
-            "interceptor_type": "DIRECTED_ENERGY_OPTICAL_LASER_EKV",
-            "fire_control_latency_ms": 1.9,
-        })
+        res_kill = client.post(
+            "/hypersonic-defense/fire-interceptor",
+            json={
+                "threat_id": "threat-waverider-glide-03",
+                "interceptor_type": "DIRECTED_ENERGY_OPTICAL_LASER_EKV",
+                "fire_control_latency_ms": 1.9,
+            },
+        )
         assert res_kill.status_code == 200
         assert res_kill.json()["interception"]["kinetic_kill_verified"] is True
 
@@ -289,4 +311,3 @@ def test_wave13_api_routes(client):
         assert res_hyp_met.status_code == 200
     finally:
         app.dependency_overrides.clear()
-

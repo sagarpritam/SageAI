@@ -116,9 +116,15 @@ class ERBridgeMetricSiphon:
             raise ValueError(f"Wormhole throat {throat_id} not registered.")
 
         # Siphon efficiency
-        siphoned = round(min(incident_power_gw, throat.siphon_throughput_capacity_gw) * random.uniform(0.985, 0.999), 2)
+        siphoned = round(
+            min(incident_power_gw, throat.siphon_throughput_capacity_gw)
+            * random.uniform(0.985, 0.999),
+            2,
+        )
         dilation = round(1.0 + (siphoned / 1000.0) * 0.14, 3)
-        pulse_uj = round(abs(throat.negative_casimir_energy_density_j_m3) * 1e-24 * siphoned, 6)
+        pulse_uj = round(
+            abs(throat.negative_casimir_energy_density_j_m3) * 1e-24 * siphoned, 6
+        )
 
         event_id = f"ER-SIPHON-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         event = ERSiphonEvent(
@@ -151,7 +157,9 @@ class ERBridgeMetricSiphon:
         }
 
     def get_siphon_metrics(self) -> Dict[str, Any]:
-        total_capacity = sum([t.siphon_throughput_capacity_gw for t in self.throats.values()])
+        total_capacity = sum(
+            [t.siphon_throughput_capacity_gw for t in self.throats.values()]
+        )
         return {
             "active_er_bridge_throats": len(self.throats),
             "aggregate_siphon_capacity_gw": round(total_capacity, 2),
@@ -163,4 +171,3 @@ class ERBridgeMetricSiphon:
 
 
 er_bridge_metric_siphon = ERBridgeMetricSiphon()
-

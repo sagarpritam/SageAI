@@ -13,7 +13,9 @@ router = APIRouter(
 
 class ClampChronologyRequest(BaseModel):
     horizon_id: str = Field(..., description="Target Cauchy horizon ID")
-    simulated_blueshift_factor: float = Field(default=1.0e12, ge=1.0, le=1.0e18, description="Simulated blueshift factor")
+    simulated_blueshift_factor: float = Field(
+        default=1.0e12, ge=1.0, le=1.0e18, description="Simulated blueshift factor"
+    )
 
 
 @router.get("/horizons")

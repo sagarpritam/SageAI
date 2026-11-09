@@ -20,16 +20,26 @@ router = APIRouter(
 
 
 class VerifyAttestationRequest(BaseModel):
-    platform: str = Field(..., description="Platform: AWS_NITRO, AMD_SEV_SNP, or INTEL_SGX")
-    attestation_doc_b64: Optional[str] = Field(None, description="Base64 encoded AWS Nitro attestation doc")
-    report_hex: Optional[str] = Field(None, description="Hex encoded AMD SEV-SNP report")
+    platform: str = Field(
+        ..., description="Platform: AWS_NITRO, AMD_SEV_SNP, or INTEL_SGX"
+    )
+    attestation_doc_b64: Optional[str] = Field(
+        None, description="Base64 encoded AWS Nitro attestation doc"
+    )
+    report_hex: Optional[str] = Field(
+        None, description="Hex encoded AMD SEV-SNP report"
+    )
     quote_hex: Optional[str] = Field(None, description="Hex encoded Intel SGX quote")
     expected_pcr0: Optional[str] = None
 
 
 class UnsealSecretRequest(BaseModel):
-    platform: str = Field(..., description="Platform: AWS_NITRO, AMD_SEV_SNP, or INTEL_SGX")
-    secret_id: str = Field(..., description="ID of protected sovereign secret to unseal")
+    platform: str = Field(
+        ..., description="Platform: AWS_NITRO, AMD_SEV_SNP, or INTEL_SGX"
+    )
+    secret_id: str = Field(
+        ..., description="ID of protected sovereign secret to unseal"
+    )
     attestation_doc_b64: Optional[str] = None
     report_hex: Optional[str] = None
     quote_hex: Optional[str] = None
@@ -93,9 +103,13 @@ async def verify_attestation_endpoint(
     elif plat == "INTEL_SGX":
         if not payload.quote_hex:
             raise HTTPException(status_code=400, detail="Missing quote_hex")
-        return hardware_attestation_service.verify_intel_sgx_quote(quote_hex=payload.quote_hex)
+        return hardware_attestation_service.verify_intel_sgx_quote(
+            quote_hex=payload.quote_hex
+        )
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported platform: {payload.platform}")
+        raise HTTPException(
+            status_code=400, detail=f"Unsupported platform: {payload.platform}"
+        )
 
 
 @router.post("/unseal")
@@ -117,4 +131,3 @@ async def unseal_secret_endpoint(
         secret_id=payload.secret_id,
         operator=current_user.get("email", "WorkloadIdentity"),
     )
-

@@ -3,13 +3,13 @@ Unit & Integration Tests for Wave 25: Holographic Ryu-Takayanagi Entanglement Si
 D-Brane Tadpole Anomaly Filter, Novikov Chrono-Geodesic Normalizer & Hypersonic MHD Plasma Stealth (Capabilities 95-97 + Option B).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.ryu_takayanagi_siphon import get_ryu_takayanagi_siphon
 from app.services.dbrane_tadpole_filter import get_dbrane_tadpole_filter
-from app.services.novikov_geodesic_normalizer import get_novikov_geodesic_normalizer
 from app.services.mhd_plasma_stealth import get_mhd_plasma_stealth
+from app.services.novikov_geodesic_normalizer import get_novikov_geodesic_normalizer
+from app.services.ryu_takayanagi_siphon import get_ryu_takayanagi_siphon
 
 client = TestClient(app)
 
@@ -65,7 +65,10 @@ def test_ryu_takayanagi_api_routes():
 
     r_metrics = client.get("/api/ryu-takayanagi/metrics")
     assert r_metrics.status_code == 200
-    assert r_metrics.json()["holographic_framework"] == "RYU_TAKAYANAGI_ADS_CFT_CORRESPONDENCE"
+    assert (
+        r_metrics.json()["holographic_framework"]
+        == "RYU_TAKAYANAGI_ADS_CFT_CORRESPONDENCE"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +119,10 @@ def test_dbrane_tadpole_api_routes():
 
     r_metrics = client.get("/api/dbrane-tadpole/metrics")
     assert r_metrics.status_code == 200
-    assert r_metrics.json()["anomaly_cancellation_mechanism"] == "GREEN_SCHWARZ_TOPOLOGICAL_AXION"
+    assert (
+        r_metrics.json()["anomaly_cancellation_mechanism"]
+        == "GREEN_SCHWARZ_TOPOLOGICAL_AXION"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -126,12 +132,12 @@ def test_novikov_geodesic_normalizer_service():
     norm = get_novikov_geodesic_normalizer()
     loops = norm.list_loops()
     assert len(loops) >= 3
-    l = loops[0]
-    assert "loop_id" in l
-    assert "unnormalized_paradox_probability" in l
+    target_loop = loops[0]
+    assert "loop_id" in target_loop
+    assert "unnormalized_paradox_probability" in target_loop
 
     res = norm.normalize_geodesic_loop(
-        loop_id=l["loop_id"],
+        loop_id=target_loop["loop_id"],
         phase_adjustment_gain=1.5,
     )
     assert res["normalization_id"].startswith("NOVIKOV-NORM-")
@@ -166,7 +172,10 @@ def test_novikov_geodesic_api_routes():
 
     r_metrics = client.get("/api/novikov-geodesic/metrics")
     assert r_metrics.status_code == 200
-    assert r_metrics.json()["path_integral_formalism"] == "FEYNMAN_NOVIKOV_GLOBAL_ACTION_EXTREMIZATION"
+    assert (
+        r_metrics.json()["path_integral_formalism"]
+        == "FEYNMAN_NOVIKOV_GLOBAL_ACTION_EXTREMIZATION"
+    )
 
 
 # ---------------------------------------------------------------------------

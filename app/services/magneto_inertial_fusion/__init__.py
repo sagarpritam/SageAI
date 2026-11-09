@@ -1,4 +1,5 @@
 """Sovereign Directed Magneto-Inertial Fusion (MIF) Package."""
+
 from .magneto_inertial_fusion import (
     MagnetoInertialFusion,
     MIFPulseResult,
@@ -14,4 +15,3 @@ __all__ = [
     "magneto_inertial_fusion",
     "get_magneto_inertial_fusion",
 ]
-

@@ -15,8 +15,12 @@ router = APIRouter(
 
 class SynthesizeMetricRequest(BaseModel):
     fabric_id: str = Field(..., description="Target spacetime fabric node ID")
-    bounce_damping_factor: float = Field(default=1.0, ge=0.1, le=10.0, description="Quantum bounce damping factor")
-    area_gap_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Loop area-gap gain factor")
+    bounce_damping_factor: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Quantum bounce damping factor"
+    )
+    area_gap_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Loop area-gap gain factor"
+    )
 
 
 @router.get("/fabrics")
@@ -42,4 +46,3 @@ async def synthesize_metric(req: SynthesizeMetricRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     synthesizer = get_centesimal_quantum_gravity_synthesizer()
     return synthesizer.get_centesimal_metrics()
-

@@ -9,9 +9,13 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.airgap_llm_guard.airgap_llm_guard_service import (
+    airgap_llm_guard_service,
+)
 from app.services.kyber_mesh_vpn.kyber_mesh_vpn_service import kyber_mesh_vpn_service
-from app.services.labyrinth_honeynet.labyrinth_honeynet_service import labyrinth_honeynet_service
-from app.services.airgap_llm_guard.airgap_llm_guard_service import airgap_llm_guard_service
+from app.services.labyrinth_honeynet.labyrinth_honeynet_service import (
+    labyrinth_honeynet_service,
+)
 
 
 @pytest.fixture
@@ -33,7 +37,7 @@ def test_kyber_mesh_vpn_service():
     new_peer = kyber_mesh_vpn_service.register_peer(
         node_name="Tokyo High-Sec AI Inference Enclave",
         endpoint="203.0.113.190:51820",
-        overlay_ip="10.220.0.15/32"
+        overlay_ip="10.220.0.15/32",
     )
     assert new_peer["status"] == "ESTABLISHED"
     assert "kyber768_pk_" in new_peer["kyber_public_key"]
@@ -74,7 +78,7 @@ def test_labyrinth_honeynet_service():
         name="Decoy Defense Industrial Base SCADA Controller",
         architecture_type="INDUSTRIAL_SCADA",
         depth_levels=6,
-        deception_persona="PLC Siemens S7-1500 Controller"
+        deception_persona="PLC Siemens S7-1500 Controller",
     )
     assert new_maze["depth_levels"] == 6
     maze_id = new_maze["labyrinth_id"]
@@ -84,7 +88,7 @@ def test_labyrinth_honeynet_service():
         labyrinth_id=maze_id,
         adversary_ip="198.51.100.99",
         probe_command="cat /etc/shadow",
-        protocol="SSH"
+        protocol="SSH",
     )
     assert trap1["status"] == "ADVERSARY_TRAPPED_IN_LABYRINTH"
     assert "synthetic-root-creds-hash" in trap1["canary_token_seeded"]
@@ -95,7 +99,7 @@ def test_labyrinth_honeynet_service():
         labyrinth_id=maze_id,
         adversary_ip="198.51.100.99",
         probe_command="kubectl get pods -A",
-        protocol="HTTPS"
+        protocol="HTTPS",
     )
     assert trap2["current_depth"] > trap1["current_depth"]
 
@@ -125,7 +129,7 @@ def test_airgap_llm_guard_service():
         model_name="Llama-3.3-70B-Sovereign-Audit",
         format_type="SAFETENSORS",
         base_architecture="Llama3-70B",
-        parameters_billions=70.0
+        parameters_billions=70.0,
     )
     assert scanned["safety_status"] == "SCANNED_READY_FOR_AIRGAP"
     assert scanned["backdoor_scan_verdict"] == "CLEAN_ZERO_TROJANS"
@@ -133,20 +137,14 @@ def test_airgap_llm_guard_service():
 
     # Validate differential privacy: valid budget (epsilon < 1.0)
     dp_valid = airgap_llm_guard_service.validate_lora_privacy(
-        model_id=model_id,
-        lora_rank=32,
-        epsilon=0.75,
-        delta=1e-6
+        model_id=model_id, lora_rank=32, epsilon=0.75, delta=1e-6
     )
     assert dp_valid["dp_compliant"] is True
     assert dp_valid["verdict"] == "APPROVED_DIFFERENTIAL_PRIVACY_MET"
 
     # Validate differential privacy: invalid budget (epsilon >= 1.0)
     dp_invalid = airgap_llm_guard_service.validate_lora_privacy(
-        model_id=model_id,
-        lora_rank=64,
-        epsilon=2.5,
-        delta=1e-4
+        model_id=model_id, lora_rank=64, epsilon=2.5, delta=1e-4
     )
     assert dp_invalid["dp_compliant"] is False
     assert dp_invalid["verdict"] == "REJECTED_PRIVACY_BUDGET_EXCEEDED"
@@ -168,7 +166,12 @@ def test_airgap_llm_guard_service():
 # ----------------------------------------------------
 def test_wave8_fastapi_routers(client):
     from app.core.security import get_current_user
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "OrbitalSecOpsAdmin", "org": "enterprise", "email": "orbital@sageai.internal"}
+
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "OrbitalSecOpsAdmin",
+        "org": "enterprise",
+        "email": "orbital@sageai.internal",
+    }
 
     try:
         # PQC Kyber Mesh VPN
@@ -176,11 +179,14 @@ def test_wave8_fastapi_routers(client):
         assert res.status_code == 200
         first_peer_id = res.json()["peers"][0]["peer_id"]
 
-        res_reg = client.post("/kyber-mesh-vpn/register-peer", json={
-            "node_name": "Canberra Deep Space Station Ground Node",
-            "endpoint": "192.0.2.140:51820",
-            "overlay_ip": "10.220.0.50/32"
-        })
+        res_reg = client.post(
+            "/kyber-mesh-vpn/register-peer",
+            json={
+                "node_name": "Canberra Deep Space Station Ground Node",
+                "endpoint": "192.0.2.140:51820",
+                "overlay_ip": "10.220.0.50/32",
+            },
+        )
         assert res_reg.status_code == 200
         new_peer_id = res_reg.json()["peer"]["peer_id"]
 
@@ -201,12 +207,15 @@ def test_wave8_fastapi_routers(client):
         assert len(res.json()["mazes"]) >= 3
         first_maze_id = res.json()["mazes"][0]["labyrinth_id"]
 
-        res_trap = client.post("/labyrinth-honeynet/trap-adversary", json={
-            "labyrinth_id": first_maze_id,
-            "adversary_ip": "198.51.100.44",
-            "probe_command": "SELECT * FROM fedwire_vault;",
-            "protocol": "POSTGRESQL"
-        })
+        res_trap = client.post(
+            "/labyrinth-honeynet/trap-adversary",
+            json={
+                "labyrinth_id": first_maze_id,
+                "adversary_ip": "198.51.100.44",
+                "probe_command": "SELECT * FROM fedwire_vault;",
+                "protocol": "POSTGRESQL",
+            },
+        )
         assert res_trap.status_code == 200
         assert res_trap.json()["trap"]["status"] == "ADVERSARY_TRAPPED_IN_LABYRINTH"
 
@@ -222,25 +231,33 @@ def test_wave8_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["models"]) >= 2
 
-        res_scan = client.post("/airgap-llm-guard/scan-artifact", json={
-            "model_name": "DeepSeek-V3-Sovereign-MoE",
-            "format_type": "SAFETENSORS",
-            "base_architecture": "DeepSeek-V3-MoE",
-            "parameters_billions": 671.0
-        })
+        res_scan = client.post(
+            "/airgap-llm-guard/scan-artifact",
+            json={
+                "model_name": "DeepSeek-V3-Sovereign-MoE",
+                "format_type": "SAFETENSORS",
+                "base_architecture": "DeepSeek-V3-MoE",
+                "parameters_billions": 671.0,
+            },
+        )
         assert res_scan.status_code == 200
         scanned_model_id = res_scan.json()["model"]["model_id"]
 
-        res_lora = client.post("/airgap-llm-guard/validate-lora", json={
-            "model_id": scanned_model_id,
-            "lora_rank": 16,
-            "epsilon": 0.82,
-            "delta": 1e-6
-        })
+        res_lora = client.post(
+            "/airgap-llm-guard/validate-lora",
+            json={
+                "model_id": scanned_model_id,
+                "lora_rank": 16,
+                "epsilon": 0.82,
+                "delta": 1e-6,
+            },
+        )
         assert res_lora.status_code == 200
         assert res_lora.json()["validation"]["dp_compliant"] is True
 
-        res_seal = client.post("/airgap-llm-guard/seal-enclave", json={"model_id": scanned_model_id})
+        res_seal = client.post(
+            "/airgap-llm-guard/seal-enclave", json={"model_id": scanned_model_id}
+        )
         assert res_seal.status_code == 200
         assert res_seal.json()["seal"]["status"] == "SEALED_AND_AUTHORIZED"
 
@@ -249,4 +266,3 @@ def test_wave8_fastapi_routers(client):
 
     finally:
         app.dependency_overrides.clear()
-

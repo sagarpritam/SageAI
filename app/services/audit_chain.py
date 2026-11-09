@@ -59,7 +59,9 @@ class ImmutableAuditChain:
         Appends a new immutable action to the ledger with cryptographic linking.
         """
         timestamp = datetime.now(timezone.utc).isoformat()
-        previous_hash = self._ledger[-1]["record_hash"] if self._ledger else GENESIS_HASH
+        previous_hash = (
+            self._ledger[-1]["record_hash"] if self._ledger else GENESIS_HASH
+        )
 
         record_hash = self._compute_hash(
             previous_hash=previous_hash,
@@ -141,10 +143,16 @@ class ImmutableAuditChain:
             "genesis_hash": GENESIS_HASH,
             "latest_hash": self._ledger[-1]["record_hash"],
             "status": "CRYPTOGRAPHICALLY_VERIFIED",
-            "compliance_standards": ["SOC2 Type II (CC6.1)", "ISO/IEC 27001 (A.12.4.1)", "FedRAMP AU-9"],
+            "compliance_standards": [
+                "SOC2 Type II (CC6.1)",
+                "ISO/IEC 27001 (A.12.4.1)",
+                "FedRAMP AU-9",
+            ],
         }
 
-    def get_ledger(self, limit: int = 50, org_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_ledger(
+        self, limit: int = 50, org_id: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """Returns recent ledger blocks."""
         ledger = self._ledger
         if org_id:
@@ -154,4 +162,3 @@ class ImmutableAuditChain:
 
 # Global immutable audit chain singleton
 audit_chain = ImmutableAuditChain()
-

@@ -18,17 +18,33 @@ router = APIRouter(
 
 
 class AnalyzeStrainRequest(BaseModel):
-    observatory_id: str = Field(..., description="Target subterranean laser strain observatory ID")
-    measured_strain_h: float = Field(..., description="Measured differential spacetime strain h = ΔL / L")
-    dominant_frequency_hz: float = Field(..., description="Dominant oscillation frequency in Hz")
-    p_wave_velocity_km_s: float = Field(6.2, description="Compressional P-wave velocity in km/s")
-    s_wave_velocity_km_s: float = Field(3.5, description="Shear S-wave velocity in km/s")
+    observatory_id: str = Field(
+        ..., description="Target subterranean laser strain observatory ID"
+    )
+    measured_strain_h: float = Field(
+        ..., description="Measured differential spacetime strain h = ΔL / L"
+    )
+    dominant_frequency_hz: float = Field(
+        ..., description="Dominant oscillation frequency in Hz"
+    )
+    p_wave_velocity_km_s: float = Field(
+        6.2, description="Compressional P-wave velocity in km/s"
+    )
+    s_wave_velocity_km_s: float = Field(
+        3.5, description="Shear S-wave velocity in km/s"
+    )
 
 
 class TriangulateSubcrustalRequest(BaseModel):
-    event_label: str = Field("SUSPECTED_SUBCRUSTAL_EXCAVATION", description="Descriptive event label")
-    sensor_arrival_times_ms: Dict[str, float] = Field(..., description="Mapping of observatory ID to arrival time in ms")
-    assumed_depth_km: float = Field(4.5, description="Estimated subterranean depth in km")
+    event_label: str = Field(
+        "SUSPECTED_SUBCRUSTAL_EXCAVATION", description="Descriptive event label"
+    )
+    sensor_arrival_times_ms: Dict[str, float] = Field(
+        ..., description="Mapping of observatory ID to arrival time in ms"
+    )
+    assumed_depth_km: float = Field(
+        4.5, description="Estimated subterranean depth in km"
+    )
 
 
 @router.get("/observatories")
@@ -38,7 +54,10 @@ async def list_observatories_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all registered subterranean laser strain observatories."""
-    return {"status": "success", "observatories": gravitational_seismic_mesh.list_observatories()}
+    return {
+        "status": "success",
+        "observatories": gravitational_seismic_mesh.list_observatories(),
+    }
 
 
 @router.get("/observatories/{observatory_id}")
@@ -51,7 +70,9 @@ async def get_observatory_endpoint(
     """Retrieves telemetry of a specific subterranean strain observatory."""
     obs = gravitational_seismic_mesh.get_observatory(observatory_id)
     if not obs:
-        raise HTTPException(status_code=404, detail=f"Observatory {observatory_id} not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Observatory {observatory_id} not found."
+        )
     return {"status": "success", "observatory": obs}
 
 
@@ -103,4 +124,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves planetary sub-crustal strain monitoring metrics."""
     return {"status": "success", "metrics": gravitational_seismic_mesh.get_metrics()}
-

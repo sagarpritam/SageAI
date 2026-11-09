@@ -25,11 +25,15 @@ class AnalyzeSampleRequest(BaseModel):
 
 
 class SolveOpaquePredicatesRequest(BaseModel):
-    expressions: List[str] = Field(..., description="Mathematical opaque predicate expressions to solve")
+    expressions: List[str] = Field(
+        ..., description="Mathematical opaque predicate expressions to solve"
+    )
 
 
 class UnhashApiRequest(BaseModel):
-    hashes: List[str] = Field(..., description="List of hexadecimal API hashes (e.g. 0x006a4abc)")
+    hashes: List[str] = Field(
+        ..., description="List of hexadecimal API hashes (e.g. 0x006a4abc)"
+    )
     algorithm: Optional[str] = "ROR13"
 
 
@@ -40,7 +44,10 @@ async def get_samples_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves laboratory obfuscated samples."""
-    return {"status": "success", "samples": symbolic_binary_deobfuscator.get_sample_library()}
+    return {
+        "status": "success",
+        "samples": symbolic_binary_deobfuscator.get_sample_library(),
+    }
 
 
 @router.post("/analyze")
@@ -78,6 +85,7 @@ async def unhash_apis_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Resolves obfuscated API hashes to plaintext Windows APIs."""
-    unhashed = symbolic_binary_deobfuscator.unhash_apis(payload.hashes, payload.algorithm or "ROR13")
+    unhashed = symbolic_binary_deobfuscator.unhash_apis(
+        payload.hashes, payload.algorithm or "ROR13"
+    )
     return {"status": "success", "unhashed_apis": unhashed}
-

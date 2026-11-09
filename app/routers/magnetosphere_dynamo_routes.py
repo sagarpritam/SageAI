@@ -5,7 +5,10 @@ from pydantic import BaseModel, Field
 
 from app.services.magnetosphere_dynamo import magnetosphere_dynamo_decoupler
 
-router = APIRouter(prefix="/api/magnetosphere-dynamo", tags=["Magnetosphere Dynamo & HEMP Decoupler (Cap 78)"])
+router = APIRouter(
+    prefix="/api/magnetosphere-dynamo",
+    tags=["Magnetosphere Dynamo & HEMP Decoupler (Cap 78)"],
+)
 
 
 class TriggerDecouplingRequest(BaseModel):
@@ -36,4 +39,3 @@ async def trigger_decoupling(req: TriggerDecouplingRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return magnetosphere_dynamo_decoupler.get_dynamo_metrics()
-

@@ -121,13 +121,20 @@ class InflatonReheatingPump:
         floquet_mu = round(0.28 * math.sqrt(q_param), 4)
 
         # Thermalized reheating temperature
-        reheat_temp = round(node.reheating_temperature_gev * (0.95 + 0.1 * math.tanh(coupling_gain)), 2)
+        reheat_temp = round(
+            node.reheating_temperature_gev * (0.95 + 0.1 * math.tanh(coupling_gain)), 2
+        )
 
         # Synthesized baryon density
-        baryon_density = round(1.85e31 * (reheat_temp / 1e11) ** 3 * node.baryon_asymmetry_eta_b, 2)
+        baryon_density = round(
+            1.85e31 * (reheat_temp / 1e11) ** 3 * node.baryon_asymmetry_eta_b, 2
+        )
 
         # Quenched anomalous entropy
-        quenched_entropy = round(14.85 * initial_amplitude_planck * coupling_gain + random.uniform(0.1, 0.5), 3)
+        quenched_entropy = round(
+            14.85 * initial_amplitude_planck * coupling_gain + random.uniform(0.1, 0.5),
+            3,
+        )
 
         cycle_id = f"REHEAT-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         res = ReheatingCycleResult(
@@ -169,4 +176,3 @@ class InflatonReheatingPump:
 
 
 inflaton_reheating_pump = InflatonReheatingPump()
-

@@ -22,13 +22,17 @@ class IngestKernelEventRequest(BaseModel):
     pid: int = Field(..., description="Process ID")
     ppid: Optional[int] = Field(1, description="Parent Process ID")
     container_id: Optional[str] = Field("host", description="Container runtime ID")
-    args: Optional[List[str]] = Field([], description="Command-line arguments or parameters")
+    args: Optional[List[str]] = Field(
+        [], description="Command-line arguments or parameters"
+    )
     severity: Optional[str] = Field("INFO", description="Initial severity level")
 
 
 class QuarantineProcessRequest(BaseModel):
     pid: int = Field(..., description="Process ID to isolate and kill")
-    reason: Optional[str] = Field("Suspicious Kernel Syscall Behavior", description="Quarantine rationale")
+    reason: Optional[str] = Field(
+        "Suspicious Kernel Syscall Behavior", description="Quarantine rationale"
+    )
 
 
 @router.get("/status")
@@ -53,7 +57,9 @@ async def get_ebpf_telemetry_stream(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves recent real-time kernel telemetry events from the eBPF ring buffer."""
-    events = ebpf_agent_service.get_telemetry_stream(limit=limit, severity_filter=severity)
+    events = ebpf_agent_service.get_telemetry_stream(
+        limit=limit, severity_filter=severity
+    )
     return {
         "status": "success",
         "count": len(events),
@@ -102,4 +108,3 @@ async def quarantine_process_endpoint(
         "status": "success",
         "quarantine": result,
     }
-

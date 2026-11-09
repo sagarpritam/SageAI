@@ -3,12 +3,12 @@ Unit & Integration Tests for Wave 22: Cosmological de Sitter Horizon, Calabi-Yau
 Cauchy Horizon Chronology Protector & Planetary Hyperspectral Interceptor Swarm (Capabilities 86-88 + Option B).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.desitter_repulsion_grid import desitter_repulsion_grid
 from app.services.calabi_yau_stabilizer import calabi_yau_stabilizer
 from app.services.cauchy_chronology_protector import cauchy_chronology_protector
+from app.services.desitter_repulsion_grid import desitter_repulsion_grid
 from app.services.hyperspectral_interceptor import hyperspectral_interceptor_swarm
 
 client = TestClient(app)
@@ -76,7 +76,9 @@ def test_calabi_yau_service():
     assert "manifold_id" in m
     assert "hodge_number_h11" in m
     assert "hodge_number_h21" in m
-    assert m["euler_characteristic"] == 2 * (m["hodge_number_h11"] - m["hodge_number_h21"])
+    assert m["euler_characteristic"] == 2 * (
+        m["hodge_number_h11"] - m["hodge_number_h21"]
+    )
 
     res = calabi_yau_stabilizer.stabilize_moduli(
         manifold_id="CY3-QUINTIC-P4-01",

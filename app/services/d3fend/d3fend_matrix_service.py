@@ -69,7 +69,10 @@ D3FEND_COUNTERMEASURE_CATALOG = [
         "d3fend_id": "D3-EBR",
         "d3fend_name": "Ephemeral Boundary Restrictions",
         "domain": "ISOLATE",
-        "mitre_attack_countered": ["T1021.002 (SMB Admin Shares)", "T1041 (C2 Exfiltration)"],
+        "mitre_attack_countered": [
+            "T1021.002 (SMB Admin Shares)",
+            "T1041 (C2 Exfiltration)",
+        ],
         "sageai_enforcer": "SDN Micro-Shield & Cilium L7 NetworkPolicy",
         "coverage_status": "ACTIVE_ENFORCED",
     },
@@ -77,7 +80,10 @@ D3FEND_COUNTERMEASURE_CATALOG = [
         "d3fend_id": "D3-DECOY",
         "d3fend_name": "Lure Object & Decoy Mesh",
         "domain": "DECEIVE",
-        "mitre_attack_countered": ["T1087 (Account Discovery)", "T1552 (Unsecured Credentials)"],
+        "mitre_attack_countered": [
+            "T1087 (Account Discovery)",
+            "T1552 (Unsecured Credentials)",
+        ],
         "sageai_enforcer": "Synthetic Honeytokens & Decoy Endpoints",
         "coverage_status": "ACTIVE_ENFORCED",
     },
@@ -118,8 +124,12 @@ class D3FENDMatrixService:
                 domains[dom].append(item)
 
         total_countermeasures = len(self.catalog)
-        active_enforced = sum(1 for c in self.catalog if c["coverage_status"] == "ACTIVE_ENFORCED")
-        defense_maturity_index = round((active_enforced / max(1, total_countermeasures)) * 100, 1)
+        active_enforced = sum(
+            1 for c in self.catalog if c["coverage_status"] == "ACTIVE_ENFORCED"
+        )
+        defense_maturity_index = round(
+            (active_enforced / max(1, total_countermeasures)) * 100, 1
+        )
 
         report = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -160,4 +170,3 @@ class D3FENDMatrixService:
 
 # Global instance
 d3fend_matrix_service = D3FENDMatrixService()
-

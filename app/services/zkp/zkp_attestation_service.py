@@ -162,4 +162,3 @@ class ZKPAttestationService:
 
 # Global instance
 zkp_attestation_service = ZKPAttestationService()
-

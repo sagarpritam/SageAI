@@ -51,7 +51,12 @@ class GeminiClient(BaseLLM):
 
         contents = []
         if system_message:
-            contents.append({"role": "user", "parts": [{"text": f"System Instructions: {system_message}"}]})
+            contents.append(
+                {
+                    "role": "user",
+                    "parts": [{"text": f"System Instructions: {system_message}"}],
+                }
+            )
         contents.append({"role": "user", "parts": [{"text": prompt}]})
 
         payload = {
@@ -64,7 +69,9 @@ class GeminiClient(BaseLLM):
 
         headers = {"Content-Type": "application/json"}
 
-        async with httpx.AsyncClient(timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)) as client:
+        async with httpx.AsyncClient(
+            timeout=kwargs.get("timeout", settings.LLM_TIMEOUT)
+        ) as client:
             try:
                 response = await client.post(url, json=payload, headers=headers)
 
@@ -86,8 +93,12 @@ class GeminiClient(BaseLLM):
                 return {
                     "content": text_content,
                     "usage": {
-                        "prompt_tokens": usage_metadata.get("promptTokenCount", len(prompt) // 4),
-                        "completion_tokens": usage_metadata.get("candidatesTokenCount", len(text_content) // 4),
+                        "prompt_tokens": usage_metadata.get(
+                            "promptTokenCount", len(prompt) // 4
+                        ),
+                        "completion_tokens": usage_metadata.get(
+                            "candidatesTokenCount", len(text_content) // 4
+                        ),
                     },
                 }
             except httpx.RequestError as e:
@@ -96,4 +107,3 @@ class GeminiClient(BaseLLM):
             except Exception:
                 gemini_breaker.record_failure()
                 raise
-

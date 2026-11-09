@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 from app.services.muon_tomography import subsurface_muon_tomography
 
-router = APIRouter(prefix="/api/muon-tomography", tags=["Subsurface Muon Tomography (Cap 75)"])
+router = APIRouter(
+    prefix="/api/muon-tomography", tags=["Subsurface Muon Tomography (Cap 75)"]
+)
 
 
 class TomographicScanRequest(BaseModel):
@@ -36,4 +38,3 @@ async def execute_scan(req: TomographicScanRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return subsurface_muon_tomography.get_mesh_metrics()
-

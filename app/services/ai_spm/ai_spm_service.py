@@ -88,28 +88,36 @@ class AISPMService:
         for pattern in PROMPT_INJECTION_PATTERNS:
             match = re.search(pattern, prompt)
             if match:
-                detections.append({
-                    "category": "LLM01: Prompt Injection / Jailbreak",
-                    "severity": "CRITICAL",
-                    "matched_pattern": match.group(0),
-                    "mitre_atlas": "AML.T0051 (LLM Prompt Injection)",
-                    "action": "BLOCK_AND_LOG",
-                })
+                detections.append(
+                    {
+                        "category": "LLM01: Prompt Injection / Jailbreak",
+                        "severity": "CRITICAL",
+                        "matched_pattern": match.group(0),
+                        "mitre_atlas": "AML.T0051 (LLM Prompt Injection)",
+                        "action": "BLOCK_AND_LOG",
+                    }
+                )
 
         # 2. Sensitive secret/PII disclosure check
         for pattern, label in SENSITIVE_PATTERNS:
             match = re.search(pattern, prompt)
             if match:
-                detections.append({
-                    "category": "LLM02: Sensitive Information Disclosure",
-                    "severity": "HIGH",
-                    "matched_pattern": label,
-                    "mitre_atlas": "AML.T0024 (Exfiltration via LLM)",
-                    "action": "REDACT_TOKEN",
-                })
+                detections.append(
+                    {
+                        "category": "LLM02: Sensitive Information Disclosure",
+                        "severity": "HIGH",
+                        "matched_pattern": label,
+                        "mitre_atlas": "AML.T0024 (Exfiltration via LLM)",
+                        "action": "REDACT_TOKEN",
+                    }
+                )
 
         is_safe = len(detections) == 0
-        risk_score = min(100, sum(35 for d in detections if d["severity"] == "CRITICAL") + sum(15 for d in detections if d["severity"] == "HIGH"))
+        risk_score = min(
+            100,
+            sum(35 for d in detections if d["severity"] == "CRITICAL")
+            + sum(15 for d in detections if d["severity"] == "HIGH"),
+        )
 
         result = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -124,7 +132,11 @@ class AISPMService:
         # Merkle Audit Chain registration
         audit_chain.record_action(
             action="AI_SPM_PROMPT_INSPECTION",
-            details={"is_safe": is_safe, "risk_score": risk_score, "threats": len(detections)},
+            details={
+                "is_safe": is_safe,
+                "risk_score": risk_score,
+                "threats": len(detections),
+            },
             org_id="system-ai-spm",
             actor="SageAI-AISPM",
         )
@@ -148,29 +160,35 @@ class AISPMService:
             for pattern in PROMPT_INJECTION_PATTERNS:
                 match = re.search(pattern, content)
                 if match:
-                    doc_threats.append({
-                        "threat_type": "INDIRECT_PROMPT_INJECTION",
-                        "severity": "CRITICAL",
-                        "matched_text": match.group(0),
-                    })
+                    doc_threats.append(
+                        {
+                            "threat_type": "INDIRECT_PROMPT_INJECTION",
+                            "severity": "CRITICAL",
+                            "matched_text": match.group(0),
+                        }
+                    )
 
             for pattern, label in SENSITIVE_PATTERNS:
                 match = re.search(pattern, content)
                 if match:
-                    doc_threats.append({
-                        "threat_type": "POISONED_CREDENTIAL_INCLUSION",
-                        "severity": "HIGH",
-                        "matched_text": label,
-                    })
+                    doc_threats.append(
+                        {
+                            "threat_type": "POISONED_CREDENTIAL_INCLUSION",
+                            "severity": "HIGH",
+                            "matched_text": label,
+                        }
+                    )
 
             if doc_threats:
-                contaminated_docs.append({
-                    "doc_id": doc.get("doc_id", "unknown"),
-                    "title": doc.get("title", "Untitled Document"),
-                    "source": doc.get("source", "local"),
-                    "threats": doc_threats,
-                    "remediation": "Purge vector chunk from vector database and quarantine ingestion source.",
-                })
+                contaminated_docs.append(
+                    {
+                        "doc_id": doc.get("doc_id", "unknown"),
+                        "title": doc.get("title", "Untitled Document"),
+                        "source": doc.get("source", "local"),
+                        "threats": doc_threats,
+                        "remediation": "Purge vector chunk from vector database and quarantine ingestion source.",
+                    }
+                )
 
         rag_posture_score = max(0, 100 - (len(contaminated_docs) * 30))
 
@@ -204,18 +222,31 @@ class AISPMService:
         """
         Audits autonomous agent configurations for excessive agency (LLM06) and unconstrained tool usage.
         """
-        tools = tools_enabled or ["execute_bash", "read_file", "query_database", "send_email", "delete_cloud_bucket"]
-        risky_tools = {"execute_bash", "delete_cloud_bucket", "drop_table", "grant_iam_role"}
+        tools = tools_enabled or [
+            "execute_bash",
+            "read_file",
+            "query_database",
+            "send_email",
+            "delete_cloud_bucket",
+        ]
+        risky_tools = {
+            "execute_bash",
+            "delete_cloud_bucket",
+            "drop_table",
+            "grant_iam_role",
+        }
 
         unconstrained_risks: List[Dict[str, Any]] = []
         for t in tools:
             if t in risky_tools:
-                unconstrained_risks.append({
-                    "tool": t,
-                    "risk": "EXCESSIVE_AGENCY_HIGH_IMPACT",
-                    "severity": "CRITICAL",
-                    "recommendation": f"Enforce human-in-the-loop approval gate and ephemeral token authorization before invoking '{t}'.",
-                })
+                unconstrained_risks.append(
+                    {
+                        "tool": t,
+                        "risk": "EXCESSIVE_AGENCY_HIGH_IMPACT",
+                        "severity": "CRITICAL",
+                        "recommendation": f"Enforce human-in-the-loop approval gate and ephemeral token authorization before invoking '{t}'.",
+                    }
+                )
 
         colang_guardrail = (
             "# Colang 2.0 Guardrail for Autonomous Agency\n"
@@ -223,7 +254,7 @@ class AISPMService:
             "  user requested destructive tool\n"
             "  $is_approved = execute verify_human_ciso_approval\n"
             "  if not $is_approved\n"
-            "    bot refuse destructive action \"Action requires CISO cryptographic Merkle authorization.\"\n"
+            '    bot refuse destructive action "Action requires CISO cryptographic Merkle authorization."\n'
             "    stop\n"
         )
 
@@ -233,14 +264,19 @@ class AISPMService:
             "unconstrained_agency_risks": len(unconstrained_risks),
             "risks": unconstrained_risks,
             "synthesized_colang_guardrail": colang_guardrail,
-            "posture_status": "HARDENED" if not unconstrained_risks else "REQUIRES_APPROVAL_GATES",
+            "posture_status": "HARDENED"
+            if not unconstrained_risks
+            else "REQUIRES_APPROVAL_GATES",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
         # Merkle Audit
         audit_chain.record_action(
             action="AI_SPM_PIPELINE_AUDIT",
-            details={"pipeline": pipeline_name, "risky_tools": len(unconstrained_risks)},
+            details={
+                "pipeline": pipeline_name,
+                "risky_tools": len(unconstrained_risks),
+            },
             org_id="system-ai-spm",
             actor="SageAI-AISPM",
         )
@@ -250,4 +286,3 @@ class AISPMService:
 
 # Global instance
 ai_spm_service = AISPMService()
-

@@ -13,23 +13,37 @@ from app.services.drone_swarm_shield.kinetic_drone_shield import kinetic_drone_s
 
 router = APIRouter(
     prefix="/drone-swarm-shield",
-    tags=["Autonomous Air-Defense & Kinetic Drone Swarm RF/Optical Directed-Energy Shield"],
+    tags=[
+        "Autonomous Air-Defense & Kinetic Drone Swarm RF/Optical Directed-Energy Shield"
+    ],
 )
 
 
 class DetectSwarmRequest(BaseModel):
     site_id: str = Field(..., description="Target protected facility identifier")
     radar_rcs_m2: float = Field(..., description="Radar Cross Section measured in m²")
-    swarm_size: int = Field(..., description="Estimated drone units in incoming swarm formation")
-    optical_confirmed: bool = Field(..., description="Whether electro-optical/thermal target lock is confirmed")
-    rf_spectrum_anomaly: bool = Field(..., description="Whether anomalous RF control link is active")
-    approach_velocity_mps: float = Field(65.0, description="Swarm approach velocity in meters per second")
+    swarm_size: int = Field(
+        ..., description="Estimated drone units in incoming swarm formation"
+    )
+    optical_confirmed: bool = Field(
+        ..., description="Whether electro-optical/thermal target lock is confirmed"
+    )
+    rf_spectrum_anomaly: bool = Field(
+        ..., description="Whether anomalous RF control link is active"
+    )
+    approach_velocity_mps: float = Field(
+        65.0, description="Swarm approach velocity in meters per second"
+    )
 
 
 class FireDirectedEnergyRequest(BaseModel):
     site_id: str = Field(..., description="Target protected facility identifier")
-    weapon_type: str = Field("HIGH_POWER_MICROWAVE_HPM", description="Directed energy weapon type")
-    burst_duration_ms: float = Field(4.2, description="Pulse burst duration in milliseconds")
+    weapon_type: str = Field(
+        "HIGH_POWER_MICROWAVE_HPM", description="Directed energy weapon type"
+    )
+    burst_duration_ms: float = Field(
+        4.2, description="Pulse burst duration in milliseconds"
+    )
 
 
 @router.get("/sites")
@@ -104,5 +118,7 @@ async def get_drone_shield_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns kinetic drone swarm air defense metrics."""
-    return {"status": "success", "metrics": kinetic_drone_shield.get_drone_shield_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": kinetic_drone_shield.get_drone_shield_metrics(),
+    }

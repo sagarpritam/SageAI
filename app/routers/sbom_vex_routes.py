@@ -15,11 +15,15 @@ router = APIRouter(prefix="/sbom-vex", tags=["SBOM & OpenVEX Attestation"])
 
 
 class CustomVexRequest(BaseModel):
-    vulnerabilities: Optional[List[str]] = Field(None, description="CVE IDs to evaluate in OpenVEX document")
+    vulnerabilities: Optional[List[str]] = Field(
+        None, description="CVE IDs to evaluate in OpenVEX document"
+    )
 
 
 class CustomSLSARequest(BaseModel):
-    artifact_name: Optional[str] = Field("sageai-core.tar.gz", description="Target build artifact name")
+    artifact_name: Optional[str] = Field(
+        "sageai-core.tar.gz", description="Target build artifact name"
+    )
 
 
 @router.get("/cyclonedx")
@@ -71,5 +75,6 @@ async def get_slsa_provenance_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Generates SLSA Level 3 Cryptographic Build Provenance."""
-    return sbom_vex_engine.generate_slsa_provenance(artifact_name=artifact_name or "sageai-core.tar.gz")
-
+    return sbom_vex_engine.generate_slsa_provenance(
+        artifact_name=artifact_name or "sageai-core.tar.gz"
+    )

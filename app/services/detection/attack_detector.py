@@ -77,22 +77,31 @@ class AttackDetector:
             for pat in regex_list:
                 match = re.search(pat, combined_text)
                 if match:
-                    severity = "CRITICAL" if attack_type in ["COMMAND_INJECTION", "SSRF_CLOUD_METADATA", "SQL_INJECTION"] else "HIGH"
-                    findings.append({
-                        "attack_type": attack_type,
-                        "severity": severity,
-                        "matched_pattern": pat,
-                        "evidence": match.group(0)[:100],
-                        "source_ip": source_ip,
-                        "target_path": target_path,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                        "recommendation": f"Block request containing {attack_type} pattern and sanitize input.",
-                    })
+                    severity = (
+                        "CRITICAL"
+                        if attack_type
+                        in ["COMMAND_INJECTION", "SSRF_CLOUD_METADATA", "SQL_INJECTION"]
+                        else "HIGH"
+                    )
+                    findings.append(
+                        {
+                            "attack_type": attack_type,
+                            "severity": severity,
+                            "matched_pattern": pat,
+                            "evidence": match.group(0)[:100],
+                            "source_ip": source_ip,
+                            "target_path": target_path,
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                            "recommendation": f"Block request containing {attack_type} pattern and sanitize input.",
+                        }
+                    )
                     break  # Avoid duplicate alerts for the same category on one request
 
         return findings
 
-    def record_auth_attempt(self, source_ip: str, success: bool = False) -> Optional[Dict[str, Any]]:
+    def record_auth_attempt(
+        self, source_ip: str, success: bool = False
+    ) -> Optional[Dict[str, Any]]:
         """
         Sliding-window credential stuffing / brute force detector.
         """
@@ -101,7 +110,9 @@ class AttackDetector:
 
         now = time.time()
         # Clean up timestamps outside window
-        timestamps = [t for t in self._login_attempts[source_ip] if now - t <= self.window_seconds]
+        timestamps = [
+            t for t in self._login_attempts[source_ip] if now - t <= self.window_seconds
+        ]
         timestamps.append(now)
         self._login_attempts[source_ip] = timestamps
 

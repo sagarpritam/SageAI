@@ -13,8 +13,18 @@ router = APIRouter(
 
 class StabilizeRadionRequest(BaseModel):
     brane_id: str = Field(..., description="Target RS Brane ID")
-    target_rc_planck: float = Field(default=36.8, ge=10.0, le=100.0, description="Compactification radius in Planck lengths")
-    scalar_flux_boost: float = Field(default=1.0, ge=0.1, le=10.0, description="Goldberger-Wise scalar flux boost factor")
+    target_rc_planck: float = Field(
+        default=36.8,
+        ge=10.0,
+        le=100.0,
+        description="Compactification radius in Planck lengths",
+    )
+    scalar_flux_boost: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=10.0,
+        description="Goldberger-Wise scalar flux boost factor",
+    )
 
 
 @router.get("/branes")
@@ -37,4 +47,3 @@ async def stabilize_radion(req: StabilizeRadionRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return randall_sundrum_stabilizer.get_stabilizer_metrics()
-

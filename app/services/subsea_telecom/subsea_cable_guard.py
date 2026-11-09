@@ -25,8 +25,8 @@ class SubseaCableGuard:
                 "fiber_pairs": 16,
                 "capacity_tbps": 320.0,
                 "otdr_attenuation_db_km": 0.165,  # Nominal < 0.18 dB/km
-                "sop_rotation_rad_s": 4.2,        # State of Polarization rotation rate
-                "das_acoustic_noise_db": -55.0,   # Nominal deep ocean background
+                "sop_rotation_rad_s": 4.2,  # State of Polarization rotation rate
+                "das_acoustic_noise_db": -55.0,  # Nominal deep ocean background
                 "status": "MONITORED_SECURE",
                 "physical_taps_intercepted": 3,
                 "redundant_fallback_route": "cable-arctic-polar03",
@@ -125,7 +125,9 @@ class SubseaCableGuard:
 
         return verdict
 
-    def trigger_autonomous_severance(self, cable_id: str, reason: str) -> Dict[str, Any]:
+    def trigger_autonomous_severance(
+        self, cable_id: str, reason: str
+    ) -> Dict[str, Any]:
         """Severs optical repeater flow within <15ms and shifts payload to redundant Arctic trunk."""
         cbl = self._cables.get(cable_id)
         if not cbl:
@@ -161,4 +163,3 @@ class SubseaCableGuard:
 
 # Singleton instance
 subsea_cable_guard = SubseaCableGuard()
-

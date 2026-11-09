@@ -116,8 +116,14 @@ class CentesimalQuantumGravitySynthesizer:
             raise ValueError(f"Spacetime fabric {fabric_id} not registered.")
 
         # Compute quantum bounce core radius: r_bounce ~ (l_Pl^2 * r_s)^(1/3)
-        bounce_radius = round(1.616e-35 * (4.2 + 0.8 * bounce_damping_factor * area_gap_gain), 38)
-        regular_kretschmann = round(fabric.kretschmann_curvature_bound_inv_m4 / (1.0 + 0.1 * bounce_damping_factor), 2)
+        bounce_radius = round(
+            1.616e-35 * (4.2 + 0.8 * bounce_damping_factor * area_gap_gain), 38
+        )
+        regular_kretschmann = round(
+            fabric.kretschmann_curvature_bound_inv_m4
+            / (1.0 + 0.1 * bounce_damping_factor),
+            2,
+        )
 
         synthesis_id = f"CQG-CENTURY-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         res = MetricSynthesisResult(
@@ -168,4 +174,3 @@ centesimal_quantum_gravity_synthesizer = CentesimalQuantumGravitySynthesizer()
 
 def get_centesimal_quantum_gravity_synthesizer() -> CentesimalQuantumGravitySynthesizer:
     return centesimal_quantum_gravity_synthesizer
-

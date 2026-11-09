@@ -75,7 +75,7 @@ async def scan_artifact_endpoint(
         format_type=payload.format_type or "SAFETENSORS",
         base_architecture=payload.base_architecture or "Llama3-8B",
         parameters_billions=payload.parameters_billions or 8.0,
-        raw_hash_seed=payload.raw_hash_seed
+        raw_hash_seed=payload.raw_hash_seed,
     )
     return {"status": "success", "model": model}
 
@@ -93,7 +93,7 @@ async def validate_lora_endpoint(
             model_id=payload.model_id,
             lora_rank=payload.lora_rank or 16,
             epsilon=payload.epsilon or 0.85,
-            delta=payload.delta or 1e-6
+            delta=payload.delta or 1e-6,
         )
         return {"status": "success", "validation": res}
     except ValueError as e:
@@ -122,5 +122,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves air-gapped sovereign model stats and differential privacy metrics."""
-    return {"status": "success", "metrics": airgap_llm_guard_service.get_airgap_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": airgap_llm_guard_service.get_airgap_metrics(),
+    }

@@ -4,4 +4,3 @@ from app.services.hypersonic_defense.hypersonic_interceptor import (
 )
 
 __all__ = ["HypersonicTrajectoryInterceptor", "hypersonic_interceptor"]
-

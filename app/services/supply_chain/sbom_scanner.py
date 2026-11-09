@@ -28,16 +28,58 @@ logger = logging.getLogger("SageAI.supply_chain")
 
 # Known Popular Packages for Typosquatting Analysis
 POPULAR_PACKAGES = {
-    "pypi": ["requests", "urllib3", "pydantic", "fastapi", "cryptography", "numpy", "pandas", "flask", "django", "pytest"],
-    "npm": ["react", "next", "lodash", "axios", "express", "tailwind", "typescript", "chalk", "commander", "webpack"],
+    "pypi": [
+        "requests",
+        "urllib3",
+        "pydantic",
+        "fastapi",
+        "cryptography",
+        "numpy",
+        "pandas",
+        "flask",
+        "django",
+        "pytest",
+    ],
+    "npm": [
+        "react",
+        "next",
+        "lodash",
+        "axios",
+        "express",
+        "tailwind",
+        "typescript",
+        "chalk",
+        "commander",
+        "webpack",
+    ],
 }
 
 # Known Vulnerability Database Mock Mapping (OSV / NVD)
 KNOWN_VULNERABILITIES = {
-    "pkg:pypi/requests@2.20.0": {"cve": "CVE-2018-18074", "severity": "HIGH", "cvss": 7.5, "title": "Redirect session authorization leak"},
-    "pkg:npm/lodash@4.17.15": {"cve": "CVE-2020-8203", "severity": "HIGH", "cvss": 7.4, "title": "Prototype pollution in defaultsDeep"},
-    "pkg:npm/next@13.4.0": {"cve": "CVE-2023-46298", "severity": "CRITICAL", "cvss": 9.8, "title": "SSR Cache poisoning vulnerability"},
-    "pkg:pypi/cryptography@3.3.0": {"cve": "CVE-2020-36242", "severity": "HIGH", "cvss": 7.5, "title": "Buffer overflow in integer conversion"},
+    "pkg:pypi/requests@2.20.0": {
+        "cve": "CVE-2018-18074",
+        "severity": "HIGH",
+        "cvss": 7.5,
+        "title": "Redirect session authorization leak",
+    },
+    "pkg:npm/lodash@4.17.15": {
+        "cve": "CVE-2020-8203",
+        "severity": "HIGH",
+        "cvss": 7.4,
+        "title": "Prototype pollution in defaultsDeep",
+    },
+    "pkg:npm/next@13.4.0": {
+        "cve": "CVE-2023-46298",
+        "severity": "CRITICAL",
+        "cvss": 9.8,
+        "title": "SSR Cache poisoning vulnerability",
+    },
+    "pkg:pypi/cryptography@3.3.0": {
+        "cve": "CVE-2020-36242",
+        "severity": "HIGH",
+        "cvss": 7.5,
+        "title": "Buffer overflow in integer conversion",
+    },
 }
 
 
@@ -66,7 +108,9 @@ class SBOMScanner:
             prev = curr
         return prev[-1]
 
-    def parse_manifest(self, content: str, manifest_type: str = "auto") -> List[Dict[str, Any]]:
+    def parse_manifest(
+        self, content: str, manifest_type: str = "auto"
+    ) -> List[Dict[str, Any]]:
         """
         Parses raw manifest content into normalized components list.
         """
@@ -79,17 +123,21 @@ class SBOMScanner:
                 line = line.strip().split("#")[0].strip()
                 if not line:
                     continue
-                match = re.match(r"^([a-zA-Z0-9_\-\.]+)(?:([=><!~]+)([a-zA-Z0-9_\-\.]+))?", line)
+                match = re.match(
+                    r"^([a-zA-Z0-9_\-\.]+)(?:([=><!~]+)([a-zA-Z0-9_\-\.]+))?", line
+                )
                 if match:
                     name = match.group(1).lower()
                     version = match.group(3) or "latest"
-                    components.append({
-                        "name": name,
-                        "version": version,
-                        "ecosystem": "pypi",
-                        "purl": f"pkg:pypi/{name}@{version}",
-                        "is_direct": True,
-                    })
+                    components.append(
+                        {
+                            "name": name,
+                            "version": version,
+                            "ecosystem": "pypi",
+                            "purl": f"pkg:pypi/{name}@{version}",
+                            "is_direct": True,
+                        }
+                    )
 
         # 2. Node.js package.json
         elif "dependencies" in content or manifest_type == "npm":
@@ -98,22 +146,42 @@ class SBOMScanner:
                 deps = pkg_data.get("dependencies", {})
                 for name, ver in deps.items():
                     clean_ver = re.sub(r"[\^~>=<]", "", ver)
-                    components.append({
-                        "name": name.lower(),
-                        "version": clean_ver,
-                        "ecosystem": "npm",
-                        "purl": f"pkg:npm/{name.lower()}@{clean_ver}",
-                        "is_direct": True,
-                    })
+                    components.append(
+                        {
+                            "name": name.lower(),
+                            "version": clean_ver,
+                            "ecosystem": "npm",
+                            "purl": f"pkg:npm/{name.lower()}@{clean_ver}",
+                            "is_direct": True,
+                        }
+                    )
             except Exception:
                 pass
 
         # Fallback if unparsed
         if not components:
             components = [
-                {"name": "fastapi", "version": "0.115.0", "ecosystem": "pypi", "purl": "pkg:pypi/fastapi@0.115.0", "is_direct": True},
-                {"name": "pydantic", "version": "2.9.2", "ecosystem": "pypi", "purl": "pkg:pypi/pydantic@2.9.2", "is_direct": True},
-                {"name": "cryptography", "version": "43.0.1", "ecosystem": "pypi", "purl": "pkg:pypi/cryptography@43.0.1", "is_direct": True},
+                {
+                    "name": "fastapi",
+                    "version": "0.115.0",
+                    "ecosystem": "pypi",
+                    "purl": "pkg:pypi/fastapi@0.115.0",
+                    "is_direct": True,
+                },
+                {
+                    "name": "pydantic",
+                    "version": "2.9.2",
+                    "ecosystem": "pypi",
+                    "purl": "pkg:pypi/pydantic@2.9.2",
+                    "is_direct": True,
+                },
+                {
+                    "name": "cryptography",
+                    "version": "43.0.1",
+                    "ecosystem": "pypi",
+                    "purl": "pkg:pypi/cryptography@43.0.1",
+                    "is_direct": True,
+                },
             ]
 
         return components
@@ -138,15 +206,17 @@ class SBOMScanner:
             purl = comp["purl"]
             if purl in KNOWN_VULNERABILITIES:
                 vuln = KNOWN_VULNERABILITIES[purl]
-                vulnerabilities.append({
-                    "component": comp["name"],
-                    "version": comp["version"],
-                    "cve": vuln["cve"],
-                    "severity": vuln["severity"],
-                    "cvss": vuln["cvss"],
-                    "title": vuln["title"],
-                    "purl": purl,
-                })
+                vulnerabilities.append(
+                    {
+                        "component": comp["name"],
+                        "version": comp["version"],
+                        "cve": vuln["cve"],
+                        "severity": vuln["severity"],
+                        "cvss": vuln["cvss"],
+                        "title": vuln["title"],
+                        "purl": purl,
+                    }
+                )
 
             # 2. Evaluate Typosquatting Risk
             eco = comp["ecosystem"]
@@ -155,13 +225,15 @@ class SBOMScanner:
                 if comp["name"] != pop:
                     dist = self._levenshtein_distance(comp["name"], pop)
                     if dist == 1:
-                        typosquat_warnings.append({
-                            "suspect_package": comp["name"],
-                            "target_popular_package": pop,
-                            "ecosystem": eco,
-                            "risk": "HIGH_CONFIDENCE_TYPOSQUATTING",
-                            "description": f"Package '{comp['name']}' differs by only 1 character from popular '{pop}'.",
-                        })
+                        typosquat_warnings.append(
+                            {
+                                "suspect_package": comp["name"],
+                                "target_popular_package": pop,
+                                "ecosystem": eco,
+                                "risk": "HIGH_CONFIDENCE_TYPOSQUATTING",
+                                "description": f"Package '{comp['name']}' differs by only 1 character from popular '{pop}'.",
+                            }
+                        )
 
         # 3. Generate Standards-Compliant CycloneDX 1.5 JSON SBOM
         cyclonedx_sbom = {
@@ -176,7 +248,13 @@ class SBOMScanner:
                     "name": project_name,
                     "version": "2.5.0",
                 },
-                "tools": [{"vendor": "SageAI", "name": "SupplyChainScanner", "version": "2.5.0"}],
+                "tools": [
+                    {
+                        "vendor": "SageAI",
+                        "name": "SupplyChainScanner",
+                        "version": "2.5.0",
+                    }
+                ],
             },
             "components": [
                 {
@@ -184,15 +262,17 @@ class SBOMScanner:
                     "name": c["name"],
                     "version": c["version"],
                     "purl": c["purl"],
-                    "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(c["purl"].encode()).hexdigest()}],
+                    "hashes": [
+                        {
+                            "alg": "SHA-256",
+                            "content": hashlib.sha256(c["purl"].encode()).hexdigest(),
+                        }
+                    ],
                     "licenses": [{"license": {"id": "MIT"}}],
                 }
                 for c in components
             ],
-            "dependencies": [
-                {"ref": c["purl"], "dependsOn": []}
-                for c in components
-            ],
+            "dependencies": [{"ref": c["purl"], "dependsOn": []} for c in components],
         }
 
         # 4. Dependency Graph Nodes & Edges
@@ -201,12 +281,14 @@ class SBOMScanner:
         for c in components:
             node_id = c["purl"]
             has_vuln = any(v["purl"] == node_id for v in vulnerabilities)
-            graph_nodes.append({
-                "id": node_id,
-                "label": f"{c['name']}@{c['version']}",
-                "ecosystem": c["ecosystem"],
-                "has_vuln": has_vuln,
-            })
+            graph_nodes.append(
+                {
+                    "id": node_id,
+                    "label": f"{c['name']}@{c['version']}",
+                    "ecosystem": c["ecosystem"],
+                    "has_vuln": has_vuln,
+                }
+            )
             graph_edges.append({"source": project_name, "target": node_id})
 
         # Anchor audit record
@@ -247,4 +329,3 @@ class SBOMScanner:
 
 # Global singleton
 sbom_scanner = SBOMScanner()
-

@@ -21,7 +21,9 @@ class MicroSingularityCell:
     schwarzschild_radius_m: float = 3.71e-19  # 2GM/c^2
     hawking_temperature_kelvin: float = 4.89e14  # T_H
     hawking_power_watts: float = 2.34e16  # ~23.4 Petawatts
-    graviton_waveguide_field_tesla: float = 35.0  # Ultra-high HTS magnetic/graviton guide
+    graviton_waveguide_field_tesla: float = (
+        35.0  # Ultra-high HTS magnetic/graviton guide
+    )
     matter_injection_rate_kg_s: float = 0.26  # Feeding rate balancing P_H/c^2
     evaporation_margin_years: float = 125000.0
     containment_status: str = "MASS_EQUILIBRIUM_LOCKED"
@@ -121,7 +123,9 @@ class MicroSingularityHawkingContainment:
         pw_luminosity = round(cell.hawking_power_watts / 1e15, 2)
         balance_ratio = round(1.0 + random.uniform(-0.002, 0.003), 4)
 
-        telem_id = f"SING-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        telem_id = (
+            f"SING-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         telem = SingularityPowerTelemetry(
             telemetry_id=telem_id,
             cell_id=cell_id,
@@ -162,7 +166,9 @@ class MicroSingularityHawkingContainment:
             raise ValueError(f"Cell {cell_id} not found.")
 
         old_rate = cell.matter_injection_rate_kg_s
-        new_rate = round(max(0.01, cell.matter_injection_rate_kg_s + delta_rate_kg_s), 4)
+        new_rate = round(
+            max(0.01, cell.matter_injection_rate_kg_s + delta_rate_kg_s), 4
+        )
         cell.matter_injection_rate_kg_s = new_rate
 
         return {
@@ -186,4 +192,3 @@ class MicroSingularityHawkingContainment:
 
 
 micro_singularity_containment = MicroSingularityHawkingContainment()
-

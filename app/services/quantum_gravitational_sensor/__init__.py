@@ -7,4 +7,3 @@ __all__ = [
     "QuantumGravitationalEntanglementSensor",
     "quantum_gravitational_sensor",
 ]
-

@@ -5,22 +5,19 @@ and Option B Sovereign Quantum Key Distribution Space-Mesh Interstellar Relay En
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.dark_energy_harvester import (
-    dark_energy_harvester,
-    DarkEnergyQuintessenceHarvester,
+from app.services.anyon_topological_braiding import (
+    anyon_topological_braiding,
 )
 from app.services.casimir_vacuum_harvester import (
     casimir_vacuum_harvester,
-    DynamicCasimirVacuumHarvester,
 )
-from app.services.anyon_topological_braiding import (
-    anyon_topological_braiding,
-    TopologicalAnyonBraidingMatrix,
+from app.services.dark_energy_harvester import (
+    dark_energy_harvester,
 )
 from app.services.qkd_space_mesh_relay import (
     qkd_space_mesh_relay,
-    SovereignQKDSpaceMeshRelay,
 )
 
 client = TestClient(app)
@@ -43,7 +40,9 @@ def test_dark_energy_harvester_service():
         coupling_factor=1.2,
     )
     assert event["event_id"].startswith("DARK-ENERGY-STAB-")
-    assert event["equation_of_state_w"] < -1.0  # Must be phantom/quintessence negative pressure
+    assert (
+        event["equation_of_state_w"] < -1.0
+    )  # Must be phantom/quintessence negative pressure
     assert event["negative_pressure_clamped_gpa"] < 0.0
     assert event["metric_energy_yield_mw"] > 0.0
     assert event["curvature_stability_index"] > 99.0
@@ -314,4 +313,3 @@ def test_qkd_space_mesh_api():
     res_met = client.get("/api/qkd-space-mesh/metrics")
     assert res_met.status_code == 200
     assert res_met.json()["status"] == "OPERATIONAL"
-

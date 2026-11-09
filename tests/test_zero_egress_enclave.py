@@ -16,7 +16,6 @@ from httpx import ASGITransport, AsyncClient
 from app.core.security import create_access_token
 from app.main import app
 from app.services.enclave.zero_egress_service import (
-    REGIONAL_ENCLAVES,
     ZeroEgressEnclaveService,
     zero_egress_service,
 )
@@ -47,7 +46,9 @@ def test_enclave_regions_catalog():
 def test_envelope_encryption_and_decryption():
     """Verify AES-256-GCM envelope encryption and successful decryption with matching passphrase."""
     service = ZeroEgressEnclaveService()
-    secret_text = "DATABASE_URL=postgresql://root:ultra_secret_pw@db.prod.internal:5432/main"
+    secret_text = (
+        "DATABASE_URL=postgresql://root:ultra_secret_pw@db.prod.internal:5432/main"
+    )
     passphrase = "EnterpriseVaultPassphrase2026!"
     region = "eu-central-1"
 
@@ -181,11 +182,13 @@ async def test_enclave_fastapi_endpoints():
     """Verify FastAPI /enclave endpoints with token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({
-            "sub": "ciso@enterprise.com",
-            "role": "admin",
-            "org": "corp-grid",
-        })
+        token = create_access_token(
+            {
+                "sub": "ciso@enterprise.com",
+                "role": "admin",
+                "org": "corp-grid",
+            }
+        )
         auth_headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Unauthenticated request should be rejected (401 or 403 depending on header)
@@ -241,7 +244,9 @@ async def test_enclave_fastapi_endpoints():
         # 6. Sanitize payload for egress
         san_res = await client.post(
             "/enclave/sanitize-egress",
-            json={"text": "Send secret to dev@org.internal with token AKIAIOSFODNN7EXAMPLE"},
+            json={
+                "text": "Send secret to dev@org.internal with token AKIAIOSFODNN7EXAMPLE"
+            },
             headers=auth_headers,
         )
         assert san_res.status_code == 200

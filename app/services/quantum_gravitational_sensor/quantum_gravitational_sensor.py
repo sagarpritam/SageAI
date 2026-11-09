@@ -120,14 +120,22 @@ class QuantumGravitationalEntanglementSensor:
         """
         node = self.nodes.get(node_id)
         if not node:
-            raise ValueError(f"Node {node_id} not registered in quantum gravitational mesh.")
+            raise ValueError(
+                f"Node {node_id} not registered in quantum gravitational mesh."
+            )
 
         # Metric perturbation delta g (relative to standard g0)
         delta_g = round(random.uniform(1.2e-18, 8.5e-18), 20)
         riemann_r = round(random.uniform(4.2e-26, 9.8e-26), 28)
-        entropy = round(node.holographic_entropy_nats * (1.0 + random.uniform(-0.001, 0.002)), 2)
+        entropy = round(
+            node.holographic_entropy_nats * (1.0 + random.uniform(-0.001, 0.002)), 2
+        )
 
-        is_anomalous = "SECTOR_7" in target_region or "ANOMALY" in target_region or "WARP" in target_region
+        is_anomalous = (
+            "SECTOR_7" in target_region
+            or "ANOMALY" in target_region
+            or "WARP" in target_region
+        )
 
         if is_anomalous:
             defect_detected = True
@@ -142,7 +150,9 @@ class QuantumGravitationalEntanglementSensor:
             confidence = 99.4
             status = "SPACETIME_GEODESIC_NOMINAL"
 
-        obs_id = f"QGRAV-OBS-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        obs_id = (
+            f"QGRAV-OBS-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         obs = MetricDistortionObservation(
             observation_id=obs_id,
             node_id=node_id,
@@ -178,7 +188,11 @@ class QuantumGravitationalEntanglementSensor:
         return {
             "active_gravitational_nodes": len(self.nodes),
             "completed_observations": len(self.observations),
-            "mean_trap_temp_nk": round(sum([n.trap_temperature_nk for n in self.nodes.values()]) / len(self.nodes), 1),
+            "mean_trap_temp_nk": round(
+                sum([n.trap_temperature_nk for n in self.nodes.values()])
+                / len(self.nodes),
+                1,
+            ),
             "interferometer_physics": "BOSE_EINSTEIN_CONDENSATE_BRAGG_DIFFRACTION",
             "sensitivity_scale": "PLANCK_METRIC_RESOLVED",
             "status": "OPERATIONAL",
@@ -186,4 +200,3 @@ class QuantumGravitationalEntanglementSensor:
 
 
 quantum_gravitational_sensor = QuantumGravitationalEntanglementSensor()
-

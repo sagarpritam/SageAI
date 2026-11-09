@@ -21,14 +21,46 @@ logger = logging.getLogger("SageAI.binary_deobfuscator")
 
 # Known Windows API exports and precomputed hashes
 KNOWN_WINDOWS_APIS = {
-    "0x006a4abc": {"name": "VirtualAlloc", "dll": "kernel32.dll", "category": "Memory Allocation"},
-    "0x0079c67b": {"name": "VirtualProtect", "dll": "kernel32.dll", "category": "Memory Permissions"},
-    "0x00d83d7f": {"name": "WriteProcessMemory", "dll": "kernel32.dll", "category": "Process Injection"},
-    "0x00160d68": {"name": "CreateRemoteThread", "dll": "kernel32.dll", "category": "Thread Hijacking"},
-    "0x00ec0e4e": {"name": "LoadLibraryA", "dll": "kernel32.dll", "category": "Dynamic Linkage"},
-    "0x007c0dfc": {"name": "GetProcAddress", "dll": "kernel32.dll", "category": "Dynamic Resolution"},
-    "0x00a8912d": {"name": "NtCreateSection", "dll": "ntdll.dll", "category": "Process Hollowing"},
-    "0x00b921ef": {"name": "WinHttpConnect", "dll": "winhttp.dll", "category": "C2 Communication"},
+    "0x006a4abc": {
+        "name": "VirtualAlloc",
+        "dll": "kernel32.dll",
+        "category": "Memory Allocation",
+    },
+    "0x0079c67b": {
+        "name": "VirtualProtect",
+        "dll": "kernel32.dll",
+        "category": "Memory Permissions",
+    },
+    "0x00d83d7f": {
+        "name": "WriteProcessMemory",
+        "dll": "kernel32.dll",
+        "category": "Process Injection",
+    },
+    "0x00160d68": {
+        "name": "CreateRemoteThread",
+        "dll": "kernel32.dll",
+        "category": "Thread Hijacking",
+    },
+    "0x00ec0e4e": {
+        "name": "LoadLibraryA",
+        "dll": "kernel32.dll",
+        "category": "Dynamic Linkage",
+    },
+    "0x007c0dfc": {
+        "name": "GetProcAddress",
+        "dll": "kernel32.dll",
+        "category": "Dynamic Resolution",
+    },
+    "0x00a8912d": {
+        "name": "NtCreateSection",
+        "dll": "ntdll.dll",
+        "category": "Process Hollowing",
+    },
+    "0x00b921ef": {
+        "name": "WinHttpConnect",
+        "dll": "winhttp.dll",
+        "category": "C2 Communication",
+    },
 }
 
 SAMPLE_OBFUSCATED_MALWARE = {
@@ -67,7 +99,9 @@ class SymbolicBinaryDeobfuscator:
     def __init__(self):
         self.api_db = KNOWN_WINDOWS_APIS.copy()
 
-    def unhash_apis(self, hashes: List[str], algorithm: str = "ROR13") -> List[Dict[str, Any]]:
+    def unhash_apis(
+        self, hashes: List[str], algorithm: str = "ROR13"
+    ) -> List[Dict[str, Any]]:
         """
         Resolves obfuscated API hashes to plaintext Windows API function names and source DLLs.
         """
@@ -80,30 +114,36 @@ class SymbolicBinaryDeobfuscator:
             # Look up in precomputed export DB
             match = self.api_db.get(clean_h)
             if match:
-                results.append({
-                    "hash": clean_h,
-                    "algorithm": algorithm,
-                    "resolved": True,
-                    "api_name": match["name"],
-                    "dll": match["dll"],
-                    "category": match["category"],
-                    "suspicion_level": "HIGH",
-                })
+                results.append(
+                    {
+                        "hash": clean_h,
+                        "algorithm": algorithm,
+                        "resolved": True,
+                        "api_name": match["name"],
+                        "dll": match["dll"],
+                        "category": match["category"],
+                        "suspicion_level": "HIGH",
+                    }
+                )
             else:
                 # Fallback heuristic resolution for demonstration
                 gen_name = f"Unhashed_WinAPI_{clean_h[-6:]}"
-                results.append({
-                    "hash": clean_h,
-                    "algorithm": algorithm,
-                    "resolved": True,
-                    "api_name": gen_name,
-                    "dll": "ntdll.dll",
-                    "category": "Process Manipulation",
-                    "suspicion_level": "MEDIUM",
-                })
+                results.append(
+                    {
+                        "hash": clean_h,
+                        "algorithm": algorithm,
+                        "resolved": True,
+                        "api_name": gen_name,
+                        "dll": "ntdll.dll",
+                        "category": "Process Manipulation",
+                        "suspicion_level": "MEDIUM",
+                    }
+                )
         return results
 
-    def solve_opaque_predicates(self, expression_list: List[str]) -> List[Dict[str, Any]]:
+    def solve_opaque_predicates(
+        self, expression_list: List[str]
+    ) -> List[Dict[str, Any]]:
         """
         Solves mathematical opaque predicates using SMT/Z3 logic simulation.
         Identifies whether a conditional branch is invariant (always True or always False),
@@ -125,15 +165,19 @@ class SymbolicBinaryDeobfuscator:
                 elimination = "Tautological predicate eliminated"
             else:
                 verdict = "ALWAYS_TRUE"
-                elimination = "SMT constraint solver evaluated predicate as invariant True"
+                elimination = (
+                    "SMT constraint solver evaluated predicate as invariant True"
+                )
 
-            solved.append({
-                "predicate_expression": clean,
-                "smt_solver": "Z3 Theorem Prover v4.12.2",
-                "evaluation": verdict,
-                "simplification_action": elimination,
-                "complexity_reduction_percent": 65.0,
-            })
+            solved.append(
+                {
+                    "predicate_expression": clean,
+                    "smt_solver": "Z3 Theorem Prover v4.12.2",
+                    "evaluation": verdict,
+                    "simplification_action": elimination,
+                    "complexity_reduction_percent": 65.0,
+                }
+            )
         return solved
 
     def deobfuscate_control_flow(
@@ -161,14 +205,26 @@ class SymbolicBinaryDeobfuscator:
 
         # Step 3: Decrypt Hidden C2 strings
         decrypted_strings = [
-            {"offset": "0x408010", "type": "XOR_0x7A", "plaintext": "https://c2-darknode.darkmesh-intel.ru/gate.php"},
-            {"offset": "0x408058", "type": "RC4_Key_4f89", "plaintext": "Authorization: Bearer stealer-token-77a8"},
-            {"offset": "0x4080a0", "type": "Base64_Reverse", "plaintext": "cmd.exe /c powershell -enc JABzAH..."},
+            {
+                "offset": "0x408010",
+                "type": "XOR_0x7A",
+                "plaintext": "https://c2-darknode.darkmesh-intel.ru/gate.php",
+            },
+            {
+                "offset": "0x408058",
+                "type": "RC4_Key_4f89",
+                "plaintext": "Authorization: Bearer stealer-token-77a8",
+            },
+            {
+                "offset": "0x4080a0",
+                "type": "Base64_Reverse",
+                "plaintext": "cmd.exe /c powershell -enc JABzAH...",
+            },
         ]
 
         # Step 4: Synthesize YARA-L Rule
         sample_hash = hashlib.sha256(sample_name.encode()).hexdigest()
-        yara_l_rule = f"""rule SageAI_Deobfuscated_{re.sub(r'[^a-zA-Z0-9]', '_', sample_name)} {{
+        yara_l_rule = f"""rule SageAI_Deobfuscated_{re.sub(r"[^a-zA-Z0-9]", "_", sample_name)} {{
   meta:
     author = "SageAI Autonomous Symbolic Deobfuscator"
     description = "Detects de-obfuscated Lumma/Stealer binary patterns"

@@ -8,4 +8,3 @@ from app.services.ztna.microsegmentation_service import (
 )
 
 __all__ = ["ZTNAMicrosegmentationService", "ztna_service"]
-

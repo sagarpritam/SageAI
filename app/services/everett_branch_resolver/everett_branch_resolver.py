@@ -132,7 +132,9 @@ class EverettWheelerBranchResolver:
 
         entropy_nats = round(entropy, 4)
         phase_alignment_deg = round(1.25 / phase_alignment_gain, 3)
-        quench_ratio_db = round(48.5 * phase_alignment_gain + random.uniform(0.5, 2.5), 1)
+        quench_ratio_db = round(
+            48.5 * phase_alignment_gain + random.uniform(0.5, 2.5), 1
+        )
         stability_pct = round(99.85 + random.uniform(0.02, 0.12), 2)
 
         res_id = f"EVERETT-RESOLVE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
@@ -175,4 +177,3 @@ class EverettWheelerBranchResolver:
 
 
 everett_branch_resolver = EverettWheelerBranchResolver()
-

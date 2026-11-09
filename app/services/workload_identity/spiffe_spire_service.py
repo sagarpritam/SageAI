@@ -88,7 +88,9 @@ class SpiffeSpireIdentityService:
     """
 
     def __init__(self):
-        self.svid_registry: Dict[str, Dict[str, Any]] = {s["svid_id"]: s.copy() for s in DEFAULT_SVID_REGISTRY}
+        self.svid_registry: Dict[str, Dict[str, Any]] = {
+            s["svid_id"]: s.copy() for s in DEFAULT_SVID_REGISTRY
+        }
         self.l7_policies: List[Dict[str, Any]] = CILIUM_L7_POLICIES.copy()
 
     def list_active_svids(self) -> List[Dict[str, Any]]:
@@ -158,8 +160,14 @@ class SpiffeSpireIdentityService:
         now_iso = datetime.now(timezone.utc).isoformat()
 
         # Step 1: Validate active SVID status
-        src_active = any(s["spiffe_id"] == source_spiffe_id and s["status"] == "ACTIVE_VALID" for s in self.svid_registry.values())
-        dst_active = any(s["spiffe_id"] == destination_spiffe_id and s["status"] == "ACTIVE_VALID" for s in self.svid_registry.values())
+        src_active = any(
+            s["spiffe_id"] == source_spiffe_id and s["status"] == "ACTIVE_VALID"
+            for s in self.svid_registry.values()
+        )
+        dst_active = any(
+            s["spiffe_id"] == destination_spiffe_id and s["status"] == "ACTIVE_VALID"
+            for s in self.svid_registry.values()
+        )
 
         if not src_active or not dst_active:
             return {
@@ -174,7 +182,10 @@ class SpiffeSpireIdentityService:
         # Step 2: Evaluate L7 Policy
         matched_policy = None
         for pol in self.l7_policies:
-            if pol["source_spiffe_id"] == source_spiffe_id and pol["destination_spiffe_id"] == destination_spiffe_id:
+            if (
+                pol["source_spiffe_id"] == source_spiffe_id
+                and pol["destination_spiffe_id"] == destination_spiffe_id
+            ):
                 matched_policy = pol
                 break
 
@@ -212,7 +223,9 @@ class SpiffeSpireIdentityService:
                 "timestamp": now_iso,
             }
 
-    def revoke_svid(self, svid_id: str, operator: str = "SecOpsIdentityLead") -> Dict[str, Any]:
+    def revoke_svid(
+        self, svid_id: str, operator: str = "SecOpsIdentityLead"
+    ) -> Dict[str, Any]:
         """
         Immediately revokes an active SVID and broadcasts revocation to Cilium eBPF map.
         """
@@ -245,4 +258,3 @@ class SpiffeSpireIdentityService:
 
 # Global Singleton Instance
 spiffe_spire_service = SpiffeSpireIdentityService()
-

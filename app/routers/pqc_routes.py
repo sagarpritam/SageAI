@@ -15,57 +15,113 @@ router = APIRouter(prefix="/pqc", tags=["Post-Quantum Cryptography & ML-KEM/ML-D
 
 
 class EncapsulateRequest(BaseModel):
-    classical_public_key: str = Field(..., description="Base64-encoded X25519 public key")
-    ml_kem_public_key: str = Field(..., description="Base64-encoded ML-KEM-768 public key")
+    classical_public_key: str = Field(
+        ..., description="Base64-encoded X25519 public key"
+    )
+    ml_kem_public_key: str = Field(
+        ..., description="Base64-encoded ML-KEM-768 public key"
+    )
 
 
 class EncryptPQCRequest(BaseModel):
-    plaintext: str = Field(..., description="Sensitive data to encrypt with quantum-safe hybrid key")
-    classical_public_key: str = Field(..., description="Base64-encoded X25519 public key")
-    ml_kem_public_key: str = Field(..., description="Base64-encoded ML-KEM-768 public key")
+    plaintext: str = Field(
+        ..., description="Sensitive data to encrypt with quantum-safe hybrid key"
+    )
+    classical_public_key: str = Field(
+        ..., description="Base64-encoded X25519 public key"
+    )
+    ml_kem_public_key: str = Field(
+        ..., description="Base64-encoded ML-KEM-768 public key"
+    )
 
 
 class DecryptPQCRequest(BaseModel):
-    envelope: Dict[str, Any] = Field(..., description="Quantum-safe encrypted envelope dictionary")
-    classical_private_key: str = Field(..., description="Base64-encoded X25519 private key")
-    ml_kem_public_key: str = Field(..., description="Base64-encoded ML-KEM-768 public key")
+    envelope: Dict[str, Any] = Field(
+        ..., description="Quantum-safe encrypted envelope dictionary"
+    )
+    classical_private_key: str = Field(
+        ..., description="Base64-encoded X25519 private key"
+    )
+    ml_kem_public_key: str = Field(
+        ..., description="Base64-encoded ML-KEM-768 public key"
+    )
 
 
 class ScanCiphersuitesRequest(BaseModel):
-    ciphersuites: List[str] = Field(..., description="List of TLS ciphersuites to evaluate for HNDL risk")
+    ciphersuites: List[str] = Field(
+        ..., description="List of TLS ciphersuites to evaluate for HNDL risk"
+    )
 
 
 class SignPayloadRequest(BaseModel):
     message: str = Field(..., description="Message or payload to digitally sign")
-    classical_private_key: str = Field(..., description="Base64-encoded Ed25519 private key")
-    ml_dsa_private_key: str = Field(..., description="Base64-encoded ML-DSA-65 private key")
-    ml_dsa_public_key: str = Field(..., description="Base64-encoded ML-DSA-65 public key")
+    classical_private_key: str = Field(
+        ..., description="Base64-encoded Ed25519 private key"
+    )
+    ml_dsa_private_key: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 private key"
+    )
+    ml_dsa_public_key: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 public key"
+    )
 
 
 class VerifySignatureRequest(BaseModel):
     message: str = Field(..., description="Original message or payload")
-    hybrid_signature: Dict[str, Any] = Field(..., description="Hybrid signature payload object")
-    classical_public_key: str = Field(..., description="Base64-encoded Ed25519 public key")
-    ml_dsa_public_key: str = Field(..., description="Base64-encoded ML-DSA-65 public key")
+    hybrid_signature: Dict[str, Any] = Field(
+        ..., description="Hybrid signature payload object"
+    )
+    classical_public_key: str = Field(
+        ..., description="Base64-encoded Ed25519 public key"
+    )
+    ml_dsa_public_key: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 public key"
+    )
 
 
 class SealZeroEgressRequest(BaseModel):
-    plaintext: str = Field(..., description="Raw sensitive payload to sanitize, encapsulate, and seal")
-    destination_region: str = Field("eu-central-1", description="Destination sovereign enclave region")
-    sender_classical_signing_priv: str = Field(..., description="Base64-encoded Ed25519 signing private key")
-    sender_ml_dsa_priv: str = Field(..., description="Base64-encoded ML-DSA-65 private key")
-    sender_ml_dsa_pub: str = Field(..., description="Base64-encoded ML-DSA-65 public key")
-    recipient_classical_pub: str = Field(..., description="Base64-encoded X25519 public key of recipient")
-    recipient_ml_kem_pub: str = Field(..., description="Base64-encoded ML-KEM-768 public key of recipient")
+    plaintext: str = Field(
+        ..., description="Raw sensitive payload to sanitize, encapsulate, and seal"
+    )
+    destination_region: str = Field(
+        "eu-central-1", description="Destination sovereign enclave region"
+    )
+    sender_classical_signing_priv: str = Field(
+        ..., description="Base64-encoded Ed25519 signing private key"
+    )
+    sender_ml_dsa_priv: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 private key"
+    )
+    sender_ml_dsa_pub: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 public key"
+    )
+    recipient_classical_pub: str = Field(
+        ..., description="Base64-encoded X25519 public key of recipient"
+    )
+    recipient_ml_kem_pub: str = Field(
+        ..., description="Base64-encoded ML-KEM-768 public key of recipient"
+    )
 
 
 class UnsealZeroEgressRequest(BaseModel):
-    pqc_envelope: Dict[str, Any] = Field(..., description="Quantum-safe sealed zero-egress envelope")
-    recipient_classical_priv: str = Field(..., description="Base64-encoded X25519 private key of recipient")
-    recipient_ml_kem_pub: str = Field(..., description="Base64-encoded ML-KEM-768 public key of recipient")
-    sender_classical_pub: str = Field(..., description="Base64-encoded Ed25519 public key of sender")
-    sender_ml_dsa_pub: str = Field(..., description="Base64-encoded ML-DSA-65 public key of sender")
-    current_region: str = Field("eu-central-1", description="Current regional enclave boundary")
+    pqc_envelope: Dict[str, Any] = Field(
+        ..., description="Quantum-safe sealed zero-egress envelope"
+    )
+    recipient_classical_priv: str = Field(
+        ..., description="Base64-encoded X25519 private key of recipient"
+    )
+    recipient_ml_kem_pub: str = Field(
+        ..., description="Base64-encoded ML-KEM-768 public key of recipient"
+    )
+    sender_classical_pub: str = Field(
+        ..., description="Base64-encoded Ed25519 public key of sender"
+    )
+    sender_ml_dsa_pub: str = Field(
+        ..., description="Base64-encoded ML-DSA-65 public key of sender"
+    )
+    current_region: str = Field(
+        "eu-central-1", description="Current regional enclave boundary"
+    )
 
 
 @router.post("/generate-keys")
@@ -237,7 +293,9 @@ async def verify_hybrid_signature_route(
         return {
             "status": "success",
             "valid": is_valid,
-            "details": "Dual Ed25519 and NIST FIPS 204 ML-DSA-65 signatures verified" if is_valid else "Signature rejected",
+            "details": "Dual Ed25519 and NIST FIPS 204 ML-DSA-65 signatures verified"
+            if is_valid
+            else "Signature rejected",
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -310,4 +368,3 @@ async def unseal_zero_egress_pqc_route(
         raise HTTPException(status_code=403, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

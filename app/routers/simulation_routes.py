@@ -18,8 +18,13 @@ router = APIRouter(prefix="/simulation", tags=["Autonomous Cyber Range"])
 
 
 class RunDrillPayload(BaseModel):
-    scenario_name: Optional[str] = Field("APT-29 Supply Chain & Ingress Breach Drill", description="Name of attack scenario")
-    attacker_ip: Optional[str] = Field("198.51.100.99", description="Simulated adversary IP")
+    scenario_name: Optional[str] = Field(
+        "APT-29 Supply Chain & Ingress Breach Drill",
+        description="Name of attack scenario",
+    )
+    attacker_ip: Optional[str] = Field(
+        "198.51.100.99", description="Simulated adversary IP"
+    )
 
 
 @router.get("/scenarios")
@@ -74,9 +79,9 @@ async def run_apt_drill(
     """
     org_id = str(current_user.get("org", "system"))
     result = await cyber_range_simulator.execute_apt_scenario(
-        scenario_name=payload.scenario_name or "APT-29 Supply Chain & Ingress Breach Drill",
+        scenario_name=payload.scenario_name
+        or "APT-29 Supply Chain & Ingress Breach Drill",
         attacker_ip=payload.attacker_ip or "198.51.100.99",
         org_id=org_id,
     )
     return result
-

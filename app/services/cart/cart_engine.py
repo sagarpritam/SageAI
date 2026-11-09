@@ -30,13 +30,55 @@ logger = logging.getLogger("SageAI.cart")
 # Default Enterprise Attack Graph Topology
 DEFAULT_ATTACK_GRAPH = {
     "nodes": [
-        {"id": "node-dmz-web", "name": "DMZ Web Ingress (Nginx)", "type": "ENTRYPOINT", "exposure": "PUBLIC_INTERNET", "risk": 75},
-        {"id": "node-api-gw", "name": "Internal API Gateway", "type": "INTERMEDIATE", "exposure": "INTERNAL_VPC", "risk": 60},
-        {"id": "node-bastion", "name": "Core Bastion Jump-Host", "type": "JUMP_BOX", "exposure": "INTERNAL_VPC", "risk": 85},
-        {"id": "node-kube-worker", "name": "Kube Node Worker 01", "type": "COMPUTE", "exposure": "INTERNAL_PODS", "risk": 55},
-        {"id": "node-db-pii", "name": "Customer PII Database", "type": "CROWN_JEWEL", "exposure": "RESTRICTED", "risk": 100},
-        {"id": "node-s3-vault", "name": "AWS S3 Master Data Vault", "type": "CROWN_JEWEL", "exposure": "RESTRICTED", "risk": 100},
-        {"id": "node-ad-dc", "name": "Active Directory Domain Controller", "type": "CROWN_JEWEL", "exposure": "ISOLATED", "risk": 100},
+        {
+            "id": "node-dmz-web",
+            "name": "DMZ Web Ingress (Nginx)",
+            "type": "ENTRYPOINT",
+            "exposure": "PUBLIC_INTERNET",
+            "risk": 75,
+        },
+        {
+            "id": "node-api-gw",
+            "name": "Internal API Gateway",
+            "type": "INTERMEDIATE",
+            "exposure": "INTERNAL_VPC",
+            "risk": 60,
+        },
+        {
+            "id": "node-bastion",
+            "name": "Core Bastion Jump-Host",
+            "type": "JUMP_BOX",
+            "exposure": "INTERNAL_VPC",
+            "risk": 85,
+        },
+        {
+            "id": "node-kube-worker",
+            "name": "Kube Node Worker 01",
+            "type": "COMPUTE",
+            "exposure": "INTERNAL_PODS",
+            "risk": 55,
+        },
+        {
+            "id": "node-db-pii",
+            "name": "Customer PII Database",
+            "type": "CROWN_JEWEL",
+            "exposure": "RESTRICTED",
+            "risk": 100,
+        },
+        {
+            "id": "node-s3-vault",
+            "name": "AWS S3 Master Data Vault",
+            "type": "CROWN_JEWEL",
+            "exposure": "RESTRICTED",
+            "risk": 100,
+        },
+        {
+            "id": "node-ad-dc",
+            "name": "Active Directory Domain Controller",
+            "type": "CROWN_JEWEL",
+            "exposure": "ISOLATED",
+            "risk": 100,
+        },
     ],
     "edges": [
         {
@@ -111,30 +153,42 @@ class CARTEngine:
         nodes_map = {n["id"]: n for n in self.graph["nodes"]}
         adj: Dict[str, List[Dict[str, Any]]] = collections.defaultdict(list)
         for e in self.graph["edges"]:
-            adj[e["source"]].append({"target": e["target"], "vector": e["vector"], "edge_id": e["id"]})
+            adj[e["source"]].append(
+                {"target": e["target"], "vector": e["vector"], "edge_id": e["id"]}
+            )
 
-        entrypoints = [n["id"] for n in self.graph["nodes"] if n["type"] == "ENTRYPOINT"]
-        crown_jewels = set(n["id"] for n in self.graph["nodes"] if n["type"] == "CROWN_JEWEL")
+        entrypoints = [
+            n["id"] for n in self.graph["nodes"] if n["type"] == "ENTRYPOINT"
+        ]
+        crown_jewels = {
+            n["id"] for n in self.graph["nodes"] if n["type"] == "CROWN_JEWEL"
+        }
 
         all_paths: List[Dict[str, Any]] = []
 
         def dfs(current: str, path: List[str], vectors: List[str]):
             if current in crown_jewels:
-                all_paths.append({
-                    "path_id": f"path-{len(all_paths) + 1}",
-                    "entrypoint": nodes_map[path[0]]["name"],
-                    "target_crown_jewel": nodes_map[current]["name"],
-                    "hops": len(path) - 1,
-                    "node_sequence": [nodes_map[nid]["name"] for nid in path],
-                    "node_ids": list(path),
-                    "vectors": list(vectors),
-                    "lethality_score": max(50, 100 - (len(path) - 1) * 10),
-                })
+                all_paths.append(
+                    {
+                        "path_id": f"path-{len(all_paths) + 1}",
+                        "entrypoint": nodes_map[path[0]]["name"],
+                        "target_crown_jewel": nodes_map[current]["name"],
+                        "hops": len(path) - 1,
+                        "node_sequence": [nodes_map[nid]["name"] for nid in path],
+                        "node_ids": list(path),
+                        "vectors": list(vectors),
+                        "lethality_score": max(50, 100 - (len(path) - 1) * 10),
+                    }
+                )
                 return
 
             for neighbor in adj[current]:
                 if neighbor["target"] not in path:  # Prevent cycles
-                    dfs(neighbor["target"], path + [neighbor["target"]], vectors + [neighbor["vector"]])
+                    dfs(
+                        neighbor["target"],
+                        path + [neighbor["target"]],
+                        vectors + [neighbor["vector"]],
+                    )
 
         for ep in entrypoints:
             dfs(ep, [ep], [])
@@ -147,8 +201,14 @@ class CARTEngine:
             for nid in intermediate_nodes:
                 node_frequencies[nid] += 1
 
-        top_choke_point_id = max(node_frequencies, key=node_frequencies.get) if node_frequencies else None
-        top_choke_point_node = nodes_map.get(top_choke_point_id) if top_choke_point_id else None
+        top_choke_point_id = (
+            max(node_frequencies, key=node_frequencies.get)
+            if node_frequencies
+            else None
+        )
+        top_choke_point_node = (
+            nodes_map.get(top_choke_point_id) if top_choke_point_id else None
+        )
         paths_neutralized = node_frequencies.get(top_choke_point_id, 0)
         collapse_pct = round((paths_neutralized / max(1, len(all_paths))) * 100, 1)
 
@@ -164,8 +224,12 @@ class CARTEngine:
             "blast_radius_score": blast_radius,
             "choke_point": {
                 "node_id": top_choke_point_id,
-                "node_name": top_choke_point_node["name"] if top_choke_point_node else "None",
-                "node_type": top_choke_point_node["type"] if top_choke_point_node else "None",
+                "node_name": top_choke_point_node["name"]
+                if top_choke_point_node
+                else "None",
+                "node_type": top_choke_point_node["type"]
+                if top_choke_point_node
+                else "None",
                 "paths_traversing": paths_neutralized,
                 "path_collapse_percentage": collapse_pct,
                 "severance_strategy": (
@@ -183,7 +247,9 @@ class CARTEngine:
             details={
                 "paths_count": len(all_paths),
                 "blast_radius": blast_radius,
-                "choke_point": top_choke_point_node["name"] if top_choke_point_node else "None",
+                "choke_point": top_choke_point_node["name"]
+                if top_choke_point_node
+                else "None",
                 "collapse_pct": collapse_pct,
             },
             org_id="system-cart",
@@ -208,12 +274,23 @@ class CARTEngine:
             "target_node_id": node_id,
             "operator": operator,
             "rules_applied": [
-                {"type": "NETWORK_MICROSEGMENTATION", "rule": f"Deny all ingress to {node_id} from DMZ subnets"},
-                {"type": "IAM_PRIVILEGE_STRIP", "rule": f"Detach AdministratorAccess from {node_id} instance profile"},
-                {"type": "PORT_SECURITY", "rule": "Revoke Port 5432 (PostgreSQL) direct access from Bastion"},
+                {
+                    "type": "NETWORK_MICROSEGMENTATION",
+                    "rule": f"Deny all ingress to {node_id} from DMZ subnets",
+                },
+                {
+                    "type": "IAM_PRIVILEGE_STRIP",
+                    "rule": f"Detach AdministratorAccess from {node_id} instance profile",
+                },
+                {
+                    "type": "PORT_SECURITY",
+                    "rule": "Revoke Port 5432 (PostgreSQL) direct access from Bastion",
+                },
             ],
             "attack_paths_collapsed": paths_analysis["choke_point"]["paths_traversing"],
-            "risk_reduction_pct": paths_analysis["choke_point"]["path_collapse_percentage"],
+            "risk_reduction_pct": paths_analysis["choke_point"][
+                "path_collapse_percentage"
+            ],
             "status": "CHOKE_POINT_SEVERED_SUCCESSFULLY",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }

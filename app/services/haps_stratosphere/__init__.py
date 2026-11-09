@@ -8,4 +8,3 @@ from .haps_stratosphere_mesh import (
 )
 
 __all__ = ["HAPSStratosphereMesh", "haps_stratosphere_mesh"]
-

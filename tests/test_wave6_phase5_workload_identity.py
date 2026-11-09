@@ -2,7 +2,6 @@
 Tests for SageAI Wave 6 Phase 6.5: Zero-Trust Workload Identity Fabric (SPIFFE/SPIRE & Cilium eBPF L7).
 """
 
-import pytest
 from app.services.workload_identity.spiffe_spire_service import (
     spiffe_spire_service,
 )
@@ -61,7 +60,9 @@ def test_revoke_svid():
     svid_id = issue_res["svid"]["svid_id"]
 
     # Revoke
-    revoke_res = spiffe_spire_service.revoke_svid(svid_id, operator="TestSecOpsDirector")
+    revoke_res = spiffe_spire_service.revoke_svid(
+        svid_id, operator="TestSecOpsDirector"
+    )
     assert revoke_res["status"] == "success"
     assert revoke_res["verdict"] == "REVOCATION_BROADCAST_COMPLETE"
     assert revoke_res["ebpf_map_updated"] is True
@@ -69,4 +70,3 @@ def test_revoke_svid():
     # Verify SVID state
     svid = spiffe_spire_service.svid_registry[svid_id]
     assert svid["status"] == "REVOKED_COMPROMISED"
-

@@ -103,15 +103,23 @@ class NeutrinoFluxDetectorArray:
 
         # Baseline comparison
         baseline = detector["baseline_flux_ev_per_day"]
-        flux_deviation_sigma = round((measured_flux_ev_per_day - baseline) / (math.sqrt(baseline) + 1e-6), 2)
+        flux_deviation_sigma = round(
+            (measured_flux_ev_per_day - baseline) / (math.sqrt(baseline) + 1e-6), 2
+        )
 
         # Check for reactor fission or detonation prompt burst
         # Typical reactor antineutrinos: 1.8 - 8 MeV; Prompt nuclear detonation: dense burst > 10 MeV
-        is_prompt_detonation = (observed_prompt_energy_mev > 12.0) and (flux_deviation_sigma > 5.0)
+        is_prompt_detonation = (observed_prompt_energy_mev > 12.0) and (
+            flux_deviation_sigma > 5.0
+        )
         is_reactor_tampering = (flux_deviation_sigma > 3.0) and not is_prompt_detonation
 
         # Cherenkov cone reconstruction angle in water/ice (n ~= 1.33, cos theta = 1 / (n * beta))
-        refractive_index = 1.33 if "Ice" in detector["medium"] or "Water" in detector["medium"] else 1.50
+        refractive_index = (
+            1.33
+            if "Ice" in detector["medium"] or "Water" in detector["medium"]
+            else 1.50
+        )
         cos_theta = min(1.0, max(0.0, 1.0 / refractive_index))
         cherenkov_angle_deg = round(math.degrees(math.acos(cos_theta)), 2)
 
@@ -160,9 +168,13 @@ class NeutrinoFluxDetectorArray:
         Triangulates geographic coordinates of subterranean nuclear activity using directional
         Cherenkov arrival vectors across 2 or more underground observatories.
         """
-        participating_detectors = [d_id for d_id in reported_azimuth_angles if d_id in self._detectors]
+        participating_detectors = [
+            d_id for d_id in reported_azimuth_angles if d_id in self._detectors
+        ]
         if len(participating_detectors) < 2:
-            raise ValueError("Triangulation requires at least 2 reporting underground neutrino detectors.")
+            raise ValueError(
+                "Triangulation requires at least 2 reporting underground neutrino detectors."
+            )
 
         # Spherical intersection approximation for directional vectors
         lat_est = 39.0 + (sum(reported_azimuth_angles.values()) % 15.0) - 7.5
@@ -188,8 +200,12 @@ class NeutrinoFluxDetectorArray:
 
     def get_metrics(self) -> Dict[str, Any]:
         total_target_mass = sum(d["target_mass_kton"] for d in self._detectors.values())
-        total_optical_sensors = sum(d["optical_sensors_count"] for d in self._detectors.values())
-        total_bursts = sum(d["anomalous_bursts_detected"] for d in self._detectors.values())
+        total_optical_sensors = sum(
+            d["optical_sensors_count"] for d in self._detectors.values()
+        )
+        total_bursts = sum(
+            d["anomalous_bursts_detected"] for d in self._detectors.values()
+        )
 
         return {
             "total_detectors_online": len(self._detectors),
@@ -203,4 +219,3 @@ class NeutrinoFluxDetectorArray:
 
 # Global singleton instance
 neutrino_flux_detector = NeutrinoFluxDetectorArray()
-

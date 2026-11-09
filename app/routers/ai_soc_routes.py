@@ -15,12 +15,18 @@ router = APIRouter(prefix="/ai-soc", tags=["Autonomous AI SOC & Neural Alert Tri
 
 
 class TriageAlertsRequest(BaseModel):
-    raw_alerts: List[Dict[str, Any]] = Field(..., description="Batch of raw security alerts to correlate and triage")
+    raw_alerts: List[Dict[str, Any]] = Field(
+        ..., description="Batch of raw security alerts to correlate and triage"
+    )
 
 
 class ExecutiveBriefingRequest(BaseModel):
-    triage_report: Dict[str, Any] = Field(..., description="Completed alert triage report")
-    ciso_name: Optional[str] = Field("Chief Information Security Officer", description="CISO recipient name")
+    triage_report: Dict[str, Any] = Field(
+        ..., description="Completed alert triage report"
+    )
+    ciso_name: Optional[str] = Field(
+        "Chief Information Security Officer", description="CISO recipient name"
+    )
 
 
 @router.post("/triage")
@@ -71,4 +77,3 @@ async def generate_briefing_endpoint(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

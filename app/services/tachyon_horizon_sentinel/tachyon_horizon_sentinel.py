@@ -163,8 +163,12 @@ class TachyonHorizonCerenkovSentinel:
             "active_sentinels": len(self.sentinels),
             "pre_causal_alerts_logged": len(self.alerts),
             "mean_lookahead_us": round(
-                abs(sum([a.pre_causal_lead_time_us for a in self.alerts])) / len(self.alerts), 1
-            ) if self.alerts else 285.0,
+                abs(sum([a.pre_causal_lead_time_us for a in self.alerts]))
+                / len(self.alerts),
+                1,
+            )
+            if self.alerts
+            else 285.0,
             "physics_mode": "SPACELIKE_VACUUM_CERENKOV_METAMATERIAL",
             "anticipatory_defense_guarantee": "ZERO_SURPRISE_CAUSAL_SHIELD",
             "status": "OPERATIONAL",
@@ -172,4 +176,3 @@ class TachyonHorizonCerenkovSentinel:
 
 
 tachyon_horizon_sentinel = TachyonHorizonCerenkovSentinel()
-

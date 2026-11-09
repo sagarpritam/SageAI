@@ -2,7 +2,6 @@
 FastAPI Router for Capability 104: Open-Closed String Field Theory Vertex Integrator.
 """
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -10,14 +9,22 @@ from app.services.string_field_theory.string_field_theory import (
     get_string_field_theory_integrator,
 )
 
-router = APIRouter(prefix="/api/string-field-theory", tags=["Capability 104: String Field Theory"])
+router = APIRouter(
+    prefix="/api/string-field-theory", tags=["Capability 104: String Field Theory"]
+)
 
 
 class CondenseTachyonRequest(BaseModel):
     vertex_id: str = Field(..., description="ID of the string field theory vertex")
-    coupling_g0: float = Field(default=0.45, ge=0.1, le=2.0, description="Open string coupling constant g_o")
-    truncation_level: int = Field(default=8, ge=2, le=16, description="Level truncation approximation level L")
-    damping_gain: float = Field(default=1.1, ge=0.8, le=2.5, description="Non-perturbative damping gain")
+    coupling_g0: float = Field(
+        default=0.45, ge=0.1, le=2.0, description="Open string coupling constant g_o"
+    )
+    truncation_level: int = Field(
+        default=8, ge=2, le=16, description="Level truncation approximation level L"
+    )
+    damping_gain: float = Field(
+        default=1.1, ge=0.8, le=2.5, description="Non-perturbative damping gain"
+    )
 
 
 @router.get("/vertices")
@@ -48,4 +55,3 @@ async def get_sft_metrics():
     """Retrieve aggregate string field theory metrics."""
     integrator = get_string_field_theory_integrator()
     return integrator.get_sft_metrics()
-

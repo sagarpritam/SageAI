@@ -40,7 +40,9 @@ def test_sync_threat_feeds_task_error_handling():
         "app.services.threat_feed.cve_indexer.cve_indexer.sync_cisa_kev",
         new_callable=AsyncMock,
     ) as mock_sync:
-        mock_sync.side_effect = RuntimeError("Network connection to CISA feed timed out")
+        mock_sync.side_effect = RuntimeError(
+            "Network connection to CISA feed timed out"
+        )
 
         result = sync_threat_feeds(force=False)
 

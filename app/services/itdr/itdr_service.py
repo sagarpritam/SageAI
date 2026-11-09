@@ -30,6 +30,7 @@ from app.services.audit_chain import audit_chain
 
 logger = logging.getLogger("SageAI.itdr")
 
+
 # Haversine Distance Calculation (km)
 def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     R = 6371.0  # Earth radius in kilometers
@@ -37,7 +38,9 @@ def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     dlon = math.radians(lon2 - lon1)
     a = (
         math.sin(dlat / 2) ** 2
-        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlon / 2) ** 2
     )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
@@ -121,59 +124,74 @@ class ITDRService:
                     e2 = logins[i + 1]
                     t1 = datetime.fromisoformat(e1["timestamp"].replace("Z", "+00:00"))
                     t2 = datetime.fromisoformat(e2["timestamp"].replace("Z", "+00:00"))
-                    time_diff_hours = max(0.001, abs((t2 - t1).total_seconds()) / 3600.0)
+                    time_diff_hours = max(
+                        0.001, abs((t2 - t1).total_seconds()) / 3600.0
+                    )
 
                     dist_km = calculate_distance_km(
-                        e1["geo"]["lat"], e1["geo"]["lon"],
-                        e2["geo"]["lat"], e2["geo"]["lon"]
+                        e1["geo"]["lat"],
+                        e1["geo"]["lon"],
+                        e2["geo"]["lat"],
+                        e2["geo"]["lon"],
                     )
                     velocity_kmh = dist_km / time_diff_hours
 
                     if velocity_kmh > 800:  # Faster than passenger aircraft
-                        threats.append({
-                            "threat_id": f"itdr-imp-travel-{hashlib.sha256(user.encode()).hexdigest()[:8]}",
-                            "threat_type": "IMPOSSIBLE_TRAVEL",
-                            "severity": "CRITICAL",
-                            "user_affected": user,
-                            "idp": e2.get("idp", "Unknown"),
-                            "description": (
-                                f"Impossible travel velocity detected: {round(velocity_kmh, 1)} km/h. "
-                                f"User logged in from {e1['geo']['city']}, {e1['geo']['country']} and then "
-                                f"{e2['geo']['city']}, {e2['geo']['country']} within {round(time_diff_hours * 60, 1)} minutes."
-                            ),
-                            "origin_loc": f"{e1['geo']['city']} ({e1['client_ip']})",
-                            "destination_loc": f"{e2['geo']['city']} ({e2['client_ip']})",
-                            "calculated_velocity_kmh": round(velocity_kmh, 1),
-                            "recommended_action": "REVOKE_SESSION_AND_ENFORCE_FIDO2",
-                        })
+                        threats.append(
+                            {
+                                "threat_id": f"itdr-imp-travel-{hashlib.sha256(user.encode()).hexdigest()[:8]}",
+                                "threat_type": "IMPOSSIBLE_TRAVEL",
+                                "severity": "CRITICAL",
+                                "user_affected": user,
+                                "idp": e2.get("idp", "Unknown"),
+                                "description": (
+                                    f"Impossible travel velocity detected: {round(velocity_kmh, 1)} km/h. "
+                                    f"User logged in from {e1['geo']['city']}, {e1['geo']['country']} and then "
+                                    f"{e2['geo']['city']}, {e2['geo']['country']} within {round(time_diff_hours * 60, 1)} minutes."
+                                ),
+                                "origin_loc": f"{e1['geo']['city']} ({e1['client_ip']})",
+                                "destination_loc": f"{e2['geo']['city']} ({e2['client_ip']})",
+                                "calculated_velocity_kmh": round(velocity_kmh, 1),
+                                "recommended_action": "REVOKE_SESSION_AND_ENFORCE_FIDO2",
+                            }
+                        )
 
         # 2. MFA Fatigue / Push Bombing
         for ev in event_list:
-            if ev.get("push_count_last_2min", 0) >= 5 and ev.get("push_accepted_after_denials"):
-                threats.append({
-                    "threat_id": f"itdr-mfa-fatigue-{hashlib.sha256(ev['user_email'].encode()).hexdigest()[:8]}",
-                    "threat_type": "MFA_FATIGUE_PUSH_BOMBING",
-                    "severity": "CRITICAL",
-                    "user_affected": ev["user_email"],
-                    "idp": ev.get("idp", "Okta"),
-                    "description": f"User subjected to {ev['push_count_last_2min']} consecutive push notifications in 2 minutes before acceptance (MFA Fatigue Attack / T1621).",
-                    "attacker_ip": ev.get("client_ip"),
-                    "recommended_action": "QUARANTINE_USER_AND_REQUIRE_NUMBER_MATCHING",
-                })
+            if ev.get("push_count_last_2min", 0) >= 5 and ev.get(
+                "push_accepted_after_denials"
+            ):
+                threats.append(
+                    {
+                        "threat_id": f"itdr-mfa-fatigue-{hashlib.sha256(ev['user_email'].encode()).hexdigest()[:8]}",
+                        "threat_type": "MFA_FATIGUE_PUSH_BOMBING",
+                        "severity": "CRITICAL",
+                        "user_affected": ev["user_email"],
+                        "idp": ev.get("idp", "Okta"),
+                        "description": f"User subjected to {ev['push_count_last_2min']} consecutive push notifications in 2 minutes before acceptance (MFA Fatigue Attack / T1621).",
+                        "attacker_ip": ev.get("client_ip"),
+                        "recommended_action": "QUARANTINE_USER_AND_REQUIRE_NUMBER_MATCHING",
+                    }
+                )
 
         # 3. Shadow Admin & Unauthorized Privilege Escalation
         for ev in event_list:
-            if ev.get("event_type") == "DirectoryRole.AddMember" and ev.get("target_role") == "Global Administrator":
-                threats.append({
-                    "threat_id": f"itdr-priv-esc-{hashlib.sha256(ev['user_email'].encode()).hexdigest()[:8]}",
-                    "threat_type": "SHADOW_ADMIN_ESCALATION",
-                    "severity": "CRITICAL",
-                    "user_affected": ev["user_email"],
-                    "idp": ev.get("idp", "Microsoft Entra ID"),
-                    "description": f"Stealth privilege escalation: {ev['user_email']} was elevated to '{ev['target_role']}' by actor {ev.get('actor_email')}.",
-                    "actor": ev.get("actor_email"),
-                    "recommended_action": "STRIP_ROLE_ASSIGNMENT_AND_LOCK_ACTOR",
-                })
+            if (
+                ev.get("event_type") == "DirectoryRole.AddMember"
+                and ev.get("target_role") == "Global Administrator"
+            ):
+                threats.append(
+                    {
+                        "threat_id": f"itdr-priv-esc-{hashlib.sha256(ev['user_email'].encode()).hexdigest()[:8]}",
+                        "threat_type": "SHADOW_ADMIN_ESCALATION",
+                        "severity": "CRITICAL",
+                        "user_affected": ev["user_email"],
+                        "idp": ev.get("idp", "Microsoft Entra ID"),
+                        "description": f"Stealth privilege escalation: {ev['user_email']} was elevated to '{ev['target_role']}' by actor {ev.get('actor_email')}.",
+                        "actor": ev.get("actor_email"),
+                        "recommended_action": "STRIP_ROLE_ASSIGNMENT_AND_LOCK_ACTOR",
+                    }
+                )
 
         # Synthesis
         critical_count = sum(1 for t in threats if t["severity"] == "CRITICAL")

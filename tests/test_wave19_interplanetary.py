@@ -2,14 +2,14 @@
 Unit & Integration Tests for Wave 19 (Capabilities 77-79) and Option B Continuous Daemon.
 """
 
-import time
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.solar_sail_laser import relativistic_solar_sail_laser_mesh
+from app.services.autonomous_redteam import autonomous_redteam_daemon
 from app.services.magnetosphere_dynamo import magnetosphere_dynamo_decoupler
 from app.services.mantle_geoneutrino import deep_mantle_geoneutrino_mesh
-from app.services.autonomous_redteam import autonomous_redteam_daemon
+from app.services.solar_sail_laser import relativistic_solar_sail_laser_mesh
 
 client = TestClient(app)
 
@@ -112,7 +112,9 @@ def test_mantle_geoneutrino_service():
     assert res["thorium_flux_tnu"] > 5.0
     assert res["mantle_heat_flux_tw"] > 15.0
     assert len(res["detected_thermal_plumes"]) >= 1
-    assert res["magma_overpressure_status"] == "CRITICAL_CONVECTIVE_OVERPRESSURE_DETECTED"
+    assert (
+        res["magma_overpressure_status"] == "CRITICAL_CONVECTIVE_OVERPRESSURE_DETECTED"
+    )
     assert res["days_to_potential_breach"] > 30.0
     assert res["early_warning_confidence_pct"] > 90.0
 

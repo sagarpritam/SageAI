@@ -5,6 +5,7 @@ Digital Signatures, and Sovereign Zero-Egress Payloads.
 """
 
 import base64
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -92,7 +93,9 @@ def test_hybrid_signature_tamper_detection():
     bad_classical_sig = dict(sig)
     corrupted_bytes = bytearray(base64.b64decode(sig["classical_signature"]))
     corrupted_bytes[0] ^= 0xFF
-    bad_classical_sig["classical_signature"] = base64.b64encode(corrupted_bytes).decode("utf-8")
+    bad_classical_sig["classical_signature"] = base64.b64encode(corrupted_bytes).decode(
+        "utf-8"
+    )
 
     is_valid_corrupted_classical = service.verify_hybrid_signature(
         message=message,
@@ -106,7 +109,9 @@ def test_hybrid_signature_tamper_detection():
     bad_ml_dsa_sig = dict(sig)
     corrupted_dsa_bytes = bytearray(base64.b64decode(sig["ml_dsa_signature"]))
     corrupted_dsa_bytes[10] ^= 0xFF
-    bad_ml_dsa_sig["ml_dsa_signature"] = base64.b64encode(corrupted_dsa_bytes).decode("utf-8")
+    bad_ml_dsa_sig["ml_dsa_signature"] = base64.b64encode(corrupted_dsa_bytes).decode(
+        "utf-8"
+    )
 
     is_valid_corrupted_dsa = service.verify_hybrid_signature(
         message=message,
@@ -204,7 +209,9 @@ async def test_fastapi_pqc_signing_and_zero_egress_routes():
     """Verify FastAPI PQC signature and zero-egress endpoints with Bearer token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "pqc_officer@defense.corp", "role": "admin", "org": "enclave-org"})
+        token = create_access_token(
+            {"sub": "pqc_officer@defense.corp", "role": "admin", "org": "enclave-org"}
+        )
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Generate Signing Keypair

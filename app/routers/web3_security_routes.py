@@ -15,13 +15,19 @@ router = APIRouter(prefix="/web3-security", tags=["Web3 & Smart Contract Securit
 
 
 class AuditContractRequest(BaseModel):
-    source_code: Optional[str] = Field(None, description="Smart contract source code in Solidity/Rust/Move")
-    contract_name: Optional[str] = Field("VulnerableVault.sol", description="Contract filename or label")
+    source_code: Optional[str] = Field(
+        None, description="Smart contract source code in Solidity/Rust/Move"
+    )
+    contract_name: Optional[str] = Field(
+        "VulnerableVault.sol", description="Contract filename or label"
+    )
     chain: Optional[str] = Field("Ethereum (EVM)", description="Blockchain ecosystem")
 
 
 class GeneratePoCRequest(BaseModel):
-    contract_name: Optional[str] = Field("VulnerableVault.sol", description="Contract to generate Foundry PoC for")
+    contract_name: Optional[str] = Field(
+        "VulnerableVault.sol", description="Contract to generate Foundry PoC for"
+    )
 
 
 @router.post("/audit")
@@ -52,4 +58,3 @@ async def generate_foundry_poc_endpoint(
         contract_name=payload.contract_name or "VulnerableVault.sol"
     )
     return {"status": "success", "foundry_poc": poc}
-

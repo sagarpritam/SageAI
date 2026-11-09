@@ -157,8 +157,12 @@ class NeuromorphicSNNGuard:
         total_clamps = sum(c["clamps_active"] for c in self._cores.values())
         return {
             "monitored_neuromorphic_cores": len(self._cores),
-            "total_spiking_neurons_active": sum(c["total_neurons"] for c in self._cores.values()),
-            "total_synapses_mapped": sum(c["total_synapses"] for c in self._cores.values()),
+            "total_spiking_neurons_active": sum(
+                c["total_neurons"] for c in self._cores.values()
+            ),
+            "total_synapses_mapped": sum(
+                c["total_synapses"] for c in self._cores.values()
+            ),
             "inhibitory_clamps_discharged": total_clamps + len(self._clamp_events),
             "mean_inference_latency_ns": 385.0,
             "mean_energy_efficiency_pj": 12.1,
@@ -167,4 +171,3 @@ class NeuromorphicSNNGuard:
 
 # Singleton instance
 neuromorphic_snn_guard = NeuromorphicSNNGuard()
-

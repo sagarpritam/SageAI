@@ -29,6 +29,7 @@ class MultiAIConsensusEngine:
     def gateway(self):
         if self._gateway is None:
             from app.services.llm.gateway import llm_gateway
+
             self._gateway = llm_gateway
         return self._gateway
 
@@ -43,10 +44,13 @@ class MultiAIConsensusEngine:
         """
         Runs the full 3-model Red-vs-Blue consensus loop with deterministic sandbox verification.
         """
-        logger.info(f"[Consensus] Initiating Red-vs-Blue consensus on '{vulnerability_title}' for {target}")
+        logger.info(
+            f"[Consensus] Initiating Red-vs-Blue consensus on '{vulnerability_title}' for {target}"
+        )
 
         # ── Step 0: Deterministic Sandbox AST Taint Verification ──────────
         from app.services.llm.sandbox_verifier import sandbox_verifier
+
         taint_result = sandbox_verifier.verify_ast_taint(evidence)
 
         # ── Step 1: Offense Model Hypothesizes Attack Vector ────────────────
@@ -69,7 +73,9 @@ class MultiAIConsensusEngine:
                 org_id=org_id,
             )
         except Exception as e:
-            logger.warning(f"[Consensus] Offense model failed, falling back to openai: {e}")
+            logger.warning(
+                f"[Consensus] Offense model failed, falling back to openai: {e}"
+            )
             offense_response = await self.gateway.generate(
                 prompt=offense_prompt,
                 system_message="You are the SageAI Offensive Red-Team AI Specialist.",
@@ -97,7 +103,9 @@ class MultiAIConsensusEngine:
                 org_id=org_id,
             )
         except Exception as e:
-            logger.warning(f"[Consensus] Defense model failed, falling back to nvidia: {e}")
+            logger.warning(
+                f"[Consensus] Defense model failed, falling back to nvidia: {e}"
+            )
             defense_response = await self.gateway.generate(
                 prompt=defense_prompt,
                 system_message="You are the SageAI Defensive Skeptic AI.",
@@ -135,7 +143,9 @@ class MultiAIConsensusEngine:
                 org_id=org_id,
             )
         except Exception as e:
-            logger.warning(f"[Consensus] Arbiter model failed, falling back to nvidia: {e}")
+            logger.warning(
+                f"[Consensus] Arbiter model failed, falling back to nvidia: {e}"
+            )
             arbiter_response = await self.gateway.generate(
                 prompt=arbiter_prompt,
                 system_message="You are the SageAI Arbiter AI. Output valid JSON only.",
@@ -147,7 +157,10 @@ class MultiAIConsensusEngine:
         decision = self._parse_arbiter_json(arbiter_response)
 
         # If deterministic AST proof verified taint reachability, guarantee high confidence
-        if taint_result.get("deterministic_proof") and decision.get("consensus_verdict") != "FALSE_POSITIVE":
+        if (
+            taint_result.get("deterministic_proof")
+            and decision.get("consensus_verdict") != "FALSE_POSITIVE"
+        ):
             decision["consensus_verdict"] = "CONFIRMED_EXPLOITABLE"
             decision["confidence_score"] = max(decision.get("confidence_score", 0), 95)
 
@@ -155,7 +168,11 @@ class MultiAIConsensusEngine:
             "vulnerability_title": vulnerability_title,
             "target": target,
             "evaluated_at": datetime.now(timezone.utc).isoformat(),
-            "models_engaged": ["deepseek-reasoner", "claude-3-7-sonnet", "gemini-2.0-flash"],
+            "models_engaged": [
+                "deepseek-reasoner",
+                "claude-3-7-sonnet",
+                "gemini-2.0-flash",
+            ],
             "deterministic_sandbox": taint_result,
             "offense_perspective": offense_response,
             "defense_perspective": defense_response,
@@ -177,7 +194,9 @@ class MultiAIConsensusEngine:
                 "consensus_verdict": "THEORETICAL_MITIGATED",
                 "confidence_score": 75,
                 "exploitability_rating": "Medium",
-                "executive_synthesis": text[:200] if text else "Multi-AI consensus completed with balanced evaluation.",
+                "executive_synthesis": text[:200]
+                if text
+                else "Multi-AI consensus completed with balanced evaluation.",
                 "recommended_mitigation": "Review defense audit findings and apply defensive sanitization.",
             }
 

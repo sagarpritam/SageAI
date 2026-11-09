@@ -42,19 +42,23 @@ async def test_ai_connections() -> list[dict[str, Any]]:
         print("[*] Probing NVIDIA NIM live endpoint...")
         verif = await verify_nvidia_key(nv_key)
         if verif.get("valid"):
-            results.append({
-                "service": "NVIDIA NIM",
-                "status": "CONNECTED",
-                "detail": f"Active ({verif.get('latency_ms', 0)}ms) - Model: {verif.get('model')}",
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "NVIDIA NIM",
+                    "status": "CONNECTED",
+                    "detail": f"Active ({verif.get('latency_ms', 0)}ms) - Model: {verif.get('model')}",
+                    "problem": None,
+                }
+            )
         else:
-            results.append({
-                "service": "NVIDIA NIM",
-                "status": "FAILED",
-                "detail": f"Key configured ({nv_key[:6]}...) but verification failed",
-                "problem": verif.get("error", "Failed verification"),
-            })
+            results.append(
+                {
+                    "service": "NVIDIA NIM",
+                    "status": "FAILED",
+                    "detail": f"Key configured ({nv_key[:6]}...) but verification failed",
+                    "problem": verif.get("error", "Failed verification"),
+                }
+            )
     else:
         # Check endpoint reachability without auth
         try:
@@ -63,12 +67,14 @@ async def test_ai_connections() -> list[dict[str, Any]]:
                 reach = "Endpoint Reachable (HTTP " + str(resp.status_code) + ")"
         except Exception as e:
             reach = f"Endpoint Unreachable: {e}"
-        results.append({
-            "service": "NVIDIA NIM",
-            "status": "NOT CONFIGURED",
-            "detail": f"NVIDIA_API_KEY is empty in .env. {reach}",
-            "problem": "Missing NVIDIA_API_KEY. System falls back to OpenAI/Anthropic or rule-based engine.",
-        })
+        results.append(
+            {
+                "service": "NVIDIA NIM",
+                "status": "NOT CONFIGURED",
+                "detail": f"NVIDIA_API_KEY is empty in .env. {reach}",
+                "problem": "Missing NVIDIA_API_KEY. System falls back to OpenAI/Anthropic or rule-based engine.",
+            }
+        )
 
     # 2. OpenAI
     openai_key = settings.OPENAI_API_KEY.strip()
@@ -80,33 +86,41 @@ async def test_ai_connections() -> list[dict[str, Any]]:
                     headers={"Authorization": f"Bearer {openai_key}"},
                 )
                 if resp.status_code == 200:
-                    results.append({
-                        "service": "OpenAI",
-                        "status": "CONNECTED",
-                        "detail": f"Key verified, accessible ({resp.status_code} OK)",
-                        "problem": None,
-                    })
+                    results.append(
+                        {
+                            "service": "OpenAI",
+                            "status": "CONNECTED",
+                            "detail": f"Key verified, accessible ({resp.status_code} OK)",
+                            "problem": None,
+                        }
+                    )
                 else:
-                    results.append({
-                        "service": "OpenAI",
-                        "status": "FAILED",
-                        "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
-                        "problem": "Invalid OPENAI_API_KEY or account quota exceeded",
-                    })
+                    results.append(
+                        {
+                            "service": "OpenAI",
+                            "status": "FAILED",
+                            "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
+                            "problem": "Invalid OPENAI_API_KEY or account quota exceeded",
+                        }
+                    )
         except Exception as e:
-            results.append({
-                "service": "OpenAI",
-                "status": "FAILED",
-                "detail": str(e),
-                "problem": f"Network error reaching api.openai.com: {e}",
-            })
+            results.append(
+                {
+                    "service": "OpenAI",
+                    "status": "FAILED",
+                    "detail": str(e),
+                    "problem": f"Network error reaching api.openai.com: {e}",
+                }
+            )
     else:
-        results.append({
-            "service": "OpenAI",
-            "status": "NOT CONFIGURED",
-            "detail": "OPENAI_API_KEY is empty in .env",
-            "problem": "No key configured. Used as secondary fallback.",
-        })
+        results.append(
+            {
+                "service": "OpenAI",
+                "status": "NOT CONFIGURED",
+                "detail": "OPENAI_API_KEY is empty in .env",
+                "problem": "No key configured. Used as secondary fallback.",
+            }
+        )
 
     # 3. Anthropic
     anthropic_key = settings.ANTHROPIC_API_KEY.strip()
@@ -121,50 +135,64 @@ async def test_ai_connections() -> list[dict[str, Any]]:
                     },
                 )
                 if resp.status_code == 200:
-                    results.append({
-                        "service": "Anthropic",
-                        "status": "CONNECTED",
-                        "detail": f"Key verified, accessible ({resp.status_code} OK)",
-                        "problem": None,
-                    })
+                    results.append(
+                        {
+                            "service": "Anthropic",
+                            "status": "CONNECTED",
+                            "detail": f"Key verified, accessible ({resp.status_code} OK)",
+                            "problem": None,
+                        }
+                    )
                 else:
-                    results.append({
-                        "service": "Anthropic",
-                        "status": "FAILED",
-                        "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
-                        "problem": "Invalid ANTHROPIC_API_KEY or billing restriction",
-                    })
+                    results.append(
+                        {
+                            "service": "Anthropic",
+                            "status": "FAILED",
+                            "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
+                            "problem": "Invalid ANTHROPIC_API_KEY or billing restriction",
+                        }
+                    )
         except Exception as e:
-            results.append({
-                "service": "Anthropic",
-                "status": "FAILED",
-                "detail": str(e),
-                "problem": f"Network error reaching api.anthropic.com: {e}",
-            })
+            results.append(
+                {
+                    "service": "Anthropic",
+                    "status": "FAILED",
+                    "detail": str(e),
+                    "problem": f"Network error reaching api.anthropic.com: {e}",
+                }
+            )
     else:
-        results.append({
-            "service": "Anthropic",
-            "status": "NOT CONFIGURED",
-            "detail": "ANTHROPIC_API_KEY is empty in .env",
-            "problem": "No key configured. Used as fallback.",
-        })
+        results.append(
+            {
+                "service": "Anthropic",
+                "status": "NOT CONFIGURED",
+                "detail": "ANTHROPIC_API_KEY is empty in .env",
+                "problem": "No key configured. Used as fallback.",
+            }
+        )
 
     # 4. Google Generative AI (Gemini)
-    gemini_key = os.getenv("GOOGLE_GENERATIVE_AI_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
+    gemini_key = os.getenv("GOOGLE_GENERATIVE_AI_API_KEY", "") or os.getenv(
+        "GEMINI_API_KEY", ""
+    )
     if gemini_key:
-        results.append({
-            "service": "Google Gemini",
-            "status": "CONFIGURED",
-            "detail": f"Key present ({gemini_key[:6]}...)",
-            "problem": None,
-        })
+        results.append(
+            {
+                "service": "Google Gemini",
+                "status": "CONFIGURED",
+                "detail": f"Key present ({gemini_key[:6]}...)",
+                "problem": None,
+            }
+        )
     else:
-        results.append({
-            "service": "Google Gemini",
-            "status": "NOT CONFIGURED",
-            "detail": "GOOGLE_GENERATIVE_AI_API_KEY is empty",
-            "problem": "Not configured.",
-        })
+        results.append(
+            {
+                "service": "Google Gemini",
+                "status": "NOT CONFIGURED",
+                "detail": "GOOGLE_GENERATIVE_AI_API_KEY is empty",
+                "problem": "Not configured.",
+            }
+        )
 
     # 5. NVIDIA NeMo Auditor Microservice
     auditor_url = settings.AUDITOR_BASE_URL.strip()
@@ -174,43 +202,57 @@ async def test_ai_connections() -> list[dict[str, Any]]:
             resp = await client.get(f"{auditor_url.rstrip('/')}/v1beta1/audit/targets")
             latency = int((time.perf_counter() - start) * 1000)
             if resp.status_code == 200:
-                results.append({
-                    "service": "NeMo Auditor Microservice",
-                    "status": "CONNECTED",
-                    "detail": f"Online at {auditor_url} ({latency}ms)",
-                    "problem": None,
-                })
+                results.append(
+                    {
+                        "service": "NeMo Auditor Microservice",
+                        "status": "CONNECTED",
+                        "detail": f"Online at {auditor_url} ({latency}ms)",
+                        "problem": None,
+                    }
+                )
             else:
-                results.append({
-                    "service": "NeMo Auditor Microservice",
-                    "status": "RUNNING (UNEXPECTED STATUS)",
-                    "detail": f"HTTP {resp.status_code} at {auditor_url}",
-                    "problem": f"NeMo responded with status {resp.status_code}",
-                })
+                results.append(
+                    {
+                        "service": "NeMo Auditor Microservice",
+                        "status": "RUNNING (UNEXPECTED STATUS)",
+                        "detail": f"HTTP {resp.status_code} at {auditor_url}",
+                        "problem": f"NeMo responded with status {resp.status_code}",
+                    }
+                )
     except Exception as e:
-        results.append({
-            "service": "NeMo Auditor Microservice",
-            "status": "OFFLINE",
-            "detail": f"Unreachable at {auditor_url} ({type(e).__name__})",
-            "problem": f"Local or remote NeMo auditor daemon is not running on {auditor_url}.",
-        })
+        results.append(
+            {
+                "service": "NeMo Auditor Microservice",
+                "status": "OFFLINE",
+                "detail": f"Unreachable at {auditor_url} ({type(e).__name__})",
+                "problem": f"Local or remote NeMo auditor daemon is not running on {auditor_url}.",
+            }
+        )
 
     # 6. LLM Gateway Failover Logic
     try:
-        clients = [llm_gateway.get_client("nvidia"), llm_gateway.get_client("openai"), llm_gateway.get_client("anthropic")]
-        results.append({
-            "service": "LLM Gateway Provider Chain",
-            "status": "READY",
-            "detail": f"Providers initialized: {[c.provider for c in clients]} (Failover: {llm_gateway.failover_chain})",
-            "problem": None,
-        })
+        clients = [
+            llm_gateway.get_client("nvidia"),
+            llm_gateway.get_client("openai"),
+            llm_gateway.get_client("anthropic"),
+        ]
+        results.append(
+            {
+                "service": "LLM Gateway Provider Chain",
+                "status": "READY",
+                "detail": f"Providers initialized: {[c.provider for c in clients]} (Failover: {llm_gateway.failover_chain})",
+                "problem": None,
+            }
+        )
     except Exception as e:
-        results.append({
-            "service": "LLM Gateway Provider Chain",
-            "status": "FAILED",
-            "detail": str(e),
-            "problem": f"Gateway provider initialization failed: {e}",
-        })
+        results.append(
+            {
+                "service": "LLM Gateway Provider Chain",
+                "status": "FAILED",
+                "detail": str(e),
+                "problem": f"Gateway provider initialization failed: {e}",
+            }
+        )
 
     return results
 
@@ -234,19 +276,23 @@ async def test_database_and_cache() -> list[dict[str, Any]]:
                     lambda sync_conn: sync_conn.dialect.get_table_names(sync_conn)
                 )
 
-            results.append({
-                "service": "Primary Database",
-                "status": "CONNECTED",
-                "detail": f"Dialect: {engine.dialect.name} ({latency}ms) — {len(tables)} tables found: {', '.join(sorted(tables)[:8])}...",
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "Primary Database",
+                    "status": "CONNECTED",
+                    "detail": f"Dialect: {engine.dialect.name} ({latency}ms) — {len(tables)} tables found: {', '.join(sorted(tables)[:8])}...",
+                    "problem": None,
+                }
+            )
     except Exception as e:
-        results.append({
-            "service": "Primary Database",
-            "status": "FAILED",
-            "detail": f"Connection to {masked_db} failed: {e}",
-            "problem": f"Cannot connect to database URL {masked_db}. Verify database service or sqlite permissions.",
-        })
+        results.append(
+            {
+                "service": "Primary Database",
+                "status": "FAILED",
+                "detail": f"Connection to {masked_db} failed: {e}",
+                "problem": f"Cannot connect to database URL {masked_db}. Verify database service or sqlite permissions.",
+            }
+        )
 
     # 2. Redis
     redis_url = settings.REDIS_URL
@@ -258,19 +304,23 @@ async def test_database_and_cache() -> list[dict[str, Any]]:
         await r.ping()
         latency = int((time.perf_counter() - start) * 1000)
         await r.aclose()
-        results.append({
-            "service": "Redis Cache & Queue",
-            "status": "CONNECTED",
-            "detail": f"Connected to {redis_url} ({latency}ms)",
-            "problem": None,
-        })
+        results.append(
+            {
+                "service": "Redis Cache & Queue",
+                "status": "CONNECTED",
+                "detail": f"Connected to {redis_url} ({latency}ms)",
+                "problem": None,
+            }
+        )
     except Exception as e:
-        results.append({
-            "service": "Redis Cache & Queue",
-            "status": "OFFLINE",
-            "detail": f"Not reachable at {redis_url} ({type(e).__name__})",
-            "problem": "Redis service is not running locally. Optional for basic scanning, required for Celery / distributed tasks.",
-        })
+        results.append(
+            {
+                "service": "Redis Cache & Queue",
+                "status": "OFFLINE",
+                "detail": f"Not reachable at {redis_url} ({type(e).__name__})",
+                "problem": "Redis service is not running locally. Optional for basic scanning, required for Celery / distributed tasks.",
+            }
+        )
 
     return results
 
@@ -284,19 +334,23 @@ async def test_osint_and_recon() -> list[dict[str, Any]]:
     if cen_id and cen_secret:
         verif = await verify_censys_credentials(cen_id, cen_secret)
         if verif.get("valid"):
-            results.append({
-                "service": "Censys (Pro)",
-                "status": "CONNECTED",
-                "detail": f"Credentials active ({verif.get('latency_ms', 0)}ms)",
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "Censys (Pro)",
+                    "status": "CONNECTED",
+                    "detail": f"Credentials active ({verif.get('latency_ms', 0)}ms)",
+                    "problem": None,
+                }
+            )
         else:
-            results.append({
-                "service": "Censys (Pro)",
-                "status": "FAILED",
-                "detail": verif.get("error"),
-                "problem": "Invalid CENSYS_API_ID / CENSYS_API_SECRET credentials.",
-            })
+            results.append(
+                {
+                    "service": "Censys (Pro)",
+                    "status": "FAILED",
+                    "detail": verif.get("error"),
+                    "problem": "Invalid CENSYS_API_ID / CENSYS_API_SECRET credentials.",
+                }
+            )
     else:
         # Check Free Fallback: Certspotter CT API
         try:
@@ -305,45 +359,55 @@ async def test_osint_and_recon() -> list[dict[str, Any]]:
                     "https://api.certspotter.com/v1/issuances?domain=example.com&include_subdomains=true&expand=dns_names"
                 )
                 if resp.status_code == 200:
-                    results.append({
-                        "service": "Censys Recon (Free Fallback)",
-                        "status": "CONNECTED (FREE TIER)",
-                        "detail": "Certspotter Certificate Transparency API is active & responsive (No API key needed)",
-                        "problem": None,
-                    })
+                    results.append(
+                        {
+                            "service": "Censys Recon (Free Fallback)",
+                            "status": "CONNECTED (FREE TIER)",
+                            "detail": "Certspotter Certificate Transparency API is active & responsive (No API key needed)",
+                            "problem": None,
+                        }
+                    )
                 else:
-                    results.append({
-                        "service": "Censys Recon (Free Fallback)",
-                        "status": "DEGRADED",
-                        "detail": f"Certspotter responded with HTTP {resp.status_code}",
-                        "problem": "Certspotter CT API rate limited or temporarily unreachable.",
-                    })
+                    results.append(
+                        {
+                            "service": "Censys Recon (Free Fallback)",
+                            "status": "DEGRADED",
+                            "detail": f"Certspotter responded with HTTP {resp.status_code}",
+                            "problem": "Certspotter CT API rate limited or temporarily unreachable.",
+                        }
+                    )
         except Exception as e:
-            results.append({
-                "service": "Censys Recon (Free Fallback)",
-                "status": "FAILED",
-                "detail": str(e),
-                "problem": f"Failed to reach Certspotter free CT API: {e}",
-            })
+            results.append(
+                {
+                    "service": "Censys Recon (Free Fallback)",
+                    "status": "FAILED",
+                    "detail": str(e),
+                    "problem": f"Failed to reach Certspotter free CT API: {e}",
+                }
+            )
 
     # 2. Shodan
     shodan_key = settings.SHODAN_API_KEY.strip()
     if shodan_key:
         verif = await verify_shodan_key(shodan_key)
         if verif.get("valid"):
-            results.append({
-                "service": "Shodan (Pro)",
-                "status": "CONNECTED",
-                "detail": verif.get("message"),
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "Shodan (Pro)",
+                    "status": "CONNECTED",
+                    "detail": verif.get("message"),
+                    "problem": None,
+                }
+            )
         else:
-            results.append({
-                "service": "Shodan (Pro)",
-                "status": "FAILED",
-                "detail": verif.get("error"),
-                "problem": "Invalid SHODAN_API_KEY.",
-            })
+            results.append(
+                {
+                    "service": "Shodan (Pro)",
+                    "status": "FAILED",
+                    "detail": verif.get("error"),
+                    "problem": "Invalid SHODAN_API_KEY.",
+                }
+            )
     else:
         # Check Free Fallback: Shodan InternetDB API (1.1.1.1)
         try:
@@ -351,52 +415,64 @@ async def test_osint_and_recon() -> list[dict[str, Any]]:
                 resp = await client.get("https://internetdb.shodan.io/1.1.1.1")
                 if resp.status_code == 200:
                     data = resp.json()
-                    results.append({
-                        "service": "Shodan Recon (Free Fallback)",
-                        "status": "CONNECTED (FREE TIER)",
-                        "detail": f"Shodan InternetDB API active (Found ports {data.get('ports', [])} on test IP)",
-                        "problem": None,
-                    })
+                    results.append(
+                        {
+                            "service": "Shodan Recon (Free Fallback)",
+                            "status": "CONNECTED (FREE TIER)",
+                            "detail": f"Shodan InternetDB API active (Found ports {data.get('ports', [])} on test IP)",
+                            "problem": None,
+                        }
+                    )
                 else:
-                    results.append({
-                        "service": "Shodan Recon (Free Fallback)",
-                        "status": "DEGRADED",
-                        "detail": f"InternetDB returned HTTP {resp.status_code}",
-                        "problem": "Shodan InternetDB API unreachable.",
-                    })
+                    results.append(
+                        {
+                            "service": "Shodan Recon (Free Fallback)",
+                            "status": "DEGRADED",
+                            "detail": f"InternetDB returned HTTP {resp.status_code}",
+                            "problem": "Shodan InternetDB API unreachable.",
+                        }
+                    )
         except Exception as e:
-            results.append({
-                "service": "Shodan Recon (Free Fallback)",
-                "status": "FAILED",
-                "detail": str(e),
-                "problem": f"Failed to connect to Shodan InternetDB API: {e}",
-            })
+            results.append(
+                {
+                    "service": "Shodan Recon (Free Fallback)",
+                    "status": "FAILED",
+                    "detail": str(e),
+                    "problem": f"Failed to connect to Shodan InternetDB API: {e}",
+                }
+            )
 
     # 3. VirusTotal
     vt_key = settings.VIRUSTOTAL_API_KEY.strip()
     if vt_key:
         verif = await verify_virustotal_key(vt_key)
         if verif.get("valid"):
-            results.append({
-                "service": "VirusTotal",
-                "status": "CONNECTED",
-                "detail": "Key verified active",
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "VirusTotal",
+                    "status": "CONNECTED",
+                    "detail": "Key verified active",
+                    "problem": None,
+                }
+            )
         else:
-            results.append({
-                "service": "VirusTotal",
-                "status": "FAILED",
-                "detail": verif.get("error"),
-                "problem": "Invalid VIRUSTOTAL_API_KEY.",
-            })
+            results.append(
+                {
+                    "service": "VirusTotal",
+                    "status": "FAILED",
+                    "detail": verif.get("error"),
+                    "problem": "Invalid VIRUSTOTAL_API_KEY.",
+                }
+            )
     else:
-        results.append({
-            "service": "VirusTotal",
-            "status": "NOT CONFIGURED",
-            "detail": "VIRUSTOTAL_API_KEY is empty in .env",
-            "problem": "VirusTotal reputation lookups will be skipped during scans.",
-        })
+        results.append(
+            {
+                "service": "VirusTotal",
+                "status": "NOT CONFIGURED",
+                "detail": "VIRUSTOTAL_API_KEY is empty in .env",
+                "problem": "VirusTotal reputation lookups will be skipped during scans.",
+            }
+        )
 
     # 4. GitHub API
     gh_token = os.getenv("GITHUB_TOKEN", "") or os.getenv("GH_TOKEN", "")
@@ -405,29 +481,37 @@ async def test_osint_and_recon() -> list[dict[str, Any]]:
         headers["Authorization"] = f"token {gh_token}"
     try:
         async with httpx.AsyncClient(timeout=4.0) as client:
-            resp = await client.get("https://api.github.com/rate_limit", headers=headers)
+            resp = await client.get(
+                "https://api.github.com/rate_limit", headers=headers
+            )
             if resp.status_code == 200:
                 data = resp.json().get("resources", {}).get("core", {})
-                results.append({
-                    "service": "GitHub API",
-                    "status": "CONNECTED",
-                    "detail": f"Connected ({data.get('remaining')}/{data.get('limit')} requests remaining)",
-                    "problem": None,
-                })
+                results.append(
+                    {
+                        "service": "GitHub API",
+                        "status": "CONNECTED",
+                        "detail": f"Connected ({data.get('remaining')}/{data.get('limit')} requests remaining)",
+                        "problem": None,
+                    }
+                )
             else:
-                results.append({
-                    "service": "GitHub API",
-                    "status": "WARN",
-                    "detail": f"HTTP {resp.status_code}",
-                    "problem": "GitHub API rate limit reached or token invalid.",
-                })
+                results.append(
+                    {
+                        "service": "GitHub API",
+                        "status": "WARN",
+                        "detail": f"HTTP {resp.status_code}",
+                        "problem": "GitHub API rate limit reached or token invalid.",
+                    }
+                )
     except Exception as e:
-        results.append({
-            "service": "GitHub API",
-            "status": "FAILED",
-            "detail": str(e),
-            "problem": f"GitHub connectivity error: {e}",
-        })
+        results.append(
+            {
+                "service": "GitHub API",
+                "status": "FAILED",
+                "detail": str(e),
+                "problem": f"GitHub connectivity error: {e}",
+            }
+        )
 
     return results
 
@@ -443,26 +527,32 @@ async def test_backend_and_thirdparty() -> list[dict[str, Any]]:
 
             stripe.api_key = stripe_key
             balance = stripe.Balance.retrieve()
-            results.append({
-                "service": "Stripe Payments",
-                "status": "CONNECTED",
-                "detail": f"Live connection verified (Available currencies: {[b.currency.upper() for b in balance.available]})",
-                "problem": None,
-            })
+            results.append(
+                {
+                    "service": "Stripe Payments",
+                    "status": "CONNECTED",
+                    "detail": f"Live connection verified (Available currencies: {[b.currency.upper() for b in balance.available]})",
+                    "problem": None,
+                }
+            )
         except Exception as e:
-            results.append({
-                "service": "Stripe Payments",
-                "status": "FAILED",
-                "detail": f"Stripe API error: {e}",
-                "problem": "STRIPE_SECRET_KEY in .env is invalid or expired.",
-            })
+            results.append(
+                {
+                    "service": "Stripe Payments",
+                    "status": "FAILED",
+                    "detail": f"Stripe API error: {e}",
+                    "problem": "STRIPE_SECRET_KEY in .env is invalid or expired.",
+                }
+            )
     else:
-        results.append({
-            "service": "Stripe Payments",
-            "status": "NOT CONFIGURED",
-            "detail": "STRIPE_SECRET_KEY is empty in .env",
-            "problem": "Checkout and billing portals will not process real charges.",
-        })
+        results.append(
+            {
+                "service": "Stripe Payments",
+                "status": "NOT CONFIGURED",
+                "detail": "STRIPE_SECRET_KEY is empty in .env",
+                "problem": "Checkout and billing portals will not process real charges.",
+            }
+        )
 
     # 2. Resend (Email)
     resend_key = settings.RESEND_API_KEY.strip()
@@ -474,33 +564,41 @@ async def test_backend_and_thirdparty() -> list[dict[str, Any]]:
                     headers={"Authorization": f"Bearer {resend_key}"},
                 )
                 if resp.status_code == 200:
-                    results.append({
-                        "service": "Resend Email Service",
-                        "status": "CONNECTED",
-                        "detail": f"Verified ({resp.status_code} OK)",
-                        "problem": None,
-                    })
+                    results.append(
+                        {
+                            "service": "Resend Email Service",
+                            "status": "CONNECTED",
+                            "detail": f"Verified ({resp.status_code} OK)",
+                            "problem": None,
+                        }
+                    )
                 else:
-                    results.append({
-                        "service": "Resend Email Service",
-                        "status": "FAILED",
-                        "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
-                        "problem": "Invalid RESEND_API_KEY.",
-                    })
+                    results.append(
+                        {
+                            "service": "Resend Email Service",
+                            "status": "FAILED",
+                            "detail": f"HTTP {resp.status_code}: {resp.text[:80]}",
+                            "problem": "Invalid RESEND_API_KEY.",
+                        }
+                    )
         except Exception as e:
-            results.append({
-                "service": "Resend Email Service",
-                "status": "FAILED",
-                "detail": str(e),
-                "problem": f"Network error contacting Resend: {e}",
-            })
+            results.append(
+                {
+                    "service": "Resend Email Service",
+                    "status": "FAILED",
+                    "detail": str(e),
+                    "problem": f"Network error contacting Resend: {e}",
+                }
+            )
     else:
-        results.append({
-            "service": "Resend Email Service",
-            "status": "NOT CONFIGURED",
-            "detail": "RESEND_API_KEY is empty in .env",
-            "problem": "Alert emails and notifications will not be delivered via email.",
-        })
+        results.append(
+            {
+                "service": "Resend Email Service",
+                "status": "NOT CONFIGURED",
+                "detail": "RESEND_API_KEY is empty in .env",
+                "problem": "Alert emails and notifications will not be delivered via email.",
+            }
+        )
 
     # 3. Internal FastAPI Core Health
     try:
@@ -511,27 +609,32 @@ async def test_backend_and_thirdparty() -> list[dict[str, Any]]:
         ) as client:
             resp = await client.get("/health")
             if resp.status_code == 200:
-                results.append({
-                    "service": "SageAI FastAPI Backend (/health)",
-                    "status": "CONNECTED",
-                    "detail": f"HTTP 200 OK — Payload: {resp.json()}",
-                    "problem": None,
-                })
+                results.append(
+                    {
+                        "service": "SageAI FastAPI Backend (/health)",
+                        "status": "CONNECTED",
+                        "detail": f"HTTP 200 OK — Payload: {resp.json()}",
+                        "problem": None,
+                    }
+                )
             else:
-                results.append({
-                    "service": "SageAI FastAPI Backend (/health)",
-                    "status": "FAILED",
-                    "detail": f"HTTP {resp.status_code}",
-                    "problem": "/health endpoint did not return HTTP 200.",
-                })
+                results.append(
+                    {
+                        "service": "SageAI FastAPI Backend (/health)",
+                        "status": "FAILED",
+                        "detail": f"HTTP {resp.status_code}",
+                        "problem": "/health endpoint did not return HTTP 200.",
+                    }
+                )
     except Exception as e:
-        results.append({
-            "service": "SageAI FastAPI Backend (/health)",
-            "status": "FAILED",
-            "detail": str(e),
-            "problem": f"Failed to instantiate FastAPI app: {e}",
-        })
-
+        results.append(
+            {
+                "service": "SageAI FastAPI Backend (/health)",
+                "status": "FAILED",
+                "detail": str(e),
+                "problem": f"Failed to instantiate FastAPI app: {e}",
+            }
+        )
 
     return results
 
@@ -566,7 +669,9 @@ async def main():
                 badge = "[WARN]"
             else:
                 badge = "[FAIL]"
-            print(f"  {badge:7} {it['service']:<32} | {it['status']:<18} | {it['detail']}")
+            print(
+                f"  {badge:7} {it['service']:<32} | {it['status']:<18} | {it['detail']}"
+            )
 
     # Collect problems
     problems = []
@@ -579,7 +684,9 @@ async def main():
     print("                      DIAGNOSTIC SUMMARY                        ")
     print("=" * 65)
     if problems:
-        print(f"\n[!] Discovered {len(problems)} items requiring attention or configuration:\n")
+        print(
+            f"\n[!] Discovered {len(problems)} items requiring attention or configuration:\n"
+        )
         for i, (svc, stat, prob) in enumerate(problems, 1):
             print(f"  {i}. [{svc}] ({stat})")
             print(f"     -> Problem: {prob}\n")

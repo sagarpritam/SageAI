@@ -7,5 +7,7 @@ from app.services.monopole_catalysis_battery.monopole_catalysis_battery import (
     get_magnetic_monopole_catalyzed_battery,
 )
 
-__all__ = ["MagneticMonopoleCatalyzedBattery", "get_magnetic_monopole_catalyzed_battery"]
-
+__all__ = [
+    "MagneticMonopoleCatalyzedBattery",
+    "get_magnetic_monopole_catalyzed_battery",
+]

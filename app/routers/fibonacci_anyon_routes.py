@@ -2,7 +2,6 @@
 FastAPI Router for Capability 106: Fibonacci Anyon Braid Compiler & Topological Fault-Tolerance Synthesizer.
 """
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -10,14 +9,23 @@ from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import (
     get_fibonacci_anyon_compiler,
 )
 
-router = APIRouter(prefix="/api/fibonacci-anyon", tags=["Capability 106: Fibonacci Anyon Compiler"])
+router = APIRouter(
+    prefix="/api/fibonacci-anyon", tags=["Capability 106: Fibonacci Anyon Compiler"]
+)
 
 
 class CompileBraidRequest(BaseModel):
     braid_id: str = Field(..., description="ID of the Fibonacci anyon braid channel")
-    target_gate: str = Field(default="HADAMARD", description="Target quantum gate (HADAMARD, PHASE_S, T_GATE, CNOT, TOFFOLI)")
-    braid_length_steps: int = Field(default=32, ge=8, le=128, description="Number of braiding generator steps")
-    damping_gain: float = Field(default=1.1, ge=0.8, le=2.5, description="Topological decoherence damping gain")
+    target_gate: str = Field(
+        default="HADAMARD",
+        description="Target quantum gate (HADAMARD, PHASE_S, T_GATE, CNOT, TOFFOLI)",
+    )
+    braid_length_steps: int = Field(
+        default=32, ge=8, le=128, description="Number of braiding generator steps"
+    )
+    damping_gain: float = Field(
+        default=1.1, ge=0.8, le=2.5, description="Topological decoherence damping gain"
+    )
 
 
 @router.get("/braids")
@@ -48,4 +56,3 @@ async def get_fibonacci_metrics():
     """Retrieve aggregate Fibonacci anyon compiler metrics."""
     compiler = get_fibonacci_anyon_compiler()
     return compiler.get_fibonacci_metrics()
-

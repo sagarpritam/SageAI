@@ -11,18 +11,26 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.zkp.zkp_attestation_service import zkp_attestation_service
 
-router = APIRouter(prefix="/zkp", tags=["Zero-Knowledge Proof (ZKP) Compliance Attestation"])
+router = APIRouter(
+    prefix="/zkp", tags=["Zero-Knowledge Proof (ZKP) Compliance Attestation"]
+)
 
 
 class GenerateProofRequest(BaseModel):
-    framework: Optional[str] = Field("SOC 2 Type II + FedRAMP High", description="Compliance framework to prove")
+    framework: Optional[str] = Field(
+        "SOC 2 Type II + FedRAMP High", description="Compliance framework to prove"
+    )
     org_id: Optional[str] = Field("enterprise-sovereign", description="Organization ID")
 
 
 class VerifyProofRequest(BaseModel):
     proof_id: str = Field(..., description="Unique proof identifier")
-    zk_proof: Dict[str, Any] = Field(..., description="Groth16 zk-SNARK proof coordinates (pi_a, pi_b, pi_c)")
-    public_signals: Dict[str, Any] = Field(..., description="Public compliance signals and assertions")
+    zk_proof: Dict[str, Any] = Field(
+        ..., description="Groth16 zk-SNARK proof coordinates (pi_a, pi_b, pi_c)"
+    )
+    public_signals: Dict[str, Any] = Field(
+        ..., description="Public compliance signals and assertions"
+    )
 
 
 @router.get("/proof")
@@ -65,4 +73,3 @@ async def verify_proof_endpoint(
         public_signals=payload.public_signals,
     )
     return {"status": "success", "verification": res}
-

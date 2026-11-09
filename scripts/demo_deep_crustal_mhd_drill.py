@@ -24,14 +24,20 @@ def main():
     print("=" * 80)
 
     # 1. Monitored Vaults Overview
-    print("\n[MHD GEOTHERMAL VAULTS] Querying Active Deep-Crustal Sovereign Facilities...")
+    print(
+        "\n[MHD GEOTHERMAL VAULTS] Querying Active Deep-Crustal Sovereign Facilities..."
+    )
     vaults = deep_crustal_mhd_vault.list_vaults()
     print(f"  > Active Deep-Crustal Kinetic Vaults: {len(vaults)}")
     for v in vaults:
-        print(f"    - {v['vault_id']} ({v['vault_name']}): Depth {v['depth_kilometers']} km, Temp {v['geothermal_brine_temp_celsius']}°C, Pressure {v['brine_pressure_mpa']} MPa, B-Field {v['superconducting_b_field_tesla']} T, Rated {v['rated_mhd_output_mw']} MW")
+        print(
+            f"    - {v['vault_id']} ({v['vault_name']}): Depth {v['depth_kilometers']} km, Temp {v['geothermal_brine_temp_celsius']}°C, Pressure {v['brine_pressure_mpa']} MPa, B-Field {v['superconducting_b_field_tesla']} T, Rated {v['rated_mhd_output_mw']} MW"
+        )
 
     # 2. Baseload Generation Drill 1: Reykjanes Supercritical Brine Loop
-    print("\n[MHD GENERATION 1] Engaging Supercritical Brine Flow at Reykjanes Volcanic Rift...")
+    print(
+        "\n[MHD GENERATION 1] Engaging Supercritical Brine Flow at Reykjanes Volcanic Rift..."
+    )
     start_t = time.time()
     res1 = deep_crustal_mhd_vault.generate_mhd_baseload(
         vault_id="MHD-VAULT-ICELAND-01",
@@ -43,13 +49,21 @@ def main():
     print(f"  > Discharge ID: {res1['discharge_id']} at {res1['vault_id']}")
     print(f"  > Brine Flow Velocity: {res1['brine_flow_velocity_m_s']:.2f} m/s")
     print(f"  > Generated MHD Power: {res1['generated_mhd_power_mw']:.1f} MW")
-    print(f"  > Hall Parameter: beta = {res1['hall_parameter_beta']:.3f} | Efficiency: {res1['mhd_generator_efficiency_pct']}%")
-    print(f"  > Vault Internal Allocation: {res1['vault_internal_power_allocated_mw']:.1f} MW | Sovereign Grid Export: {res1['sovereign_grid_export_mw']:.1f} MW")
-    print(f"  > Subterranean Isolation: {res1['subterranean_isolation_confirmed']} (Class-V Faradaic Batholith)")
+    print(
+        f"  > Hall Parameter: beta = {res1['hall_parameter_beta']:.3f} | Efficiency: {res1['mhd_generator_efficiency_pct']}%"
+    )
+    print(
+        f"  > Vault Internal Allocation: {res1['vault_internal_power_allocated_mw']:.1f} MW | Sovereign Grid Export: {res1['sovereign_grid_export_mw']:.1f} MW"
+    )
+    print(
+        f"  > Subterranean Isolation: {res1['subterranean_isolation_confirmed']} (Class-V Faradaic Batholith)"
+    )
     print(f"  > Generation Status: {res1['status']} ({t1_ms:.2f} ms)")
 
     # 3. Baseload Generation Drill 2: Great Basin Granitic Batholith Kinetic Vault
-    print("\n[MHD GENERATION 2] Engaging High-Pressure Basal Flow at Great Basin Kinetic Vault...")
+    print(
+        "\n[MHD GENERATION 2] Engaging High-Pressure Basal Flow at Great Basin Kinetic Vault..."
+    )
     start_t = time.time()
     res2 = deep_crustal_mhd_vault.generate_mhd_baseload(
         vault_id="MHD-VAULT-NEVADA-02",
@@ -68,7 +82,9 @@ def main():
     print("\n[MHD VAULT NETWORK TELEMETRY] Aggregate Deep Geothermal Infrastructure:")
     metrics = deep_crustal_mhd_vault.get_vault_metrics()
     print(f"  > Active Deep Vaults: {metrics['active_mhd_vaults']}")
-    print(f"  > Aggregate Rated Capacity: {metrics['aggregate_rated_mhd_capacity_mw']:.1f} MW")
+    print(
+        f"  > Aggregate Rated Capacity: {metrics['aggregate_rated_mhd_capacity_mw']:.1f} MW"
+    )
     print(f"  > Completed Power Discharges: {metrics['completed_power_discharges']}")
     print(f"  > Primary Working Fluid: {metrics['primary_working_fluid']}")
     print(f"  > Confinement Architecture: {metrics['magnetic_confinement']}")
@@ -76,10 +92,11 @@ def main():
     print(f"  > Status: {metrics['status']}")
 
     print("\n" + "=" * 80)
-    print("  >>> OPTION B SUBTERRANEAN DEEP-CRUSTAL MHD GEOTHERMAL GRID: 100% OPERATIONAL")
+    print(
+        "  >>> OPTION B SUBTERRANEAN DEEP-CRUSTAL MHD GEOTHERMAL GRID: 100% OPERATIONAL"
+    )
     print("=" * 80)
 
 
 if __name__ == "__main__":
     main()
-

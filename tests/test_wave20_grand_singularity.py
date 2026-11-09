@@ -5,22 +5,19 @@ and Option B Enterprise Multi-Region Multi-Cluster Federation Engine.
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
+from app.services.cluster_federation import (
+    cluster_federation_engine,
+)
 from app.services.quantum_gravitational_sensor import (
     quantum_gravitational_sensor,
-    QuantumGravitationalEntanglementSensor,
-)
-from app.services.tachyon_horizon_sentinel import (
-    tachyon_horizon_sentinel,
-    TachyonHorizonCerenkovSentinel,
 )
 from app.services.singularity_containment import (
     micro_singularity_containment,
-    MicroSingularityHawkingContainment,
 )
-from app.services.cluster_federation import (
-    cluster_federation_engine,
-    EnterpriseClusterFederationEngine,
+from app.services.tachyon_horizon_sentinel import (
+    tachyon_horizon_sentinel,
 )
 
 client = TestClient(app)
@@ -187,7 +184,9 @@ def test_singularity_containment_service():
     assert "SINGULARITY-VAULT-GENEVA-01" in cell_ids
 
     # Telemetry sampling
-    telem = micro_singularity_containment.sample_singularity_telemetry("SINGULARITY-VAULT-GENEVA-01")
+    telem = micro_singularity_containment.sample_singularity_telemetry(
+        "SINGULARITY-VAULT-GENEVA-01"
+    )
     assert telem["telemetry_id"].startswith("SING-TEL-")
     assert telem["hawking_luminosity_pw"] > 0.0
     assert 0.95 <= telem["matter_feed_balance_ratio"] <= 1.05
@@ -221,7 +220,9 @@ def test_singularity_containment_api():
     assert len(res.json()) >= 3
 
     # POST telemetry
-    res_telem = client.post("/api/singularity-containment/telemetry/SINGULARITY-VAULT-CHEYENNE-02")
+    res_telem = client.post(
+        "/api/singularity-containment/telemetry/SINGULARITY-VAULT-CHEYENNE-02"
+    )
     assert res_telem.status_code == 200
     assert res_telem.json()["hawking_luminosity_pw"] > 0.0
 

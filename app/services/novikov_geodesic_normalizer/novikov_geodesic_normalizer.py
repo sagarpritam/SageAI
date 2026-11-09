@@ -87,16 +87,16 @@ class NovikovGeodesicNormalizer:
     def list_loops(self) -> List[Dict[str, Any]]:
         return [
             {
-                "loop_id": l.loop_id,
-                "spacetime_region": l.spacetime_region,
-                "proper_time_period_femtoseconds": l.proper_time_period_femtoseconds,
-                "ctc_winding_number": l.ctc_winding_number,
-                "self_interaction_cross_section_b": l.self_interaction_cross_section_b,
-                "unnormalized_paradox_probability": l.unnormalized_paradox_probability,
-                "topological_phase_slip_radians": l.topological_phase_slip_radians,
-                "status": l.status,
+                "loop_id": loop.loop_id,
+                "spacetime_region": loop.spacetime_region,
+                "proper_time_period_femtoseconds": loop.proper_time_period_femtoseconds,
+                "ctc_winding_number": loop.ctc_winding_number,
+                "self_interaction_cross_section_b": loop.self_interaction_cross_section_b,
+                "unnormalized_paradox_probability": loop.unnormalized_paradox_probability,
+                "topological_phase_slip_radians": loop.topological_phase_slip_radians,
+                "status": loop.status,
             }
-            for l in self.loops.values()
+            for loop in self.loops.values()
         ]
 
     def normalize_geodesic_loop(
@@ -114,7 +114,9 @@ class NovikovGeodesicNormalizer:
 
         initial_prob = loop.unnormalized_paradox_probability
         # Novikov action phase shift delta S / hbar
-        phase_adj = round(-loop.topological_phase_slip_radians * phase_adjustment_gain, 5)
+        phase_adj = round(
+            -loop.topological_phase_slip_radians * phase_adjustment_gain, 5
+        )
         residual_slip_fs = round(0.00004 / (1.0 + phase_adjustment_gain), 7)
 
         norm_id = f"NOVIKOV-NORM-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
@@ -165,4 +167,3 @@ novikov_geodesic_normalizer = NovikovGeodesicNormalizer()
 
 def get_novikov_geodesic_normalizer() -> NovikovGeodesicNormalizer:
     return novikov_geodesic_normalizer
-

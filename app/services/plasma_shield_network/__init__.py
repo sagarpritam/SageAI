@@ -8,4 +8,3 @@ from app.services.plasma_shield_network.spaceborne_plasma_shield import (
 )
 
 __all__ = ["SpaceborneDirectedEnergyPlasmaShield", "spaceborne_plasma_shield"]
-

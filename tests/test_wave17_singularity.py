@@ -8,11 +8,17 @@ Test Suite for Wave 17: Gravitational Seismic, Counter-Quantum & Spaceborne Plas
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
-from app.services.gravitational_seismic.gravitational_seismic_mesh import gravitational_seismic_mesh
-from app.services.counter_quantum_matrix.counter_quantum_engine import counter_quantum_harvest_matrix
-from app.services.plasma_shield_network.spaceborne_plasma_shield import spaceborne_plasma_shield
+from app.main import app
+from app.services.counter_quantum_matrix.counter_quantum_engine import (
+    counter_quantum_harvest_matrix,
+)
+from app.services.gravitational_seismic.gravitational_seismic_mesh import (
+    gravitational_seismic_mesh,
+)
+from app.services.plasma_shield_network.spaceborne_plasma_shield import (
+    spaceborne_plasma_shield,
+)
 
 
 @pytest.fixture
@@ -74,13 +80,18 @@ def test_gravitational_seismic_service():
 
 
 def test_gravitational_seismic_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/gravitational-seismic/observatories")
         assert r1.status_code == 200
         assert len(r1.json()["observatories"]) >= 4
 
-        r2 = client.get("/gravitational-seismic/observatories/gw-obs-einstein-telescope-02")
+        r2 = client.get(
+            "/gravitational-seismic/observatories/gw-obs-einstein-telescope-02"
+        )
         assert r2.status_code == 200
         assert r2.json()["observatory"]["arm_length_km"] == 10.0
 
@@ -95,7 +106,9 @@ def test_gravitational_seismic_endpoints(client):
             },
         )
         assert r3.status_code == 200
-        assert r3.json()["analysis"]["threat_type"] == "COVERT_DEEP_TUNNEL_BORING_MACHINE"
+        assert (
+            r3.json()["analysis"]["threat_type"] == "COVERT_DEEP_TUNNEL_BORING_MACHINE"
+        )
 
         r4 = client.post(
             "/gravitational-seismic/triangulate-tamper",
@@ -128,7 +141,9 @@ def test_counter_quantum_matrix_service():
     assert "interceptor-transatlantic-tap-01" in it_ids
     assert "interceptor-satellite-downlink-02" in it_ids
 
-    subsea = counter_quantum_harvest_matrix.get_interceptor("interceptor-transatlantic-tap-01")
+    subsea = counter_quantum_harvest_matrix.get_interceptor(
+        "interceptor-transatlantic-tap-01"
+    )
     assert subsea is not None
     assert subsea["target_pqc_scheme"] == "ML-KEM-1024"
 
@@ -158,13 +173,18 @@ def test_counter_quantum_matrix_service():
 
 
 def test_counter_quantum_matrix_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/counter-quantum/interceptors")
         assert r1.status_code == 200
         assert len(r1.json()["interceptors"]) >= 3
 
-        r2 = client.get("/counter-quantum/interceptors/interceptor-satellite-downlink-02")
+        r2 = client.get(
+            "/counter-quantum/interceptors/interceptor-satellite-downlink-02"
+        )
         assert r2.status_code == 200
         assert r2.json()["interceptor"]["target_pqc_scheme"] == "ML-DSA-87"
 
@@ -241,7 +261,10 @@ def test_spaceborne_plasma_shield_service():
 
 
 def test_spaceborne_plasma_shield_endpoints(client):
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-ciso", "role": "admin"}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "test-ciso",
+        "role": "admin",
+    }
     try:
         r1 = client.get("/plasma-shield/platforms")
         assert r1.status_code == 200
@@ -261,7 +284,10 @@ def test_spaceborne_plasma_shield_endpoints(client):
             },
         )
         assert r3.status_code == 200
-        assert r3.json()["window_event"]["containment_status"] == "HIGH_DENSITY_PLASMA_STANDOFF_ESTABLISHED"
+        assert (
+            r3.json()["window_event"]["containment_status"]
+            == "HIGH_DENSITY_PLASMA_STANDOFF_ESTABLISHED"
+        )
 
         r4 = client.post(
             "/plasma-shield/fire-pulse",
@@ -280,4 +306,3 @@ def test_spaceborne_plasma_shield_endpoints(client):
         assert r5.json()["metrics"]["total_shield_platforms"] >= 3
     finally:
         app.dependency_overrides.clear()
-

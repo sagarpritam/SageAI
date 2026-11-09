@@ -83,8 +83,13 @@ class SpaceborneDirectedEnergyPlasmaShield:
 
         # Plasma window response time and kinetic energy dissipation
         response_latency_ms = 8.2
-        kinetic_energy_mj = round(0.5 * estimated_threat_mass_kg * (incoming_velocity_km_s * 1e3)**2 / 1e6, 2)
-        plasma_drag_deceleration_g = round((incoming_velocity_km_s * 1e3 * 0.15) / 9.81, 1)
+        kinetic_energy_mj = round(
+            0.5 * estimated_threat_mass_kg * (incoming_velocity_km_s * 1e3) ** 2 / 1e6,
+            2,
+        )
+        plasma_drag_deceleration_g = round(
+            (incoming_velocity_km_s * 1e3 * 0.15) / 9.81, 1
+        )
 
         platform["status"] = "PLASMA_WINDOW_ACTIVELY_ENGAGED"
 
@@ -143,7 +148,9 @@ class SpaceborneDirectedEnergyPlasmaShield:
 
     def get_metrics(self) -> Dict[str, Any]:
         total_mw = sum(p["power_capacity_mw"] for p in self._platforms.values())
-        total_deflections = sum(p["threats_deflected_count"] for p in self._platforms.values())
+        total_deflections = sum(
+            p["threats_deflected_count"] for p in self._platforms.values()
+        )
 
         return {
             "total_shield_platforms": len(self._platforms),
@@ -156,4 +163,3 @@ class SpaceborneDirectedEnergyPlasmaShield:
 
 # Global singleton instance
 spaceborne_plasma_shield = SpaceborneDirectedEnergyPlasmaShield()
-

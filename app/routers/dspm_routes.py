@@ -15,12 +15,22 @@ router = APIRouter(prefix="/dspm", tags=["Data Security Posture Management (DSPM
 
 
 class ScanDataStoreRequest(BaseModel):
-    store_id: str = Field(..., description="Bucket or database identifier (e.g. s3-prod-customer-data)")
+    store_id: str = Field(
+        ..., description="Bucket or database identifier (e.g. s3-prod-customer-data)"
+    )
     cloud_provider: str = Field("AWS", description="AWS, GCP, Azure, or Self-Hosted")
-    store_type: str = Field("OBJECT_STORAGE", description="OBJECT_STORAGE, RDS_DATABASE, BLOB_STORAGE")
-    sample_records: List[str] = Field(..., description="Sample data objects or rows to inspect and classify")
-    is_public: bool = Field(False, description="Whether data store allows public read access")
-    encryption_enabled: bool = Field(False, description="Whether encryption at rest with KMS is enabled")
+    store_type: str = Field(
+        "OBJECT_STORAGE", description="OBJECT_STORAGE, RDS_DATABASE, BLOB_STORAGE"
+    )
+    sample_records: List[str] = Field(
+        ..., description="Sample data objects or rows to inspect and classify"
+    )
+    is_public: bool = Field(
+        False, description="Whether data store allows public read access"
+    )
+    encryption_enabled: bool = Field(
+        False, description="Whether encryption at rest with KMS is enabled"
+    )
     region: str = Field("us-east-1", description="Cloud region of storage asset")
 
 
@@ -94,4 +104,3 @@ async def generate_remediation_plan_endpoint(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

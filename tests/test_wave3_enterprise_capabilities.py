@@ -11,11 +11,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.redteam.atomic_adversary_emulator import atomic_adversary_emulator
-from app.services.cloud_posture.iac_drift_engine import iac_drift_engine
-from app.services.supply_chain.sbom_vex_engine import sbom_vex_engine
-from app.services.itdr.itdr_service import itdr_service
 from app.services.cart.cart_engine import cart_engine
+from app.services.cloud_posture.iac_drift_engine import iac_drift_engine
+from app.services.itdr.itdr_service import itdr_service
+from app.services.redteam.atomic_adversary_emulator import atomic_adversary_emulator
+from app.services.supply_chain.sbom_vex_engine import sbom_vex_engine
 
 
 @pytest.fixture
@@ -32,13 +32,17 @@ def test_atomic_adversary_emulator():
     assert "T1003.001" in tech_ids
 
     # 2. Atomic test execution in safe dry-run
-    result = atomic_adversary_emulator.run_atomic_test("T1059.001", target_host="test-runner", dry_run=True)
+    result = atomic_adversary_emulator.run_atomic_test(
+        "T1059.001", target_host="test-runner", dry_run=True
+    )
     assert result["status"] == "SUCCESS_SAFE_CONTAINED"
     assert result["blue_team_detected"] is True
     assert "audit_tx_id" in result
 
     # 3. Caldera campaign execution
-    campaign_res = atomic_adversary_emulator.execute_campaign("APT29_COZY_BEAR", target_network="test-vpc")
+    campaign_res = atomic_adversary_emulator.execute_campaign(
+        "APT29_COZY_BEAR", target_network="test-vpc"
+    )
     assert campaign_res["status"] == "COMPLETED"
     assert campaign_res["total_steps"] == 4
     assert campaign_res["coverage_percentage"] > 0
@@ -129,7 +133,11 @@ def test_wave3_routers(client):
     # Test router endpoints exist and respond (even with mock/default tokens)
     # Auth override for test client if needed
     from app.core.security import get_current_user
-    app.dependency_overrides[get_current_user] = lambda: {"sub": "SecOpsDirector", "org": "enterprise"}
+
+    app.dependency_overrides[get_current_user] = lambda: {
+        "sub": "SecOpsDirector",
+        "org": "enterprise",
+    }
 
     try:
         # Atomic Red Team
@@ -158,4 +166,3 @@ def test_wave3_routers(client):
         assert "analysis" in res.json()
     finally:
         app.dependency_overrides.clear()
-

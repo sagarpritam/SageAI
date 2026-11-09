@@ -11,16 +11,24 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.ransomware.anti_ransomware_service import anti_ransomware_service
 
-router = APIRouter(prefix="/ransomware", tags=["Anti-Ransomware Defense & Canary Traps"])
+router = APIRouter(
+    prefix="/ransomware", tags=["Anti-Ransomware Defense & Canary Traps"]
+)
 
 
 class DeployCanariesRequest(BaseModel):
-    target_directories: Optional[List[str]] = Field(None, description="Directories to arm with canary trap files")
+    target_directories: Optional[List[str]] = Field(
+        None, description="Directories to arm with canary trap files"
+    )
 
 
 class AnalyzeFileStreamRequest(BaseModel):
-    events: List[Dict[str, Any]] = Field(..., description="File modification and rename stream events")
-    executed_commands: Optional[List[str]] = Field(None, description="Host process command lines to evaluate for VSS tampering")
+    events: List[Dict[str, Any]] = Field(
+        ..., description="File modification and rename stream events"
+    )
+    executed_commands: Optional[List[str]] = Field(
+        None, description="Host process command lines to evaluate for VSS tampering"
+    )
 
 
 @router.post("/deploy-canaries")
@@ -92,4 +100,3 @@ async def simulate_ransomware_attack_endpoint(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

@@ -19,15 +19,23 @@ router = APIRouter(
 
 class SynthesizeWaveformRequest(BaseModel):
     emitter_id: str = Field(..., description="Target adversary radar emitter ID")
-    carrier_frequency_ghz: float = Field(9.85, description="Intercepted carrier frequency in GHz")
+    carrier_frequency_ghz: float = Field(
+        9.85, description="Intercepted carrier frequency in GHz"
+    )
     pulse_width_us: float = Field(12.5, description="Pulse width in microseconds")
     snr_db: float = Field(24.5, description="Signal-to-noise ratio in dB")
-    technique: str = Field("RANGE_GATE_PULL_OFF_RGPO", description="DRFM deception technique")
+    technique: str = Field(
+        "RANGE_GATE_PULL_OFF_RGPO", description="DRFM deception technique"
+    )
 
 
 class EngageCountermeasureRequest(BaseModel):
-    emitter_id: str = Field(..., description="Target adversary radar emitter ID to neutralize")
-    technique: str = Field("RANGE_GATE_PULL_OFF_RGPO", description="DRFM deception technique")
+    emitter_id: str = Field(
+        ..., description="Target adversary radar emitter ID to neutralize"
+    )
+    technique: str = Field(
+        "RANGE_GATE_PULL_OFF_RGPO", description="DRFM deception technique"
+    )
     duration_ms: float = Field(250.0, description="Jamming burst duration in ms")
 
 

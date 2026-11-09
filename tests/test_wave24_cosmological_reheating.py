@@ -3,13 +3,13 @@ Unit & Integration Tests for Wave 24: Cosmological Inflationary Reheating & Bary
 5D Warped Spacetime Randall-Sundrum Brane Stabilizer, Cosmic Censorship Horizon Enforcer & Deep-Crustal MHD Vault (Capabilities 92-94 + Option B).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.inflaton_reheating_pump import inflaton_reheating_pump
-from app.services.randall_sundrum_stabilizer import randall_sundrum_stabilizer
 from app.services.cosmic_censorship_enforcer import cosmic_censorship_enforcer
 from app.services.deep_crustal_mhd_vault import deep_crustal_mhd_vault
+from app.services.inflaton_reheating_pump import inflaton_reheating_pump
+from app.services.randall_sundrum_stabilizer import randall_sundrum_stabilizer
 
 client = TestClient(app)
 
@@ -132,7 +132,10 @@ def test_cosmic_censorship_service():
         compensatory_damping_gain=1.2,
     )
     assert res["enforcement_id"].startswith("CENSOR-ENFORCE-")
-    assert res["post_enforcement_extremality_ratio"] < res["pre_enforcement_extremality_ratio"]
+    assert (
+        res["post_enforcement_extremality_ratio"]
+        < res["pre_enforcement_extremality_ratio"]
+    )
     assert res["trapped_surface_closed"] is True
     assert res["naked_singularity_prevented"] is True
     assert res["status"] == "COSMIC_CENSORSHIP_ENFORCED_HORIZON_CLOAKED"
@@ -215,4 +218,3 @@ def test_deep_crustal_mhd_api():
     r_met = client.get("/api/deep-crustal-mhd/metrics")
     assert r_met.status_code == 200
     assert r_met.json()["status"] == "OPERATIONAL"
-

@@ -19,16 +19,26 @@ router = APIRouter(
 
 class AnalyzeAcousticTelemetryRequest(BaseModel):
     node_id: str = Field(..., description="Target ocean floor sonar node ID")
-    sound_velocity_mps: float = Field(1495.0, description="Measured sound velocity in m/s")
+    sound_velocity_mps: float = Field(
+        1495.0, description="Measured sound velocity in m/s"
+    )
     ambient_spl_db: float = Field(..., description="Ambient Sound Pressure Level in dB")
-    spectral_peak_hz: float = Field(..., description="Dominant acoustic frequency peak in Hz")
-    acoustic_doppler_mps: float = Field(..., description="Acoustic Doppler velocity shift in m/s")
+    spectral_peak_hz: float = Field(
+        ..., description="Dominant acoustic frequency peak in Hz"
+    )
+    acoustic_doppler_mps: float = Field(
+        ..., description="Acoustic Doppler velocity shift in m/s"
+    )
 
 
 class TriangulateContactRequest(BaseModel):
-    node_id: str = Field(..., description="Sonar array node performing multi-lateration")
+    node_id: str = Field(
+        ..., description="Sonar array node performing multi-lateration"
+    )
     bearing_deg: float = Field(142.5, description="Acoustic bearing angle in degrees")
-    estimated_depth_m: float = Field(850.0, description="Estimated target depth in meters")
+    estimated_depth_m: float = Field(
+        850.0, description="Estimated target depth in meters"
+    )
 
 
 @router.get("/nodes")
@@ -102,5 +112,7 @@ async def get_sonar_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet telemetry for marine acoustic ocean floor defense."""
-    return {"status": "success", "metrics": marine_acoustic_sonar_mesh.get_sonar_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": marine_acoustic_sonar_mesh.get_sonar_metrics(),
+    }

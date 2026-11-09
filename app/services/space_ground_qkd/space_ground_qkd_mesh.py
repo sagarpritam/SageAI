@@ -57,8 +57,8 @@ class SpaceGroundQKDMesh:
                 "eavesdropping_aborts": 1,
             },
         ]
-        for l in default_links:
-            self._links[l["link_id"]] = l
+        for link in default_links:
+            self._links[link["link_id"]] = link
 
     def list_links(self) -> List[Dict[str, Any]]:
         """Returns all space-ground QKD optical links."""
@@ -131,7 +131,9 @@ class SpaceGroundQKDMesh:
 
     def get_qkd_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for space-ground quantum key distribution."""
-        total_aborts = sum(l["eavesdropping_aborts"] for l in self._links.values())
+        total_aborts = sum(
+            link["eavesdropping_aborts"] for link in self._links.values()
+        )
         return {
             "active_space_ground_quantum_links": len(self._links),
             "total_entanglement_swaps_completed": len(self._swap_events) + 120,
@@ -143,4 +145,3 @@ class SpaceGroundQKDMesh:
 
 # Singleton instance
 space_ground_qkd_mesh = SpaceGroundQKDMesh()
-

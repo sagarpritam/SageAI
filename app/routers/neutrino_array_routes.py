@@ -18,18 +18,34 @@ router = APIRouter(
 
 
 class AnalyzeNeutrinoFluxRequest(BaseModel):
-    detector_id: str = Field(..., description="Target subterranean neutrino observatory ID")
-    observed_prompt_energy_mev: float = Field(..., description="Observed prompt positron energy in MeV")
-    delayed_coincidence_time_us: float = Field(22.5, description="Delayed neutron capture coincidence delay in μs")
-    measured_flux_ev_per_day: float = Field(..., description="Measured antineutrino event rate per day")
+    detector_id: str = Field(
+        ..., description="Target subterranean neutrino observatory ID"
+    )
+    observed_prompt_energy_mev: float = Field(
+        ..., description="Observed prompt positron energy in MeV"
+    )
+    delayed_coincidence_time_us: float = Field(
+        22.5, description="Delayed neutron capture coincidence delay in μs"
+    )
+    measured_flux_ev_per_day: float = Field(
+        ..., description="Measured antineutrino event rate per day"
+    )
     zenith_angle_deg: float = Field(..., description="Arrival zenith angle in degrees")
-    azimuth_angle_deg: float = Field(..., description="Arrival azimuth angle in degrees")
+    azimuth_angle_deg: float = Field(
+        ..., description="Arrival azimuth angle in degrees"
+    )
 
 
 class TriangulateFissileEventRequest(BaseModel):
-    event_label: str = Field("UNANNOUNCED_SUBTERRANEAN_FISSILE_SURGE", description="Event descriptive label")
-    reported_azimuth_angles: Dict[str, float] = Field(..., description="Mapping of detector ID to detected arrival azimuth")
-    estimated_source_distance_km: float = Field(850.0, description="Estimated standoff distance in km")
+    event_label: str = Field(
+        "UNANNOUNCED_SUBTERRANEAN_FISSILE_SURGE", description="Event descriptive label"
+    )
+    reported_azimuth_angles: Dict[str, float] = Field(
+        ..., description="Mapping of detector ID to detected arrival azimuth"
+    )
+    estimated_source_distance_km: float = Field(
+        850.0, description="Estimated standoff distance in km"
+    )
 
 
 @router.get("/detectors")
@@ -52,7 +68,9 @@ async def get_detector_endpoint(
     """Retrieves telemetry of a specific subterranean neutrino detector."""
     det = neutrino_flux_detector.get_detector(detector_id)
     if not det:
-        raise HTTPException(status_code=404, detail=f"Detector {detector_id} not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Detector {detector_id} not found."
+        )
     return {"status": "success", "detector": det}
 
 

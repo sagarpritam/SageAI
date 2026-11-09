@@ -128,15 +128,23 @@ class SuperconductingAntimatterContainment:
         plasma_density = round(cell.antiproton_count / max(0.01, volume_cm3), 2)
 
         # ExB drift velocity
-        drift_v = round((cell.axial_well_voltage_volts / (cell.plasma_radius_mm * 1e-3)) / cell.magnetic_field_tesla, 2)
+        drift_v = round(
+            (cell.axial_well_voltage_volts / (cell.plasma_radius_mm * 1e-3))
+            / cell.magnetic_field_tesla,
+            2,
+        )
 
         # Residual gas annihilation loss rate based on vacuum pressure
         # P = 4e-15 mbar -> ~10^2 molecules/cm^3
-        loss_rate_per_sec = round(cell.antiproton_count * (cell.vacuum_pressure_mbar / 1e-15) * 1.8e-8, 4)
+        loss_rate_per_sec = round(
+            cell.antiproton_count * (cell.vacuum_pressure_mbar / 1e-15) * 1.8e-8, 4
+        )
 
         stability_sigma = round(5.8 + random.uniform(-0.3, 0.4), 2)
 
-        telemetry_id = f"AP-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        telemetry_id = (
+            f"AP-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         telem = AntimatterPlasmaTelemetry(
             telemetry_id=telemetry_id,
             cell_id=cell_id,
@@ -178,7 +186,9 @@ class SuperconductingAntimatterContainment:
         old_radius = cell.plasma_radius_mm
         new_radius = round(max(target_radius_mm, cell.plasma_radius_mm - 0.25), 3)
         cell.plasma_radius_mm = new_radius
-        cell.rotating_wall_amplitude_v = round(cell.rotating_wall_amplitude_v + delta_voltage_v, 2)
+        cell.rotating_wall_amplitude_v = round(
+            cell.rotating_wall_amplitude_v + delta_voltage_v, 2
+        )
 
         return {
             "cell_id": cell_id,
@@ -190,7 +200,9 @@ class SuperconductingAntimatterContainment:
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-    def execute_fail_safe_quench_divert(self, cell_id: str, reason: str = "SIMULATED_SAFETY_DRILL") -> Dict[str, Any]:
+    def execute_fail_safe_quench_divert(
+        self, cell_id: str, reason: str = "SIMULATED_SAFETY_DRILL"
+    ) -> Dict[str, Any]:
         """
         Fast magnetic quench diversion protocol: safely redirects antiprotons into
         high-density beryllium/tungsten moderator dump target with zero explosive rupture.
@@ -200,7 +212,9 @@ class SuperconductingAntimatterContainment:
             raise ValueError(f"Cell {cell_id} not found.")
 
         antiprotons = cell.antiproton_count
-        annihilation_energy_joules = antiprotons * 2.0 * self.MASS_ANTIPROTON_KG * (self.SPEED_OF_LIGHT**2)
+        annihilation_energy_joules = (
+            antiprotons * 2.0 * self.MASS_ANTIPROTON_KG * (self.SPEED_OF_LIGHT**2)
+        )
 
         # Moderator thermalizes energy over cooling fluid (absorbed in < 1 ms)
         dump_time_us = round(random.uniform(420.0, 780.0), 1)
@@ -219,17 +233,26 @@ class SuperconductingAntimatterContainment:
 
     def get_matrix_metrics(self) -> Dict[str, Any]:
         total_pbar = sum([c.antiproton_count for c in self.cells.values()])
-        total_energy_j = total_pbar * 2.0 * self.MASS_ANTIPROTON_KG * (self.SPEED_OF_LIGHT**2)
+        total_energy_j = (
+            total_pbar * 2.0 * self.MASS_ANTIPROTON_KG * (self.SPEED_OF_LIGHT**2)
+        )
         return {
             "active_containment_cells": len(self.cells),
             "total_antiprotons_stored": total_pbar,
             "equivalent_annihilation_energy_joules": round(total_energy_j, 4),
-            "mean_magnetic_field_tesla": round(sum([c.magnetic_field_tesla for c in self.cells.values()]) / len(self.cells), 2),
-            "mean_cryogenic_temp_k": round(sum([c.cryogenic_temp_kelvin for c in self.cells.values()]) / len(self.cells), 2),
+            "mean_magnetic_field_tesla": round(
+                sum([c.magnetic_field_tesla for c in self.cells.values()])
+                / len(self.cells),
+                2,
+            ),
+            "mean_cryogenic_temp_k": round(
+                sum([c.cryogenic_temp_kelvin for c in self.cells.values()])
+                / len(self.cells),
+                2,
+            ),
             "plasma_mode": "PENNING_MALMBERG_ROTATING_WALL",
             "status": "NOMINAL_STABLE",
         }
 
 
 superconducting_antimatter_containment = SuperconductingAntimatterContainment()
-

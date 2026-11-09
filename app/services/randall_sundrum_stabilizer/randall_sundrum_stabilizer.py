@@ -121,14 +121,20 @@ class RandallSundrumStabilizer:
         gw_vev = round(0.12 * brane.bulk_curvature_scale_k_gev * scalar_flux_boost, 2)
 
         # Warp factor e^(-k * pi * r_c)
-        exponent = round((brane.warp_factor_exponent_k_pi_rc / 36.8) * target_rc_planck, 2)
+        exponent = round(
+            (brane.warp_factor_exponent_k_pi_rc / 36.8) * target_rc_planck, 2
+        )
         effective_warp = round(math.exp(-exponent) if exponent < 700 else 1e-16, 20)
 
         # Radion mass eigenvalue
-        radion_mass = round(brane.radion_mass_gev * (0.98 + 0.04 * scalar_flux_boost), 1)
+        radion_mass = round(
+            brane.radion_mass_gev * (0.98 + 0.04 * scalar_flux_boost), 1
+        )
 
         # Graviton leakage quench ratio
-        leakage_quench_db = round(118.5 * scalar_flux_boost + random.uniform(0.5, 2.5), 1)
+        leakage_quench_db = round(
+            118.5 * scalar_flux_boost + random.uniform(0.5, 2.5), 1
+        )
 
         stabilization_id = f"RS-RADION-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         res = RadionStabilizationResult(
@@ -170,4 +176,3 @@ class RandallSundrumStabilizer:
 
 
 randall_sundrum_stabilizer = RandallSundrumStabilizer()
-

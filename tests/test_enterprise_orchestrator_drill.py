@@ -14,7 +14,6 @@ from httpx import ASGITransport, AsyncClient
 from app.core.security import create_access_token
 from app.main import app
 from app.services.orchestrator.enterprise_orchestrator import (
-    EnterpriseSecurityOrchestrator,
     enterprise_orchestrator,
 )
 
@@ -112,7 +111,9 @@ async def test_enterprise_compliance_report_generation():
     )
     report_md = enterprise_orchestrator.generate_compliance_report(drill_res)
 
-    assert "# SageAI Enterprise Security Assessment & Compliance Audit Report" in report_md
+    assert (
+        "# SageAI Enterprise Security Assessment & Compliance Audit Report" in report_md
+    )
     assert drill_res["merkle_seal"]["record_hash"] in report_md
     assert "SOC 2 Type II" in report_md
     assert "ISO/IEC 27001:2022" in report_md
@@ -126,15 +127,19 @@ async def test_enterprise_api_routes():
     """Verify FastAPI enterprise endpoints with token authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({
-            "sub": "ciso@enterprise.com",
-            "role": "admin",
-            "org": "corp-grid",
-        })
+        token = create_access_token(
+            {
+                "sub": "ciso@enterprise.com",
+                "role": "admin",
+                "org": "corp-grid",
+            }
+        )
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Capabilities route
-        caps_res = await client.get("/security/enterprise-capabilities", headers=headers)
+        caps_res = await client.get(
+            "/security/enterprise-capabilities", headers=headers
+        )
         assert caps_res.status_code == 200
         caps_data = caps_res.json()
         assert caps_data["status"] == "healthy"
@@ -163,4 +168,3 @@ async def test_enterprise_api_routes():
         assert report_data["status"] == "success"
         assert "markdown_report" in report_data
         assert "merkle_seal" in report_data
-

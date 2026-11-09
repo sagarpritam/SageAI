@@ -8,4 +8,3 @@ from app.services.gravitational_seismic.gravitational_seismic_mesh import (
 )
 
 __all__ = ["GravitationalWaveSeismicMesh", "gravitational_seismic_mesh"]
-

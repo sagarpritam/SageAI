@@ -8,4 +8,3 @@ from app.services.cognitive_ew.cognitive_ew_engine import (
 )
 
 __all__ = ["CognitiveEWEngine", "cognitive_ew_engine"]
-

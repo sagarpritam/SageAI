@@ -138,7 +138,9 @@ class HardwareEnclaveAttestationService:
 
         # Validate PCR0 against Golden Reference
         pcr0_valid = bool(actual_pcr0 and actual_pcr0.lower() == target_pcr0.lower())
-        pcr1_valid = bool(pcrs.get("1") == self.golden_measurements["AWS_NITRO"].get("PCR1"))
+        pcr1_valid = bool(
+            pcrs.get("1") == self.golden_measurements["AWS_NITRO"].get("PCR1")
+        )
 
         is_valid = pcr0_valid and pcr1_valid
 
@@ -146,7 +148,9 @@ class HardwareEnclaveAttestationService:
             "valid": is_valid,
             "platform": "AWS_NITRO",
             "enclave_id": doc.get("module_id", "nitro-enclave-unknown"),
-            "verification_status": "HARDWARE_ATTESTED_GENUINE" if is_valid else "ATTESTATION_TAMPERING_DETECTED",
+            "verification_status": "HARDWARE_ATTESTED_GENUINE"
+            if is_valid
+            else "ATTESTATION_TAMPERING_DETECTED",
             "pcr_results": {
                 "pcr0_valid": pcr0_valid,
                 "pcr1_valid": pcr1_valid,
@@ -159,7 +163,9 @@ class HardwareEnclaveAttestationService:
 
         # Merkle Audit Recording
         audit_chain.record_action(
-            action="NITRO_ATTESTATION_VERIFIED" if is_valid else "NITRO_ATTESTATION_FAILED",
+            action="NITRO_ATTESTATION_VERIFIED"
+            if is_valid
+            else "NITRO_ATTESTATION_FAILED",
             details={
                 "valid": is_valid,
                 "enclave_id": result["enclave_id"],
@@ -181,7 +187,10 @@ class HardwareEnclaveAttestationService:
         Validates launch measurement, VCEK hardware certificate chain, and security policy.
         """
         now_iso = datetime.now(timezone.utc).isoformat()
-        target_meas = expected_measurement or self.golden_measurements["AMD_SEV_SNP"]["measurement"]
+        target_meas = (
+            expected_measurement
+            or self.golden_measurements["AMD_SEV_SNP"]["measurement"]
+        )
 
         # Check report format and length
         clean_hex = report_hex.strip().lower()
@@ -195,19 +204,25 @@ class HardwareEnclaveAttestationService:
 
         # Extract simulated measurement from report
         actual_meas = clean_hex[:96] if len(clean_hex) >= 96 else clean_hex
-        meas_valid = bool(actual_meas.lower() == target_meas[: len(actual_meas)].lower())
+        meas_valid = bool(
+            actual_meas.lower() == target_meas[: len(actual_meas)].lower()
+        )
 
         is_valid = meas_valid
 
         result = {
             "valid": is_valid,
             "platform": "AMD_SEV_SNP",
-            "verification_status": "HARDWARE_SEV_SNP_VALIDATED" if is_valid else "SEV_SNP_MEASUREMENT_MISMATCH",
+            "verification_status": "HARDWARE_SEV_SNP_VALIDATED"
+            if is_valid
+            else "SEV_SNP_MEASUREMENT_MISMATCH",
             "vcek_cert_chain": "AMD_KDS_SIGNED_VALID",
             "security_policy": {
                 "debug_allowed": False,
                 "smt_allowed": True,
-                "tcb_version": self.golden_measurements["AMD_SEV_SNP"]["min_tcb_version"],
+                "tcb_version": self.golden_measurements["AMD_SEV_SNP"][
+                    "min_tcb_version"
+                ],
             },
             "measurement_valid": meas_valid,
             "timestamp": now_iso,
@@ -233,7 +248,11 @@ class HardwareEnclaveAttestationService:
         clean_hex = quote_hex.strip().lower()
 
         if len(clean_hex) < 32:
-            return {"valid": False, "platform": "INTEL_SGX", "error": "Malformed SGX quote"}
+            return {
+                "valid": False,
+                "platform": "INTEL_SGX",
+                "error": "Malformed SGX quote",
+            }
 
         mrenclave = clean_hex[:40]
         expected_mrenclave = self.golden_measurements["INTEL_SGX"]["mrenclave"]
@@ -243,7 +262,9 @@ class HardwareEnclaveAttestationService:
         return {
             "valid": is_valid,
             "platform": "INTEL_SGX",
-            "verification_status": "INTEL_PCS_QUOTE_VERIFIED" if is_valid else "QUOTE_REJECTED",
+            "verification_status": "INTEL_PCS_QUOTE_VERIFIED"
+            if is_valid
+            else "QUOTE_REJECTED",
             "mrenclave": mrenclave,
             "mrsigner": self.golden_measurements["INTEL_SGX"]["mrsigner"],
             "tcb_status": "UpToDate",
@@ -288,7 +309,9 @@ class HardwareEnclaveAttestationService:
                 details={
                     "platform": plat,
                     "secret_id": secret_id,
-                    "reason": attestation_result.get("verification_status", "UNKNOWN_ERROR"),
+                    "reason": attestation_result.get(
+                        "verification_status", "UNKNOWN_ERROR"
+                    ),
                 },
                 org_id="system-enclave",
                 actor=operator,
@@ -337,4 +360,3 @@ class HardwareEnclaveAttestationService:
 
 # Global Singleton Instance
 hardware_attestation_service = HardwareEnclaveAttestationService()
-

@@ -125,4 +125,3 @@ class BehavioralAnomalyEngine:
 
 # Global singleton UEBA engine
 anomaly_engine = BehavioralAnomalyEngine()
-

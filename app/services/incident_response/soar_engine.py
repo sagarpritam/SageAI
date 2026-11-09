@@ -119,7 +119,9 @@ class IncidentResponseEngine:
         logger.info(f"[SOAR] Created incident {incident_id}: '{title}' ({severity})")
         return incident
 
-    def _determine_playbook_actions(self, severity: str, source: str) -> List[Dict[str, Any]]:
+    def _determine_playbook_actions(
+        self, severity: str, source: str
+    ) -> List[Dict[str, Any]]:
         """Determines relevant playbook actions based on severity and source."""
         actions = [
             {"action": "GENERATE_VIRTUAL_PATCH", "requires_approval": False},
@@ -128,9 +130,19 @@ class IncidentResponseEngine:
 
         if severity.upper() in ["CRITICAL", "HIGH"]:
             actions.append({"action": "BLOCK_IP_FIREWALL", "requires_approval": True})
-            if "CANARY" in source.upper() or "AUTH" in source.upper() or "DECEPTION" in source.upper():
-                actions.append({"action": "REVOKE_USER_SESSION", "requires_approval": True})
-            if "NIDS" in source.upper() or "BEACON" in source.upper() or "DEEP" in source.upper():
+            if (
+                "CANARY" in source.upper()
+                or "AUTH" in source.upper()
+                or "DECEPTION" in source.upper()
+            ):
+                actions.append(
+                    {"action": "REVOKE_USER_SESSION", "requires_approval": True}
+                )
+            if (
+                "NIDS" in source.upper()
+                or "BEACON" in source.upper()
+                or "DEEP" in source.upper()
+            ):
                 actions.append({"action": "ISOLATE_HOST", "requires_approval": True})
 
         return actions
@@ -145,16 +157,20 @@ class IncidentResponseEngine:
                     "status": "EXECUTED",
                     "executed_at": datetime.now(timezone.utc).isoformat(),
                     "executed_by": "SageAI SOAR Autonomous Engine",
-                    "details": self.SAFE_AUTO_ACTIONS.get(action_name, "Safe action executed"),
+                    "details": self.SAFE_AUTO_ACTIONS.get(
+                        action_name, "Safe action executed"
+                    ),
                 }
                 incident["executed_actions"].append(record)
-                self._action_audit_log.append({
-                    "incident_id": incident["incident_id"],
-                    "action": action_name,
-                    "status": "SUCCESS",
-                    "actor": "Autonomous Engine",
-                    "timestamp": record["executed_at"],
-                })
+                self._action_audit_log.append(
+                    {
+                        "incident_id": incident["incident_id"],
+                        "action": action_name,
+                        "status": "SUCCESS",
+                        "actor": "Autonomous Engine",
+                        "timestamp": record["executed_at"],
+                    }
+                )
 
     def execute_high_impact_action(
         self,
@@ -173,7 +189,10 @@ class IncidentResponseEngine:
         incident = self._incidents[incident_id]
 
         if action_name not in self.HIGH_IMPACT_ACTIONS:
-            return {"status": "error", "message": f"Unknown high-impact action: {action_name}"}
+            return {
+                "status": "error",
+                "message": f"Unknown high-impact action: {action_name}",
+            }
 
         # Human-in-the-loop permission guard
         allowed_roles = ["admin", "ciso", "secops_lead", "owner"]
@@ -204,14 +223,16 @@ class IncidentResponseEngine:
         incident["status"] = "CONTAINED"
         incident["updated_at"] = timestamp
 
-        self._action_audit_log.append({
-            "incident_id": incident_id,
-            "action": action_name,
-            "status": "SUCCESS",
-            "actor": approved_by,
-            "role": role,
-            "timestamp": timestamp,
-        })
+        self._action_audit_log.append(
+            {
+                "incident_id": incident_id,
+                "action": action_name,
+                "status": "SUCCESS",
+                "actor": approved_by,
+                "role": role,
+                "timestamp": timestamp,
+            }
+        )
 
         logger.info(
             f"[SOAR ACTION EXECUTED] {action_name} executed for {incident_id} by {approved_by} ({role})"
@@ -226,7 +247,9 @@ class IncidentResponseEngine:
     def get_incident(self, incident_id: str) -> Optional[Dict[str, Any]]:
         return self._incidents.get(incident_id)
 
-    def list_incidents(self, limit: int = 50, org_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def list_incidents(
+        self, limit: int = 50, org_id: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         incidents = list(self._incidents.values())
         if org_id and org_id != "system":
             incidents = [i for i in incidents if i.get("org_id") in (org_id, "system")]

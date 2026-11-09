@@ -80,7 +80,9 @@ class EBPFAgentService:
 
     def __init__(self, buffer_capacity: int = 5000):
         self.buffer_capacity = buffer_capacity
-        self.ring_buffer: Deque[Dict[str, Any]] = collections.deque(maxlen=buffer_capacity)
+        self.ring_buffer: Deque[Dict[str, Any]] = collections.deque(
+            maxlen=buffer_capacity
+        )
         self.quarantined_pids: Dict[int, Dict[str, Any]] = {}
         self.total_events_processed: int = 0
         self._seed_baseline_telemetry()
@@ -137,7 +139,9 @@ class EBPFAgentService:
                 "current_events": len(self.ring_buffer),
                 "total_processed": self.total_events_processed,
                 "dropped_events": 0,
-                "buffer_utilization_pct": round((len(self.ring_buffer) / self.buffer_capacity) * 100, 2),
+                "buffer_utilization_pct": round(
+                    (len(self.ring_buffer) / self.buffer_capacity) * 100, 2
+                ),
             },
             "quarantined_pids_count": len(self.quarantined_pids),
         }
@@ -162,7 +166,10 @@ class EBPFAgentService:
         mitre_attack = event_data.get("mitre_attack", "None")
 
         # 1. Container Escape Detection
-        if syscall in ["sys_enter_setns", "sys_enter_unshare"] or "docker.sock" in args_str:
+        if (
+            syscall in ["sys_enter_setns", "sys_enter_unshare"]
+            or "docker.sock" in args_str
+        ):
             severity = "CRITICAL"
             threat_label = "CONTAINER_ESCAPE_ATTEMPT (Namespace Switch to Host)"
             mitre_attack = "T1611"
@@ -174,13 +181,19 @@ class EBPFAgentService:
             mitre_attack = "T1055"
 
         # 3. Interactive Reverse Shell
-        elif any(shell in args_str for shell in ["/bin/sh", "/bin/bash", "nc -e", "bash -i", "/dev/tcp"]):
+        elif any(
+            shell in args_str
+            for shell in ["/bin/sh", "/bin/bash", "nc -e", "bash -i", "/dev/tcp"]
+        ):
             severity = "HIGH"
             threat_label = "INTERACTIVE_REVERSE_SHELL_DETECTED"
             mitre_attack = "T1059.004"
 
         # 4. Sensitive Credential Access
-        elif any(cred in args_str for cred in ["/etc/shadow", "/.aws/credentials", "/proc/kcore", "id_rsa"]):
+        elif any(
+            cred in args_str
+            for cred in ["/etc/shadow", "/.aws/credentials", "/proc/kcore", "id_rsa"]
+        ):
             severity = "HIGH"
             threat_label = "SENSITIVE_CREDENTIAL_READ_ATTEMPT"
             mitre_attack = "T1003"
@@ -281,4 +294,3 @@ class EBPFAgentService:
 
 # Global singleton
 ebpf_agent_service = EBPFAgentService()
-

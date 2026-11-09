@@ -140,29 +140,49 @@ class CisLunarQuantumLaserRelay:
         light_time_sec = geometric_dist_km / self.SPEED_OF_LIGHT_KM_S
 
         # Relativistic Shapiro delay due to Earth-Moon gravitational well (approx in nsec)
-        shapiro_delay_nsec = 4.0 * (self.GM_EARTH / (3e8**3)) * math.log(geometric_dist_km * 1e3 / 6.371e6) * 1e9
+        shapiro_delay_nsec = (
+            4.0
+            * (self.GM_EARTH / (3e8**3))
+            * math.log(geometric_dist_km * 1e3 / 6.371e6)
+            * 1e9
+        )
         shapiro_delay_nsec = max(1.2, round(abs(shapiro_delay_nsec), 3))
 
         # Optical link budget (free space path loss + aperture gains)
         wavelength_m = source.laser_wavelength_nm * 1e-9
-        freq_hz = 3e8 / wavelength_m
-        path_loss_db = 20.0 * math.log10((4.0 * math.pi * geometric_dist_km * 1000.0) / wavelength_m)
-        tx_gain_db = 10.0 * math.log10((math.pi * source.aperture_diameter_m / wavelength_m) ** 2)
-        rx_gain_db = 10.0 * math.log10((math.pi * target.aperture_diameter_m / wavelength_m) ** 2)
+        3e8 / wavelength_m
+        path_loss_db = 20.0 * math.log10(
+            (4.0 * math.pi * geometric_dist_km * 1000.0) / wavelength_m
+        )
+        tx_gain_db = 10.0 * math.log10(
+            (math.pi * source.aperture_diameter_m / wavelength_m) ** 2
+        )
+        rx_gain_db = 10.0 * math.log10(
+            (math.pi * target.aperture_diameter_m / wavelength_m) ** 2
+        )
         tx_power_dbm = 10.0 * math.log10(source.optical_power_watts * 1000.0)
 
-        rx_power_dbm = tx_power_dbm + tx_gain_db + rx_gain_db - path_loss_db - (atmospheric_turbulence_index * 8.5)
+        rx_power_dbm = (
+            tx_power_dbm
+            + tx_gain_db
+            + rx_gain_db
+            - path_loss_db
+            - (atmospheric_turbulence_index * 8.5)
+        )
         rx_power_dbm = round(max(-72.0, min(-38.0, rx_power_dbm)), 2)
 
         # QBER calculation based on pointing jitter & received optical SNR
-        jitter_penalty = (source.pointing_jitter_nrad + target.pointing_jitter_nrad) / 100.0
+        jitter_penalty = (
+            source.pointing_jitter_nrad + target.pointing_jitter_nrad
+        ) / 100.0
         qber = 0.012 + (jitter_penalty * 0.004) + (atmospheric_turbulence_index * 0.008)
         qber = round(min(0.11, max(0.015, qber)), 4)
 
         # Secure key rate (decoy state BB84 formula approximation)
-        pulse_rep_rate_mhz = 250.0  # 250 MHz repetition rate
         raw_key_rate_kbps = (10 ** (rx_power_dbm / 10.0)) * 1e7
-        secure_key_rate = raw_key_rate_kbps * (1.0 - 2.0 * (-qber * math.log2(max(1e-6, qber)) if qber > 0 else 0))
+        secure_key_rate = raw_key_rate_kbps * (
+            1.0 - 2.0 * (-qber * math.log2(max(1e-6, qber)) if qber > 0 else 0)
+        )
         secure_key_rate = round(max(12.5, min(95.0, secure_key_rate)), 2)
 
         # OAM throughput: sum across orthogonal topological charges
@@ -170,7 +190,9 @@ class CisLunarQuantumLaserRelay:
         channel_rate_gbps = 80.0  # 80 Gbps per OAM mode
         aggregate_gbps = round(len(modes) * channel_rate_gbps * (1.0 - (qber * 2.0)), 1)
 
-        drift_correction = round(random.uniform(0.12, 0.45) * source.beam_divergence_urad, 3)
+        drift_correction = round(
+            random.uniform(0.12, 0.45) * source.beam_divergence_urad, 3
+        )
 
         tx_id = f"CISLUNAR-TX-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
         result = CisLunarTransmissionResult(
@@ -209,7 +231,9 @@ class CisLunarQuantumLaserRelay:
         return {
             "total_nodes": len(self.nodes),
             "total_transmissions_logged": len(self.transmissions),
-            "max_distance_km": max([n.distance_km for n in self.nodes.values()] or [0.0]),
+            "max_distance_km": max(
+                [n.distance_km for n in self.nodes.values()] or [0.0]
+            ),
             "primary_constellation": "Earth-Moon L1/L2 High-Rate Quantum Laser Mesh",
             "active_oam_channels": sum([len(n.oam_modes) for n in self.nodes.values()]),
             "status": "OPERATIONAL",
@@ -217,4 +241,3 @@ class CisLunarQuantumLaserRelay:
 
 
 cislunar_quantum_relay = CisLunarQuantumLaserRelay()
-

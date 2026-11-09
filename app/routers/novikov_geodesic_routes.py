@@ -7,13 +7,19 @@ from app.services.novikov_geodesic_normalizer import get_novikov_geodesic_normal
 
 router = APIRouter(
     prefix="/api/novikov-geodesic",
-    tags=["Chrono-Topological Novikov Self-Consistency Geodesic Loop Normalizer (Cap 97)"],
+    tags=[
+        "Chrono-Topological Novikov Self-Consistency Geodesic Loop Normalizer (Cap 97)"
+    ],
 )
 
 
 class NormalizeLoopRequest(BaseModel):
-    loop_id: str = Field(..., description="Target closed timelike curve / geodesic loop ID")
-    phase_adjustment_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Path integral phase adjustment gain")
+    loop_id: str = Field(
+        ..., description="Target closed timelike curve / geodesic loop ID"
+    )
+    phase_adjustment_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Path integral phase adjustment gain"
+    )
 
 
 @router.get("/loops")
@@ -38,4 +44,3 @@ async def normalize_loop(req: NormalizeLoopRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     norm = get_novikov_geodesic_normalizer()
     return norm.get_normalizer_metrics()
-

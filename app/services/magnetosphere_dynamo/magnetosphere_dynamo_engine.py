@@ -30,7 +30,9 @@ class DynamoModulatorStation:
 class EMPDecouplingResponse:
     decoupling_id: str
     station_id: str
-    threat_type: str  # "HEMP_NUCLEAR_BURST", "SOLAR_CME_COMPRESSION", "GEOMAGNETIC_HEAVE"
+    threat_type: (
+        str  # "HEMP_NUCLEAR_BURST", "SOLAR_CME_COMPRESSION", "GEOMAGNETIC_HEAVE"
+    )
     peak_electric_field_kv_m: float
     rise_time_ns: float
     clamped_e1_voltage_volts: float
@@ -164,8 +166,12 @@ class MagnetosphereDynamoDecoupler:
             "active_dynamo_stations": len(self.stations),
             "total_decoupling_events": len(self.responses),
             "mean_attenuation_db": round(
-                sum([r.attenuation_ratio_db for r in self.responses]) / len(self.responses), 1
-            ) if self.responses else 49.5,
+                sum([r.attenuation_ratio_db for r in self.responses])
+                / len(self.responses),
+                1,
+            )
+            if self.responses
+            else 49.5,
             "resonance_mode": "ALFVEN_ULF_MAGNETOHYDRODYNAMIC",
             "hemp_e1_response_limit_ps": 400.0,
             "status": "OPERATIONAL",
@@ -173,4 +179,3 @@ class MagnetosphereDynamoDecoupler:
 
 
 magnetosphere_dynamo_decoupler = MagnetosphereDynamoDecoupler()
-

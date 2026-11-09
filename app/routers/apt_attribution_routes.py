@@ -62,7 +62,7 @@ async def analyze_ioc_endpoint(
     res = apt_attribution_service.analyze_ioc_attribution(
         indicator=payload.indicator,
         indicator_type=payload.indicator_type or "IPV4",
-        ja4_fingerprint=payload.ja4_fingerprint
+        ja4_fingerprint=payload.ja4_fingerprint,
     )
     return {"status": "success", "attribution": res}
 
@@ -86,7 +86,10 @@ async def get_graph_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves STIX 2.1 knowledge graph nodes and edges for visualization."""
-    return {"status": "success", "graph": apt_attribution_service.get_attribution_graph()}
+    return {
+        "status": "success",
+        "graph": apt_attribution_service.get_attribution_graph(),
+    }
 
 
 @router.get("/metrics")
@@ -96,5 +99,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves threat attribution engine metrics."""
-    return {"status": "success", "metrics": apt_attribution_service.get_fusion_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": apt_attribution_service.get_fusion_metrics(),
+    }

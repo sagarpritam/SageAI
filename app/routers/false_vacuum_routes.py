@@ -15,9 +15,11 @@ class QuenchNucleationRequest(BaseModel):
     chamber_id: str = Field(..., description="Target vacuum chamber ID")
     simulated_instanton_perturbation: str = Field(
         default="MICROSCOPIC_BLACK_HOLE_CATALYZED_TUNNELING",
-        description="Perturbation profile"
+        description="Perturbation profile",
     )
-    counter_bias_power_tw: float = Field(default=48.0, ge=1.0, le=500.0, description="Counter-bias power in Terawatts")
+    counter_bias_power_tw: float = Field(
+        default=48.0, ge=1.0, le=500.0, description="Counter-bias power in Terawatts"
+    )
 
 
 @router.get("/chambers")
@@ -40,4 +42,3 @@ async def quench_nucleation(req: QuenchNucleationRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return false_vacuum_decay_shield.get_shield_metrics()
-

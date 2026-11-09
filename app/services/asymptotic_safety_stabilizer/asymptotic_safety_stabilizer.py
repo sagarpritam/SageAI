@@ -120,12 +120,18 @@ class AsymptoticSafetyFlowStabilizer:
             raise ValueError(f"RG scale node {node_id} not registered.")
 
         # Compute proximity to Reuter Fixed Point (g* ~ 0.707, lambda* ~ 0.193)
-        delta_g = abs(node.dimensionless_newton_g - node.uv_fixed_point_attractor_g_star)
-        delta_lam = abs(node.dimensionless_cosmo_lambda - node.uv_fixed_point_attractor_lambda_star)
+        delta_g = abs(
+            node.dimensionless_newton_g - node.uv_fixed_point_attractor_g_star
+        )
+        delta_lam = abs(
+            node.dimensionless_cosmo_lambda - node.uv_fixed_point_attractor_lambda_star
+        )
         pre_div = round((delta_g + delta_lam) * 100.0, 4)
 
         # Apply flow regulator damping
-        stability_pct = min(99.995, 99.85 + (0.14 * math.tanh(regulator_shape_parameter)))
+        stability_pct = min(
+            99.995, 99.85 + (0.14 * math.tanh(regulator_shape_parameter))
+        )
         anomalous_eta = round(-0.998 + 0.002 * random.uniform(0.1, 0.9), 4)
         effective_gamma = round(1.0 + (flow_momentum_k_gev / 1e19) * 0.12, 4)
 
@@ -174,4 +180,3 @@ asymptotic_safety_stabilizer = AsymptoticSafetyFlowStabilizer()
 
 def get_asymptotic_safety_stabilizer() -> AsymptoticSafetyFlowStabilizer:
     return asymptotic_safety_stabilizer
-

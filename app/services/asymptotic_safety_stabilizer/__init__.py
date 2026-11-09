@@ -1,4 +1,5 @@
 """Asymptotically Safe Renormalization Group Fixed Point Flow Stabilizer Package."""
+
 from .asymptotic_safety_stabilizer import (
     AsymptoticSafetyFlowStabilizer,
     RGScaleNode,
@@ -14,4 +15,3 @@ __all__ = [
     "asymptotic_safety_stabilizer",
     "get_asymptotic_safety_stabilizer",
 ]
-

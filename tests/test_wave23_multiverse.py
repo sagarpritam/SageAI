@@ -3,11 +3,11 @@ Unit & Integration Tests for Wave 23: Multiverse Everett-Wheeler Quantum Branch 
 ER=EPR Wormhole Metric Siphon, False Vacuum Nucleation Shield & Orbital HPM Directed Energy Grid (Capabilities 89-91 + Option B).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.everett_branch_resolver import everett_branch_resolver
 from app.services.er_bridge_siphon import er_bridge_metric_siphon
+from app.services.everett_branch_resolver import everett_branch_resolver
 from app.services.false_vacuum_shield import false_vacuum_decay_shield
 from app.services.orbital_hpm_grid import orbital_hpm_grid
 
@@ -211,4 +211,3 @@ def test_orbital_hpm_api():
     r_met = client.get("/api/orbital-hpm/metrics")
     assert r_met.status_code == 200
     assert r_met.json()["active_hpm_satellites"] >= 4
-

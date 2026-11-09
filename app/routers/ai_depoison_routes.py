@@ -18,12 +18,18 @@ router = APIRouter(
 
 
 class ScanAdapterRequest(BaseModel):
-    adapter_id: str = Field(..., description="Target fine-tuned LoRA adapter identifier")
-    anomaly_threshold: float = Field(10.0, description="Activation sparsity anomaly threshold percentage")
+    adapter_id: str = Field(
+        ..., description="Target fine-tuned LoRA adapter identifier"
+    )
+    anomaly_threshold: float = Field(
+        10.0, description="Activation sparsity anomaly threshold percentage"
+    )
 
 
 class ExciseBackdoorRequest(BaseModel):
-    adapter_id: str = Field(..., description="Target adapter to ablate backdoor neurons and excise weights")
+    adapter_id: str = Field(
+        ..., description="Target adapter to ablate backdoor neurons and excise weights"
+    )
 
 
 @router.get("/adapters")
@@ -90,5 +96,7 @@ async def get_depoison_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns AI model de-poisoning and trojan weight ablation metrics."""
-    return {"status": "success", "metrics": ai_model_depoison_engine.get_depoison_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": ai_model_depoison_engine.get_depoison_metrics(),
+    }

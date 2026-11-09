@@ -79,12 +79,16 @@ class PhotonicQuantumCryptFirewall:
         """
         coprocessor = self._coprocessors.get(coprocessor_id)
         if not coprocessor:
-            raise ValueError(f"Photonic quantum co-processor {coprocessor_id} not registered.")
+            raise ValueError(
+                f"Photonic quantum co-processor {coprocessor_id} not registered."
+            )
 
         now = time.time()
         # Vulnerability criteria: low root Hermite factor (< 1.0035) or low lattice dimension (< 512)
         is_lattice_vulnerable = root_hermite_factor < 1.0035 or lattice_dimension < 512
-        is_coherence_risk = photon_loss_rate_pct < 0.2 and coprocessor["squeezing_factor_db"] > 2.0
+        is_coherence_risk = (
+            photon_loss_rate_pct < 0.2 and coprocessor["squeezing_factor_db"] > 2.0
+        )
         threat_detected = is_lattice_vulnerable or is_coherence_risk
 
         threat_type = "NOMINAL_LATTICE_QUANTUM_HARDNESS"
@@ -128,7 +132,9 @@ class PhotonicQuantumCryptFirewall:
         """
         coprocessor = self._coprocessors.get(coprocessor_id)
         if not coprocessor:
-            raise ValueError(f"Photonic quantum co-processor {coprocessor_id} not registered.")
+            raise ValueError(
+                f"Photonic quantum co-processor {coprocessor_id} not registered."
+            )
 
         now = time.time()
         coprocessor["status"] = "QUANTUM_FIREWALL_ENGAGED"
@@ -149,12 +155,19 @@ class PhotonicQuantumCryptFirewall:
 
     def get_photonic_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for photonic optical quantum firewall defense."""
-        total_blocked = sum(c["cryptanalytic_attempts_blocked"] for c in self._coprocessors.values())
+        total_blocked = sum(
+            c["cryptanalytic_attempts_blocked"] for c in self._coprocessors.values()
+        )
         return {
             "active_photonic_coprocessors": len(self._coprocessors),
-            "total_optical_modes_monitored": sum(c["optical_modes"] for c in self._coprocessors.values()),
-            "total_mzi_interferometers": sum(c["mzi_interferometer_elements"] for c in self._coprocessors.values()),
-            "cryptanalytic_attacks_neutralized": total_blocked + len(self._firewall_events),
+            "total_optical_modes_monitored": sum(
+                c["optical_modes"] for c in self._coprocessors.values()
+            ),
+            "total_mzi_interferometers": sum(
+                c["mzi_interferometer_elements"] for c in self._coprocessors.values()
+            ),
+            "cryptanalytic_attacks_neutralized": total_blocked
+            + len(self._firewall_events),
             "mean_optical_gate_latency_fs": 117.7,
             "mean_quantum_fidelity_barrier_pct": 99.999,
         }
@@ -162,4 +175,3 @@ class PhotonicQuantumCryptFirewall:
 
 # Singleton instance
 photonic_quantum_firewall = PhotonicQuantumCryptFirewall()
-

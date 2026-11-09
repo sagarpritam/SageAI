@@ -254,7 +254,10 @@ async def approve_patch(
     if not github_token:
         # Check for simulate mode
         simulate = request.query_params.get("simulate", "false").lower() == "true"
-        if simulate or request.headers.get("x-simulate-dispatch", "false").lower() == "true":
+        if (
+            simulate
+            or request.headers.get("x-simulate-dispatch", "false").lower() == "true"
+        ):
             github_token = "mock_gh_token_simulated"
         else:
             raise HTTPException(

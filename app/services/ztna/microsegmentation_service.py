@@ -147,7 +147,7 @@ spec:
     - ports:
 """
         for port in allowed_ports:
-            cilium_yaml += f"      - port: \"{port}\"\n        protocol: {protocol}\n"
+            cilium_yaml += f'      - port: "{port}"\n        protocol: {protocol}\n'
 
         cilium_yaml += """  - toEntities:
     - none

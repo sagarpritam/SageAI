@@ -69,7 +69,7 @@ async def create_labyrinth_endpoint(
         name=payload.name,
         architecture_type=payload.architecture_type or "FINANCIAL_CORE",
         depth_levels=payload.depth_levels or 5,
-        deception_persona=payload.deception_persona or "High-Value Enterprise Node"
+        deception_persona=payload.deception_persona or "High-Value Enterprise Node",
     )
     return {"status": "success", "maze": maze}
 
@@ -87,7 +87,7 @@ async def trap_adversary_endpoint(
             labyrinth_id=payload.labyrinth_id,
             adversary_ip=payload.adversary_ip,
             probe_command=payload.probe_command,
-            protocol=payload.protocol or "SSH"
+            protocol=payload.protocol or "SSH",
         )
         return {"status": "success", "trap": res}
     except ValueError as e:
@@ -115,5 +115,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves honeynet engagement and adversary dwell time metrics."""
-    return {"status": "success", "metrics": labyrinth_honeynet_service.get_labyrinth_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": labyrinth_honeynet_service.get_labyrinth_metrics(),
+    }

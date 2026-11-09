@@ -7,7 +7,7 @@ UEBA Anomaly Tracking, and SOAR Cryptographic Merkle Sealing.
 """
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 from app.services.detection.nids_monitor import NIDSMonitor
@@ -77,7 +77,10 @@ async def test_simulation_api_endpoints():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         # Mock auth token
         from app.core.security import create_access_token
-        token = create_access_token({"sub": "admin@sageai.io", "role": "admin", "org": "test-org"})
+
+        token = create_access_token(
+            {"sub": "admin@sageai.io", "role": "admin", "org": "test-org"}
+        )
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Scenarios endpoint
@@ -100,4 +103,3 @@ async def test_simulation_api_endpoints():
         drill_data = drill_res.json()
         assert drill_data["status"] == "DRILL_SUCCESSFUL"
         assert drill_data["stages_completed"] == 6
-

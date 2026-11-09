@@ -36,7 +36,9 @@ class AnalyzeRequestPayload(BaseModel):
 class NIDSProbePayload(BaseModel):
     source_ip: str = Field(..., description="Source IP address")
     destination_port: int = Field(..., description="Target port probed")
-    destination_ip: Optional[str] = Field("internal_server", description="Destination IP")
+    destination_ip: Optional[str] = Field(
+        "internal_server", description="Destination IP"
+    )
 
 
 class AnomalyCheckPayload(BaseModel):

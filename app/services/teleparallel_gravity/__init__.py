@@ -8,4 +8,3 @@ from app.services.teleparallel_gravity.teleparallel_gravity import (
 )
 
 __all__ = ["TeleparallelGravityEngine", "get_teleparallel_gravity_engine"]
-

@@ -383,7 +383,10 @@ class CVEIndexer:
 
         synthesizer = ThreatPatternSynthesizer()
         results = []
-        top_threats = self.search("", limit=limit, kev_only=True) or list(self._index.values())[:limit]
+        top_threats = (
+            self.search("", limit=limit, kev_only=True)
+            or list(self._index.values())[:limit]
+        )
         for vuln in top_threats:
             res = synthesizer.process_threat_item(vuln.model_dump())
             results.append(res)

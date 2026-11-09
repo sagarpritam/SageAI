@@ -16,7 +16,9 @@ from typing import Any, Dict, List
 class HyperspectralSatelliteNode:
     satellite_id: str
     satellite_name: str
-    orbit_type: str  # "SUN_SYNCHRONOUS_POLAR", "MOLNIYA_HIGH_INCLINATION", "LEO_EQUATORIAL"
+    orbit_type: (
+        str  # "SUN_SYNCHRONOUS_POLAR", "MOLNIYA_HIGH_INCLINATION", "LEO_EQUATORIAL"
+    )
     altitude_km: float
     spectral_bands_count: int = 288
     wavelength_range_nm: str = "400 - 14,000 nm (VNIR / SWIR / LWIR)"
@@ -149,14 +151,25 @@ class PlanetaryHyperspectralInterceptorSwarm:
             raise ValueError(f"Satellite {satellite_id} not registered.")
 
         signature_map = {
-            "COVERT_NUCLEAR_ENRICHMENT": ("UF6_FLUORINATED_ISOTOPE_VAPOR_PLUME (16.0 um absorption)", 14.8),
-            "REINFORCED_UNDERGROUND_BUNKER": ("GEOTHERMAL_CONVECTIVE_AIR_SHAFT_VENTILATION", 18.2),
-            "MOBILE_CAMOUFLAGED_TEL": ("SYNTHETIC_CHLOROPHYLL_NETTING_REFLECTANCE_BREAKDOWN", 6.4),
-            "SUBMERSIBLE_WAKE_CAVITATION": ("THERMAL_SHEAR_SURFACE_BIOLUMINESCENCE_WAKE", 2.8),
+            "COVERT_NUCLEAR_ENRICHMENT": (
+                "UF6_FLUORINATED_ISOTOPE_VAPOR_PLUME (16.0 um absorption)",
+                14.8,
+            ),
+            "REINFORCED_UNDERGROUND_BUNKER": (
+                "GEOTHERMAL_CONVECTIVE_AIR_SHAFT_VENTILATION",
+                18.2,
+            ),
+            "MOBILE_CAMOUFLAGED_TEL": (
+                "SYNTHETIC_CHLOROPHYLL_NETTING_REFLECTANCE_BREAKDOWN",
+                6.4,
+            ),
+            "SUBMERSIBLE_WAKE_CAVITATION": (
+                "THERMAL_SHEAR_SURFACE_BIOLUMINESCENCE_WAKE",
+                2.8,
+            ),
         }
         sig_text, delta_t = signature_map.get(
-            suspected_classification,
-            ("UNIDENTIFIED_NARROWBAND_SPECTRAL_ANOMALY", 5.0)
+            suspected_classification, ("UNIDENTIFIED_NARROWBAND_SPECTRAL_ANOMALY", 5.0)
         )
 
         abundance = round(0.88 + random.uniform(0.02, 0.09), 3)
@@ -205,7 +218,9 @@ class PlanetaryHyperspectralInterceptorSwarm:
         coords = scan.target_coordinates if scan else "34.0522°N, 51.4215°E"
 
         latency_ms = round(14.5 + random.uniform(0.5, 4.5), 2)
-        tt_impact = 18.2 if interceptor_platform == "SPACE_GROUND_KINETIC_ROD" else 0.0012
+        tt_impact = (
+            18.2 if interceptor_platform == "SPACE_GROUND_KINETIC_ROD" else 0.0012
+        )
         kill_prob = round(99.4 + random.uniform(0.1, 0.5), 2)
 
         engagement_id = f"ENGAGE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"

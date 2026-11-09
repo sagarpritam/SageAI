@@ -120,7 +120,9 @@ class KineticDroneShield:
             "optical_target_locked": optical_confirmed,
             "rf_control_link_anomaly": rf_spectrum_anomaly,
             "recommended_countermeasure": recommended_weapon,
-            "time_to_impact_sec": round(800.0 / approach_velocity_mps, 2) if approach_velocity_mps > 0 else 999.0,
+            "time_to_impact_sec": round(800.0 / approach_velocity_mps, 2)
+            if approach_velocity_mps > 0
+            else 999.0,
             "timestamp": now,
         }
 
@@ -171,4 +173,3 @@ class KineticDroneShield:
 
 # Singleton instance
 kinetic_drone_shield = KineticDroneShield()
-

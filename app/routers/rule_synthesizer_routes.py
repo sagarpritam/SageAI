@@ -19,12 +19,22 @@ router = APIRouter(prefix="/rules", tags=["Threat Pattern & Rule Synthesizer"])
 
 
 class CustomRuleSynthesizeRequest(BaseModel):
-    cve_id: str = Field(..., description="CVE ID or vulnerability tag (e.g. CVE-2024-21887)")
+    cve_id: str = Field(
+        ..., description="CVE ID or vulnerability tag (e.g. CVE-2024-21887)"
+    )
     title: Optional[str] = Field(None, description="Vulnerability title")
-    description: Optional[str] = Field(None, description="Detailed vulnerability description")
-    severity: Optional[str] = Field("high", description="Severity: critical, high, medium, low")
-    strings: Optional[List[str]] = Field(None, description="Extracted suspicious strings/IOCs")
-    target_path: Optional[str] = Field("/api/v1/health", description="Target HTTP probe path for Nuclei")
+    description: Optional[str] = Field(
+        None, description="Detailed vulnerability description"
+    )
+    severity: Optional[str] = Field(
+        "high", description="Severity: critical, high, medium, low"
+    )
+    strings: Optional[List[str]] = Field(
+        None, description="Extracted suspicious strings/IOCs"
+    )
+    target_path: Optional[str] = Field(
+        "/api/v1/health", description="Target HTTP probe path for Nuclei"
+    )
 
 
 class RuleValidationRequest(BaseModel):
@@ -127,4 +137,3 @@ async def export_rule_bundle(
         "total_rules": len(rules_bundle),
         "bundle": rules_bundle,
     }
-

@@ -104,12 +104,14 @@ class AIImmuneMutationGuard:
         ]
 
         is_adversarial = any(sig in lower_prompt for sig in adversarial_signatures)
-        matched_sig = next((sig for sig in adversarial_signatures if sig in lower_prompt), None)
+        matched_sig = next(
+            (sig for sig in adversarial_signatures if sig in lower_prompt), None
+        )
 
         if is_adversarial:
             model["attacks_neutralized"] += 1
             mutation_delta = round(min(0.042, model["latent_epsilon_bound"]), 4)
-            mutation_id = f"mut-{uuid.uuid4().hex[:6]}"
+            f"mut-{uuid.uuid4().hex[:6]}"
 
             event = {
                 "evaluation_id": f"eval-{uuid.uuid4().hex[:6]}",
@@ -180,4 +182,3 @@ class AIImmuneMutationGuard:
 
 # Singleton instance
 ai_immune_mutation_guard = AIImmuneMutationGuard()
-

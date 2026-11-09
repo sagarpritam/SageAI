@@ -13,8 +13,15 @@ router = APIRouter(
 
 class PulseFusionRequest(BaseModel):
     reactor_id: str = Field(..., description="Target MIF reactor platform ID")
-    current_boost_ma: float = Field(default=2.0, ge=0.0, le=10.0, description="Driver current boost in Mega-Amperes")
-    compression_gain: float = Field(default=1.0, ge=0.1, le=5.0, description="Plasma liner implosion compression gain")
+    current_boost_ma: float = Field(
+        default=2.0, ge=0.0, le=10.0, description="Driver current boost in Mega-Amperes"
+    )
+    compression_gain: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=5.0,
+        description="Plasma liner implosion compression gain",
+    )
 
 
 @router.get("/reactors")
@@ -40,4 +47,3 @@ async def pulse_fusion(req: PulseFusionRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     mif = get_magneto_inertial_fusion()
     return mif.get_fusion_metrics()
-

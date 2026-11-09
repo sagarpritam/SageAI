@@ -8,16 +8,15 @@ Verifies:
 5. Defense Grid API Routes
 """
 
-import pytest
-from app.services.audit_chain import ImmutableAuditChain, audit_chain
-from app.services.detection.anomaly_engine import BehavioralAnomalyEngine, anomaly_engine
+from app.services.audit_chain import ImmutableAuditChain
+from app.services.detection.anomaly_engine import BehavioralAnomalyEngine
 from app.services.detection.attack_detector import AttackDetector
 from app.services.detection.nids_monitor import NIDSMonitor
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. Behavioral Anomaly Engine (UEBA) Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_anomaly_engine_z_score_detection():
     engine = BehavioralAnomalyEngine(z_score_threshold=3.0)
@@ -45,7 +44,7 @@ def test_anomaly_engine_z_score_detection():
 def test_anomaly_engine_request_frequency_tracking():
     engine = BehavioralAnomalyEngine()
 
-    alerts = engine.track_request_frequency(
+    engine.track_request_frequency(
         client_ip="198.51.100.77",
         endpoint="/api/v1/checkout",
         payload_bytes=512,
@@ -58,6 +57,7 @@ def test_anomaly_engine_request_frequency_tracking():
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. Immutable Cryptographic Audit Chain Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_audit_chain_block_creation_and_integrity():
     chain = ImmutableAuditChain()
@@ -123,22 +123,33 @@ def test_audit_chain_tamper_detection():
 # 3. WAF Attack Detector Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_attack_detector_sqli_and_xss():
     detector = AttackDetector()
 
     # SQL Injection
-    sqli_hits = detector.analyze_payload("/api/users", query_params="1' UNION SELECT username, password FROM users --", source_ip="203.0.113.1")
+    sqli_hits = detector.analyze_payload(
+        "/api/users",
+        query_params="1' UNION SELECT username, password FROM users --",
+        source_ip="203.0.113.1",
+    )
     assert len(sqli_hits) > 0
     assert sqli_hits[0]["attack_type"] == "SQL_INJECTION"
     assert sqli_hits[0]["severity"] == "CRITICAL"
 
     # XSS
-    xss_hits = detector.analyze_payload("/api/comments", body="<script>alert(document.cookie)</script>", source_ip="203.0.113.2")
+    xss_hits = detector.analyze_payload(
+        "/api/comments",
+        body="<script>alert(document.cookie)</script>",
+        source_ip="203.0.113.2",
+    )
     assert len(xss_hits) > 0
     assert xss_hits[0]["attack_type"] == "CROSS_SITE_SCRIPTING"
 
     # Command Injection
-    cmdi_hits = detector.analyze_payload("/api/ping", query_params="; whoami && cat /etc/passwd", source_ip="203.0.113.3")
+    cmdi_hits = detector.analyze_payload(
+        "/api/ping", query_params="; whoami && cat /etc/passwd", source_ip="203.0.113.3"
+    )
     assert len(cmdi_hits) > 0
     assert cmdi_hits[0]["attack_type"] == "COMMAND_INJECTION"
 
@@ -146,6 +157,7 @@ def test_attack_detector_sqli_and_xss():
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. NIDS Monitor Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_nids_monitor_port_scan():
     monitor = NIDSMonitor(port_scan_threshold=4, scan_window_seconds=10)

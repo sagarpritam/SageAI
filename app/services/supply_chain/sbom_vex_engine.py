@@ -28,12 +28,48 @@ logger = logging.getLogger("SageAI.sbom_vex")
 
 # Pre-packaged Enterprise Component Inventory
 DEFAULT_COMPONENTS = [
-    {"name": "fastapi", "version": "0.110.0", "purl": "pkg:pypi/fastapi@0.110.0", "ecosystem": "PyPI", "license": "MIT"},
-    {"name": "pydantic", "version": "2.6.4", "purl": "pkg:pypi/pydantic@2.6.4", "ecosystem": "PyPI", "license": "MIT"},
-    {"name": "cryptography", "version": "42.0.5", "purl": "pkg:pypi/cryptography@42.0.5", "ecosystem": "PyPI", "license": "Apache-2.0"},
-    {"name": "next", "version": "14.2.3", "purl": "pkg:npm/next@14.2.3", "ecosystem": "npm", "license": "MIT"},
-    {"name": "react", "version": "18.3.1", "purl": "pkg:npm/react@18.3.1", "ecosystem": "npm", "license": "MIT"},
-    {"name": "urllib3", "version": "1.26.5", "purl": "pkg:pypi/urllib3@1.26.5", "ecosystem": "PyPI", "license": "MIT"},
+    {
+        "name": "fastapi",
+        "version": "0.110.0",
+        "purl": "pkg:pypi/fastapi@0.110.0",
+        "ecosystem": "PyPI",
+        "license": "MIT",
+    },
+    {
+        "name": "pydantic",
+        "version": "2.6.4",
+        "purl": "pkg:pypi/pydantic@2.6.4",
+        "ecosystem": "PyPI",
+        "license": "MIT",
+    },
+    {
+        "name": "cryptography",
+        "version": "42.0.5",
+        "purl": "pkg:pypi/cryptography@42.0.5",
+        "ecosystem": "PyPI",
+        "license": "Apache-2.0",
+    },
+    {
+        "name": "next",
+        "version": "14.2.3",
+        "purl": "pkg:npm/next@14.2.3",
+        "ecosystem": "npm",
+        "license": "MIT",
+    },
+    {
+        "name": "react",
+        "version": "18.3.1",
+        "purl": "pkg:npm/react@18.3.1",
+        "ecosystem": "npm",
+        "license": "MIT",
+    },
+    {
+        "name": "urllib3",
+        "version": "1.26.5",
+        "purl": "pkg:pypi/urllib3@1.26.5",
+        "ecosystem": "PyPI",
+        "license": "MIT",
+    },
 ]
 
 # Vulnerability Exploitability Mapping (for VEX evaluation)
@@ -86,7 +122,9 @@ class SBOMVexEngine:
         self.components = DEFAULT_COMPONENTS
         self.vuln_catalog = VULN_EXPLOITABILITY_CATALOG
 
-    def generate_cyclonedx_sbom(self, components: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+    def generate_cyclonedx_sbom(
+        self, components: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
         """
         Generates CycloneDX 1.5 JSON SBOM specification.
         """
@@ -102,7 +140,11 @@ class SBOMVexEngine:
             "metadata": {
                 "timestamp": now_iso,
                 "tools": [
-                    {"vendor": "SageAI Enterprise Security", "name": "SageAI SBOM & VEX Engine", "version": "2.7.0"}
+                    {
+                        "vendor": "SageAI Enterprise Security",
+                        "name": "SageAI SBOM & VEX Engine",
+                        "version": "2.7.0",
+                    }
                 ],
                 "component": {
                     "type": "application",
@@ -122,7 +164,9 @@ class SBOMVexEngine:
             ],
         }
 
-    def generate_spdx_sbom(self, components: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+    def generate_spdx_sbom(
+        self, components: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
         """
         Generates SPDX 2.3 JSON SBOM specification.
         """
@@ -137,7 +181,10 @@ class SBOMVexEngine:
             "documentNamespace": f"https://sageai.defense/spdx/{int(datetime.now().timestamp())}",
             "creationInfo": {
                 "created": now_iso,
-                "creators": ["Tool: SageAI-SBOMVexEngine-2.7.0", "Organization: SageAI Enterprise"],
+                "creators": [
+                    "Tool: SageAI-SBOMVexEngine-2.7.0",
+                    "Organization: SageAI Enterprise",
+                ],
             },
             "packages": [
                 {
@@ -159,7 +206,9 @@ class SBOMVexEngine:
             ],
         }
 
-    def generate_openvex(self, vulnerabilities: Optional[List[str]] = None) -> Dict[str, Any]:
+    def generate_openvex(
+        self, vulnerabilities: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """
         Generates OpenVEX v0.2.0 Specification document.
         Assesses exploitability status and provides machine-readable justifications.
@@ -175,15 +224,20 @@ class SBOMVexEngine:
             if not v_info:
                 continue
 
-            statements.append({
-                "vulnerability": {"name": v_info["cve"], "description": v_info["title"]},
-                "products": [v_info["affected_purl"]],
-                "status": v_info["status"],
-                "justification": v_info["justification"],
-                "impact_statement": v_info["impact_statement"],
-                "action_statement": v_info["action_statement"],
-                "timestamp": now_iso,
-            })
+            statements.append(
+                {
+                    "vulnerability": {
+                        "name": v_info["cve"],
+                        "description": v_info["title"],
+                    },
+                    "products": [v_info["affected_purl"]],
+                    "status": v_info["status"],
+                    "justification": v_info["justification"],
+                    "impact_statement": v_info["impact_statement"],
+                    "action_statement": v_info["action_statement"],
+                    "timestamp": now_iso,
+                }
+            )
 
         openvex_doc = {
             "@context": "https://openvex.dev/ns/v0.2.0",
@@ -205,12 +259,16 @@ class SBOMVexEngine:
 
         return openvex_doc
 
-    def generate_slsa_provenance(self, artifact_name: str = "sageai-core.tar.gz") -> Dict[str, Any]:
+    def generate_slsa_provenance(
+        self, artifact_name: str = "sageai-core.tar.gz"
+    ) -> Dict[str, Any]:
         """
         Generates SLSA Level 3 Cryptographic Provenance Attestation.
         """
         now_iso = datetime.now(timezone.utc).isoformat()
-        artifact_hash = hashlib.sha256(f"{artifact_name}-{now_iso}".encode()).hexdigest()
+        artifact_hash = hashlib.sha256(
+            f"{artifact_name}-{now_iso}".encode()
+        ).hexdigest()
 
         return {
             "_type": "https://in-toto.io/Statement/v1",
@@ -229,7 +287,12 @@ class SBOMVexEngine:
                         "ref": "refs/heads/main",
                     },
                     "resolvedDependencies": [
-                        {"uri": c["purl"], "digest": {"sha256": hashlib.sha256(c["name"].encode()).hexdigest()}}
+                        {
+                            "uri": c["purl"],
+                            "digest": {
+                                "sha256": hashlib.sha256(c["name"].encode()).hexdigest()
+                            },
+                        }
                         for c in self.components
                     ],
                 },

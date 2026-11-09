@@ -11,15 +11,22 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.forensics.forensics_service import forensics_service
 
-router = APIRouter(prefix="/forensics", tags=["Autonomous Live Forensics & Volatility Acquisition"])
+router = APIRouter(
+    prefix="/forensics", tags=["Autonomous Live Forensics & Volatility Acquisition"]
+)
 
 
 class AcquireForensicsRequest(BaseModel):
-    target_host: Optional[str] = Field("prod-k8s-node-04", description="Designated host to acquire volatile memory from")
+    target_host: Optional[str] = Field(
+        "prod-k8s-node-04",
+        description="Designated host to acquire volatile memory from",
+    )
 
 
 class TimelineRequest(BaseModel):
-    container_id: str = Field(..., description="Forensic evidence container ID to build timeline for")
+    container_id: str = Field(
+        ..., description="Forensic evidence container ID to build timeline for"
+    )
 
 
 @router.post("/acquire")
@@ -50,8 +57,9 @@ async def generate_timeline_endpoint(
 ):
     """Synthesizes a chronological incident timeline from acquired volatile forensic evidence."""
     try:
-        timeline = forensics_service.generate_timeline(container_id=payload.container_id)
+        timeline = forensics_service.generate_timeline(
+            container_id=payload.container_id
+        )
         return {"status": "success", "timeline": timeline}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

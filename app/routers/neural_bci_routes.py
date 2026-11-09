@@ -19,14 +19,24 @@ router = APIRouter(
 
 class EvaluateIntentRequest(BaseModel):
     operator_id: str = Field(..., description="Target enrolled BCI operator identifier")
-    p300_amplitude_uv: float = Field(..., description="Measured P300 event-related potential in microvolts")
-    n400_latency_ms: float = Field(..., description="Measured N400 latency in milliseconds")
-    cognitive_stress_index: float = Field(..., description="Normalized cognitive stress / duress index (0.0 to 1.0)")
-    synthetic_replay_flag: Optional[bool] = Field(False, description="Flag for synthetic brainwave injection detection")
+    p300_amplitude_uv: float = Field(
+        ..., description="Measured P300 event-related potential in microvolts"
+    )
+    n400_latency_ms: float = Field(
+        ..., description="Measured N400 latency in milliseconds"
+    )
+    cognitive_stress_index: float = Field(
+        ..., description="Normalized cognitive stress / duress index (0.0 to 1.0)"
+    )
+    synthetic_replay_flag: Optional[bool] = Field(
+        False, description="Flag for synthetic brainwave injection detection"
+    )
 
 
 class IssueSvidRequest(BaseModel):
-    operator_id: str = Field(..., description="Operator identifier for PQC SVID token generation")
+    operator_id: str = Field(
+        ..., description="Operator identifier for PQC SVID token generation"
+    )
 
 
 @router.get("/operators")
@@ -97,4 +107,3 @@ async def get_bci_metrics_endpoint(
 ):
     """Returns fleet metrics for all neural BCI zero-trust gates."""
     return {"status": "success", "metrics": neural_bci_guard.get_bci_metrics()}
-

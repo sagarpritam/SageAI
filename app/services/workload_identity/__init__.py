@@ -8,4 +8,3 @@ from app.services.workload_identity.spiffe_spire_service import (
 )
 
 __all__ = ["SpiffeSpireIdentityService", "spiffe_spire_service"]
-

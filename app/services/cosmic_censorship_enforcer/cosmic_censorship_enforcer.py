@@ -127,12 +127,22 @@ class CosmicCensorshipEnforcer:
         pre_extremality = round(math.sqrt(a**2 + q**2), 4)
 
         # Clamping torque drives a/M back safely below 0.95
-        post_a = round(min(0.92, node.spin_parameter_a_over_m / (1.0 + 0.1 * compensatory_damping_gain)), 4)
+        post_a = round(
+            min(
+                0.92,
+                node.spin_parameter_a_over_m / (1.0 + 0.1 * compensatory_damping_gain),
+            ),
+            4,
+        )
         post_extremality = round(math.sqrt(post_a**2 + q**2), 4)
 
         # Horizon expansion delta r_+
-        expansion_m = round(124.5 * compensatory_damping_gain + random.uniform(1.0, 5.0), 2)
-        damped_j_s = round(4.8e41 * (node.black_hole_mass_solar / 10.0) * compensatory_damping_gain, 2)
+        expansion_m = round(
+            124.5 * compensatory_damping_gain + random.uniform(1.0, 5.0), 2
+        )
+        damped_j_s = round(
+            4.8e41 * (node.black_hole_mass_solar / 10.0) * compensatory_damping_gain, 2
+        )
 
         enforcement_id = f"CENSOR-ENFORCE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         res = CensorshipEnforcementResult(
@@ -175,4 +185,3 @@ class CosmicCensorshipEnforcer:
 
 
 cosmic_censorship_enforcer = CosmicCensorshipEnforcer()
-

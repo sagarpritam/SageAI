@@ -104,52 +104,62 @@ class CSPMService:
             cloud_provider = asset.get("cloud", "AWS")
             is_public = asset.get("is_public", False)
             has_admin_iam = asset.get("has_admin_iam", False)
-            has_unencrypted_storage = asset.get("unencrypted_storage", False)
+            asset.get("unencrypted_storage", False)
 
             # Check Toxic Combination: Public Exposure + Overprivileged IAM + Sensitive Data
             if is_public and has_admin_iam:
-                toxic_combinations.append({
-                    "title": f"TOXIC COMBINATION: Public Workload with Admin IAM on {asset_name}",
-                    "severity": "CRITICAL",
-                    "risk_score": 9.9,
-                    "asset": asset_name,
-                    "mitre_attack": "T1078.004",
-                    "vectors": [
-                        "Publicly accessible ingress endpoint",
-                        "Compute instance role contains sts:AssumeRole / iam:* wildcards",
-                        "Attacker compromise yields full tenant cloud takeover",
-                    ],
-                    "remediation": "Sever admin IAM instance profile immediately; isolate behind internal private subnet.",
-                })
+                toxic_combinations.append(
+                    {
+                        "title": f"TOXIC COMBINATION: Public Workload with Admin IAM on {asset_name}",
+                        "severity": "CRITICAL",
+                        "risk_score": 9.9,
+                        "asset": asset_name,
+                        "mitre_attack": "T1078.004",
+                        "vectors": [
+                            "Publicly accessible ingress endpoint",
+                            "Compute instance role contains sts:AssumeRole / iam:* wildcards",
+                            "Attacker compromise yields full tenant cloud takeover",
+                        ],
+                        "remediation": "Sever admin IAM instance profile immediately; isolate behind internal private subnet.",
+                    }
+                )
 
             for rule in CIS_BENCHMARK_RULES:
                 if rule["cloud"] == cloud_provider:
                     # Evaluate policy condition
                     is_violation = False
-                    if "S3" in rule["title"] and is_public and asset_type in ["S3_BUCKET", "STORAGE"]:
+                    if (
+                        "S3" in rule["title"]
+                        and is_public
+                        and asset_type in ["S3_BUCKET", "STORAGE"]
+                    ):
                         is_violation = True
                     elif "Port 22" in rule["title"] and asset.get("open_ssh", False):
                         is_violation = True
                     elif "Administrative" in rule["title"] and has_admin_iam:
                         is_violation = True
-                    elif "Privileged Execution" in rule["title"] and asset.get("is_privileged_container", False):
+                    elif "Privileged Execution" in rule["title"] and asset.get(
+                        "is_privileged_container", False
+                    ):
                         is_violation = True
 
                     if is_violation:
                         failed_count += 1
                         finding_key = f"{asset_name}:{rule['rule_id']}".encode()
                         finding_id = f"FIND-{hashlib.sha256(finding_key).hexdigest()[:8].upper()}"
-                        findings.append({
-                            "finding_id": finding_id,
-                            "rule_id": rule["rule_id"],
-                            "framework": rule["framework"],
-                            "title": rule["title"],
-                            "severity": rule["severity"],
-                            "asset_name": asset_name,
-                            "category": rule["category"],
-                            "mitre_attack": rule["mitre_attack"],
-                            "remediation": rule["remediation"],
-                        })
+                        findings.append(
+                            {
+                                "finding_id": finding_id,
+                                "rule_id": rule["rule_id"],
+                                "framework": rule["framework"],
+                                "title": rule["title"],
+                                "severity": rule["severity"],
+                                "asset_name": asset_name,
+                                "category": rule["category"],
+                                "mitre_attack": rule["mitre_attack"],
+                                "remediation": rule["remediation"],
+                            }
+                        )
                     else:
                         passed_count += 1
 
@@ -187,7 +197,9 @@ class CSPMService:
             },
         }
 
-    def generate_remediation_script(self, finding_id: str, rule_id: str) -> Dict[str, Any]:
+    def generate_remediation_script(
+        self, finding_id: str, rule_id: str
+    ) -> Dict[str, Any]:
         """
         Generates automated Terraform and AWS CLI / Boto3 remediation scripts.
         """
@@ -201,7 +213,7 @@ class CSPMService:
                     "  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
                 ),
                 "terraform": (
-                    "resource \"aws_s3_bucket_public_access_block\" \"secure_block\" {\n"
+                    'resource "aws_s3_bucket_public_access_block" "secure_block" {\n'
                     "  bucket                  = aws_s3_bucket.target.id\n"
                     "  block_public_acls       = true\n"
                     "  block_public_policy     = true\n"
@@ -223,8 +235,8 @@ class CSPMService:
                     "ingress {\n"
                     "  from_port   = 22\n"
                     "  to_port     = 22\n"
-                    "  protocol    = \"tcp\"\n"
-                    "  cidr_blocks = [\"10.0.0.0/8\"]\n"
+                    '  protocol    = "tcp"\n'
+                    '  cidr_blocks = ["10.0.0.0/8"]\n'
                     "}"
                 ),
             }
@@ -239,4 +251,3 @@ class CSPMService:
 
 # Global singleton
 cspm_service = CSPMService()
-

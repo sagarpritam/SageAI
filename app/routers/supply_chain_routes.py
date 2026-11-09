@@ -15,8 +15,12 @@ router = APIRouter(prefix="/supply-chain", tags=["Software Supply Chain & SBOM"]
 
 
 class ScanManifestRequest(BaseModel):
-    manifest_content: str = Field(..., description="Raw requirements.txt or package.json content")
-    project_name: Optional[str] = Field("SageAI-Core", description="Project or component name")
+    manifest_content: str = Field(
+        ..., description="Raw requirements.txt or package.json content"
+    )
+    project_name: Optional[str] = Field(
+        "SageAI-Core", description="Project or component name"
+    )
 
 
 @router.post("/scan")
@@ -39,4 +43,3 @@ async def scan_software_supply_chain(
         actor=user_id,
     )
     return result
-

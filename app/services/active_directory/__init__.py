@@ -8,4 +8,3 @@ from app.services.active_directory.bloodhound_service import (
 )
 
 __all__ = ["BloodHoundService", "bloodhound_service"]
-

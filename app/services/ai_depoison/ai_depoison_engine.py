@@ -82,11 +82,17 @@ class AIModelDePoisonEngine:
             "scan_id": f"scan-{uuid.uuid4().hex[:6]}",
             "adapter_id": adapter_id,
             "poison_detected": is_poisoned,
-            "backdoor_signature": adapter["backdoor_trigger_detected"] if is_poisoned else "NONE",
+            "backdoor_signature": adapter["backdoor_trigger_detected"]
+            if is_poisoned
+            else "NONE",
             "anomaly_sparsity_pct": adapter["anomaly_sparsity_pct"],
             "threshold_pct": anomaly_threshold,
-            "verdict": "BACKDOOR_TROJAN_ISOLATED" if is_poisoned else "CLEAN_WEIGHTS_CONFIRMED",
-            "recommended_action": "SURGICAL_RANK1_NEURON_ABLATION" if is_poisoned else "PASS_TO_PRODUCTION",
+            "verdict": "BACKDOOR_TROJAN_ISOLATED"
+            if is_poisoned
+            else "CLEAN_WEIGHTS_CONFIRMED",
+            "recommended_action": "SURGICAL_RANK1_NEURON_ABLATION"
+            if is_poisoned
+            else "PASS_TO_PRODUCTION",
             "timestamp": now,
         }
         return verdict
@@ -120,7 +126,9 @@ class AIModelDePoisonEngine:
 
     def get_depoison_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for AI model de-poisoning and trojan extraction."""
-        poisoned_count = sum(1 for a in self._adapters.values() if a["status"] == "POISON_SUSPECTED")
+        poisoned_count = sum(
+            1 for a in self._adapters.values() if a["status"] == "POISON_SUSPECTED"
+        )
         depoisoned_count = len(self._excision_events) + 8
         return {
             "total_adapters_monitored": len(self._adapters),
@@ -133,4 +141,3 @@ class AIModelDePoisonEngine:
 
 # Singleton instance
 ai_model_depoison_engine = AIModelDePoisonEngine()
-

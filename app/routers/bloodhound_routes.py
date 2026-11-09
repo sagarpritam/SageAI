@@ -11,11 +11,15 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.active_directory.bloodhound_service import bloodhound_service
 
-router = APIRouter(prefix="/bloodhound", tags=["Active Directory & BloodHound Graph Engine"])
+router = APIRouter(
+    prefix="/bloodhound", tags=["Active Directory & BloodHound Graph Engine"]
+)
 
 
 class GenerateLockdownRequest(BaseModel):
-    risk_ids: Optional[List[str]] = Field(None, description="Optional list of risk IDs to target in lockdown script")
+    risk_ids: Optional[List[str]] = Field(
+        None, description="Optional list of risk IDs to target in lockdown script"
+    )
 
 
 @router.get("/topology")
@@ -52,4 +56,3 @@ async def generate_lockdown_endpoint(
         return {"status": "success", "lockdown_script": script}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

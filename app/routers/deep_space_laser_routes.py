@@ -18,16 +18,28 @@ router = APIRouter(
 
 
 class AcquireBeamRequest(BaseModel):
-    terminal_id: str = Field(..., description="Target deep-space optical terminal identifier")
-    point_ahead_angle_urad: float = Field(..., description="Point-ahead acquisition angle in micro-radians")
-    doppler_shift_ghz: float = Field(..., description="Relativistic Doppler frequency shift in GHz")
+    terminal_id: str = Field(
+        ..., description="Target deep-space optical terminal identifier"
+    )
+    point_ahead_angle_urad: float = Field(
+        ..., description="Point-ahead acquisition angle in micro-radians"
+    )
+    doppler_shift_ghz: float = Field(
+        ..., description="Relativistic Doppler frequency shift in GHz"
+    )
     photon_snr_db: float = Field(..., description="Photon Signal-to-Noise Ratio in dB")
 
 
 class TransmitFrameRequest(BaseModel):
-    terminal_id: str = Field(..., description="Target terminal to transmit authenticated DSOC frame")
-    payload_size_kb: int = Field(1024, description="Telemetry payload size in kilobytes")
-    pqc_cipher: str = Field("ML-KEM-1024_LDPC", description="Post-quantum framing standard")
+    terminal_id: str = Field(
+        ..., description="Target terminal to transmit authenticated DSOC frame"
+    )
+    payload_size_kb: int = Field(
+        1024, description="Telemetry payload size in kilobytes"
+    )
+    pqc_cipher: str = Field(
+        "ML-KEM-1024_LDPC", description="Post-quantum framing standard"
+    )
 
 
 @router.get("/terminals")
@@ -100,5 +112,7 @@ async def get_deepspace_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns deep-space optical communications fleet metrics."""
-    return {"status": "success", "metrics": deep_space_laser_mesh.get_deepspace_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": deep_space_laser_mesh.get_deepspace_metrics(),
+    }

@@ -20,20 +20,29 @@ from app.services.malware.reverse_engineer import ReverseEngineeringEngine
 # 1. Reverse Engineering Engine Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_reverse_engineering_pe_sections_and_iat():
     re_engine = ReverseEngineeringEngine()
 
     # Synthetic binary with PE signature, mock IAT strings, and Base64 encoded payload
     encoded_payload = base64.b64encode(b"powershell.exe -enc aGVsbG8=").decode("ascii")
     sample_data = (
-        b"MZ" + b"\x00" * 0x3A + b"\x80\x00\x00\x00" + b"\x00" * 0x40 +
-        b"PE\x00\x00\x4c\x01\x02\x00" +  # 2 sections
-        b"\x00" * 16 + b"\xe0\x00" + b"\x00" * 224 +
+        b"MZ"
+        + b"\x00" * 0x3A
+        + b"\x80\x00\x00\x00"
+        + b"\x00" * 0x40
+        + b"PE\x00\x00\x4c\x01\x02\x00"  # 2 sections
+        + b"\x00" * 16
+        + b"\xe0\x00"
+        + b"\x00" * 224
+        +
         # Section 1: .text
-        b".text\x00\x00\x00\x00\x10\x00\x00\x00\x10\x00\x00\x00\x10\x00\x00\x00\x04\x00\x00\x00" + b"\x00" * 16 +
+        b".text\x00\x00\x00\x00\x10\x00\x00\x00\x10\x00\x00\x00\x10\x00\x00\x00\x04\x00\x00\x00"
+        + b"\x00" * 16
+        +
         # Strings in binary
-        b"VirtualAllocEx WriteProcessMemory CreateRemoteThread IsDebuggerPresent " +
-        encoded_payload.encode("ascii")
+        b"VirtualAllocEx WriteProcessMemory CreateRemoteThread IsDebuggerPresent "
+        + encoded_payload.encode("ascii")
     )
 
     analysis = re_engine.analyze_binary(sample_data, filename="trojan_dropper.exe")
@@ -62,6 +71,7 @@ def test_reverse_engineering_disassembly_instructions():
 # 2. Honeypots & Deception Technology Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_deception_honeypot_decoys_and_canary():
     deception = DeceptionHoneypotService()
 
@@ -70,8 +80,12 @@ def test_deception_honeypot_decoys_and_canary():
     assert any(d["path"] == "/wp-login.php" for d in decoys)
 
     # Generate canary tokens
-    token_api = deception.generate_canary_token(token_type="api_key", label="Mock DB Key")
-    token_aws = deception.generate_canary_token(token_type="aws_key", label="S3 Backup Key")
+    token_api = deception.generate_canary_token(
+        token_type="api_key", label="Mock DB Key"
+    )
+    token_aws = deception.generate_canary_token(
+        token_type="aws_key", label="S3 Backup Key"
+    )
 
     assert token_api["canary_value"].startswith("sage_honey_live_")
     assert token_aws["canary_value"].startswith("AKIA")
@@ -88,7 +102,9 @@ def test_deception_honeypot_decoys_and_canary():
     assert event["fingerprint"] is not None
 
     # Verify canary access
-    canary_alert = deception.verify_canary_access(token_api["canary_value"], source_ip="203.0.113.88")
+    canary_alert = deception.verify_canary_access(
+        token_api["canary_value"], source_ip="203.0.113.88"
+    )
     assert canary_alert is not None
     assert canary_alert["severity"] == "CRITICAL"
     assert "Canary token" in canary_alert["alert"]
@@ -97,6 +113,7 @@ def test_deception_honeypot_decoys_and_canary():
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. Advanced Attack Detection (WAF/IDS) Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_attack_detector_sqli_xss_cmdi_ssrf():
     detector = AttackDetector()
@@ -163,6 +180,7 @@ def test_attack_detector_brute_force_sliding_window():
 # 4. Network Intrusion Detection (NIDS) Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_nids_port_scan_detection():
     nids = NIDSMonitor(port_scan_threshold=4, scan_window_seconds=10)
     attacker_ip = "203.0.113.50"
@@ -206,6 +224,7 @@ def test_nids_c2_beaconing_detection():
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. SOAR Automated Incident Response & Safety Gates Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_soar_incident_lifecycle_and_safety_authorization():
     soar = IncidentResponseEngine()

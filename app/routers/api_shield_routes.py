@@ -11,11 +11,15 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.api_security.api_shield_service import api_shield_service
 
-router = APIRouter(prefix="/api-shield", tags=["API Security & Microservices Boundary Shield"])
+router = APIRouter(
+    prefix="/api-shield", tags=["API Security & Microservices Boundary Shield"]
+)
 
 
 class AuditEndpointsRequest(BaseModel):
-    endpoints: Optional[List[Dict[str, Any]]] = Field(None, description="Custom microservices endpoints catalog to audit")
+    endpoints: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Custom microservices endpoints catalog to audit"
+    )
 
 
 @router.get("/audit")
@@ -50,4 +54,3 @@ async def get_opa_rego_endpoint(
     """Synthesizes an Open Policy Agent (OPA) Rego policy to enforce zero-trust API boundaries."""
     policy = api_shield_service.generate_opa_rego_policy()
     return {"status": "success", "opa_policy": policy}
-

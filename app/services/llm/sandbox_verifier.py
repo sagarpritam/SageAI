@@ -21,19 +21,45 @@ class SandboxTaintVerifier:
     """
 
     TAINT_SOURCES = {
-        "request.args", "request.form", "request.values", "request.data",
-        "req.query", "req.body", "req.params", "params", "sys.argv",
-        "query_param", "user_input", "payload",
+        "request.args",
+        "request.form",
+        "request.values",
+        "request.data",
+        "req.query",
+        "req.body",
+        "req.params",
+        "params",
+        "sys.argv",
+        "query_param",
+        "user_input",
+        "payload",
     }
 
     TAINT_SINKS = {
         "SQL_INJECTION": {"execute", "executemany", "raw", "select"},
-        "COMMAND_INJECTION": {"system", "popen", "run", "Popen", "spawn", "exec", "eval"},
+        "COMMAND_INJECTION": {
+            "system",
+            "popen",
+            "run",
+            "Popen",
+            "spawn",
+            "exec",
+            "eval",
+        },
         "SSRF": {"get", "post", "urlopen", "fetch", "request"},
         "PATH_TRAVERSAL": {"open", "remove", "read_file", "send_file"},
     }
 
-    SANITIZERS = {"int", "float", "bool", "quote", "escape", "parametrize", "isnumeric", "isdigit"}
+    SANITIZERS = {
+        "int",
+        "float",
+        "bool",
+        "quote",
+        "escape",
+        "parametrize",
+        "isnumeric",
+        "isdigit",
+    }
 
     def __init__(self):
         pass
@@ -92,21 +118,26 @@ class SandboxTaintVerifier:
                         for arg in node.args:
                             args_names.extend(self.outer._extract_names_and_attrs(arg))
                         for kw in node.keywords:
-                            args_names.extend(self.outer._extract_names_and_attrs(kw.value))
+                            args_names.extend(
+                                self.outer._extract_names_and_attrs(kw.value)
+                            )
 
                         reaching_taints = [
-                            name for name in args_names
+                            name
+                            for name in args_names
                             if name in tainted_vars or self.outer.is_taint_source(name)
                         ]
 
                         if reaching_taints:
-                            vulnerabilities_detected.append({
-                                "vulnerability_class": vuln_class,
-                                "dangerous_sink": func_name,
-                                "tainted_sources_reached": reaching_taints,
-                                "line_number": getattr(node, "lineno", 0),
-                                "ast_proof": f"Tainted parameter '{reaching_taints[0]}' flows directly into unescaped sink '{func_name}'",
-                            })
+                            vulnerabilities_detected.append(
+                                {
+                                    "vulnerability_class": vuln_class,
+                                    "dangerous_sink": func_name,
+                                    "tainted_sources_reached": reaching_taints,
+                                    "line_number": getattr(node, "lineno", 0),
+                                    "ast_proof": f"Tainted parameter '{reaching_taints[0]}' flows directly into unescaped sink '{func_name}'",
+                                }
+                            )
 
                 self.generic_visit(node)
 
@@ -119,7 +150,9 @@ class SandboxTaintVerifier:
             "deterministic_proof": is_confirmed,
             "taint_trace_count": len(vulnerabilities_detected),
             "findings": vulnerabilities_detected,
-            "verdict": "CONFIRMED_VIA_AST_TAINT_FLOW" if is_confirmed else "UNPROVEN_TAINT_PATH",
+            "verdict": "CONFIRMED_VIA_AST_TAINT_FLOW"
+            if is_confirmed
+            else "UNPROVEN_TAINT_PATH",
         }
 
     def verify_probe_response(
@@ -137,18 +170,26 @@ class SandboxTaintVerifier:
 
         if expected_reflection and expected_reflection in response_body:
             is_confirmed = True
-            reasons.append(f"Payload reflection verified in response body ('{expected_reflection[:40]}')")
+            reasons.append(
+                f"Payload reflection verified in response body ('{expected_reflection[:40]}')"
+            )
 
-        if http_status == 200 and any(k in response_body.lower() for k in ["ami-id", "instance-id", "root:x:0:0"]):
+        if http_status == 200 and any(
+            k in response_body.lower() for k in ["ami-id", "instance-id", "root:x:0:0"]
+        ):
             is_confirmed = True
-            reasons.append("Sensitive system metadata / file content confirmed leaked in HTTP 200 response")
+            reasons.append(
+                "Sensitive system metadata / file content confirmed leaked in HTTP 200 response"
+            )
 
         return {
             "probe_verified": True,
             "deterministic_proof": is_confirmed,
             "http_status": http_status,
             "evidence_reasons": reasons,
-            "verdict": "CONFIRMED_VIA_ACTIVE_PROBE" if is_confirmed else "INCONCLUSIVE_PROBE",
+            "verdict": "CONFIRMED_VIA_ACTIVE_PROBE"
+            if is_confirmed
+            else "INCONCLUSIVE_PROBE",
         }
 
     def _extract_names_and_attrs(self, node: ast.AST) -> List[str]:
@@ -178,19 +219,30 @@ class SandboxTaintVerifier:
         """Fallback regex taint tracer for partial or non-Python code."""
         findings = []
         patterns = [
-            (r"(?i)(execute|executemany|raw)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)", "SQL_INJECTION"),
-            (r"(?i)(system|popen|subprocess\.run)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)", "COMMAND_INJECTION"),
-            (r"(?i)(requests\.get|urlopen|fetch)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)", "SSRF"),
+            (
+                r"(?i)(execute|executemany|raw)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)",
+                "SQL_INJECTION",
+            ),
+            (
+                r"(?i)(system|popen|subprocess\.run)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)",
+                "COMMAND_INJECTION",
+            ),
+            (
+                r"(?i)(requests\.get|urlopen|fetch)\s*\([^)]*(\+|%|\.format|\$)\s*[a-zA-Z0-9_]*\)",
+                "SSRF",
+            ),
         ]
 
         for pat, vuln_type in patterns:
             match = re.search(pat, snippet)
             if match:
-                findings.append({
-                    "vulnerability_class": vuln_type,
-                    "dangerous_sink": match.group(1),
-                    "ast_proof": f"Heuristic taint flow matched pattern '{match.group(0)[:60]}'",
-                })
+                findings.append(
+                    {
+                        "vulnerability_class": vuln_type,
+                        "dangerous_sink": match.group(1),
+                        "ast_proof": f"Heuristic taint flow matched pattern '{match.group(0)[:60]}'",
+                    }
+                )
 
         is_confirmed = len(findings) > 0
         return {
@@ -198,7 +250,9 @@ class SandboxTaintVerifier:
             "deterministic_proof": is_confirmed,
             "taint_trace_count": len(findings),
             "findings": findings,
-            "verdict": "CONFIRMED_VIA_HEURISTIC_TAINT_FLOW" if is_confirmed else "UNPROVEN_TAINT_PATH",
+            "verdict": "CONFIRMED_VIA_HEURISTIC_TAINT_FLOW"
+            if is_confirmed
+            else "UNPROVEN_TAINT_PATH",
         }
 
 

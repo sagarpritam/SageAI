@@ -12,9 +12,15 @@ router = APIRouter(
 
 
 class SwapEntanglementRequest(BaseModel):
-    origin_node_id: str = Field(default="QKD-EARTH-CANARY-01", example="QKD-EARTH-CANARY-01")
-    relay_node_id: str = Field(default="QKD-RELAY-LAGRANGE-L1-03", example="QKD-RELAY-LAGRANGE-L1-03")
-    destination_node_id: str = Field(default="QKD-PROBE-MARS-ORBIT-04", example="QKD-PROBE-MARS-ORBIT-04")
+    origin_node_id: str = Field(
+        default="QKD-EARTH-CANARY-01", example="QKD-EARTH-CANARY-01"
+    )
+    relay_node_id: str = Field(
+        default="QKD-RELAY-LAGRANGE-L1-03", example="QKD-RELAY-LAGRANGE-L1-03"
+    )
+    destination_node_id: str = Field(
+        default="QKD-PROBE-MARS-ORBIT-04", example="QKD-PROBE-MARS-ORBIT-04"
+    )
 
 
 @router.get("/nodes")
@@ -37,4 +43,3 @@ async def swap_entanglement(req: SwapEntanglementRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return qkd_space_mesh_relay.get_mesh_metrics()
-

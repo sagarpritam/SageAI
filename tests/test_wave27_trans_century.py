@@ -11,11 +11,17 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.teleparallel_gravity.teleparallel_gravity import get_teleparallel_gravity_engine
-from app.services.spin_foam_quantizer.spin_foam_quantizer import get_spin_foam_geometry_quantizer
-from app.services.noncommutative_spacetime.noncommutative_spacetime import get_noncommutative_spacetime_protector
 from app.services.antimatter_catalyzed_fusion.antimatter_catalyzed_fusion import (
     get_antimatter_catalyzed_fusion_rocket,
+)
+from app.services.noncommutative_spacetime.noncommutative_spacetime import (
+    get_noncommutative_spacetime_protector,
+)
+from app.services.spin_foam_quantizer.spin_foam_quantizer import (
+    get_spin_foam_geometry_quantizer,
+)
+from app.services.teleparallel_gravity.teleparallel_gravity import (
+    get_teleparallel_gravity_engine,
 )
 
 
@@ -27,6 +33,7 @@ def client():
 # ==============================================================================
 # Capability 101: Teleparallel Gravity Tests
 # ==============================================================================
+
 
 def test_teleparallel_gravity_service():
     engine = get_teleparallel_gravity_engine()
@@ -77,6 +84,7 @@ def test_teleparallel_gravity_api(client):
 # ==============================================================================
 # Capability 102: Spin-Foam Quantizer Tests
 # ==============================================================================
+
 
 def test_spin_foam_quantizer_service():
     quantizer = get_spin_foam_geometry_quantizer()
@@ -130,6 +138,7 @@ def test_spin_foam_quantizer_api(client):
 # Capability 103: Non-Commutative Spacetime Tests
 # ==============================================================================
 
+
 def test_noncommutative_spacetime_service():
     protector = get_noncommutative_spacetime_protector()
     manifolds = protector.get_manifolds()
@@ -182,6 +191,7 @@ def test_noncommutative_spacetime_api(client):
 # Option B Wave 27: Antimatter-Catalyzed Fusion Rocket Tests
 # ==============================================================================
 
+
 def test_antimatter_fusion_service():
     rocket = get_antimatter_catalyzed_fusion_rocket()
     thrusters = rocket.get_thrusters()
@@ -230,4 +240,3 @@ def test_antimatter_fusion_api(client):
     metrics_res = client.get("/api/antimatter-fusion/metrics")
     assert metrics_res.status_code == 200
     assert metrics_res.json()["trans_solar_intercept_readiness"] is True
-

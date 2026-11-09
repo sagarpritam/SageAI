@@ -21,7 +21,9 @@ router = APIRouter(
 
 class AttestFirmwareRequest(BaseModel):
     device_id: str = Field(..., description="Target node identifier")
-    pcr0_sha256: str = Field(..., description="TPM 2.0 PCR0 Core Root of Trust measurement")
+    pcr0_sha256: str = Field(
+        ..., description="TPM 2.0 PCR0 Core Root of Trust measurement"
+    )
     pcr2_sha256: str = Field(..., description="TPM 2.0 PCR2 Option ROM measurement")
     spi_flash_sha256: str = Field(..., description="Physical SPI Flash ROM image hash")
     secure_boot_enabled: Optional[bool] = True
@@ -69,7 +71,9 @@ async def attest_firmware_endpoint(
             pcr0_sha256=payload.pcr0_sha256,
             pcr2_sha256=payload.pcr2_sha256,
             spi_flash_sha256=payload.spi_flash_sha256,
-            secure_boot_enabled=payload.secure_boot_enabled if payload.secure_boot_enabled is not None else True
+            secure_boot_enabled=payload.secure_boot_enabled
+            if payload.secure_boot_enabled is not None
+            else True,
         )
         return {"status": "success", "attestation": res}
     except ValueError as e:
@@ -99,4 +103,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves firmware attestation fleet metrics."""
     return {"status": "success", "metrics": firmware_integrity_guard.get_metrics()}
-

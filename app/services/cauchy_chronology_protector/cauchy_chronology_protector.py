@@ -16,7 +16,9 @@ from typing import Any, Dict, List
 @dataclass
 class CauchyHorizonNode:
     horizon_id: str
-    spacetime_metric_type: str  # "KERR_INNER_HORIZON", "GODEL_ROTATING_UNIVERSE", "MISNER_CYLINDER"
+    spacetime_metric_type: (
+        str  # "KERR_INNER_HORIZON", "GODEL_ROTATING_UNIVERSE", "MISNER_CYLINDER"
+    )
     facility_name: str
     cauchy_surface_radius_m: float
     angular_momentum_spin_a: float  # a = J/M
@@ -120,8 +122,15 @@ class CauchyHorizonChronologyProtector:
             raise ValueError(f"Cauchy horizon {horizon_id} not registered.")
 
         # Renormalized stress-energy density grows as (blueshift)^4 before backreaction
-        stress_energy = round(1.48e24 * math.sqrt(simulated_blueshift_factor / 1e12) * random.uniform(0.98, 1.02), 2)
-        suppression_db = round(horizon.chronology_protection_margin_db + random.uniform(0.5, 2.5), 2)
+        stress_energy = round(
+            1.48e24
+            * math.sqrt(simulated_blueshift_factor / 1e12)
+            * random.uniform(0.98, 1.02),
+            2,
+        )
+        suppression_db = round(
+            horizon.chronology_protection_margin_db + random.uniform(0.5, 2.5), 2
+        )
         phase_slip_fs = round(0.00042 * (1e12 / simulated_blueshift_factor), 6)
         counter_pulse_j = round(4.85e-9 * (stress_energy / 1e24), 12)
         fidelity = round(99.9999 + random.uniform(0.00001, 0.00008), 5)
@@ -160,7 +169,11 @@ class CauchyHorizonChronologyProtector:
         return {
             "monitored_cauchy_horizons": len(self.horizons),
             "enforced_chronology_actions": len(self.protection_actions),
-            "mean_divergence_suppression_db": round(sum([h.chronology_protection_margin_db for h in self.horizons.values()]) / len(self.horizons), 1),
+            "mean_divergence_suppression_db": round(
+                sum([h.chronology_protection_margin_db for h in self.horizons.values()])
+                / len(self.horizons),
+                1,
+            ),
             "causality_violation_rate": 0.0,
             "conjecture": "HAWKING_CHRONOLOGY_PROTECTION_VERIFIED",
             "status": "OPERATIONAL",

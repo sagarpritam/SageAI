@@ -135,12 +135,28 @@ class MultilingualDebriefService:
         audit_state = audit_chain.verify_chain_integrity()
 
         # Group findings by severity
-        critical_count = sum(1 for f in findings if str(f.get("severity", "")).upper() == "CRITICAL")
-        high_count = sum(1 for f in findings if str(f.get("severity", "")).upper() == "HIGH")
-        medium_count = sum(1 for f in findings if str(f.get("severity", "")).upper() == "MEDIUM")
-        low_count = sum(1 for f in findings if str(f.get("severity", "")).upper() == "LOW")
+        critical_count = sum(
+            1 for f in findings if str(f.get("severity", "")).upper() == "CRITICAL"
+        )
+        high_count = sum(
+            1 for f in findings if str(f.get("severity", "")).upper() == "HIGH"
+        )
+        medium_count = sum(
+            1 for f in findings if str(f.get("severity", "")).upper() == "MEDIUM"
+        )
+        low_count = sum(
+            1 for f in findings if str(f.get("severity", "")).upper() == "LOW"
+        )
 
-        risk_level = "CRITICAL" if risk_score >= 80 else "HIGH" if risk_score >= 60 else "MEDIUM" if risk_score >= 30 else "LOW"
+        risk_level = (
+            "CRITICAL"
+            if risk_score >= 80
+            else "HIGH"
+            if risk_score >= 60
+            else "MEDIUM"
+            if risk_score >= 30
+            else "LOW"
+        )
 
         # Generate top strategic recommendations
         recommendations = [
@@ -208,4 +224,3 @@ class MultilingualDebriefService:
 
 # Global singleton instance
 multilingual_debrief_service = MultilingualDebriefService()
-

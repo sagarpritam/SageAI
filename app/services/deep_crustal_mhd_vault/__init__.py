@@ -11,4 +11,3 @@ __all__ = [
     "MHDPowerDischargeResult",
     "deep_crustal_mhd_vault",
 ]
-

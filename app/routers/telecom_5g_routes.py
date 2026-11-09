@@ -19,14 +19,22 @@ router = APIRouter(
 
 class RanAnomalyRequest(BaseModel):
     slice_id: str = Field(..., description="Target 5G slice identifier")
-    radio_signal_dbm: float = Field(..., description="Measured RSRP signal strength in dBm")
-    pci_collision: Optional[bool] = Field(False, description="Physical Cell ID collision flag")
-    unexpected_rnti: Optional[bool] = Field(False, description="Radio Network Temporary Identifier anomaly flag")
+    radio_signal_dbm: float = Field(
+        ..., description="Measured RSRP signal strength in dBm"
+    )
+    pci_collision: Optional[bool] = Field(
+        False, description="Physical Cell ID collision flag"
+    )
+    unexpected_rnti: Optional[bool] = Field(
+        False, description="Radio Network Temporary Identifier anomaly flag"
+    )
 
 
 class QuarantineSliceRequest(BaseModel):
     slice_id: str = Field(..., description="Slice to isolate")
-    reason: str = Field("Adversary intrusion detected", description="Reason for quarantine")
+    reason: str = Field(
+        "Adversary intrusion detected", description="Reason for quarantine"
+    )
 
 
 @router.get("/slices")
@@ -95,5 +103,7 @@ async def get_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns 5G/6G RAN and Core health metrics."""
-    return {"status": "success", "metrics": telecom_5g_slice_guard.get_telecom_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": telecom_5g_slice_guard.get_telecom_metrics(),
+    }

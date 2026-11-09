@@ -133,43 +133,57 @@ class SubsurfaceMuonTomographyMesh:
         total_events = int(station.muon_count_rate_hz * 3600.0 * exposure_time_hours)
 
         # Spatial resolution scales with depth and angular resolution
-        spatial_res_m = round((target_depth_meters * (station.angular_resolution_mrad * 1e-3)), 2)
+        spatial_res_m = round(
+            (target_depth_meters * (station.angular_resolution_mrad * 1e-3)), 2
+        )
         spatial_res_m = max(1.8, min(8.5, spatial_res_m))
 
         # Synthesize simulated density anomalies based on target zone characteristics
         anomalies = []
-        is_suspicious_subterranean = "BUNKER" in target_zone.upper() or "ZAGROS" in target_zone.upper() or "SHAFT" in target_zone.upper()
+        is_suspicious_subterranean = (
+            "BUNKER" in target_zone.upper()
+            or "ZAGROS" in target_zone.upper()
+            or "SHAFT" in target_zone.upper()
+        )
 
         if is_suspicious_subterranean:
             # Void chamber anomaly
-            anomalies.append({
-                "anomaly_id": f"ANOM-VOID-{random.randint(100, 999)}",
-                "classification": "CLANDESTINE_EXCAVATED_VOID",
-                "estimated_density_g_cm3": 0.08,
-                "density_contrast_pct": -96.9,
-                "relative_depth_m": target_depth_meters - 45.0,
-                "estimated_volume_m3": round(random.uniform(4200.0, 18500.0), 1),
-                "confidence_score": 0.984,
-            })
+            anomalies.append(
+                {
+                    "anomaly_id": f"ANOM-VOID-{random.randint(100, 999)}",
+                    "classification": "CLANDESTINE_EXCAVATED_VOID",
+                    "estimated_density_g_cm3": 0.08,
+                    "density_contrast_pct": -96.9,
+                    "relative_depth_m": target_depth_meters - 45.0,
+                    "estimated_volume_m3": round(random.uniform(4200.0, 18500.0), 1),
+                    "confidence_score": 0.984,
+                }
+            )
             # High-Z dense mass anomaly (shielding / centrifuge cascade)
-            anomalies.append({
-                "anomaly_id": f"ANOM-HIGHZ-{random.randint(100, 999)}",
-                "classification": "HIGH_Z_SHIELDED_MASS",
-                "estimated_density_g_cm3": 9.45,
-                "density_contrast_pct": +256.6,
-                "relative_depth_m": target_depth_meters,
-                "estimated_volume_m3": round(random.uniform(150.0, 680.0), 1),
-                "confidence_score": 0.961,
-            })
+            anomalies.append(
+                {
+                    "anomaly_id": f"ANOM-HIGHZ-{random.randint(100, 999)}",
+                    "classification": "HIGH_Z_SHIELDED_MASS",
+                    "estimated_density_g_cm3": 9.45,
+                    "density_contrast_pct": +256.6,
+                    "relative_depth_m": target_depth_meters,
+                    "estimated_volume_m3": round(random.uniform(150.0, 680.0), 1),
+                    "confidence_score": 0.961,
+                }
+            )
             void_conf = 98.4
             high_z_conf = 96.1
             mean_density = 2.41
         else:
-            mean_density = round(self.STANDARD_ROCK_DENSITY + random.uniform(-0.05, 0.05), 3)
+            mean_density = round(
+                self.STANDARD_ROCK_DENSITY + random.uniform(-0.05, 0.05), 3
+            )
             void_conf = 12.0
             high_z_conf = 4.5
 
-        scan_id = f"MUON-SCAN-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        scan_id = (
+            f"MUON-SCAN-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        )
         reconstruction_ms = round(random.uniform(18.5, 42.0), 2)
 
         result = MuonTomographyScanResult(
@@ -207,7 +221,9 @@ class SubsurfaceMuonTomographyMesh:
         return {
             "active_telescope_stations": len(self.stations),
             "completed_scans_count": len(self.scans),
-            "total_effective_area_m2": sum([s.effective_area_m2 for s in self.stations.values()]),
+            "total_effective_area_m2": sum(
+                [s.effective_area_m2 for s in self.stations.values()]
+            ),
             "zenith_tracking_mode": "CONTINUOUS_COSMIC_ATTENUATION",
             "max_penetration_depth_m": 1200.0,
             "status": "OPERATIONAL",
@@ -215,4 +231,3 @@ class SubsurfaceMuonTomographyMesh:
 
 
 subsurface_muon_tomography = SubsurfaceMuonTomographyMesh()
-

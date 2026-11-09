@@ -69,7 +69,10 @@ class AutonomousRedTeamDaemon:
     def stop_daemon(self) -> Dict[str, Any]:
         with self._lock:
             if not self.is_running:
-                return {"daemon_state": "ALREADY_STOPPED", "total_ticks": self.total_ticks}
+                return {
+                    "daemon_state": "ALREADY_STOPPED",
+                    "total_ticks": self.total_ticks,
+                }
 
             self.is_running = False
             return {
@@ -141,4 +144,3 @@ class AutonomousRedTeamDaemon:
 
 
 autonomous_redteam_daemon = AutonomousRedTeamDaemon()
-

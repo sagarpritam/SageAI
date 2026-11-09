@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 from app.services.antimatter_containment import superconducting_antimatter_containment
 
-router = APIRouter(prefix="/api/antimatter-containment", tags=["Antimatter Containment (Cap 76)"])
+router = APIRouter(
+    prefix="/api/antimatter-containment", tags=["Antimatter Containment (Cap 76)"]
+)
 
 
 class CompressPlasmaRequest(BaseModel):
@@ -58,4 +60,3 @@ async def quench_divert(req: QuenchDivertRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return superconducting_antimatter_containment.get_matrix_metrics()
-

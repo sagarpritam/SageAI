@@ -83,13 +83,11 @@ async def run_enterprise_audit_drill(
     )
 
     try:
-        drill_result = (
-            await enterprise_orchestrator.execute_full_enterprise_drill(
-                scenario_name=scenario,
-                attacker_ip=attacker_ip,
-                org_id=org_id,
-                actor=user_id,
-            )
+        drill_result = await enterprise_orchestrator.execute_full_enterprise_drill(
+            scenario_name=scenario,
+            attacker_ip=attacker_ip,
+            org_id=org_id,
+            actor=user_id,
         )
         return drill_result
     except Exception as e:
@@ -111,9 +109,7 @@ async def get_enterprise_compliance_report(
     anchored to the latest cryptographic Merkle hash chain state.
     """
     org_id = str(current_user.get("org", "system"))
-    user_id = str(
-        current_user.get("sub", current_user.get("user_id", "Auditor-Lead"))
-    )
+    user_id = str(current_user.get("sub", current_user.get("user_id", "Auditor-Lead")))
 
     drill_result = await enterprise_orchestrator.execute_full_enterprise_drill(
         scenario_name="Automated Executive Compliance Audit Drill",
@@ -121,9 +117,7 @@ async def get_enterprise_compliance_report(
         org_id=org_id,
         actor=user_id,
     )
-    markdown_report = enterprise_orchestrator.generate_compliance_report(
-        drill_result
-    )
+    markdown_report = enterprise_orchestrator.generate_compliance_report(drill_result)
 
     return {
         "status": "success",
@@ -132,4 +126,3 @@ async def get_enterprise_compliance_report(
         "merkle_seal": drill_result["merkle_seal"],
         "markdown_report": markdown_report,
     }
-

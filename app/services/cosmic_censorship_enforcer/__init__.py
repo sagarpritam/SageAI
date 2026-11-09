@@ -11,4 +11,3 @@ __all__ = [
     "CensorshipEnforcementResult",
     "cosmic_censorship_enforcer",
 ]
-

@@ -18,15 +18,28 @@ router = APIRouter(
 
 
 class SynchronizeMeshRequest(BaseModel):
-    primary_clock_id: str = Field("clock-strontium-boulder-01", description="Reference atomic lattice clock ID")
-    fiber_link_length_km: float = Field(1250.0, description="Dark fiber synchronization span in km")
-    carrier_phase_jitter_fs: float = Field(4.2, description="Observed carrier phase jitter in femtoseconds")
+    primary_clock_id: str = Field(
+        "clock-strontium-boulder-01", description="Reference atomic lattice clock ID"
+    )
+    fiber_link_length_km: float = Field(
+        1250.0, description="Dark fiber synchronization span in km"
+    )
+    carrier_phase_jitter_fs: float = Field(
+        4.2, description="Observed carrier phase jitter in femtoseconds"
+    )
 
 
 class GenerateTimestampRequest(BaseModel):
-    clock_id: str = Field("clock-strontium-boulder-01", description="Optical atomic clock to anchor epoch")
-    payload_data: str = Field(..., description="Telemetry, financial transaction, or SCADA state hash to anchor")
-    target_subsystem: str = Field("SCADA_INTERGRID_PMU", description="Destination critical subsystem")
+    clock_id: str = Field(
+        "clock-strontium-boulder-01", description="Optical atomic clock to anchor epoch"
+    )
+    payload_data: str = Field(
+        ...,
+        description="Telemetry, financial transaction, or SCADA state hash to anchor",
+    )
+    target_subsystem: str = Field(
+        "SCADA_INTERGRID_PMU", description="Destination critical subsystem"
+    )
 
 
 @router.get("/clocks")

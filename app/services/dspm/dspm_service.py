@@ -100,14 +100,18 @@ class DSPMService:
                 if matches:
                     cat = pat["category"]
                     category_counts[cat] = category_counts.get(cat, 0) + len(matches)
-                    findings.append({
-                        "name": pat["name"],
-                        "category": cat,
-                        "matches_found": len(matches),
-                        "severity": pat["severity"],
-                        "compliance_frameworks": pat["compliance"],
-                        "masked_sample": matches[0][:4] + "******" if len(matches[0]) > 6 else "******",
-                    })
+                    findings.append(
+                        {
+                            "name": pat["name"],
+                            "category": cat,
+                            "matches_found": len(matches),
+                            "severity": pat["severity"],
+                            "compliance_frameworks": pat["compliance"],
+                            "masked_sample": matches[0][:4] + "******"
+                            if len(matches[0]) > 6
+                            else "******",
+                        }
+                    )
 
         has_critical_data = any(f["severity"] == "CRITICAL" for f in findings)
 
@@ -152,7 +156,9 @@ class DSPMService:
             "region": region,
             "scanned_at": datetime.now(timezone.utc).isoformat(),
             "risk_score": risk_score,
-            "posture_grade": "A" if risk_score < 20 else ("B" if risk_score < 40 else ("C" if risk_score < 60 else "F")),
+            "posture_grade": "A"
+            if risk_score < 20
+            else ("B" if risk_score < 40 else ("C" if risk_score < 60 else "F")),
             "is_public_accessible": is_public,
             "encryption_at_rest": encryption_enabled,
             "toxic_combination_detected": toxic_combination,
@@ -172,15 +178,50 @@ class DSPMService:
         Returns an interactive data lineage graph tracing data flows from ingestion to cloud storage.
         """
         nodes = [
-            {"id": "ingress-api", "label": "Customer Ingress API Gateway", "type": "API_GATEWAY", "region": "us-east-1"},
-            {"id": "db-core", "label": "Production RDS PostgreSQL (PCI Encrypted)", "type": "DATABASE", "region": "us-east-1"},
-            {"id": "s3-analytics", "label": "Analytics S3 Bucket (Public Exposed)", "type": "OBJECT_STORAGE", "region": "us-east-1"},
-            {"id": "backup-eu", "label": "EU Sovereign Cold Backup", "type": "ENCLAVE_STORAGE", "region": "eu-central-1"},
+            {
+                "id": "ingress-api",
+                "label": "Customer Ingress API Gateway",
+                "type": "API_GATEWAY",
+                "region": "us-east-1",
+            },
+            {
+                "id": "db-core",
+                "label": "Production RDS PostgreSQL (PCI Encrypted)",
+                "type": "DATABASE",
+                "region": "us-east-1",
+            },
+            {
+                "id": "s3-analytics",
+                "label": "Analytics S3 Bucket (Public Exposed)",
+                "type": "OBJECT_STORAGE",
+                "region": "us-east-1",
+            },
+            {
+                "id": "backup-eu",
+                "label": "EU Sovereign Cold Backup",
+                "type": "ENCLAVE_STORAGE",
+                "region": "eu-central-1",
+            },
         ]
         edges = [
-            {"source": "ingress-api", "target": "db-core", "label": "Encrypted Transaction Stream", "risk": "LOW"},
-            {"source": "db-core", "target": "s3-analytics", "label": "ETL Export (Unmasked PII)", "risk": "CRITICAL"},
-            {"source": "db-core", "target": "backup-eu", "label": "Zero-Egress PQC Enclave Sync", "risk": "ZERO"},
+            {
+                "source": "ingress-api",
+                "target": "db-core",
+                "label": "Encrypted Transaction Stream",
+                "risk": "LOW",
+            },
+            {
+                "source": "db-core",
+                "target": "s3-analytics",
+                "label": "ETL Export (Unmasked PII)",
+                "risk": "CRITICAL",
+            },
+            {
+                "source": "db-core",
+                "target": "backup-eu",
+                "label": "Zero-Egress PQC Enclave Sync",
+                "risk": "ZERO",
+            },
         ]
         return {
             "graph_name": "SageAI Enterprise Data Lineage & Egress Flow",
@@ -230,4 +271,3 @@ aws s3api put-bucket-encryption --bucket {store_id} --server-side-encryption-con
 
 # Global singleton
 dspm_service = DSPMService()
-

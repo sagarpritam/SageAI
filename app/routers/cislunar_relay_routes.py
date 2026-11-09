@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 from app.services.cislunar_quantum_relay import cislunar_quantum_relay
 
-router = APIRouter(prefix="/api/cislunar-relay", tags=["Cis-Lunar Quantum Relay (Cap 74)"])
+router = APIRouter(
+    prefix="/api/cislunar-relay", tags=["Cis-Lunar Quantum Relay (Cap 74)"]
+)
 
 
 class EstablishLinkRequest(BaseModel):
@@ -36,4 +38,3 @@ async def establish_link(req: EstablishLinkRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cislunar_quantum_relay.get_relay_metrics()
-

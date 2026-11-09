@@ -4,11 +4,12 @@ Unit & Integration Tests for Wave 18 (Capabilities 74-76) and Option B (Autonomo
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.services.cislunar_quantum_relay import cislunar_quantum_relay
-from app.services.muon_tomography import subsurface_muon_tomography
 from app.services.antimatter_containment import superconducting_antimatter_containment
 from app.services.autonomous_redteam import autonomous_redteam_cluster
+from app.services.cislunar_quantum_relay import cislunar_quantum_relay
+from app.services.muon_tomography import subsurface_muon_tomography
 
 client = TestClient(app)
 
@@ -43,7 +44,9 @@ def test_cislunar_quantum_relay_service():
     assert metrics["status"] == "OPERATIONAL"
 
     with pytest.raises(ValueError):
-        cislunar_quantum_relay.establish_quantum_link("INVALID_SOURCE", "LAGRANGE-L1-HALO-1")
+        cislunar_quantum_relay.establish_quantum_link(
+            "INVALID_SOURCE", "LAGRANGE-L1-HALO-1"
+        )
 
 
 def test_muon_tomography_service():
@@ -73,7 +76,9 @@ def test_muon_tomography_service():
     assert metrics["status"] == "OPERATIONAL"
 
     with pytest.raises(ValueError):
-        subsurface_muon_tomography.execute_tomographic_inversion("UNKNOWN-STATION", "Zone-X")
+        subsurface_muon_tomography.execute_tomographic_inversion(
+            "UNKNOWN-STATION", "Zone-X"
+        )
 
 
 def test_antimatter_containment_service():
@@ -83,7 +88,9 @@ def test_antimatter_containment_service():
     assert "CELL-ALPHA-PENNING-01" in cell_ids
 
     # Telemetry
-    telem = superconducting_antimatter_containment.monitor_plasma_dynamics("CELL-ALPHA-PENNING-01")
+    telem = superconducting_antimatter_containment.monitor_plasma_dynamics(
+        "CELL-ALPHA-PENNING-01"
+    )
     assert telem["stored_antiprotons"] > 100_000_000
     assert telem["plasma_density_cm3"] > 1e6
     assert telem["quench_dump_readiness_pct"] > 99.0
@@ -122,7 +129,13 @@ def test_autonomous_redteam_cluster_service():
 
     # Launch adversarial campaign
     res = autonomous_redteam_cluster.launch_adversarial_campaign(
-        target_domains=["ORBITAL_PNT", "QUANTUM_NETWORK", "DEEP_SPACE_RELAY", "SUBTERRANEAN_SEISMIC", "PLASMA_SHIELD"],
+        target_domains=[
+            "ORBITAL_PNT",
+            "QUANTUM_NETWORK",
+            "DEEP_SPACE_RELAY",
+            "SUBTERRANEAN_SEISMIC",
+            "PLASMA_SHIELD",
+        ],
         intensity=0.90,
         target_capabilities_count=76,
     )
@@ -220,4 +233,3 @@ def test_wave18_api_routes():
     )
     assert r_camp.status_code == 200
     assert r_camp.json()["verdict"] == "ALL_VECTORS_DEFLECTED_ZERO_CASCADE"
-

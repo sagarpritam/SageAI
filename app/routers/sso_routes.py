@@ -67,7 +67,9 @@ class SAMLLoginRequest(BaseModel):
 
 
 class SAMLACSRequest(BaseModel):
-    SAMLResponse: str = Field(..., description="Base64-encoded SAMLResponse assertion from IdP")
+    SAMLResponse: str = Field(
+        ..., description="Base64-encoded SAMLResponse assertion from IdP"
+    )
     RelayState: Optional[str] = None
 
 
@@ -86,7 +88,11 @@ async def get_sso_config(
     """
     Retrieve Enterprise SSO Configuration & SAML 2.0 Service Provider (SP) parameters.
     """
-    config = _org_sso_configs.get(org_id, DEFAULT_SSO_CONFIG) if org_id else DEFAULT_SSO_CONFIG
+    config = (
+        _org_sso_configs.get(org_id, DEFAULT_SSO_CONFIG)
+        if org_id
+        else DEFAULT_SSO_CONFIG
+    )
     return {
         "status": "success",
         "sso": config,
@@ -128,7 +134,8 @@ async def configure_sso(
         "idp_name": payload.idp_name,
         "idp_entity_id": payload.idp_entity_id,
         "idp_sso_url": payload.idp_sso_url,
-        "idp_certificate_fingerprint": cert_fp or DEFAULT_SSO_CONFIG["idp_certificate_fingerprint"],
+        "idp_certificate_fingerprint": cert_fp
+        or DEFAULT_SSO_CONFIG["idp_certificate_fingerprint"],
         "sp_entity_id": DEFAULT_SSO_CONFIG["sp_entity_id"],
         "acs_url": DEFAULT_SSO_CONFIG["acs_url"],
         "slo_url": DEFAULT_SSO_CONFIG["slo_url"],
@@ -166,15 +173,15 @@ async def get_saml_metadata():
     """
     xml_metadata = f"""<?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     entityID="{DEFAULT_SSO_CONFIG['sp_entity_id']}">
+                     entityID="{DEFAULT_SSO_CONFIG["sp_entity_id"]}">
     <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true"
                          protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                                     Location="{DEFAULT_SSO_CONFIG['acs_url']}"
+                                     Location="{DEFAULT_SSO_CONFIG["acs_url"]}"
                                      index="1" isDefault="true"/>
         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                                Location="{DEFAULT_SSO_CONFIG['slo_url']}"/>
+                                Location="{DEFAULT_SSO_CONFIG["slo_url"]}"/>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>"""
 
@@ -198,10 +205,10 @@ async def saml_initiate_login(
     ID="{req_id}"
     Version="2.0"
     IssueInstant="{issue_instant}"
-    Destination="{DEFAULT_SSO_CONFIG['idp_sso_url']}"
-    AssertionConsumerServiceURL="{DEFAULT_SSO_CONFIG['acs_url']}"
+    Destination="{DEFAULT_SSO_CONFIG["idp_sso_url"]}"
+    AssertionConsumerServiceURL="{DEFAULT_SSO_CONFIG["acs_url"]}"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
-    <saml:Issuer>{DEFAULT_SSO_CONFIG['sp_entity_id']}</saml:Issuer>
+    <saml:Issuer>{DEFAULT_SSO_CONFIG["sp_entity_id"]}</saml:Issuer>
     <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
 </samlp:AuthnRequest>"""
 
@@ -256,6 +263,7 @@ async def saml_assertion_consumer_service(
     except Exception:
         # Fallback regex/string search in case of malformed mock XML
         import re
+
         match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", decoded_xml)
         if match:
             user_email = match.group(0).lower()
@@ -269,7 +277,11 @@ async def saml_assertion_consumer_service(
     # Check allowed domain if configured
     email_domain = user_email.split("@")[-1]
     allowed_domains = DEFAULT_SSO_CONFIG.get("allowed_email_domains", [])
-    if "*" not in allowed_domains and allowed_domains and email_domain not in allowed_domains:
+    if (
+        "*" not in allowed_domains
+        and allowed_domains
+        and email_domain not in allowed_domains
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Email domain '{email_domain}' is not authorized for Enterprise SSO federation.",
@@ -287,7 +299,9 @@ async def saml_assertion_consumer_service(
             )
 
         # Create or assign to enterprise organization
-        org_res = await db.execute(select(Organization).where(Organization.name == "Enterprise Federal Org"))
+        org_res = await db.execute(
+            select(Organization).where(Organization.name == "Enterprise Federal Org")
+        )
         org = org_res.scalar_one_or_none()
         if not org:
             org = Organization(name="Enterprise Federal Org", plan="enterprise")
@@ -295,6 +309,7 @@ async def saml_assertion_consumer_service(
             await db.flush()
 
         import secrets
+
         random_pw = secrets.token_urlsafe(32)
         from app.core.security import hash_password
 
@@ -351,7 +366,9 @@ async def oidc_callback(
     user = res.scalar_one_or_none()
 
     if not user:
-        org_res = await db.execute(select(Organization).where(Organization.name == "Enterprise Federal Org"))
+        org_res = await db.execute(
+            select(Organization).where(Organization.name == "Enterprise Federal Org")
+        )
         org = org_res.scalar_one_or_none()
         if not org:
             org = Organization(name="Enterprise Federal Org", plan="enterprise")
@@ -390,4 +407,3 @@ async def oidc_callback(
     )
 
     return TokenResponse(access_token=token)
-

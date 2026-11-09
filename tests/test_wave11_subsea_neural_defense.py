@@ -9,9 +9,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.subsea_telecom.subsea_cable_guard import subsea_cable_guard
+from app.services.intergrid_failover.intergrid_failover_guard import (
+    intergrid_failover_guard,
+)
 from app.services.neural_bci.neural_bci_guard import neural_bci_guard
-from app.services.intergrid_failover.intergrid_failover_guard import intergrid_failover_guard
+from app.services.subsea_telecom.subsea_cable_guard import subsea_cable_guard
 
 
 @pytest.fixture
@@ -185,6 +187,7 @@ def test_intergrid_failover_guard_service():
 # ----------------------------------------------------
 def test_wave11_fastapi_routers(client):
     from app.core.security import get_current_user
+
     app.dependency_overrides[get_current_user] = lambda: {
         "sub": "NationalSecurityCommanderAdmin",
         "org": "enterprise",
@@ -197,19 +200,25 @@ def test_wave11_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["cables"]) >= 3
 
-        res_insp = client.post("/subsea-cable/inspect-telemetry", json={
-            "cable_id": "cable-transpacific-tp02",
-            "otdr_db_loss": 0.35,
-            "sop_rotation_rad_s": 55.0,
-            "das_acoustic_db": -25.0,
-        })
+        res_insp = client.post(
+            "/subsea-cable/inspect-telemetry",
+            json={
+                "cable_id": "cable-transpacific-tp02",
+                "otdr_db_loss": 0.35,
+                "sop_rotation_rad_s": 55.0,
+                "das_acoustic_db": -25.0,
+            },
+        )
         assert res_insp.status_code == 200
         assert res_insp.json()["inspection"]["threat_detected"] is True
 
-        res_sev = client.post("/subsea-cable/trigger-severance", json={
-            "cable_id": "cable-transpacific-tp02",
-            "reason": "Hostile submersible fiber microbending detected",
-        })
+        res_sev = client.post(
+            "/subsea-cable/trigger-severance",
+            json={
+                "cable_id": "cable-transpacific-tp02",
+                "reason": "Hostile submersible fiber microbending detected",
+            },
+        )
         assert res_sev.status_code == 200
         assert res_sev.json()["severance"]["new_status"] == "SEVERED_LOOPBACK_ISOLATED"
 
@@ -221,20 +230,26 @@ def test_wave11_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["operators"]) >= 3
 
-        res_bci_eval = client.post("/neural-bci/evaluate-intent", json={
-            "operator_id": "bci-scada-engineer-02",
-            "p300_amplitude_uv": 12.0,
-            "n400_latency_ms": 410.0,
-            "cognitive_stress_index": 0.95,
-            "synthetic_replay_flag": False,
-        })
+        res_bci_eval = client.post(
+            "/neural-bci/evaluate-intent",
+            json={
+                "operator_id": "bci-scada-engineer-02",
+                "p300_amplitude_uv": 12.0,
+                "n400_latency_ms": 410.0,
+                "cognitive_stress_index": 0.95,
+                "synthetic_replay_flag": False,
+            },
+        )
         assert res_bci_eval.status_code == 200
         assert res_bci_eval.json()["evaluation"]["threat_detected"] is True
         assert res_bci_eval.json()["evaluation"]["access_granted"] is False
 
-        res_svid = client.post("/neural-bci/issue-svid", json={
-            "operator_id": "bci-scada-engineer-02",
-        })
+        res_svid = client.post(
+            "/neural-bci/issue-svid",
+            json={
+                "operator_id": "bci-scada-engineer-02",
+            },
+        )
         assert res_svid.status_code == 200
         assert res_svid.json()["svid"]["algorithm"] == "ML-DSA-65_POST_QUANTUM"
 
@@ -246,24 +261,32 @@ def test_wave11_fastapi_routers(client):
         assert res.status_code == 200
         assert len(res.json()["interconnects"]) >= 3
 
-        res_grid_eval = client.post("/intergrid-failover/evaluate-stability", json={
-            "grid_id": "grid-western-interconnect",
-            "frequency_hz": 58.8,
-            "phase_angle_delta_deg": 48.0,
-            "rocof_hz_s": 2.1,
-        })
+        res_grid_eval = client.post(
+            "/intergrid-failover/evaluate-stability",
+            json={
+                "grid_id": "grid-western-interconnect",
+                "frequency_hz": 58.8,
+                "phase_angle_delta_deg": 48.0,
+                "rocof_hz_s": 2.1,
+            },
+        )
         assert res_grid_eval.status_code == 200
         assert res_grid_eval.json()["stability_analysis"]["threat_detected"] is True
 
-        res_island = client.post("/intergrid-failover/trigger-islanding", json={
-            "grid_id": "grid-western-interconnect",
-            "reason": "Cascading phase desync emergency",
-        })
+        res_island = client.post(
+            "/intergrid-failover/trigger-islanding",
+            json={
+                "grid_id": "grid-western-interconnect",
+                "reason": "Cascading phase desync emergency",
+            },
+        )
         assert res_island.status_code == 200
-        assert res_island.json()["islanding"]["new_status"] == "ISLANDED_AUTONOMOUS_OPERATION"
+        assert (
+            res_island.json()["islanding"]["new_status"]
+            == "ISLANDED_AUTONOMOUS_OPERATION"
+        )
 
         res_grid_met = client.get("/intergrid-failover/metrics")
         assert res_grid_met.status_code == 200
     finally:
         app.dependency_overrides.clear()
-

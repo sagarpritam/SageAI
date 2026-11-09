@@ -137,10 +137,15 @@ class OpticalAtomicClockMesh:
             raise ValueError(f"Clock {clock_id} not found.")
 
         current_tai_epoch = time.time_ns()
-        raw_token = f"{current_tai_epoch}:{clock['atomic_species']}:{clock_id}:{payload_data}"
+        raw_token = (
+            f"{current_tai_epoch}:{clock['atomic_species']}:{clock_id}:{payload_data}"
+        )
 
         # ML-DSA-87 Post-Quantum Signature emulation
-        pqc_signature_hex = hashlib.sha3_512(raw_token.encode("utf-8")).hexdigest() + hashlib.blake2b(raw_token.encode("utf-8")).hexdigest()
+        pqc_signature_hex = (
+            hashlib.sha3_512(raw_token.encode("utf-8")).hexdigest()
+            + hashlib.blake2b(raw_token.encode("utf-8")).hexdigest()
+        )
 
         clock["timestamps_authenticated"] += 1
 
@@ -173,4 +178,3 @@ class OpticalAtomicClockMesh:
 
 # Global singleton instance
 optical_atomic_clock_mesh = OpticalAtomicClockMesh()
-

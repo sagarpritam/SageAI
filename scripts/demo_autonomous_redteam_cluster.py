@@ -31,13 +31,17 @@ def main():
     for ag in agents:
         print(f"  > [{ag['agent_id']}] Codename: {ag['codename']}")
         print(f"    Specialization: {ag['specialization']}")
-        print(f"    Aggression Level: {ag['aggression_level'] * 100:.0f}% | Vectors: {ag['active_payload_vectors']}")
+        print(
+            f"    Aggression Level: {ag['aggression_level'] * 100:.0f}% | Vectors: {ag['active_payload_vectors']}"
+        )
         print(f"    Evasion Techniques: {', '.join(ag['evasion_techniques'])}")
 
     time.sleep(0.5)
 
     # 2. Launch Randomized Asymmetric Campaign
-    print("\n[PHASE 2] Launching Asymmetric Multi-Domain Assault Campaign (Intensity: 90%)...")
+    print(
+        "\n[PHASE 2] Launching Asymmetric Multi-Domain Assault Campaign (Intensity: 90%)..."
+    )
     start = time.time()
     res = autonomous_redteam_cluster.launch_adversarial_campaign(
         target_domains=[
@@ -63,14 +67,18 @@ def main():
 
     print("\n[PHASE 3] Detailed Domain Mitigation Audit:")
     for finding in res["detailed_findings"]:
-        print(f"  - [{finding['domain']}]: {finding['status']} (Latency: {finding['containment_latency_ms']} ms, Residual Risk: {finding['residual_risk']})")
+        print(
+            f"  - [{finding['domain']}]: {finding['status']} (Latency: {finding['containment_latency_ms']} ms, Residual Risk: {finding['residual_risk']})"
+        )
 
     # 3. Swarm Telemetry & Metrics
     metrics = autonomous_redteam_cluster.get_cluster_metrics()
     print("\n[PHASE 4] Adversarial Cluster Metrics:")
     print(f"  - Active Red Agents: {metrics['active_red_agents']}")
     print(f"  - Mean Resilience Index: {metrics['mean_resilience_score']}%")
-    print(f"  - Planetary Capabilities Covered: {metrics['coverage_capabilities']} / 76")
+    print(
+        f"  - Planetary Capabilities Covered: {metrics['coverage_capabilities']} / 76"
+    )
     print(f"  - Operational Status: {metrics['status']}")
 
     print("\n" + "=" * 80)

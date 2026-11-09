@@ -1,4 +1,5 @@
 """Sovereign Sub-Atmospheric Magnetohydrodynamic (MHD) Aerodynamic Plasma Stealth Package."""
+
 from .mhd_plasma_stealth import (
     MHDAeroPlatformNode,
     MHDPlasmaStealth,
@@ -12,4 +13,3 @@ __all__ = [
     "MHDStealthEngagementResult",
     "get_mhd_plasma_stealth",
 ]
-

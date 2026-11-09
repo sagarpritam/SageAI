@@ -8,4 +8,3 @@ from app.services.zkp.zkp_attestation_service import (
 )
 
 __all__ = ["ZKPAttestationService", "zkp_attestation_service"]
-

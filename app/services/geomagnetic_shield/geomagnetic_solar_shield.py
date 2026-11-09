@@ -107,7 +107,9 @@ class GeomagneticSolarShield:
                 action_recommended = "PRECHARGE_DAMPING_RESISTORS"
 
         # Calculate estimated reactive power loss (MVAR) caused by half-cycle saturation
-        reactive_power_loss_mvar = round(0.45 * measured_gic_amps * (substation["voltage_class_kv"] / 500.0), 2)
+        reactive_power_loss_mvar = round(
+            0.45 * measured_gic_amps * (substation["voltage_class_kv"] / 500.0), 2
+        )
 
         return {
             "evaluation_id": f"cme-eval-{uuid.uuid4().hex[:6]}",
@@ -159,11 +161,16 @@ class GeomagneticSolarShield:
 
     def get_geomagnetic_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for planetary geomagnetic CME power grid shielding."""
-        total_tripped = sum(1 for s in self._substations.values() if s["cme_shield_tripped"])
+        total_tripped = sum(
+            1 for s in self._substations.values() if s["cme_shield_tripped"]
+        )
         return {
             "monitored_ehv_substations": len(self._substations),
-            "total_ehv_transformers_shielded": sum(s["transformers_protected"] for s in self._substations.values()),
-            "neutral_blocking_interventions": total_tripped + len(self._blocking_events),
+            "total_ehv_transformers_shielded": sum(
+                s["transformers_protected"] for s in self._substations.values()
+            ),
+            "neutral_blocking_interventions": total_tripped
+            + len(self._blocking_events),
             "mean_tripping_speed_ms": 9.4,
             "transformer_catastrophic_failures": 0,
             "grid_stability_guaranteed_pct": 100.0,
@@ -172,4 +179,3 @@ class GeomagneticSolarShield:
 
 # Singleton instance
 geomagnetic_solar_shield = GeomagneticSolarShield()
-

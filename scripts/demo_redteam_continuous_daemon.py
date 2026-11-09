@@ -33,14 +33,18 @@ def main():
 
     # 2. Monitor execution over 3 cycles
     print("\n[PHASE 2] Sampling Live Telemetry Ticks Across Capabilities 1–79...")
-    for cycle in range(3):
+    for _cycle in range(3):
         time.sleep(1.6)
         status = autonomous_redteam_daemon.get_status()
         latest = status["recent_ticks"][0] if status["recent_ticks"] else None
         if latest:
             print(f"  > [Tick #{latest['tick_id']}] Campaign: {latest['campaign_id']}")
-            print(f"    - Vectors Tested: {latest['attack_vectors']} | Deflection Rate: {latest['deflection_pct']}%")
-            print(f"    - Mitigation Latency: {latest['mitigation_latency_ms']} ms | Resilience Score: {latest['resilience_score']}%")
+            print(
+                f"    - Vectors Tested: {latest['attack_vectors']} | Deflection Rate: {latest['deflection_pct']}%"
+            )
+            print(
+                f"    - Mitigation Latency: {latest['mitigation_latency_ms']} ms | Resilience Score: {latest['resilience_score']}%"
+            )
             print(f"    - Verdict: {latest['verdict']}")
 
     # 3. Graceful shutdown
@@ -57,4 +61,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

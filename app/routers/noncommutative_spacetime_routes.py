@@ -2,7 +2,6 @@
 FastAPI Router for Capability 103: Non-Commutative Moyal-Weyl Spacetime Phase Space Protector.
 """
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -10,14 +9,23 @@ from app.services.noncommutative_spacetime.noncommutative_spacetime import (
     get_noncommutative_spacetime_protector,
 )
 
-router = APIRouter(prefix="/api/noncommutative-spacetime", tags=["Capability 103: Non-Commutative Spacetime"])
+router = APIRouter(
+    prefix="/api/noncommutative-spacetime",
+    tags=["Capability 103: Non-Commutative Spacetime"],
+)
 
 
 class ProtectPhaseSpaceRequest(BaseModel):
     manifold_id: str = Field(..., description="ID of the non-commutative manifold")
-    theta_adjustment_factor: float = Field(default=1.0, ge=0.2, le=4.0, description="Non-commutativity scale adjustment")
-    star_product_order: int = Field(default=4, ge=2, le=8, description="Moyal star product expansion order")
-    damping_gain: float = Field(default=1.1, ge=0.8, le=2.5, description="UV/IR mixing damping gain")
+    theta_adjustment_factor: float = Field(
+        default=1.0, ge=0.2, le=4.0, description="Non-commutativity scale adjustment"
+    )
+    star_product_order: int = Field(
+        default=4, ge=2, le=8, description="Moyal star product expansion order"
+    )
+    damping_gain: float = Field(
+        default=1.1, ge=0.8, le=2.5, description="UV/IR mixing damping gain"
+    )
 
 
 @router.get("/manifolds")
@@ -48,4 +56,3 @@ async def get_noncommutative_metrics():
     """Retrieve aggregate non-commutative spacetime metrics."""
     protector = get_noncommutative_spacetime_protector()
     return protector.get_noncommutative_metrics()
-

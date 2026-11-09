@@ -11,11 +11,15 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.cart.cart_engine import cart_engine
 
-router = APIRouter(prefix="/cart", tags=["Continuous Attack Path & Graph Choke-Point Analysis (CART)"])
+router = APIRouter(
+    prefix="/cart", tags=["Continuous Attack Path & Graph Choke-Point Analysis (CART)"]
+)
 
 
 class SeverChokePointRequest(BaseModel):
-    node_id: Optional[str] = Field("node-bastion", description="Choke-point node ID to isolate and sever")
+    node_id: Optional[str] = Field(
+        "node-bastion", description="Choke-point node ID to isolate and sever"
+    )
 
 
 @router.get("/topology")
@@ -59,4 +63,3 @@ async def sever_choke_point_endpoint(
         return {"status": "success", "severance_result": res}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

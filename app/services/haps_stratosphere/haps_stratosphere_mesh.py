@@ -119,7 +119,9 @@ class HAPSStratosphereMesh:
             "battery_soc_pct": battery_soc_pct,
             "sar_clutter_ratio_db": sar_clutter_ratio_db,
             "optical_jitter_urad": optical_link_jitter_urad,
-            "station_keeping_efficiency_pct": round(max(50.0, 100.0 - (wind_velocity_mps * 0.8)), 1),
+            "station_keeping_efficiency_pct": round(
+                max(50.0, 100.0 - (wind_velocity_mps * 0.8)), 1
+            ),
             "action_recommended": action_recommended,
             "timestamp": now,
         }
@@ -157,7 +159,9 @@ class HAPSStratosphereMesh:
 
     def get_haps_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for stratospheric persistent surveillance swarm."""
-        total_frames = sum(n["telemetry_frames_downlinked"] for n in self._nodes.values())
+        total_frames = sum(
+            n["telemetry_frames_downlinked"] for n in self._nodes.values()
+        )
         return {
             "active_stratospheric_haps_nodes": len(self._nodes),
             "total_downlinked_sar_frames": total_frames + len(self._telemetry_frames),
@@ -169,4 +173,3 @@ class HAPSStratosphereMesh:
 
 # Singleton instance
 haps_stratosphere_mesh = HAPSStratosphereMesh()
-

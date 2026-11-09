@@ -15,7 +15,9 @@ router = APIRouter(prefix="/adversary", tags=["Adversary Emulation & MITRE ATT&C
 
 
 class RunAdversaryDrillRequest(BaseModel):
-    actor_id: str = Field("APT29", description="Threat actor ID (APT29, FIN7, VOLT_TYPHOON)")
+    actor_id: str = Field(
+        "APT29", description="Threat actor ID (APT29, FIN7, VOLT_TYPHOON)"
+    )
 
 
 @router.get("/matrix")
@@ -47,4 +49,3 @@ async def execute_apt_emulation_drill(
         operator=user_id,
     )
     return result
-

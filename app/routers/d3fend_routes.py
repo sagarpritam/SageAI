@@ -15,7 +15,10 @@ router = APIRouter(prefix="/d3fend", tags=["MITRE D3FEND Defensive Matrix"])
 
 
 class QueryCountermeasureRequest(BaseModel):
-    attack_technique: str = Field(..., description="Offensive MITRE ATT&CK Technique ID or Name (e.g. T1059, PowerShell)")
+    attack_technique: str = Field(
+        ...,
+        description="Offensive MITRE ATT&CK Technique ID or Name (e.g. T1059, PowerShell)",
+    )
 
 
 @router.get("/matrix")
@@ -36,6 +39,7 @@ async def query_countermeasure_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Queries defensive D3FEND countermeasures mapped to an offensive MITRE ATT&CK technique."""
-    res = d3fend_matrix_service.get_countermeasure_for_attack(attack_technique=payload.attack_technique)
+    res = d3fend_matrix_service.get_countermeasure_for_attack(
+        attack_technique=payload.attack_technique
+    )
     return {"status": "success", "query_result": res}
-

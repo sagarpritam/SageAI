@@ -8,4 +8,3 @@ from app.services.threat_modeling.threat_modeler import (
 )
 
 __all__ = ["ThreatModelingEngine", "threat_modeling_engine"]
-

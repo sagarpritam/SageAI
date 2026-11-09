@@ -17,6 +17,7 @@ from app.services.llm.vercel_client import VercelGatewayClient
 # 1. Specialized Provider Clients Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_anthropic_client_generation():
     client = AnthropicClient()
@@ -38,7 +39,9 @@ async def test_anthropic_client_generation():
         patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post,
     ):
         mock_post.return_value = MockResponse()
-        result = await client.generate("Generate security patch", system_message="Security bot")
+        result = await client.generate(
+            "Generate security patch", system_message="Security bot"
+        )
 
         assert result["content"] == "def test_patch(): return True"
         assert result["usage"]["prompt_tokens"] == 15
@@ -57,9 +60,15 @@ async def test_gemini_client_generation():
 
         def json(self):
             return {
-                "candidates": [{
-                    "content": {"parts": [{"text": "Log forensic analysis: No anomalies found."}]}
-                }],
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {"text": "Log forensic analysis: No anomalies found."}
+                            ]
+                        }
+                    }
+                ],
                 "usageMetadata": {"promptTokenCount": 500, "candidatesTokenCount": 50},
             }
 
@@ -86,9 +95,13 @@ async def test_deepseek_client_generation():
 
         def json(self):
             return {
-                "choices": [{
-                    "message": {"content": "Multi-hop exploit chain: Step 1 SQLi -> Step 2 SSH Key Exfil"}
-                }],
+                "choices": [
+                    {
+                        "message": {
+                            "content": "Multi-hop exploit chain: Step 1 SQLi -> Step 2 SSH Key Exfil"
+                        }
+                    }
+                ],
                 "usage": {"prompt_tokens": 30, "completion_tokens": 40},
             }
 
@@ -115,9 +128,7 @@ async def test_vercel_gateway_client_generation():
 
         def json(self):
             return {
-                "choices": [{
-                    "message": {"content": "Vercel routed response"}
-                }],
+                "choices": [{"message": {"content": "Vercel routed response"}}],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 20},
             }
 
@@ -135,6 +146,7 @@ async def test_vercel_gateway_client_generation():
 # 2. LLMGateway Routing Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_gateway_task_specialization_routing():
     assert llm_gateway.route_task("code_audit") == "anthropic"
     assert llm_gateway.route_task("patch_generation") == "anthropic"
@@ -149,6 +161,7 @@ def test_gateway_task_specialization_routing():
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. Red-vs-Blue Consensus Engine Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_multi_ai_consensus_evaluation():

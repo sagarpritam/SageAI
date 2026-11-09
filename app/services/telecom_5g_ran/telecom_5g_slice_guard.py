@@ -129,7 +129,9 @@ class Telecom5GSliceGuard:
             "new_status": "ISOLATED_QUARANTINED",
             "reason": reason,
             "quarantined_at": time.time(),
-            "traffic_diverted_to": "slice-urllc-defense-01" if slice_id != "slice-urllc-defense-01" else "HARDENED_FALLBACK_CORE",
+            "traffic_diverted_to": "slice-urllc-defense-01"
+            if slice_id != "slice-urllc-defense-01"
+            else "HARDENED_FALLBACK_CORE",
         }
         return quarantine_record
 
@@ -148,4 +150,3 @@ class Telecom5GSliceGuard:
 
 # Singleton instance
 telecom_5g_slice_guard = Telecom5GSliceGuard()
-

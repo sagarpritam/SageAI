@@ -107,7 +107,7 @@ async def remediate_incident_via_sagepatch(
         raise HTTPException(status_code=404, detail=f"Incident {incident_id} not found")
 
     title_lower = incident.get("title", "").lower()
-    details = incident.get("details", {})
+    incident.get("details", {})
     org_id = str(current_user.get("org") or current_user.get("org_id") or "system")
 
     # Ensure Organization exists in DB to satisfy foreign key constraint
@@ -117,11 +117,17 @@ async def remediate_incident_via_sagepatch(
         db.add(org)
         await db.flush()
 
-    repo = (payload.repository if payload and payload.repository else "demo/app").strip()
+    repo = (
+        payload.repository if payload and payload.repository else "demo/app"
+    ).strip()
 
     if "command" in title_lower or "cmdi" in title_lower:
         vuln_type = "Command Injection"
-        file_path = payload.file_path if payload and payload.file_path else "app/utils/diagnostics.py"
+        file_path = (
+            payload.file_path
+            if payload and payload.file_path
+            else "app/utils/diagnostics.py"
+        )
         orig_code = (
             "def execute_ping(host: str) -> int:\n"
             "    import os\n"
@@ -134,7 +140,11 @@ async def remediate_incident_via_sagepatch(
         )
     elif "ssrf" in title_lower or "metadata" in title_lower:
         vuln_type = "SSRF"
-        file_path = payload.file_path if payload and payload.file_path else "app/services/fetcher.py"
+        file_path = (
+            payload.file_path
+            if payload and payload.file_path
+            else "app/services/fetcher.py"
+        )
         orig_code = (
             "def fetch_remote(url: str):\n"
             "    import requests\n"
@@ -149,7 +159,11 @@ async def remediate_incident_via_sagepatch(
         )
     elif "canary" in title_lower or "deception" in title_lower:
         vuln_type = "Credential Exposure"
-        file_path = payload.file_path if payload and payload.file_path else "app/services/credential_loader.py"
+        file_path = (
+            payload.file_path
+            if payload and payload.file_path
+            else "app/services/credential_loader.py"
+        )
         orig_code = (
             "AWS_ACCESS_KEY = 'AKIA_MOCK_CANARY_VALUE'\n"
             "AWS_SECRET_KEY = 'SK_MOCK_CANARY_VALUE'\n"
@@ -162,7 +176,11 @@ async def remediate_incident_via_sagepatch(
     else:
         # Default SQLi
         vuln_type = "SQL Injection"
-        file_path = payload.file_path if payload and payload.file_path else "app/db/repositories.py"
+        file_path = (
+            payload.file_path
+            if payload and payload.file_path
+            else "app/db/repositories.py"
+        )
         orig_code = (
             "def get_user(username: str):\n"
             "    sql = f'SELECT * FROM users WHERE name = \"{username}\"'\n"
@@ -183,13 +201,17 @@ async def remediate_incident_via_sagepatch(
         severity=incident.get("severity", "HIGH"),
         original_code=orig_code,
         patched_code=patched_code,
-        requested_by=str(current_user.get("email") or current_user.get("sub") or "incident-responder"),
+        requested_by=str(
+            current_user.get("email") or current_user.get("sub") or "incident-responder"
+        ),
     )
 
     action_record = {
         "action": "DISPATCH_SAGEPATCH_REMEDIATION",
         "status": "PROPOSED",
-        "executed_at": patch.created_at.isoformat() if hasattr(patch, 'created_at') and patch.created_at else None,
+        "executed_at": patch.created_at.isoformat()
+        if hasattr(patch, "created_at") and patch.created_at
+        else None,
         "executed_by": "SagePatch Closed-Loop Engine",
         "details": f"Proposed patch {patch.id} for {vuln_type} in {file_path}. Awaiting human review in AutoFix Queue.",
     }
@@ -233,7 +255,9 @@ async def reverse_engineer_sample(
 
     # Safety constraint: enforce maximum analysis buffer size (10MB)
     if len(raw_bytes) > 10 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="Payload exceeds 10MB analysis limit")
+        raise HTTPException(
+            status_code=400, detail="Payload exceeds 10MB analysis limit"
+        )
 
     analysis = rev_engine.analyze_binary(raw_bytes, filename=request.filename)
     return {

@@ -8,4 +8,3 @@ from app.services.antimatter_catalyzed_fusion.antimatter_catalyzed_fusion import
 )
 
 __all__ = ["AntimatterCatalyzedFusionRocket", "get_antimatter_catalyzed_fusion_rocket"]
-

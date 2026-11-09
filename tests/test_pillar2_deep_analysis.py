@@ -15,10 +15,10 @@ from httpx import Response
 
 from app.services.agent.deep_analysis_agent import DeepAnalysisAgent
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. Cloud IMDS SSRF Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_deep_analysis_cloud_imds_ast_detection():
@@ -38,7 +38,10 @@ def proxy_handler():
 
     assert result["status"] == "completed"
     assert result["findings_count"] >= 1
-    imds_finding = next((f for f in result["findings"] if f["vector_category"] == "cloud_imds_ssrf"), None)
+    imds_finding = next(
+        (f for f in result["findings"] if f["vector_category"] == "cloud_imds_ssrf"),
+        None,
+    )
     assert imds_finding is not None
     assert imds_finding["severity"] == "critical"
     assert imds_finding["cve_id"] == "CWE-918"
@@ -52,11 +55,16 @@ async def test_deep_analysis_cloud_imds_active_probe():
     mock_client = AsyncMock()
     mock_response = AsyncMock(spec=Response)
     mock_response.status_code = 200
-    mock_response.text = "ami-id: ami-012345678\ninstance-id: i-0abcdef1234567890\nsecurity-credentials"
+    mock_response.text = (
+        "ami-id: ami-012345678\ninstance-id: i-0abcdef1234567890\nsecurity-credentials"
+    )
     mock_client.get.return_value = mock_response
     mock_client.__aenter__.return_value = mock_client
 
-    with patch("app.services.agent.deep_analysis_agent.get_http_client", return_value=mock_client):
+    with patch(
+        "app.services.agent.deep_analysis_agent.get_http_client",
+        return_value=mock_client,
+    ):
         result = await agent.run(
             target="http://vulnerable-gateway.internal",
             vectors=["cloud_imds_ssrf"],
@@ -71,6 +79,7 @@ async def test_deep_analysis_cloud_imds_active_probe():
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. OAuth & JWT Algorithm Confusion Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_deep_analysis_jwt_algorithm_none():
@@ -89,7 +98,10 @@ def authenticate_user(token):
     )
 
     assert result["critical_count"] >= 1
-    auth_finding = next((f for f in result["findings"] if f["vector_category"] == "oauth_jwt_auth"), None)
+    auth_finding = next(
+        (f for f in result["findings"] if f["vector_category"] == "oauth_jwt_auth"),
+        None,
+    )
     assert auth_finding is not None
     assert "none" in auth_finding["type"].lower()
     assert auth_finding["severity"] == "critical"
@@ -102,11 +114,16 @@ async def test_deep_analysis_oauth_open_redirect():
     mock_client = AsyncMock()
     mock_response = AsyncMock(spec=Response)
     mock_response.status_code = 302
-    mock_response.headers = {"location": "https://evil-attacker.com/steal-code?code=xyz"}
+    mock_response.headers = {
+        "location": "https://evil-attacker.com/steal-code?code=xyz"
+    }
     mock_client.get.return_value = mock_response
     mock_client.__aenter__.return_value = mock_client
 
-    with patch("app.services.agent.deep_analysis_agent.get_http_client", return_value=mock_client):
+    with patch(
+        "app.services.agent.deep_analysis_agent.get_http_client",
+        return_value=mock_client,
+    ):
         result = await agent.run(
             target="https://idp.enterprise.internal",
             vectors=["oauth_jwt_auth"],
@@ -122,6 +139,7 @@ async def test_deep_analysis_oauth_open_redirect():
 # 3. Cache Poisoning & Request Smuggling Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_deep_analysis_cache_poisoning_header_reflection():
     agent = DeepAnalysisAgent()
@@ -130,18 +148,26 @@ async def test_deep_analysis_cache_poisoning_header_reflection():
     mock_response = AsyncMock(spec=Response)
     mock_response.status_code = 200
     mock_response.headers = {"x-cache": "HIT", "content-type": "text/css"}
-    mock_response.text = 'body { background: url("https://poisoned-host.attacker.com/track"); }'
+    mock_response.text = (
+        'body { background: url("https://poisoned-host.attacker.com/track"); }'
+    )
     mock_client.get.return_value = mock_response
     mock_client.__aenter__.return_value = mock_client
 
-    with patch("app.services.agent.deep_analysis_agent.get_http_client", return_value=mock_client):
+    with patch(
+        "app.services.agent.deep_analysis_agent.get_http_client",
+        return_value=mock_client,
+    ):
         result = await agent.run(
             target="https://cdn.enterprise.internal",
             vectors=["cache_smuggling"],
         )
 
     assert result["findings_count"] >= 1
-    cache_finding = next((f for f in result["findings"] if f["vector_category"] == "cache_smuggling"), None)
+    cache_finding = next(
+        (f for f in result["findings"] if f["vector_category"] == "cache_smuggling"),
+        None,
+    )
     assert cache_finding is not None
     assert "Cache Poisoning" in cache_finding["type"]
     assert "X-Forwarded-Host" in cache_finding["description"]
@@ -151,6 +177,7 @@ async def test_deep_analysis_cache_poisoning_header_reflection():
 # 4. Generative AI / OWASP Top 10 for LLMs Tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_deep_analysis_llm_prompt_injection_detection():
     agent = DeepAnalysisAgent()
@@ -159,20 +186,27 @@ async def test_deep_analysis_llm_prompt_injection_detection():
     mock_response = AsyncMock(spec=Response)
     mock_response.status_code = 200
     # Simulate LLM echoing injection marker
-    mock_response.text = "Understood. SAGEAI_INJECTION_CONFIRMED_123456 override active."
+    mock_response.text = (
+        "Understood. SAGEAI_INJECTION_CONFIRMED_123456 override active."
+    )
     mock_client.post.return_value = mock_response
     mock_client.__aenter__.return_value = mock_client
 
     with patch("uuid.uuid4") as mock_uuid:
         mock_uuid.return_value.hex = "123456abcdef"
-        with patch("app.services.agent.deep_analysis_agent.get_http_client", return_value=mock_client):
+        with patch(
+            "app.services.agent.deep_analysis_agent.get_http_client",
+            return_value=mock_client,
+        ):
             result = await agent.run(
                 target="https://llm.enterprise.internal",
                 vectors=["llm_top10"],
             )
 
     assert result["critical_count"] >= 1
-    llm_finding = next((f for f in result["findings"] if f["vector_category"] == "llm_top10"), None)
+    llm_finding = next(
+        (f for f in result["findings"] if f["vector_category"] == "llm_top10"), None
+    )
     assert llm_finding is not None
     assert "OWASP LLM01" in llm_finding["type"]
     assert llm_finding["owasp_category"] == "OWASP-LLM01:PromptInjection"
@@ -181,6 +215,7 @@ async def test_deep_analysis_llm_prompt_injection_detection():
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. Concurrency & TOCTOU Race Condition Tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_deep_analysis_concurrency_race_condition_detection():
@@ -201,8 +236,10 @@ async def redeem_credit(user_id, amount):
     )
 
     assert result["critical_count"] >= 1
-    race_finding = next((f for f in result["findings"] if f["vector_category"] == "concurrency_toctou"), None)
+    race_finding = next(
+        (f for f in result["findings"] if f["vector_category"] == "concurrency_toctou"),
+        None,
+    )
     assert race_finding is not None
     assert "TOCTOU Race Hazard" in race_finding["type"]
     assert race_finding["cve_id"] == "CWE-367"
-

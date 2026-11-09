@@ -8,4 +8,3 @@ from app.services.threat_hunting.threat_hunter import (
 )
 
 __all__ = ["ThreatHunterService", "threat_hunter_service"]
-

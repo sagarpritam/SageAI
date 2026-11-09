@@ -23,20 +23,137 @@ logger = logging.getLogger("SageAI.adversary")
 
 # 14 MITRE ATT&CK Tactics with Core Techniques
 MITRE_TACTICS_CATALOG = [
-    {"id": "TA0043", "name": "Reconnaissance", "techniques": ["T1595 (Active Scanning)", "T1592 (Gather Victim Host Info)", "T1589 (Gather Victim Identity Info)"], "coverage_pct": 95},
-    {"id": "TA0042", "name": "Resource Development", "techniques": ["T1587 (Develop Capabilities)", "T1584 (Compromise Infrastructure)"], "coverage_pct": 90},
-    {"id": "TA0001", "name": "Initial Access", "techniques": ["T1190 (Exploit Public-Facing App)", "T1078 (Valid Accounts)", "T1566 (Phishing)"], "coverage_pct": 98},
-    {"id": "TA0002", "name": "Execution", "techniques": ["T1059 (Command & Scripting Interpreter)", "T1203 (Exploitation for Client Execution)"], "coverage_pct": 96},
-    {"id": "TA0003", "name": "Persistence", "techniques": ["T1098 (Account Manipulation)", "T1543 (Create or Modify System Process)"], "coverage_pct": 92},
-    {"id": "TA0004", "name": "Privilege Escalation", "techniques": ["T1068 (Exploitation for Privilege Escalation)", "T1611 (Escape to Host)"], "coverage_pct": 94},
-    {"id": "TA0005", "name": "Defense Evasion", "techniques": ["T1027 (Obfuscated Files)", "T1070 (Indicator Removal)", "T1562 (Impair Defenses)"], "coverage_pct": 91},
-    {"id": "TA0006", "name": "Credential Access", "techniques": ["T1003 (OS Credential Dumping)", "T1552 (Unsecured Credentials)", "T1110 (Brute Force)"], "coverage_pct": 97},
-    {"id": "TA0007", "name": "Discovery", "techniques": ["T1046 (Network Service Discovery)", "T1082 (System Information Discovery)"], "coverage_pct": 95},
-    {"id": "TA0008", "name": "Lateral Movement", "techniques": ["T1021 (Remote Services)", "T1550 (Use Alternate Authentication Material)"], "coverage_pct": 93},
-    {"id": "TA0009", "name": "Collection", "techniques": ["T1005 (Data from Local System)", "T1530 (Data from Cloud Storage)"], "coverage_pct": 96},
-    {"id": "TA0011", "name": "Command and Control", "techniques": ["T1071 (Application Layer Protocol)", "T1573 (Encrypted Channel)", "T1048 (Exfiltration Over Alternative Protocol)"], "coverage_pct": 98},
-    {"id": "TA0010", "name": "Exfiltration", "techniques": ["T1048 (Exfiltration Over Alt Protocol)", "T1567 (Exfiltration Over Web Service)"], "coverage_pct": 99},
-    {"id": "TA0040", "name": "Impact", "techniques": ["T1486 (Data Encrypted for Impact)", "T1498 (Network Denial of Service)"], "coverage_pct": 95},
+    {
+        "id": "TA0043",
+        "name": "Reconnaissance",
+        "techniques": [
+            "T1595 (Active Scanning)",
+            "T1592 (Gather Victim Host Info)",
+            "T1589 (Gather Victim Identity Info)",
+        ],
+        "coverage_pct": 95,
+    },
+    {
+        "id": "TA0042",
+        "name": "Resource Development",
+        "techniques": [
+            "T1587 (Develop Capabilities)",
+            "T1584 (Compromise Infrastructure)",
+        ],
+        "coverage_pct": 90,
+    },
+    {
+        "id": "TA0001",
+        "name": "Initial Access",
+        "techniques": [
+            "T1190 (Exploit Public-Facing App)",
+            "T1078 (Valid Accounts)",
+            "T1566 (Phishing)",
+        ],
+        "coverage_pct": 98,
+    },
+    {
+        "id": "TA0002",
+        "name": "Execution",
+        "techniques": [
+            "T1059 (Command & Scripting Interpreter)",
+            "T1203 (Exploitation for Client Execution)",
+        ],
+        "coverage_pct": 96,
+    },
+    {
+        "id": "TA0003",
+        "name": "Persistence",
+        "techniques": [
+            "T1098 (Account Manipulation)",
+            "T1543 (Create or Modify System Process)",
+        ],
+        "coverage_pct": 92,
+    },
+    {
+        "id": "TA0004",
+        "name": "Privilege Escalation",
+        "techniques": [
+            "T1068 (Exploitation for Privilege Escalation)",
+            "T1611 (Escape to Host)",
+        ],
+        "coverage_pct": 94,
+    },
+    {
+        "id": "TA0005",
+        "name": "Defense Evasion",
+        "techniques": [
+            "T1027 (Obfuscated Files)",
+            "T1070 (Indicator Removal)",
+            "T1562 (Impair Defenses)",
+        ],
+        "coverage_pct": 91,
+    },
+    {
+        "id": "TA0006",
+        "name": "Credential Access",
+        "techniques": [
+            "T1003 (OS Credential Dumping)",
+            "T1552 (Unsecured Credentials)",
+            "T1110 (Brute Force)",
+        ],
+        "coverage_pct": 97,
+    },
+    {
+        "id": "TA0007",
+        "name": "Discovery",
+        "techniques": [
+            "T1046 (Network Service Discovery)",
+            "T1082 (System Information Discovery)",
+        ],
+        "coverage_pct": 95,
+    },
+    {
+        "id": "TA0008",
+        "name": "Lateral Movement",
+        "techniques": [
+            "T1021 (Remote Services)",
+            "T1550 (Use Alternate Authentication Material)",
+        ],
+        "coverage_pct": 93,
+    },
+    {
+        "id": "TA0009",
+        "name": "Collection",
+        "techniques": [
+            "T1005 (Data from Local System)",
+            "T1530 (Data from Cloud Storage)",
+        ],
+        "coverage_pct": 96,
+    },
+    {
+        "id": "TA0011",
+        "name": "Command and Control",
+        "techniques": [
+            "T1071 (Application Layer Protocol)",
+            "T1573 (Encrypted Channel)",
+            "T1048 (Exfiltration Over Alternative Protocol)",
+        ],
+        "coverage_pct": 98,
+    },
+    {
+        "id": "TA0010",
+        "name": "Exfiltration",
+        "techniques": [
+            "T1048 (Exfiltration Over Alt Protocol)",
+            "T1567 (Exfiltration Over Web Service)",
+        ],
+        "coverage_pct": 99,
+    },
+    {
+        "id": "TA0040",
+        "name": "Impact",
+        "techniques": [
+            "T1486 (Data Encrypted for Impact)",
+            "T1498 (Network Denial of Service)",
+        ],
+        "coverage_pct": 95,
+    },
 ]
 
 # APT Threat Actor Emulation Profiles
@@ -113,14 +230,26 @@ class MitreAdversaryEmulator:
         drill_stages = []
 
         for idx, ttp in enumerate(apt["ttp_killchain"], start=1):
-            drill_stages.append({
-                "stage": idx,
-                "technique": ttp,
-                "status": "DETECTED_AND_CONTAINED",
-                "interception_layer": "Next-Gen WAF" if ttp == "T1190" else ("NIDS Monitor" if ttp == "T1071" else ("eBPF Kernel Sensor" if ttp in ["T1059", "T1611"] else "SOAR Engine")),
-                "latency_ms": 12 + idx * 3,
-                "contained": True,
-            })
+            drill_stages.append(
+                {
+                    "stage": idx,
+                    "technique": ttp,
+                    "status": "DETECTED_AND_CONTAINED",
+                    "interception_layer": "Next-Gen WAF"
+                    if ttp == "T1190"
+                    else (
+                        "NIDS Monitor"
+                        if ttp == "T1071"
+                        else (
+                            "eBPF Kernel Sensor"
+                            if ttp in ["T1059", "T1611"]
+                            else "SOAR Engine"
+                        )
+                    ),
+                    "latency_ms": 12 + idx * 3,
+                    "contained": True,
+                }
+            )
 
         # Anchor audit record
         audit_record = audit_chain.record_action(
@@ -157,4 +286,3 @@ class MitreAdversaryEmulator:
 
 # Global singleton
 mitre_emulator = MitreAdversaryEmulator()
-

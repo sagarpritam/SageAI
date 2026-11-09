@@ -8,4 +8,3 @@ from app.services.threat_hunting_swarm.hunting_swarm_service import (
 )
 
 __all__ = ["ThreatHuntingSwarmService", "threat_hunting_swarm_service"]
-

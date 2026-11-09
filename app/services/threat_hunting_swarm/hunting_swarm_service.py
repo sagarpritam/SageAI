@@ -89,10 +89,23 @@ class ThreatHuntingSwarmService:
                 "sigma_rule": scenario["sigma_rule"],
                 "hypothesis": scenario["hypothesis"],
                 "agents": {
-                    "hypothesis_agent": {"status": "COMPLETED", "verdict": "HYPOTHESIS_FORMULATED"},
-                    "telemetry_agent": {"status": "COMPLETED", "probes_analyzed": 1420, "findings": scenario["telemetry_findings"]},
-                    "correlation_agent": {"status": "COMPLETED", "confidence_score": scenario["confidence_score"]},
-                    "arbiter_agent": {"status": "DECISION_READY", "recommended_action": scenario["recommended_action"]},
+                    "hypothesis_agent": {
+                        "status": "COMPLETED",
+                        "verdict": "HYPOTHESIS_FORMULATED",
+                    },
+                    "telemetry_agent": {
+                        "status": "COMPLETED",
+                        "probes_analyzed": 1420,
+                        "findings": scenario["telemetry_findings"],
+                    },
+                    "correlation_agent": {
+                        "status": "COMPLETED",
+                        "confidence_score": scenario["confidence_score"],
+                    },
+                    "arbiter_agent": {
+                        "status": "DECISION_READY",
+                        "recommended_action": scenario["recommended_action"],
+                    },
                 },
                 "status": "HUNT_COMPLETED_ACTION_PENDING",
                 "created_at": datetime.now(timezone.utc).isoformat(),
@@ -112,7 +125,10 @@ class ThreatHuntingSwarmService:
         topic = hunt_topic or "Process Injection & Memory Hollowing"
 
         # Match scenario or build dynamic one
-        matched = next((s for s in PRESET_HUNT_SCENARIOS if s["topic"].lower() in topic.lower()), PRESET_HUNT_SCENARIOS[0])
+        matched = next(
+            (s for s in PRESET_HUNT_SCENARIOS if s["topic"].lower() in topic.lower()),
+            PRESET_HUNT_SCENARIOS[0],
+        )
 
         hunt_id = f"hunt-swm-{int(datetime.now(timezone.utc).timestamp())}"
         hunt_record = {
@@ -207,4 +223,3 @@ class ThreatHuntingSwarmService:
 
 # Global Singleton Instance
 threat_hunting_swarm_service = ThreatHuntingSwarmService()
-

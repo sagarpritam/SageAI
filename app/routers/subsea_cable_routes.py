@@ -19,14 +19,22 @@ router = APIRouter(
 
 class InspectTelemetryRequest(BaseModel):
     cable_id: str = Field(..., description="Target submarine cable trunk")
-    otdr_db_loss: float = Field(..., description="Coherent OTDR measured attenuation in dB/km")
-    sop_rotation_rad_s: float = Field(..., description="State of Polarization rotation rate in rad/s")
-    das_acoustic_db: float = Field(..., description="Distributed Acoustic Sensing hydrophone noise level in dB")
+    otdr_db_loss: float = Field(
+        ..., description="Coherent OTDR measured attenuation in dB/km"
+    )
+    sop_rotation_rad_s: float = Field(
+        ..., description="State of Polarization rotation rate in rad/s"
+    )
+    das_acoustic_db: float = Field(
+        ..., description="Distributed Acoustic Sensing hydrophone noise level in dB"
+    )
 
 
 class SeveranceRequest(BaseModel):
     cable_id: str = Field(..., description="Cable trunk to loopback sever")
-    reason: str = Field("Physical ROV tap detected", description="Reason for autonomous severance")
+    reason: str = Field(
+        "Physical ROV tap detected", description="Reason for autonomous severance"
+    )
 
 
 @router.get("/cables")
@@ -82,7 +90,9 @@ async def trigger_severance_endpoint(
 ):
     """Executes sub-15ms optical repeater loopback severance and traffic reroute."""
     try:
-        res = subsea_cable_guard.trigger_autonomous_severance(body.cable_id, body.reason)
+        res = subsea_cable_guard.trigger_autonomous_severance(
+            body.cable_id, body.reason
+        )
         return {"status": "success", "severance": res}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -96,4 +106,3 @@ async def get_subsea_metrics_endpoint(
 ):
     """Returns subsea fiber infrastructure protection metrics."""
     return {"status": "success", "metrics": subsea_cable_guard.get_subsea_metrics()}
-

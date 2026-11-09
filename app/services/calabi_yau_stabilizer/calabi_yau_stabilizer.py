@@ -124,7 +124,9 @@ class CalabiYauModuliStabilizer:
         w0 = round(manifold.flux_superpotential_w0 * flux_intensity_factor, 6)
         volume = round(target_volume_string_units * random.uniform(0.99, 1.01), 2)
         kahler_mass_gev = round(1.45e14 * (w0 / 1e-3) / (volume / 50.0), 2)
-        uplift_energy = round(manifold.anti_d3_uplift_energy_gev * flux_intensity_factor, 2)
+        uplift_energy = round(
+            manifold.anti_d3_uplift_energy_gev * flux_intensity_factor, 2
+        )
         decompact_barrier = round(kahler_mass_gev * 0.082, 2)
 
         # Metastable positive de Sitter vacuum energy
@@ -163,11 +165,22 @@ class CalabiYauModuliStabilizer:
         }
 
     def get_stabilization_metrics(self) -> Dict[str, Any]:
-        total_moduli = sum([m.hodge_number_h11 + m.hodge_number_h21 for m in self.manifolds.values()])
+        total_moduli = sum(
+            [m.hodge_number_h11 + m.hodge_number_h21 for m in self.manifolds.values()]
+        )
         return {
             "registered_calabi_yau_threefolds": len(self.manifolds),
             "total_stabilized_moduli": total_moduli,
-            "mean_compactification_volume": round(sum([m.compactification_volume_string_units for m in self.manifolds.values()]) / len(self.manifolds), 2),
+            "mean_compactification_volume": round(
+                sum(
+                    [
+                        m.compactification_volume_string_units
+                        for m in self.manifolds.values()
+                    ]
+                )
+                / len(self.manifolds),
+                2,
+            ),
             "completed_stabilizations": len(self.stabilization_history),
             "flux_mechanism": "GUKOV_VAFA_WITTEN_RR_NS_FLUX_WITH_KKLT_ANTI_D3_UPLIFT",
             "status": "OPERATIONAL",

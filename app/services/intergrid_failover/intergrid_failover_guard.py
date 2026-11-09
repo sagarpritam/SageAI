@@ -147,8 +147,12 @@ class InterGridFailoverGuard:
     def get_intergrid_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for all sovereign transmission interconnects."""
         total_gw = sum(g["total_generation_gw"] for g in self._interconnects.values())
-        total_substations = sum(g["substations_monitored"] for g in self._interconnects.values())
-        total_prevented = sum(g["destabilization_events_prevented"] for g in self._interconnects.values())
+        total_substations = sum(
+            g["substations_monitored"] for g in self._interconnects.values()
+        )
+        total_prevented = sum(
+            g["destabilization_events_prevented"] for g in self._interconnects.values()
+        )
         return {
             "monitored_interconnections": len(self._interconnects),
             "total_generation_monitored_gw": total_gw,
@@ -160,4 +164,3 @@ class InterGridFailoverGuard:
 
 # Singleton instance
 intergrid_failover_guard = InterGridFailoverGuard()
-

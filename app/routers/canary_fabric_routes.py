@@ -20,8 +20,13 @@ router = APIRouter(
 
 
 class DeployHoneytokenRequest(BaseModel):
-    token_type: str = Field(..., description="CLOUD_IAM, GIT_REPO_SECRET, DATABASE_TABLE, or ACTIVE_DIRECTORY_SPN")
-    deployment_target: str = Field(..., description="Target file, repo, table, or SPN path")
+    token_type: str = Field(
+        ...,
+        description="CLOUD_IAM, GIT_REPO_SECRET, DATABASE_TABLE, or ACTIVE_DIRECTORY_SPN",
+    )
+    deployment_target: str = Field(
+        ..., description="Target file, repo, table, or SPN path"
+    )
     memo: Optional[str] = None
 
 
@@ -40,7 +45,10 @@ async def list_tokens_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Lists all deployed active synthetic honeytokens."""
-    return {"status": "success", "canaries": canary_fabric_service.list_deployed_canaries()}
+    return {
+        "status": "success",
+        "canaries": canary_fabric_service.list_deployed_canaries(),
+    }
 
 
 @router.get("/tripwires")
@@ -50,7 +58,10 @@ async def list_tripwires_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Lists historical tripwire breach events."""
-    return {"status": "success", "tripwire_events": canary_fabric_service.get_tripwire_history()}
+    return {
+        "status": "success",
+        "tripwire_events": canary_fabric_service.get_tripwire_history(),
+    }
 
 
 @router.post("/deploy")
@@ -82,6 +93,7 @@ async def trigger_tripwire_endpoint(
         attacker_ip=payload.attacker_ip or "198.51.100.74",
         user_agent=payload.user_agent or "python-requests/2.31.0",
         target_service=payload.target_service or "AWS STS GetCallerIdentity",
-        auto_isolate_host=payload.auto_isolate_host if payload.auto_isolate_host is not None else True,
+        auto_isolate_host=payload.auto_isolate_host
+        if payload.auto_isolate_host is not None
+        else True,
     )
-

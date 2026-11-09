@@ -72,7 +72,9 @@ class CouncilModelTelemetry:
 
     def __init__(self):
         # provider -> deque of recent latencies in ms (last 50 requests)
-        self._latencies: Dict[str, deque] = {p: deque(maxlen=50) for p in self.COUNCIL_MODELS}
+        self._latencies: Dict[str, deque] = {
+            p: deque(maxlen=50) for p in self.COUNCIL_MODELS
+        }
         self._success_counts: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
         self._failure_counts: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
         self._total_tokens: Dict[str, int] = dict.fromkeys(self.COUNCIL_MODELS, 0)
@@ -103,18 +105,25 @@ class CouncilModelTelemetry:
     def get_provider_health(self, provider: str) -> Dict[str, Any]:
         """Calculates real-time health metrics for a provider."""
         clean_p = provider.lower()
-        meta = self.COUNCIL_MODELS.get(clean_p, {
-            "name": clean_p.capitalize(),
-            "provider": clean_p.capitalize(),
-            "role": "General LLM",
-            "input_cost_per_1m": 1.0,
-            "output_cost_per_1m": 2.0,
-            "context_window": "128k",
-        })
+        meta = self.COUNCIL_MODELS.get(
+            clean_p,
+            {
+                "name": clean_p.capitalize(),
+                "provider": clean_p.capitalize(),
+                "role": "General LLM",
+                "input_cost_per_1m": 1.0,
+                "output_cost_per_1m": 2.0,
+                "context_window": "128k",
+            },
+        )
 
         latencies = list(self._latencies.get(clean_p, []))
         avg_latency = round(statistics.mean(latencies), 1) if latencies else 180.0
-        p95_latency = round(statistics.quantiles(latencies, n=20)[-1], 1) if len(latencies) >= 20 else avg_latency
+        p95_latency = (
+            round(statistics.quantiles(latencies, n=20)[-1], 1)
+            if len(latencies) >= 20
+            else avg_latency
+        )
 
         successes = self._success_counts.get(clean_p, 0)
         failures = self._failure_counts.get(clean_p, 0)
@@ -156,4 +165,3 @@ class CouncilModelTelemetry:
 
 # Global council telemetry singleton
 council_telemetry = CouncilModelTelemetry()
-

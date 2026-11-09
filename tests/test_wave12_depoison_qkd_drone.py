@@ -8,11 +8,11 @@ Test Suite for Wave 12: Sovereign AI Model De-Poisoning, Space-Ground QKD Mesh &
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
+from app.main import app
 from app.services.ai_depoison.ai_depoison_engine import ai_model_depoison_engine
-from app.services.space_ground_qkd.space_ground_qkd_mesh import space_ground_qkd_mesh
 from app.services.drone_swarm_shield.kinetic_drone_shield import kinetic_drone_shield
+from app.services.space_ground_qkd.space_ground_qkd_mesh import space_ground_qkd_mesh
 
 
 @pytest.fixture
@@ -56,7 +56,9 @@ def test_ai_model_depoison_service():
     assert poison_scan["recommended_action"] == "SURGICAL_RANK1_NEURON_ABLATION"
 
     # Surgical rank-1 weight excision
-    excision = ai_model_depoison_engine.excise_backdoor_weights("lora-finance-analyst-v2")
+    excision = ai_model_depoison_engine.excise_backdoor_weights(
+        "lora-finance-analyst-v2"
+    )
     assert excision["new_status"] == "DEPOISONED_VERIFIED"
     assert excision["utility_retention_pct"] > 99.8
     assert excision["excision_latency_ms"] < 50.0
@@ -77,7 +79,7 @@ def test_ai_model_depoison_service():
 def test_space_ground_qkd_service():
     links = space_ground_qkd_mesh.list_links()
     assert len(links) >= 3
-    link_ids = [l["link_id"] for l in links]
+    link_ids = [link["link_id"] for link in links]
     assert "link-qkd-svalbard-01" in link_ids
     assert "link-qkd-canary-02" in link_ids
 
@@ -102,7 +104,9 @@ def test_space_ground_qkd_service():
         measured_qber_pct=14.6,
     )
     assert eavesdrop_eval["threat_detected"] is True
-    assert eavesdrop_eval["threat_type"] == "QUANTUM_BEAM_SPLITTING_EAVESDROPPER_DETECTED"
+    assert (
+        eavesdrop_eval["threat_type"] == "QUANTUM_BEAM_SPLITTING_EAVESDROPPER_DETECTED"
+    )
     assert eavesdrop_eval["action_recommended"] == "IMMEDIATE_PHOTON_SHUTTER_ABORT"
 
     updated_link = space_ground_qkd_mesh.get_link("link-qkd-svalbard-01")
@@ -198,16 +202,22 @@ def test_wave12_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["adapters"]) >= 3
 
-        res_scan = client.post("/ai-depoison/scan", json={
-            "adapter_id": "lora-kinetic-scada-edge",
-            "anomaly_threshold": 10.0,
-        })
+        res_scan = client.post(
+            "/ai-depoison/scan",
+            json={
+                "adapter_id": "lora-kinetic-scada-edge",
+                "anomaly_threshold": 10.0,
+            },
+        )
         assert res_scan.status_code == 200
         assert res_scan.json()["scan"]["poison_detected"] is True
 
-        res_exc = client.post("/ai-depoison/excise-backdoor", json={
-            "adapter_id": "lora-kinetic-scada-edge",
-        })
+        res_exc = client.post(
+            "/ai-depoison/excise-backdoor",
+            json={
+                "adapter_id": "lora-kinetic-scada-edge",
+            },
+        )
         assert res_exc.status_code == 200
         assert res_exc.json()["excision"]["new_status"] == "DEPOISONED_VERIFIED"
 
@@ -219,17 +229,23 @@ def test_wave12_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["links"]) >= 3
 
-        res_qber = client.post("/space-ground-qkd/evaluate-qber", json={
-            "link_id": "link-qkd-hawaii-03",
-            "measured_qber_pct": 13.2,
-            "photon_coincidence_window_ns": 1.2,
-        })
+        res_qber = client.post(
+            "/space-ground-qkd/evaluate-qber",
+            json={
+                "link_id": "link-qkd-hawaii-03",
+                "measured_qber_pct": 13.2,
+                "photon_coincidence_window_ns": 1.2,
+            },
+        )
         assert res_qber.status_code == 200
         assert res_qber.json()["evaluation"]["threat_detected"] is True
 
-        res_swap = client.post("/space-ground-qkd/swap", json={
-            "link_id": "link-qkd-hawaii-03",
-        })
+        res_swap = client.post(
+            "/space-ground-qkd/swap",
+            json={
+                "link_id": "link-qkd-hawaii-03",
+            },
+        )
         assert res_swap.status_code == 200
         assert res_swap.json()["swap"]["swapping_fidelity"] > 0.9
 
@@ -241,27 +257,35 @@ def test_wave12_api_routes(client):
         assert res.status_code == 200
         assert len(res.json()["sites"]) >= 3
 
-        res_drone = client.post("/drone-swarm-shield/detect-swarm", json={
-            "site_id": "site-datacenter-virginia-01",
-            "radar_rcs_m2": 0.05,
-            "swarm_size": 6,
-            "optical_confirmed": True,
-            "rf_spectrum_anomaly": True,
-            "approach_velocity_mps": 85.0,
-        })
+        res_drone = client.post(
+            "/drone-swarm-shield/detect-swarm",
+            json={
+                "site_id": "site-datacenter-virginia-01",
+                "radar_rcs_m2": 0.05,
+                "swarm_size": 6,
+                "optical_confirmed": True,
+                "rf_spectrum_anomaly": True,
+                "approach_velocity_mps": 85.0,
+            },
+        )
         assert res_drone.status_code == 200
         assert res_drone.json()["detection"]["threat_detected"] is True
 
-        res_burst = client.post("/drone-swarm-shield/fire-directed-energy", json={
-            "site_id": "site-datacenter-virginia-01",
-            "weapon_type": "HIGH_POWER_MICROWAVE_HPM",
-            "burst_duration_ms": 4.0,
-        })
+        res_burst = client.post(
+            "/drone-swarm-shield/fire-directed-energy",
+            json={
+                "site_id": "site-datacenter-virginia-01",
+                "weapon_type": "HIGH_POWER_MICROWAVE_HPM",
+                "burst_duration_ms": 4.0,
+            },
+        )
         assert res_burst.status_code == 200
-        assert res_burst.json()["interception"]["electronic_avionic_kill_confirmed"] is True
+        assert (
+            res_burst.json()["interception"]["electronic_avionic_kill_confirmed"]
+            is True
+        )
 
         res_drone_met = client.get("/drone-swarm-shield/metrics")
         assert res_drone_met.status_code == 200
     finally:
         app.dependency_overrides.clear()
-

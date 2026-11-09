@@ -28,11 +28,15 @@ def main():
     clusters = cluster_federation_engine.list_clusters()
     print(f"  > Active Federated Enclaves: {len(clusters)}")
     for c in clusters:
-        leader_badge = "★ LEADER" if c['is_leader'] else "  MEMBER"
-        print(f"    [{leader_badge}] {c['cluster_id']} ({c['region_name']}): Nodes {c['active_nodes']}, Latency {c['round_trip_latency_ms']} ms, Type {c['datacenter_type']}")
+        leader_badge = "★ LEADER" if c["is_leader"] else "  MEMBER"
+        print(
+            f"    [{leader_badge}] {c['cluster_id']} ({c['region_name']}): Nodes {c['active_nodes']}, Latency {c['round_trip_latency_ms']} ms, Type {c['datacenter_type']}"
+        )
 
     # 2. Distributed State Consensus Synchronization
-    print("\n[STEP 2] Executing BFT Merkle State Proof Synchronization across 82 Capabilities...")
+    print(
+        "\n[STEP 2] Executing BFT Merkle State Proof Synchronization across 82 Capabilities..."
+    )
     start_t = time.time()
     sync_res = cluster_federation_engine.synchronize_cluster_state(
         initiating_cluster_id="CLUSTER-US-EAST-01",
@@ -47,11 +51,15 @@ def main():
     print(f"  > Merkle Root:        {sync_res['synchronized_merkle_root']}")
     print(f"  > State Drift:        {sync_res['state_drift_ms']} ms (< 1.0 ms SLA)")
     print(f"  > Synced Capabilities: {sync_res['synced_capabilities_count']} / 82")
-    print(f"  > Zero-Trust Token:   {'VERIFIED' if sync_res['zero_trust_token_verified'] else 'FAILED'}")
+    print(
+        f"  > Zero-Trust Token:   {'VERIFIED' if sync_res['zero_trust_token_verified'] else 'FAILED'}"
+    )
     print(f"  > Consensus Status:   {sync_res['status']} ({sync_time_ms:.2f} ms)")
 
     # 3. Simulated Regional EMP Isolation & Sub-12ms Automated Failover
-    print("\n[STEP 3] Simulating Catastrophic Regional EMP Isolation on EU-Central Enclave...")
+    print(
+        "\n[STEP 3] Simulating Catastrophic Regional EMP Isolation on EU-Central Enclave..."
+    )
     print("  > Triggering automated zero-loss failover rerouting...")
 
     start_fo = time.time()
@@ -64,10 +72,16 @@ def main():
 
     print(f"  > Isolated Disrupted Enclave: {fo_res['isolated_cluster_id']}")
     print(f"  > Active Failover Standby:   {fo_res['active_failover_cluster_id']}")
-    print(f"  > Observed Failover Latency:  {fo_res['failover_latency_ms']} ms (< 12.0 ms Enterprise SLA)")
+    print(
+        f"  > Observed Failover Latency:  {fo_res['failover_latency_ms']} ms (< 12.0 ms Enterprise SLA)"
+    )
     print(f"  > Traffic Rerouting Posture:  {fo_res['traffic_reroute_status']}")
-    print(f"  > State Loss Incurred:        {fo_res['state_loss_pct']}% (PERFECT ZERO LOSS)")
-    print(f"  > Quorum Merkle Verification: {fo_res['merkle_verification']} ({fo_exec_ms:.2f} ms)")
+    print(
+        f"  > State Loss Incurred:        {fo_res['state_loss_pct']}% (PERFECT ZERO LOSS)"
+    )
+    print(
+        f"  > Quorum Merkle Verification: {fo_res['merkle_verification']} ({fo_exec_ms:.2f} ms)"
+    )
 
     # 4. Federation Engine Metrics
     metrics = cluster_federation_engine.get_federation_metrics()
@@ -86,4 +100,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

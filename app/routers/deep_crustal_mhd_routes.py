@@ -13,8 +13,12 @@ router = APIRouter(
 
 class GenerateMHDPowerRequest(BaseModel):
     vault_id: str = Field(..., description="Target deep-crustal vault ID")
-    brine_velocity_factor: float = Field(default=1.0, ge=0.1, le=5.0, description="Brine velocity flow factor")
-    load_factor: float = Field(default=0.85, ge=0.1, le=1.0, description="MHD generator electrical load factor")
+    brine_velocity_factor: float = Field(
+        default=1.0, ge=0.1, le=5.0, description="Brine velocity flow factor"
+    )
+    load_factor: float = Field(
+        default=0.85, ge=0.1, le=1.0, description="MHD generator electrical load factor"
+    )
 
 
 @router.get("/vaults")
@@ -37,4 +41,3 @@ async def generate_power(req: GenerateMHDPowerRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return deep_crustal_mhd_vault.get_vault_metrics()
-

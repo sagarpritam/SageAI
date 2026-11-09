@@ -8,4 +8,3 @@ from .photonic_quantum_firewall import (
 )
 
 __all__ = ["PhotonicQuantumCryptFirewall", "photonic_quantum_firewall"]
-

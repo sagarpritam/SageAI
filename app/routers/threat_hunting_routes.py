@@ -15,12 +15,16 @@ router = APIRouter(prefix="/threat-hunting", tags=["AI Threat Hunting & Query Fo
 
 
 class ForgeQueryRequest(BaseModel):
-    hypothesis: str = Field(..., description="Natural language threat hunting hypothesis")
+    hypothesis: str = Field(
+        ..., description="Natural language threat hunting hypothesis"
+    )
 
 
 class ExecuteHuntRequest(BaseModel):
     hypothesis: str = Field(..., description="Hypothesis to guide the threat hunt")
-    telemetry_events: List[Dict[str, Any]] = Field(..., description="Events to scan for adversarial patterns")
+    telemetry_events: List[Dict[str, Any]] = Field(
+        ..., description="Events to scan for adversarial patterns"
+    )
 
 
 @router.get("/templates")
@@ -84,4 +88,3 @@ async def execute_hunt_endpoint(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

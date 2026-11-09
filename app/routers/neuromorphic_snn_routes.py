@@ -19,16 +19,28 @@ router = APIRouter(
 
 class ClassifySpikeTrainRequest(BaseModel):
     core_id: str = Field(..., description="Target neuromorphic chip core identifier")
-    mean_spike_rate_mhz: float = Field(..., description="Mean spike firing frequency in MHz")
-    aer_inter_arrival_jitter_ns: float = Field(..., description="AER inter-arrival timing jitter in nanoseconds")
-    voltage_anomaly_mv: float = Field(..., description="Measured voltage deviation in millivolts")
-    bus_payload_entropy: float = Field(7.2, description="Shannon entropy of the bus payload")
+    mean_spike_rate_mhz: float = Field(
+        ..., description="Mean spike firing frequency in MHz"
+    )
+    aer_inter_arrival_jitter_ns: float = Field(
+        ..., description="AER inter-arrival timing jitter in nanoseconds"
+    )
+    voltage_anomaly_mv: float = Field(
+        ..., description="Measured voltage deviation in millivolts"
+    )
+    bus_payload_entropy: float = Field(
+        7.2, description="Shannon entropy of the bus payload"
+    )
 
 
 class InjectInhibitoryClampRequest(BaseModel):
     core_id: str = Field(..., description="Target neuromorphic core to clamp")
-    clamp_line: str = Field("BUS_LINE_RESET_ISOLATE", description="Hardware bus line to isolate")
-    response_latency_ns: float = Field(385.0, description="Inhibitory clamp actuation speed in nanoseconds")
+    clamp_line: str = Field(
+        "BUS_LINE_RESET_ISOLATE", description="Hardware bus line to isolate"
+    )
+    response_latency_ns: float = Field(
+        385.0, description="Inhibitory clamp actuation speed in nanoseconds"
+    )
 
 
 @router.get("/cores")
@@ -102,5 +114,7 @@ async def get_neuromorphic_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns neuromorphic silicon fleet metrics."""
-    return {"status": "success", "metrics": neuromorphic_snn_guard.get_neuromorphic_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": neuromorphic_snn_guard.get_neuromorphic_metrics(),
+    }

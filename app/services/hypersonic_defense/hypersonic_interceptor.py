@@ -83,7 +83,9 @@ class HypersonicTrajectoryInterceptor:
 
         now = time.time()
         is_hypersonic = measured_mach >= 5.0
-        is_threat = is_hypersonic and (skip_glide_detected or plasma_blackout_active or altitude_km > 20.0)
+        is_threat = is_hypersonic and (
+            skip_glide_detected or plasma_blackout_active or altitude_km > 20.0
+        )
 
         threat_type = "NOMINAL_AIRSPACE_TRAJECTORY"
         threat_level = "LOW"
@@ -157,10 +159,14 @@ class HypersonicTrajectoryInterceptor:
 
     def get_hypersonic_defense_metrics(self) -> Dict[str, Any]:
         """Returns fleet metrics for hypersonic glide vehicle air-defense."""
-        total_intercepted = sum(t["interceptions_count"] for t in self._threats.values())
+        total_intercepted = sum(
+            t["interceptions_count"] for t in self._threats.values()
+        )
         return {
             "active_hypersonic_threats_tracked": len(self._threats),
-            "hypersonic_threats_neutralized": total_intercepted + len(self._intercept_events) + 5,
+            "hypersonic_threats_neutralized": total_intercepted
+            + len(self._intercept_events)
+            + 5,
             "mean_fire_control_latency_ms": 2.1,
             "max_closing_velocity_mach": 38.5,
             "kinetic_intercept_success_rate_pct": 100.0,
@@ -169,4 +175,3 @@ class HypersonicTrajectoryInterceptor:
 
 # Singleton instance
 hypersonic_interceptor = HypersonicTrajectoryInterceptor()
-

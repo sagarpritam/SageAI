@@ -20,16 +20,26 @@ router = APIRouter(
 
 
 class EvaluateLatticeCryptanalysisRequest(BaseModel):
-    coprocessor_id: str = Field(..., description="Target photonic quantum co-processor ID")
-    lattice_dimension: int = Field(1024, description="Lattice dimension n (e.g. 512, 768, 1024)")
-    target_pqc_scheme: str = Field("ML-KEM-1024", description="Target post-quantum cryptographic scheme")
+    coprocessor_id: str = Field(
+        ..., description="Target photonic quantum co-processor ID"
+    )
+    lattice_dimension: int = Field(
+        1024, description="Lattice dimension n (e.g. 512, 768, 1024)"
+    )
+    target_pqc_scheme: str = Field(
+        "ML-KEM-1024", description="Target post-quantum cryptographic scheme"
+    )
     root_hermite_factor: float = Field(1.0045, description="Root Hermite factor delta")
-    photon_loss_rate_pct: float = Field(1.2, description="Optical waveguide photon loss rate percentage")
+    photon_loss_rate_pct: float = Field(
+        1.2, description="Optical waveguide photon loss rate percentage"
+    )
 
 
 class EngagePhotonicFirewallRequest(BaseModel):
     coprocessor_id: str = Field(..., description="Photonic co-processor to shield")
-    defense_mode: str = Field("OPTICAL_NOISE_INJECTION_BARRIER", description="Phase scrambling barrier mode")
+    defense_mode: str = Field(
+        "OPTICAL_NOISE_INJECTION_BARRIER", description="Phase scrambling barrier mode"
+    )
 
 
 @router.get("/coprocessors")
@@ -39,7 +49,10 @@ async def list_coprocessors_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all monitored photonic quantum cryptanalytic co-processors."""
-    return {"status": "success", "coprocessors": photonic_quantum_firewall.list_coprocessors()}
+    return {
+        "status": "success",
+        "coprocessors": photonic_quantum_firewall.list_coprocessors(),
+    }
 
 
 @router.get("/coprocessors/{coprocessor_id}")
@@ -52,7 +65,9 @@ async def get_coprocessor_endpoint(
     """Retrieves details of a specific photonic quantum co-processor."""
     coprocessor = photonic_quantum_firewall.get_coprocessor(coprocessor_id)
     if not coprocessor:
-        raise HTTPException(status_code=404, detail="Photonic quantum co-processor not found")
+        raise HTTPException(
+            status_code=404, detail="Photonic quantum co-processor not found"
+        )
     return {"status": "success", "coprocessor": coprocessor}
 
 
@@ -102,5 +117,7 @@ async def get_photonic_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet telemetry for photonic optical quantum firewall defense."""
-    return {"status": "success", "metrics": photonic_quantum_firewall.get_photonic_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": photonic_quantum_firewall.get_photonic_metrics(),
+    }

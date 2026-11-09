@@ -9,18 +9,22 @@ Injects 5 simultaneous high-severity attacks across independent domains:
 Measures autonomous cross-domain containment latency and verifies zero cascade failures.
 """
 
+import concurrent.futures
 import os
 import sys
 import time
-import concurrent.futures
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.services.atomic_clock_mesh.optical_atomic_clock_mesh import optical_atomic_clock_mesh
-from app.services.geomagnetic_shield.geomagnetic_solar_shield import geomagnetic_solar_shield
-from app.services.marine_sonar.marine_acoustic_mesh import marine_acoustic_sonar_mesh
 from app.services.airgap_exploit_swarm.airgap_exploit_swarm import airgap_exploit_swarm
+from app.services.atomic_clock_mesh.optical_atomic_clock_mesh import (
+    optical_atomic_clock_mesh,
+)
 from app.services.cognitive_ew.cognitive_ew_engine import cognitive_ew_engine
+from app.services.geomagnetic_shield.geomagnetic_solar_shield import (
+    geomagnetic_solar_shield,
+)
+from app.services.marine_sonar.marine_acoustic_mesh import marine_acoustic_sonar_mesh
 
 CYAN = "\033[96m"
 GREEN = "\033[92m"
@@ -32,9 +36,13 @@ RESET = "\033[0m"
 
 
 def print_banner(title: str):
-    print(f"\n{CYAN}{BOLD}{'='*80}{RESET}")
-    print(f"{CYAN}{BOLD} 💥 SAGEAI PLANETARY MULTI-VECTOR CHAOS & BLITZKRIEG DRILL: {title}{RESET}".center(78))
-    print(f"{CYAN}{BOLD}{'='*80}{RESET}\n")
+    print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
+    print(
+        f"{CYAN}{BOLD} 💥 SAGEAI PLANETARY MULTI-VECTOR CHAOS & BLITZKRIEG DRILL: {title}{RESET}".center(
+            78
+        )
+    )
+    print(f"{CYAN}{BOLD}{'=' * 80}{RESET}\n")
 
 
 def execute_vector_1():
@@ -46,7 +54,12 @@ def execute_vector_1():
         carrier_phase_jitter_fs=85.0,  # Hostile phase attack
     )
     dt_ms = (time.perf_counter() - t0) * 1000.0
-    return "Optical Atomic Clock Mesh", res["sync_status"], dt_ms, res["spoofing_detected"]
+    return (
+        "Optical Atomic Clock Mesh",
+        res["sync_status"],
+        dt_ms,
+        res["spoofing_detected"],
+    )
 
 
 def execute_vector_2():
@@ -58,7 +71,12 @@ def execute_vector_2():
         tripping_latency_ms=8.9,
     )
     dt_ms = (time.perf_counter() - t0) * 1000.0
-    return "Geomagnetic Solar CME Shield", res["new_substation_status"], dt_ms, res["transformer_core_burnout_prevented"]
+    return (
+        "Geomagnetic Solar CME Shield",
+        res["new_substation_status"],
+        dt_ms,
+        res["transformer_core_burnout_prevented"],
+    )
 
 
 def execute_vector_3():
@@ -72,7 +90,12 @@ def execute_vector_3():
         acoustic_doppler_mps=14.5,
     )
     dt_ms = (time.perf_counter() - t0) * 1000.0
-    return "Deep Ocean Sonar Mesh", res["action_recommended"], dt_ms, res["threat_detected"]
+    return (
+        "Deep Ocean Sonar Mesh",
+        res["action_recommended"],
+        dt_ms,
+        res["threat_detected"],
+    )
 
 
 def execute_vector_4():
@@ -83,7 +106,12 @@ def execute_vector_4():
         patch_strategy="SHADOW_STACK_CFI_INOCULATION",
     )
     dt_ms = (time.perf_counter() - t0) * 1000.0
-    return "Air-Gapped Exploit Swarm", res["patch_strategy"], dt_ms, res["zero_day_neutralized"]
+    return (
+        "Air-Gapped Exploit Swarm",
+        res["patch_strategy"],
+        dt_ms,
+        res["zero_day_neutralized"],
+    )
 
 
 def execute_vector_5():
@@ -95,12 +123,19 @@ def execute_vector_5():
         duration_ms=250.0,
     )
     dt_ms = (time.perf_counter() - t0) * 1000.0
-    return "Cognitive EW Engine", res["status"], dt_ms, res["deception_outcome"] == "ADVERSARY_RANGE_GATE_SEDUCED_AND_DROPPED"
+    return (
+        "Cognitive EW Engine",
+        res["status"],
+        dt_ms,
+        res["deception_outcome"] == "ADVERSARY_RANGE_GATE_SEDUCED_AND_DROPPED",
+    )
 
 
 def run_planetary_chaos_drill():
     print_banner("SIMULTANEOUS 5-THEATER CROSS-DOMAIN ASSAULT")
-    print(f"{YELLOW}{BOLD}⚡ INJECTING 5 SIMULTANEOUS ATTACK VECTORS ACROSS PLANETARY THEATERS...{RESET}\n")
+    print(
+        f"{YELLOW}{BOLD}⚡ INJECTING 5 SIMULTANEOUS ATTACK VECTORS ACROSS PLANETARY THEATERS...{RESET}\n"
+    )
 
     t_blitz_start = time.perf_counter()
 
@@ -118,20 +153,32 @@ def run_planetary_chaos_drill():
     print(f"{BOLD}Execution Results & Latency Breakdown:{RESET}")
     for system_name, status, lat, verified in results:
         status_color = GREEN if verified else RED
-        print(f"  {GREEN}✓ [{system_name}]:{RESET} Status={BOLD}{status}{RESET} | Latency={status_color}{lat:.2f} ms{RESET} | Neutralized={verified}")
+        print(
+            f"  {GREEN}✓ [{system_name}]:{RESET} Status={BOLD}{status}{RESET} | Latency={status_color}{lat:.2f} ms{RESET} | Neutralized={verified}"
+        )
 
-    print(f"\n{CYAN}{BOLD}{'='*80}{RESET}")
+    print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(f"{CYAN}{BOLD} 📊 CHAOS & RESILIENCY METRICS SUMMARY{RESET}".center(78))
-    print(f"{CYAN}{BOLD}{'='*80}{RESET}")
+    print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(f"  Total Injected Threat Vectors:      {BOLD}5 Simultaneous Vectors{RESET}")
-    print(f"  Total Neutralized:                  {GREEN}{BOLD}5 / 5 (100% Containment){RESET}")
-    print(f"  Concurrent Execution Wall Time:     {GREEN}{BOLD}{t_total_ms:.2f} ms{RESET}")
-    print(f"  Cross-Domain Cascades:              {GREEN}{BOLD}0 Cascades / Zero Breaches{RESET}")
-    print(f"  System Resilience Score:            {GREEN}{BOLD}99.999% SLA Maintained{RESET}")
-    print(f"{CYAN}{BOLD}{'='*80}{RESET}\n")
+    print(
+        f"  Total Neutralized:                  {GREEN}{BOLD}5 / 5 (100% Containment){RESET}"
+    )
+    print(
+        f"  Concurrent Execution Wall Time:     {GREEN}{BOLD}{t_total_ms:.2f} ms{RESET}"
+    )
+    print(
+        f"  Cross-Domain Cascades:              {GREEN}{BOLD}0 Cascades / Zero Breaches{RESET}"
+    )
+    print(
+        f"  System Resilience Score:            {GREEN}{BOLD}99.999% SLA Maintained{RESET}"
+    )
+    print(f"{CYAN}{BOLD}{'=' * 80}{RESET}\n")
 
     assert all(r[3] for r in results), "One or more attack vectors failed containment"
-    print(f"{GREEN}{BOLD}✅ PLANETARY CHAOS & RESILIENCY DRILL 100% OPERATIONAL & VERIFIED{RESET}\n")
+    print(
+        f"{GREEN}{BOLD}✅ PLANETARY CHAOS & RESILIENCY DRILL 100% OPERATIONAL & VERIFIED{RESET}\n"
+    )
 
 
 if __name__ == "__main__":

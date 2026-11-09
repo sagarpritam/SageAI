@@ -13,8 +13,12 @@ router = APIRouter(
 
 class EnforceCensorshipRequest(BaseModel):
     node_id: str = Field(..., description="Target spacetime curvature node ID")
-    simulated_overspin_torque_pct: float = Field(default=2.5, ge=0.0, le=20.0, description="Overspin torque percentage")
-    compensatory_damping_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Compensatory damping gain")
+    simulated_overspin_torque_pct: float = Field(
+        default=2.5, ge=0.0, le=20.0, description="Overspin torque percentage"
+    )
+    compensatory_damping_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Compensatory damping gain"
+    )
 
 
 @router.get("/singularities")
@@ -37,4 +41,3 @@ async def enforce_horizon(req: EnforceCensorshipRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cosmic_censorship_enforcer.get_enforcer_metrics()
-

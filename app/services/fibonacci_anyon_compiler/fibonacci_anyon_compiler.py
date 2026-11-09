@@ -83,10 +83,16 @@ class FibonacciAnyonCompiler:
         compilation_error = math.exp(-0.075 * steps) * 1e-4
 
         # Gate fidelity
-        fidelity_pct = min(99.9999, channel["base_gate_fidelity_pct"] * (1.0 + 0.000005 * (gain - 1.0)))
+        fidelity_pct = min(
+            99.9999, channel["base_gate_fidelity_pct"] * (1.0 + 0.000005 * (gain - 1.0))
+        )
 
         # Topological decoherence suppression in dB
-        suppression_db = channel["topological_decoherence_suppression_db"] + (10.0 * math.log10(gain)) + (steps * 0.05)
+        suppression_db = (
+            channel["topological_decoherence_suppression_db"]
+            + (10.0 * math.log10(gain))
+            + (steps * 0.05)
+        )
 
         # Generate synthetic canonical braid word representation
         braid_word = f"sigma_1^{steps % 3 + 1} * sigma_2^-{steps % 2 + 1} * sigma_1^{steps % 4 + 1} * sigma_2^{steps % 5 + 1}"
@@ -134,4 +140,3 @@ _fibonacci_anyon_compiler = FibonacciAnyonCompiler()
 def get_fibonacci_anyon_compiler() -> FibonacciAnyonCompiler:
     """Return the global FibonacciAnyonCompiler singleton instance."""
     return _fibonacci_anyon_compiler
-

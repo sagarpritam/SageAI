@@ -8,4 +8,3 @@ from app.services.cti.stix_taxii_service import (
 )
 
 __all__ = ["StixTaxiiService", "cti_service"]
-

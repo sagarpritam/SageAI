@@ -4,7 +4,7 @@ Tests for SageAI Wave 6 Phase 6.1: Confidential Hardware Enclave Remote Attestat
 
 import base64
 import json
-import pytest
+
 from app.services.enclave_attestation.hardware_attestation_service import (
     hardware_attestation_service,
 )
@@ -132,4 +132,3 @@ def test_unseal_secret_tampered_enclave_rejected():
     )
     assert res["status"] == "DENIED"
     assert "Secret release aborted" in res["reason"]
-

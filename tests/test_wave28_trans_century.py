@@ -11,11 +11,17 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.string_field_theory.string_field_theory import get_string_field_theory_integrator
-from app.services.mirror_symmetry.mirror_symmetry import get_calabi_yau_mirror_symmetry_inverter
-from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import get_fibonacci_anyon_compiler
+from app.services.fibonacci_anyon_compiler.fibonacci_anyon_compiler import (
+    get_fibonacci_anyon_compiler,
+)
+from app.services.mirror_symmetry.mirror_symmetry import (
+    get_calabi_yau_mirror_symmetry_inverter,
+)
 from app.services.monopole_catalysis_battery.monopole_catalysis_battery import (
     get_magnetic_monopole_catalyzed_battery,
+)
+from app.services.string_field_theory.string_field_theory import (
+    get_string_field_theory_integrator,
 )
 
 
@@ -27,6 +33,7 @@ def client():
 # ==============================================================================
 # Capability 104: String Field Theory Tests
 # ==============================================================================
+
 
 def test_string_field_theory_service():
     integrator = get_string_field_theory_integrator()
@@ -81,6 +88,7 @@ def test_string_field_theory_api(client):
 # Capability 105: Calabi-Yau Mirror Symmetry Tests
 # ==============================================================================
 
+
 def test_mirror_symmetry_service():
     inverter = get_calabi_yau_mirror_symmetry_inverter()
     manifolds = inverter.get_manifolds()
@@ -133,6 +141,7 @@ def test_mirror_symmetry_api(client):
 # ==============================================================================
 # Capability 106: Fibonacci Anyon Compiler Tests
 # ==============================================================================
+
 
 def test_fibonacci_anyon_service():
     compiler = get_fibonacci_anyon_compiler()
@@ -189,6 +198,7 @@ def test_fibonacci_anyon_api(client):
 # Option B Wave 28: Magnetic Monopole Proton Decay Battery Tests
 # ==============================================================================
 
+
 def test_monopole_battery_service():
     battery = get_magnetic_monopole_catalyzed_battery()
     traps = battery.get_traps()
@@ -237,4 +247,3 @@ def test_monopole_battery_api(client):
     metrics_res = client.get("/api/monopole-battery/metrics")
     assert metrics_res.status_code == 200
     assert metrics_res.json()["zero_carbon_zero_actinide_waste"] is True
-

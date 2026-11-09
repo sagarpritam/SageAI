@@ -15,12 +15,16 @@ router = APIRouter(prefix="/itdr", tags=["Identity Threat Detection & Response (
 
 
 class AnalyzeIdentityEventsRequest(BaseModel):
-    events: Optional[List[Dict[str, Any]]] = Field(None, description="Custom identity events batch")
+    events: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Custom identity events batch"
+    )
 
 
 class ContainUserRequest(BaseModel):
     user_email: str = Field(..., description="Target compromised user email")
-    action: Optional[str] = Field("REVOKE_SESSION_AND_ENFORCE_FIDO2", description="Containment action playbook")
+    action: Optional[str] = Field(
+        "REVOKE_SESSION_AND_ENFORCE_FIDO2", description="Containment action playbook"
+    )
 
 
 @router.get("/telemetry")
@@ -64,4 +68,3 @@ async def contain_user_endpoint(
         return {"status": "success", "containment_result": result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

@@ -3,12 +3,14 @@ Unit & Integration Tests for Wave 26: Asymptotic Safety Flow Stabilizer, Horava-
 Centesimal Quantum Gravity Singularity-Free Synthesizer & Magneto-Inertial Fusion (Capabilities 98-100 + Option B).
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 from app.services.asymptotic_safety_stabilizer import get_asymptotic_safety_stabilizer
+from app.services.centesimal_quantum_gravity import (
+    get_centesimal_quantum_gravity_synthesizer,
+)
 from app.services.horava_lifshitz_governor import get_horava_lifshitz_governor
-from app.services.centesimal_quantum_gravity import get_centesimal_quantum_gravity_synthesizer
 from app.services.magneto_inertial_fusion import get_magneto_inertial_fusion
 
 client = TestClient(app)
@@ -114,7 +116,9 @@ def test_horava_lifshitz_api():
 
     r_metrics = client.get("/api/horava-lifshitz/metrics")
     assert r_metrics.status_code == 200
-    assert r_metrics.json()["uv_critical_exponent"] == "Z_EQUALS_3_LIFSHITZ_POWER_COUNTING"
+    assert (
+        r_metrics.json()["uv_critical_exponent"] == "Z_EQUALS_3_LIFSHITZ_POWER_COUNTING"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -221,5 +225,7 @@ def test_magneto_inertial_fusion_api():
 
     r_metrics = client.get("/api/magneto-inertial-fusion/metrics")
     assert r_metrics.status_code == 200
-    assert r_metrics.json()["confinement_scheme"] == "CYLINDRICAL_METALLIC_LINER_MAGNETO_INERTIAL"
-
+    assert (
+        r_metrics.json()["confinement_scheme"]
+        == "CYLINDRICAL_METALLIC_LINER_MAGNETO_INERTIAL"
+    )

@@ -11,4 +11,3 @@ __all__ = [
     "ReheatingCycleResult",
     "inflaton_reheating_pump",
 ]
-

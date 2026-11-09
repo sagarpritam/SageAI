@@ -39,9 +39,7 @@ DEFAULT_DECLARED_IAC = [
             "ingress": [
                 {"port": 443, "cidr_blocks": ["10.0.0.0/8"], "protocol": "tcp"}
             ],
-            "egress": [
-                {"port": 0, "cidr_blocks": ["0.0.0.0/0"], "protocol": "-1"}
-            ],
+            "egress": [{"port": 0, "cidr_blocks": ["0.0.0.0/0"], "protocol": "-1"}],
         },
     },
     {
@@ -51,7 +49,10 @@ DEFAULT_DECLARED_IAC = [
         "file_path": "terraform/storage/s3_buckets.tf",
         "declared_state": {
             "bucket": "sage-financial-records-vault",
-            "server_side_encryption": {"algorithm": "aws:kms", "kms_key_id": "arn:aws:kms:us-east-1:123456789:key/sage-vault-key"},
+            "server_side_encryption": {
+                "algorithm": "aws:kms",
+                "kms_key_id": "arn:aws:kms:us-east-1:123456789:key/sage-vault-key",
+            },
             "block_public_access": True,
         },
     },
@@ -89,11 +90,13 @@ DEFAULT_RUNTIME_STATE = [
         "live_state": {
             "ingress": [
                 {"port": 443, "cidr_blocks": ["10.0.0.0/8"], "protocol": "tcp"},
-                {"port": 22, "cidr_blocks": ["0.0.0.0/0"], "protocol": "tcp"},  # DRIFT: Out-of-band console edit
+                {
+                    "port": 22,
+                    "cidr_blocks": ["0.0.0.0/0"],
+                    "protocol": "tcp",
+                },  # DRIFT: Out-of-band console edit
             ],
-            "egress": [
-                {"port": 0, "cidr_blocks": ["0.0.0.0/0"], "protocol": "-1"}
-            ],
+            "egress": [{"port": 0, "cidr_blocks": ["0.0.0.0/0"], "protocol": "-1"}],
         },
     },
     {
@@ -167,113 +170,130 @@ class IaCDriftEngine:
                 live_ingress = live_state.get("ingress", [])
                 decl_ingress = decl_state.get("ingress", [])
                 for rule in live_ingress:
-                    if rule not in decl_ingress and "0.0.0.0/0" in rule.get("cidr_blocks", []):
-                        drifts.append({
-                            "drift_id": f"drift-{rid}-ingress-any",
+                    if rule not in decl_ingress and "0.0.0.0/0" in rule.get(
+                        "cidr_blocks", []
+                    ):
+                        drifts.append(
+                            {
+                                "drift_id": f"drift-{rid}-ingress-any",
+                                "resource_id": rid,
+                                "resource_type": decl["resource_type"],
+                                "provider": decl["provider"],
+                                "file_path": decl["file_path"],
+                                "drift_type": "DRIFT_SECURITY_GROUP_INGRESS_ALL",
+                                "severity": "CRITICAL",
+                                "description": f"Security group has drifted: Port {rule.get('port')} is open to 0.0.0.0/0, violating declared IaC.",
+                                "declared_value": decl_ingress,
+                                "runtime_value": live_ingress,
+                                "remediation_hcl": (
+                                    f"# Reconciliation patch for {decl['file_path']}\n"
+                                    'resource "aws_security_group_rule" "ingress_bastion_ssh" {\n'
+                                    '  type              = "ingress"\n'
+                                    "  from_port         = 22\n"
+                                    "  to_port           = 22\n"
+                                    '  protocol          = "tcp"\n'
+                                    '  cidr_blocks       = ["10.0.0.0/16"] # Reconciled from 0.0.0.0/0\n'
+                                    f"  security_group_id = {rid}.id\n"
+                                    "}\n"
+                                ),
+                                "remediation_cli": f"aws ec2 revoke-security-group-ingress --group-id {rid.split('.')[-1]} --protocol tcp --port {rule.get('port')} --cidr 0.0.0.0/0",
+                            }
+                        )
+
+            # 2. S3 Encryption Drift
+            elif decl["resource_type"] == "aws_s3_bucket":
+                if decl_state.get("server_side_encryption") and not live_state.get(
+                    "server_side_encryption"
+                ):
+                    drifts.append(
+                        {
+                            "drift_id": f"drift-{rid}-encryption-disabled",
                             "resource_id": rid,
                             "resource_type": decl["resource_type"],
                             "provider": decl["provider"],
                             "file_path": decl["file_path"],
-                            "drift_type": "DRIFT_SECURITY_GROUP_INGRESS_ALL",
-                            "severity": "CRITICAL",
-                            "description": f"Security group has drifted: Port {rule.get('port')} is open to 0.0.0.0/0, violating declared IaC.",
-                            "declared_value": decl_ingress,
-                            "runtime_value": live_ingress,
+                            "drift_type": "DRIFT_UNENCRYPTED_S3_STORAGE",
+                            "severity": "HIGH",
+                            "description": "S3 bucket server-side encryption was disabled out-of-band in cloud console.",
+                            "declared_value": decl_state.get("server_side_encryption"),
+                            "runtime_value": None,
                             "remediation_hcl": (
-                                f'# Reconciliation patch for {decl["file_path"]}\n'
-                                'resource "aws_security_group_rule" "ingress_bastion_ssh" {\n'
-                                '  type              = "ingress"\n'
-                                '  from_port         = 22\n'
-                                '  to_port           = 22\n'
-                                '  protocol          = "tcp"\n'
-                                '  cidr_blocks       = ["10.0.0.0/16"] # Reconciled from 0.0.0.0/0\n'
-                                f'  security_group_id = {rid}.id\n'
-                                '}\n'
+                                f'resource "aws_s3_bucket_server_side_encryption_configuration" "reconciled_sse" {{\n'
+                                f"  bucket = {rid}.id\n"
+                                "  rule {\n"
+                                "    apply_server_side_encryption_by_default {\n"
+                                '      sse_algorithm = "aws:kms"\n'
+                                "    }\n"
+                                "  }\n"
+                                "}\n"
                             ),
-                            "remediation_cli": f"aws ec2 revoke-security-group-ingress --group-id {rid.split('.')[-1]} --protocol tcp --port {rule.get('port')} --cidr 0.0.0.0/0",
-                        })
-
-            # 2. S3 Encryption Drift
-            elif decl["resource_type"] == "aws_s3_bucket":
-                if decl_state.get("server_side_encryption") and not live_state.get("server_side_encryption"):
-                    drifts.append({
-                        "drift_id": f"drift-{rid}-encryption-disabled",
-                        "resource_id": rid,
-                        "resource_type": decl["resource_type"],
-                        "provider": decl["provider"],
-                        "file_path": decl["file_path"],
-                        "drift_type": "DRIFT_UNENCRYPTED_S3_STORAGE",
-                        "severity": "HIGH",
-                        "description": "S3 bucket server-side encryption was disabled out-of-band in cloud console.",
-                        "declared_value": decl_state.get("server_side_encryption"),
-                        "runtime_value": None,
-                        "remediation_hcl": (
-                            f'resource "aws_s3_bucket_server_side_encryption_configuration" "reconciled_sse" {{\n'
-                            f'  bucket = {rid}.id\n'
-                            '  rule {\n'
-                            '    apply_server_side_encryption_by_default {\n'
-                            '      sse_algorithm = "aws:kms"\n'
-                            '    }\n'
-                            '  }\n'
-                            '}\n'
-                        ),
-                        "remediation_cli": f"aws s3api put-bucket-encryption --bucket {decl_state.get('bucket')} --server-side-encryption-configuration '{{\"Rules\": [{{\"ApplyServerSideEncryptionByDefault\": {{\"SSEAlgorithm\": \"aws:kms\"}}}}]}}'",
-                    })
+                            "remediation_cli": f'aws s3api put-bucket-encryption --bucket {decl_state.get("bucket")} --server-side-encryption-configuration \'{{"Rules": [{{"ApplyServerSideEncryptionByDefault": {{"SSEAlgorithm": "aws:kms"}}}}]}}\'',
+                        }
+                    )
 
             # 3. IAM Wildcard Drift
             elif decl["resource_type"] == "aws_iam_policy":
-                if "*" in live_state.get("actions", []) and "*" not in decl_state.get("actions", []):
-                    drifts.append({
-                        "drift_id": f"drift-{rid}-iam-wildcard",
-                        "resource_id": rid,
-                        "resource_type": decl["resource_type"],
-                        "provider": decl["provider"],
-                        "file_path": decl["file_path"],
-                        "drift_type": "DRIFT_IAM_WILDCARD_ADMIN",
-                        "severity": "CRITICAL",
-                        "description": "IAM Policy escalated out-of-band to wildcard administrative actions (*).",
-                        "declared_value": decl_state.get("actions"),
-                        "runtime_value": live_state.get("actions"),
-                        "remediation_hcl": (
-                            f'# Re-apply least privilege policy\n'
-                            f'resource "aws_iam_policy" "reconciled_policy" {{\n'
-                            f'  name   = "{decl_state.get("name")}"\n'
-                            f'  policy = jsonencode({{\n'
-                            '    Version = "2012-10-17"\n'
-                            '    Statement = [{\n'
-                            f'      Action   = {json.dumps(decl_state.get("actions"))}\n'
-                            '      Effect   = "Allow"\n'
-                            '      Resource = "*"\n'
-                            '    }]\n'
-                            '  })\n'
-                            '}\n'
-                        ),
-                        "remediation_cli": f"aws iam create-policy-version --policy-arn arn:aws:iam::123456789:policy/{decl_state.get('name')} --policy-document file://reconciled-policy.json --set-as-default",
-                    })
+                if "*" in live_state.get("actions", []) and "*" not in decl_state.get(
+                    "actions", []
+                ):
+                    drifts.append(
+                        {
+                            "drift_id": f"drift-{rid}-iam-wildcard",
+                            "resource_id": rid,
+                            "resource_type": decl["resource_type"],
+                            "provider": decl["provider"],
+                            "file_path": decl["file_path"],
+                            "drift_type": "DRIFT_IAM_WILDCARD_ADMIN",
+                            "severity": "CRITICAL",
+                            "description": "IAM Policy escalated out-of-band to wildcard administrative actions (*).",
+                            "declared_value": decl_state.get("actions"),
+                            "runtime_value": live_state.get("actions"),
+                            "remediation_hcl": (
+                                f"# Re-apply least privilege policy\n"
+                                f'resource "aws_iam_policy" "reconciled_policy" {{\n'
+                                f'  name   = "{decl_state.get("name")}"\n'
+                                f"  policy = jsonencode({{\n"
+                                '    Version = "2012-10-17"\n'
+                                "    Statement = [{\n"
+                                f"      Action   = {json.dumps(decl_state.get('actions'))}\n"
+                                '      Effect   = "Allow"\n'
+                                '      Resource = "*"\n'
+                                "    }]\n"
+                                "  })\n"
+                                "}\n"
+                            ),
+                            "remediation_cli": f"aws iam create-policy-version --policy-arn arn:aws:iam::123456789:policy/{decl_state.get('name')} --policy-document file://reconciled-policy.json --set-as-default",
+                        }
+                    )
 
             # 4. Kubernetes Privileged Pod Drift
             elif decl["resource_type"] == "kubernetes_deployment":
-                if live_state.get("privileged") is True and decl_state.get("privileged") is False:
-                    drifts.append({
-                        "drift_id": f"drift-{rid}-k8s-privileged",
-                        "resource_id": rid,
-                        "resource_type": decl["resource_type"],
-                        "provider": decl["provider"],
-                        "file_path": decl["file_path"],
-                        "drift_type": "DRIFT_K8S_PRIVILEGED_POD",
-                        "severity": "CRITICAL",
-                        "description": "Kubernetes container deployment running in privileged mode, drifting from Helm specification.",
-                        "declared_value": {"privileged": False},
-                        "runtime_value": {"privileged": True},
-                        "remediation_hcl": (
-                            "# Kubernetes Helm SecurityContext Patch\n"
-                            "securityContext:\n"
-                            "  privileged: false\n"
-                            "  allowPrivilegeEscalation: false\n"
-                            "  readOnlyRootFilesystem: true\n"
-                        ),
-                        "remediation_cli": f"kubectl patch deployment {decl_state.get('container')} --type='json' -p='[{{\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/securityContext/privileged\", \"value\": false}}]'",
-                    })
+                if (
+                    live_state.get("privileged") is True
+                    and decl_state.get("privileged") is False
+                ):
+                    drifts.append(
+                        {
+                            "drift_id": f"drift-{rid}-k8s-privileged",
+                            "resource_id": rid,
+                            "resource_type": decl["resource_type"],
+                            "provider": decl["provider"],
+                            "file_path": decl["file_path"],
+                            "drift_type": "DRIFT_K8S_PRIVILEGED_POD",
+                            "severity": "CRITICAL",
+                            "description": "Kubernetes container deployment running in privileged mode, drifting from Helm specification.",
+                            "declared_value": {"privileged": False},
+                            "runtime_value": {"privileged": True},
+                            "remediation_hcl": (
+                                "# Kubernetes Helm SecurityContext Patch\n"
+                                "securityContext:\n"
+                                "  privileged: false\n"
+                                "  allowPrivilegeEscalation: false\n"
+                                "  readOnlyRootFilesystem: true\n"
+                            ),
+                            "remediation_cli": f'kubectl patch deployment {decl_state.get("container")} --type=\'json\' -p=\'[{{"op": "replace", "path": "/spec/template/spec/containers/0/securityContext/privileged", "value": false}}]\'',
+                        }
+                    )
 
         critical_count = sum(1 for d in drifts if d["severity"] == "CRITICAL")
         high_count = sum(1 for d in drifts if d["severity"] == "HIGH")
@@ -312,7 +332,9 @@ class IaCDriftEngine:
         Generates an automated Git PR payload with combined Terraform / Helm reconciliation patches.
         """
         scan_res = self.scan_drift()
-        matched_drifts = [d for d in scan_res["drifts"] if d["drift_id"] in drift_ids or not drift_ids]
+        matched_drifts = [
+            d for d in scan_res["drifts"] if d["drift_id"] in drift_ids or not drift_ids
+        ]
 
         combined_diff = "\n".join([d["remediation_hcl"] for d in matched_drifts])
         pr_title = f"fix(security): reconcile {len(matched_drifts)} out-of-band cloud infrastructure drifts"
@@ -321,9 +343,13 @@ class IaCDriftEngine:
             "This Pull Request reconciles security drifts detected between declared IaC manifests and live cloud state:\n\n"
         )
         for d in matched_drifts:
-            pr_body += f"- **[{d['severity']}] {d['resource_id']}**: {d['description']}\n"
+            pr_body += (
+                f"- **[{d['severity']}] {d['resource_id']}**: {d['description']}\n"
+            )
 
-        pr_body += f"\n### Unified Terraform / Helm HCL Diff:\n```hcl\n{combined_diff}\n```\n"
+        pr_body += (
+            f"\n### Unified Terraform / Helm HCL Diff:\n```hcl\n{combined_diff}\n```\n"
+        )
 
         result = {
             "pr_id": f"pr-{int(datetime.now().timestamp())}",
@@ -339,7 +365,11 @@ class IaCDriftEngine:
         # Merkle Audit
         audit_chain.record_action(
             action="IAC_PR_GENERATED",
-            details={"pr_id": result["pr_id"], "branch": branch_name, "count": len(matched_drifts)},
+            details={
+                "pr_id": result["pr_id"],
+                "branch": branch_name,
+                "count": len(matched_drifts),
+            },
             org_id="system-cloud",
             actor="SageAI-IaCDriftEngine",
         )

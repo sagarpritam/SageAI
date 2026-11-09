@@ -4,8 +4,10 @@ and Enterprise SAML 2.0 / OIDC SSO Federation.
 """
 
 import base64
+
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
+
 from app.main import app
 from app.services.reporting.multilingual_debrief import (
     MultilingualDebriefService,
@@ -43,7 +45,10 @@ class TestMultilingualDebrief:
         assert debrief["posture"]["risk_level"] == "CRITICAL"
         assert debrief["posture"]["breakdown"]["critical"] == 1
         assert debrief["posture"]["breakdown"]["high"] == 1
-        assert "Merkle Hash Chain Verified" in debrief["compliance_assurance"]["tamper_proof_statement"]
+        assert (
+            "Merkle Hash Chain Verified"
+            in debrief["compliance_assurance"]["tamper_proof_statement"]
+        )
         assert debrief["compliance_assurance"]["merkle_verification"]["valid"] is True
         assert debrief["compliance_assurance"]["block_hash"] != ""
 
@@ -56,9 +61,14 @@ class TestMultilingualDebrief:
         )
         assert debrief["status"] == "success"
         assert debrief["language"]["code"] == "ja"
-        assert "エグゼクティブ・サイバーセキュリティ報告書" in debrief["metadata"]["title"]
+        assert (
+            "エグゼクティブ・サイバーセキュリティ報告書" in debrief["metadata"]["title"]
+        )
         assert "全体的なセキュリティ態勢" in debrief["posture"]["section_label"]
-        assert "Merkleハッシュチェーン検証済み" in debrief["compliance_assurance"]["tamper_proof_statement"]
+        assert (
+            "Merkleハッシュチェーン検証済み"
+            in debrief["compliance_assurance"]["tamper_proof_statement"]
+        )
 
     def test_generate_debrief_german_french_spanish_chinese_arabic(self):
         tests = [
@@ -149,7 +159,9 @@ class TestSSOAndDebriefAPI:
                 </saml:Assertion>
             </samlp:Response>"""
 
-            encoded_response = base64.b64encode(saml_assertion_xml.encode("utf-8")).decode("utf-8")
+            encoded_response = base64.b64encode(
+                saml_assertion_xml.encode("utf-8")
+            ).decode("utf-8")
 
             res = await client.post(
                 "/auth/sso/saml/acs",
@@ -165,7 +177,10 @@ class TestSSOAndDebriefAPI:
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             res = await client.post(
                 "/auth/sso/oidc/callback",
-                json={"code": "oidc_auth_code_987654321", "email": "director@enterprise.com"},
+                json={
+                    "code": "oidc_auth_code_987654321",
+                    "email": "director@enterprise.com",
+                },
             )
             assert res.status_code == 200
             data = res.json()

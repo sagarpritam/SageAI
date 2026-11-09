@@ -8,4 +8,3 @@ from app.services.telemetry.ebpf_agent import (
 )
 
 __all__ = ["EBPFAgentService", "ebpf_agent_service"]
-

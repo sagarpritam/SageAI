@@ -45,7 +45,9 @@ celery_app.conf.update(
         },
         "cleanup-old-scans-weekly": {
             "task": "SageAI.cleanup_old_scans",
-            "schedule": crontab(minute=0, hour=3, day_of_week="sunday"),  # Weekly on Sunday at 03:00 UTC
+            "schedule": crontab(
+                minute=0, hour=3, day_of_week="sunday"
+            ),  # Weekly on Sunday at 03:00 UTC
         },
     },
 )
@@ -253,4 +255,3 @@ def sync_threat_feeds(force: bool = False):
     except Exception as exc:
         logger.error("Threat feed sync failed: %s", exc, exc_info=True)
         return {"status": "failed", "error": str(exc)}
-

@@ -107,29 +107,38 @@ class DarkWebRadarService:
         for entry in log_list:
             # Check compromised credentials
             for cred in entry.get("credentials", []):
-                if domain_filter in cred.get("username", "") or domain_filter in cred.get("url", ""):
-                    compromised_identities.append({
-                        "identity": cred["username"],
-                        "target_service": cred["url"],
-                        "malware_source": entry["malware_family"],
-                        "source_marketplace": entry["source_marketplace"],
-                        "severity": "CRITICAL",
-                        "infected_machine": entry["infected_machine"],
-                        "action": "FORCE_PASSWORD_RESET_AND_REVOKE_SESSIONS",
-                    })
+                if domain_filter in cred.get(
+                    "username", ""
+                ) or domain_filter in cred.get("url", ""):
+                    compromised_identities.append(
+                        {
+                            "identity": cred["username"],
+                            "target_service": cred["url"],
+                            "malware_source": entry["malware_family"],
+                            "source_marketplace": entry["source_marketplace"],
+                            "severity": "CRITICAL",
+                            "infected_machine": entry["infected_machine"],
+                            "action": "FORCE_PASSWORD_RESET_AND_REVOKE_SESSIONS",
+                        }
+                    )
 
             # Check active session cookies
             for cookie in entry.get("cookies", []):
-                if domain_filter in cookie.get("domain", "") and cookie.get("status") == "ACTIVE_UNEXPIRED":
-                    active_session_tokens.append({
-                        "domain": cookie["domain"],
-                        "cookie_name": cookie["name"],
-                        "token_hash": cookie["value_hash"],
-                        "malware_family": entry["malware_family"],
-                        "severity": "CRITICAL",
-                        "victim_ip": entry["victim_ip"],
-                        "action": "INVALIDATE_IDP_SESSION_IMMEDIATELY",
-                    })
+                if (
+                    domain_filter in cookie.get("domain", "")
+                    and cookie.get("status") == "ACTIVE_UNEXPIRED"
+                ):
+                    active_session_tokens.append(
+                        {
+                            "domain": cookie["domain"],
+                            "cookie_name": cookie["name"],
+                            "token_hash": cookie["value_hash"],
+                            "malware_family": entry["malware_family"],
+                            "severity": "CRITICAL",
+                            "victim_ip": entry["victim_ip"],
+                            "action": "INVALIDATE_IDP_SESSION_IMMEDIATELY",
+                        }
+                    )
 
         critical_threats = len(active_session_tokens) + len(compromised_identities)
         exposure_index = min(100, critical_threats * 25)
@@ -176,7 +185,11 @@ class DarkWebRadarService:
             "user_identity": user_identity,
             "token_hash": token_hash,
             "status": "SESSION_REVOKED_SUCCESSFULLY",
-            "revoked_idp_providers": ["Okta Universal Directory", "Google Workspace", "AWS SSO"],
+            "revoked_idp_providers": [
+                "Okta Universal Directory",
+                "Google Workspace",
+                "AWS SSO",
+            ],
             "operator": operator,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -194,4 +207,3 @@ class DarkWebRadarService:
 
 # Global instance
 darkweb_radar_service = DarkWebRadarService()
-

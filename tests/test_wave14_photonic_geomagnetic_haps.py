@@ -8,11 +8,15 @@ Test Suite for Wave 14: Photonic Quantum Computing Co-Processor, Geomagnetic Sol
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.security import get_current_user
-from app.services.photonic_quantum.photonic_quantum_firewall import photonic_quantum_firewall
-from app.services.geomagnetic_shield.geomagnetic_solar_shield import geomagnetic_solar_shield
+from app.main import app
+from app.services.geomagnetic_shield.geomagnetic_solar_shield import (
+    geomagnetic_solar_shield,
+)
 from app.services.haps_stratosphere.haps_stratosphere_mesh import haps_stratosphere_mesh
+from app.services.photonic_quantum.photonic_quantum_firewall import (
+    photonic_quantum_firewall,
+)
 
 
 @pytest.fixture
@@ -173,7 +177,9 @@ def test_haps_stratosphere_service():
     assert jet_stream["threat_detected"] is True
     assert jet_stream["threat_level"] == "CRITICAL"
     assert jet_stream["threat_type"] == "STRATOSPHERIC_JET_STREAM_SHEAR_DRIFT"
-    assert jet_stream["action_recommended"] == "ACTIVATE_MAX_AERO_THRUST_STATION_KEEPING"
+    assert (
+        jet_stream["action_recommended"] == "ACTIVATE_MAX_AERO_THRUST_STATION_KEEPING"
+    )
 
     # Relay sub-millimeter SAR telemetry
     telemetry = haps_stratosphere_mesh.relay_submillimeter_sar_telemetry(
@@ -300,4 +306,3 @@ def test_wave14_fastapi_endpoints(client):
 
     finally:
         app.dependency_overrides.pop(get_current_user, None)
-

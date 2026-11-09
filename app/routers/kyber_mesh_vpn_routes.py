@@ -64,7 +64,7 @@ async def register_peer_endpoint(
         node_name=payload.node_name,
         endpoint=payload.endpoint,
         overlay_ip=payload.overlay_ip,
-        allowed_ips=payload.allowed_ips
+        allowed_ips=payload.allowed_ips,
     )
     return {"status": "success", "peer": peer}
 
@@ -107,4 +107,3 @@ async def get_metrics_endpoint(
 ):
     """Retrieves post-quantum mesh telemetry and tunnel throughput."""
     return {"status": "success", "metrics": kyber_mesh_vpn_service.get_mesh_metrics()}
-

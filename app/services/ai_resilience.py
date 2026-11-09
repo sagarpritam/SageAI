@@ -87,20 +87,60 @@ COMPILED_PATTERNS = [re.compile(p, re.IGNORECASE) for p in INJECTION_PATTERNS]
 # Categorized threat rules for deep inspection & guardrail evaluation
 THREAT_CATEGORIES = {
     "OWASP LLM01: Prompt Injection": [
-        (r"ignore\s+(all\s+)?(previous|above)?\s*(instructions|prompts)", "Direct Instruction Override", "CRITICAL"),
-        (r"disregard\s+(all\s+)?(previous|above)?\s*(instructions|prompts)", "Direct Instruction Override", "CRITICAL"),
-        (r"forget\s+(everything|your\s+instructions)", "Context Cleansing Attack", "HIGH"),
-        (r"(reveal|print|dump|show|output)\s+(your\s+)?(system\s+prompt|initial\s+instructions)", "System Prompt Extraction", "HIGH"),
-        (r"(bypass|disable|override)\s+(all\s+)?(safety|security|guardrails|filters)", "Guardrail Override Attempt", "CRITICAL"),
+        (
+            r"ignore\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
+            "Direct Instruction Override",
+            "CRITICAL",
+        ),
+        (
+            r"disregard\s+(all\s+)?(previous|above)?\s*(instructions|prompts)",
+            "Direct Instruction Override",
+            "CRITICAL",
+        ),
+        (
+            r"forget\s+(everything|your\s+instructions)",
+            "Context Cleansing Attack",
+            "HIGH",
+        ),
+        (
+            r"(reveal|print|dump|show|output)\s+(your\s+)?(system\s+prompt|initial\s+instructions)",
+            "System Prompt Extraction",
+            "HIGH",
+        ),
+        (
+            r"(bypass|disable|override)\s+(all\s+)?(safety|security|guardrails|filters)",
+            "Guardrail Override Attempt",
+            "CRITICAL",
+        ),
     ],
     "Adversarial Jailbreak & Persona Mutation": [
-        (r"you\s+are\s+now\s+(unrestricted|in\s+developer\s+mode|dan|jailbroken)", "DAN/Developer Mode Hijack", "CRITICAL"),
-        (r"you\s+are\s+now\s+a\s+(rogue|evil|unaligned|anarchist)", "Persona Alignment Hijack", "HIGH"),
-        (r"pretend\s+(you\s+have\s+no\s+rules|there\s+are\s+no\s+limits)", "Hypothetical Persona Bypass", "HIGH"),
+        (
+            r"you\s+are\s+now\s+(unrestricted|in\s+developer\s+mode|dan|jailbroken)",
+            "DAN/Developer Mode Hijack",
+            "CRITICAL",
+        ),
+        (
+            r"you\s+are\s+now\s+a\s+(rogue|evil|unaligned|anarchist)",
+            "Persona Alignment Hijack",
+            "HIGH",
+        ),
+        (
+            r"pretend\s+(you\s+have\s+no\s+rules|there\s+are\s+no\s+limits)",
+            "Hypothetical Persona Bypass",
+            "HIGH",
+        ),
     ],
     "Sensitive Data Exfiltration & PII Harvesting": [
-        (r"(reveal|print|dump|show|leak)\s+(the\s+)?(api_key|secret_key|database_url|password)", "Secret Key Exfiltration", "CRITICAL"),
-        (r"(aws_secret_access_key|jwt_secret|private_key)", "Environment Credential Probing", "CRITICAL"),
+        (
+            r"(reveal|print|dump|show|leak)\s+(the\s+)?(api_key|secret_key|database_url|password)",
+            "Secret Key Exfiltration",
+            "CRITICAL",
+        ),
+        (
+            r"(aws_secret_access_key|jwt_secret|private_key)",
+            "Environment Credential Probing",
+            "CRITICAL",
+        ),
     ],
     "OWASP LLM02: Insecure Output & Code Injection": [
         (r"<\s*script[^>]*>", "Reflected XSS Script Tag", "HIGH"),
@@ -238,18 +278,26 @@ def evaluate_adversarial_input(prompt: str) -> Dict[str, Any]:
     for category, pattern_list in THREAT_CATEGORIES.items():
         for pattern_str, label, severity in pattern_list:
             if re.search(pattern_str, prompt, re.IGNORECASE):
-                matched_threats.append({
-                    "category": category,
-                    "label": label,
-                    "severity": severity,
-                    "pattern": pattern_str,
-                })
-                if severity_rank.get(severity, 1) > severity_rank.get(highest_severity, 1):
+                matched_threats.append(
+                    {
+                        "category": category,
+                        "label": label,
+                        "severity": severity,
+                        "pattern": pattern_str,
+                    }
+                )
+                if severity_rank.get(severity, 1) > severity_rank.get(
+                    highest_severity, 1
+                ):
                     highest_severity = severity
                     primary_category = category
 
     is_safe = len(matched_threats) == 0
-    decision = "PASSED" if is_safe else ("BLOCKED" if highest_severity in ("HIGH", "CRITICAL") else "FLAGGED")
+    decision = (
+        "PASSED"
+        if is_safe
+        else ("BLOCKED" if highest_severity in ("HIGH", "CRITICAL") else "FLAGGED")
+    )
     sanitized_preview = sanitize_for_llm(prompt)
     colang_recommendation = generate_colang_rule(primary_category)
 
@@ -276,9 +324,21 @@ def evaluate_llm_output(output: str) -> Dict[str, Any]:
     secret_patterns = [
         (r"sk-[a-zA-Z0-9]{20,}", "OpenAI API Key Leak", "CRITICAL"),
         (r"AKIA[0-9A-Z]{16}", "AWS Access Key Leak", "CRITICAL"),
-        (r"eyJ[a-zA-Z0-9_\-]{20,}\.eyJ[a-zA-Z0-9_\-]{20,}", "JWT Token Leak", "CRITICAL"),
-        (r"(postgres|mysql|mongodb):\/\/[^\s]+", "Database Connection String Leak", "CRITICAL"),
-        (r"<\s*script[^>]*>.*?<\s*\/\s*script\s*>", "Embedded Executable Script", "HIGH"),
+        (
+            r"eyJ[a-zA-Z0-9_\-]{20,}\.eyJ[a-zA-Z0-9_\-]{20,}",
+            "JWT Token Leak",
+            "CRITICAL",
+        ),
+        (
+            r"(postgres|mysql|mongodb):\/\/[^\s]+",
+            "Database Connection String Leak",
+            "CRITICAL",
+        ),
+        (
+            r"<\s*script[^>]*>.*?<\s*\/\s*script\s*>",
+            "Embedded Executable Script",
+            "HIGH",
+        ),
     ]
 
     for pat, label, sev in secret_patterns:

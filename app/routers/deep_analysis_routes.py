@@ -24,8 +24,12 @@ router = APIRouter(prefix="/deep-analysis", tags=["Deep Attack Analysis"])
 
 class DeepAuditRequest(BaseModel):
     target: str = Field(..., description="Target domain, IP, or URL")
-    vectors: Optional[List[str]] = Field(None, description="List of attack vectors to evaluate")
-    code_snippet: Optional[str] = Field(None, description="Optional code snippet for deterministic AST taint analysis")
+    vectors: Optional[List[str]] = Field(
+        None, description="List of attack vectors to evaluate"
+    )
+    code_snippet: Optional[str] = Field(
+        None, description="Optional code snippet for deterministic AST taint analysis"
+    )
 
 
 class SingleVectorProbeRequest(BaseModel):
@@ -146,4 +150,3 @@ async def probe_single_vector(
         "vector": req.vector,
         "audit": result,
     }
-

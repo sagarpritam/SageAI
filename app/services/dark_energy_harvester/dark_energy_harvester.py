@@ -126,10 +126,19 @@ class DarkEnergyQuintessenceHarvester:
 
         # Inflaton field amplitude and potential calculation
         phi = round(random.uniform(2.42e18, 3.15e18), 4)  # Planck mass order scalar
-        potential_density = round(random.uniform(1.2e-47, 1.8e-47), 50)  # Giga-electron-volt^4
+        potential_density = round(
+            random.uniform(1.2e-47, 1.8e-47), 50
+        )  # Giga-electron-volt^4
         w_eos = round(-1.0 - (0.01 + random.uniform(0.005, 0.035) * coupling_factor), 4)
-        neg_p = round(node.negative_pressure_gpa * (1.0 + (coupling_factor - 1.0) * 0.1), 3)
-        yield_mw = round(node.metric_energy_harvest_rate_mw * coupling_factor * (1.0 + random.uniform(-0.02, 0.03)), 2)
+        neg_p = round(
+            node.negative_pressure_gpa * (1.0 + (coupling_factor - 1.0) * 0.1), 3
+        )
+        yield_mw = round(
+            node.metric_energy_harvest_rate_mw
+            * coupling_factor
+            * (1.0 + random.uniform(-0.02, 0.03)),
+            2,
+        )
         stability_idx = round(99.4 + random.uniform(0.1, 0.5), 2)
 
         event_id = f"DARK-ENERGY-STAB-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
@@ -163,11 +172,17 @@ class DarkEnergyQuintessenceHarvester:
         }
 
     def get_harvest_metrics(self) -> Dict[str, Any]:
-        total_mw = sum([h.metric_energy_harvest_rate_mw for h in self.harvesters.values()])
+        total_mw = sum(
+            [h.metric_energy_harvest_rate_mw for h in self.harvesters.values()]
+        )
         return {
             "active_quintessence_harvesters": len(self.harvesters),
             "total_harvest_rate_mw": total_mw,
-            "mean_equation_of_state_w": round(sum([h.equation_of_state_w for h in self.harvesters.values()]) / len(self.harvesters), 3),
+            "mean_equation_of_state_w": round(
+                sum([h.equation_of_state_w for h in self.harvesters.values()])
+                / len(self.harvesters),
+                3,
+            ),
             "stabilization_events_logged": len(self.events),
             "cosmic_inflation_mode": "QUINTESSENCE_NEGATIVE_PRESSURE_COUPLED",
             "status": "OPERATIONAL",
@@ -175,4 +190,3 @@ class DarkEnergyQuintessenceHarvester:
 
 
 dark_energy_harvester = DarkEnergyQuintessenceHarvester()
-

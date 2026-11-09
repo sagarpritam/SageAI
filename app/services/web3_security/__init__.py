@@ -8,4 +8,3 @@ from app.services.web3_security.smart_contract_auditor import (
 )
 
 __all__ = ["SmartContractAuditor", "smart_contract_auditor"]
-

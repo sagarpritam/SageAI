@@ -11,7 +11,9 @@ from app.core.rate_limit import limiter
 from app.core.security import get_current_user
 from app.services.kms_hsm.kms_hsm_service import kms_hsm_service
 
-router = APIRouter(prefix="/kms-hsm", tags=["Sovereign KMS HSM & Shamir's Secret Sharing"])
+router = APIRouter(
+    prefix="/kms-hsm", tags=["Sovereign KMS HSM & Shamir's Secret Sharing"]
+)
 
 
 class RotateKeyRequest(BaseModel):
@@ -23,14 +25,22 @@ class ZeroizeKeyRequest(BaseModel):
 
 
 class SplitSecretRequest(BaseModel):
-    secret: str = Field(..., description="Sensitive secret string to split into threshold shares")
-    n_shares: Optional[int] = Field(5, description="Total number of custodian shares to generate")
-    k_threshold: Optional[int] = Field(3, description="Minimum number of shares required to reconstruct")
+    secret: str = Field(
+        ..., description="Sensitive secret string to split into threshold shares"
+    )
+    n_shares: Optional[int] = Field(
+        5, description="Total number of custodian shares to generate"
+    )
+    k_threshold: Optional[int] = Field(
+        3, description="Minimum number of shares required to reconstruct"
+    )
     custodians: Optional[List[str]] = Field(None, description="Custom custodian labels")
 
 
 class ReconstructSecretRequest(BaseModel):
-    shares: List[str] = Field(..., description="List of at least k threshold shares to reconstruct the secret")
+    shares: List[str] = Field(
+        ..., description="List of at least k threshold shares to reconstruct the secret"
+    )
 
 
 @router.get("/keys")
@@ -108,4 +118,3 @@ async def reconstruct_secret_endpoint(
         return {"status": "success", "reconstructed": res}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

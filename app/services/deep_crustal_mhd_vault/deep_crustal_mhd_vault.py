@@ -125,7 +125,13 @@ class DeepCrustalMHDVault:
 
         velocity = round(18.5 * brine_velocity_factor, 2)
         # Power P = sigma * u^2 * B^2 * K * (1-K) * Volume
-        generated = round(vault.rated_mhd_output_mw * brine_velocity_factor * load_factor * random.uniform(0.98, 1.02), 1)
+        generated = round(
+            vault.rated_mhd_output_mw
+            * brine_velocity_factor
+            * load_factor
+            * random.uniform(0.98, 1.02),
+            1,
+        )
         vault_internal = round(min(120.0, generated * 0.1), 1)
         grid_export = round(generated - vault_internal, 1)
 
@@ -175,4 +181,3 @@ class DeepCrustalMHDVault:
 
 
 deep_crustal_mhd_vault = DeepCrustalMHDVault()
-

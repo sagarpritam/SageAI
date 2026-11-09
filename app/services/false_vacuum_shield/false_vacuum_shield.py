@@ -20,7 +20,7 @@ class VacuumChamberNode:
     tunneling_barrier_height_gev4: float = 1.48e9
     coleman_de_luccia_bounce_action_b: float = 1840.5
     critical_bubble_radius_am: float = 450.0  # attometers
-    vacuum_decay_rate_log10: float = -285.4   # log10(Gamma / V)
+    vacuum_decay_rate_log10: float = -285.4  # log10(Gamma / V)
     counter_bias_pulse_power_tw: float = 45.0  # Terawatts
     status: str = "FALSE_VACUUM_METASTABLE_SECURE"
 
@@ -117,7 +117,9 @@ class FalseVacuumDecayShield:
         if not chamber:
             raise ValueError(f"Vacuum chamber {chamber_id} not registered.")
 
-        suppression_orders = round(120.0 * (counter_bias_power_tw / 45.0) + random.uniform(1.5, 8.5), 1)
+        suppression_orders = round(
+            120.0 * (counter_bias_power_tw / 45.0) + random.uniform(1.5, 8.5), 1
+        )
         prob_density = round(1.0e-28 * (45.0 / counter_bias_power_tw), 35)
         confidence = round(99.9999 + random.uniform(0.00001, 0.00008), 5)
 
@@ -153,7 +155,16 @@ class FalseVacuumDecayShield:
         return {
             "monitored_vacuum_chambers": len(self.chambers),
             "completed_nucleation_quenches": len(self.quench_events),
-            "mean_cdl_bounce_action": round(sum([c.coleman_de_luccia_bounce_action_b for c in self.chambers.values()]) / len(self.chambers), 1),
+            "mean_cdl_bounce_action": round(
+                sum(
+                    [
+                        c.coleman_de_luccia_bounce_action_b
+                        for c in self.chambers.values()
+                    ]
+                )
+                / len(self.chambers),
+                1,
+            ),
             "electroweak_vacuum_state": "METASTABLE_EQUILIBRIUM_PROTECTED",
             "decay_mechanism": "COLEMAN_DE_LUCCIA_GRAVITATIONAL_BOUNCE_SUPPRESSED",
             "status": "OPERATIONAL",
@@ -161,4 +172,3 @@ class FalseVacuumDecayShield:
 
 
 false_vacuum_decay_shield = FalseVacuumDecayShield()
-

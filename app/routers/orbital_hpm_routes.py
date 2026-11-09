@@ -7,15 +7,23 @@ from app.services.orbital_hpm_grid import orbital_hpm_grid
 
 router = APIRouter(
     prefix="/api/orbital-hpm",
-    tags=["Orbital High-Power Microwave (HPM) Electronics Directed Energy Grid (Option B)"],
+    tags=[
+        "Orbital High-Power Microwave (HPM) Electronics Directed Energy Grid (Option B)"
+    ],
 )
 
 
 class FireHPMPulseRequest(BaseModel):
     satellite_id: str = Field(..., description="Target HPM satellite ID")
-    target_identifier: str = Field(default="RADAR-BATTERY-S400-SECTOR-9", description="Target identifier")
-    target_category: str = Field(default="SAM_RADAR_PHASED_ARRAY", description="Target category")
-    pulse_duration_ns: float = Field(default=250.0, ge=10.0, le=5000.0, description="Pulse duration in nanoseconds")
+    target_identifier: str = Field(
+        default="RADAR-BATTERY-S400-SECTOR-9", description="Target identifier"
+    )
+    target_category: str = Field(
+        default="SAM_RADAR_PHASED_ARRAY", description="Target category"
+    )
+    pulse_duration_ns: float = Field(
+        default=250.0, ge=10.0, le=5000.0, description="Pulse duration in nanoseconds"
+    )
 
 
 @router.get("/arrays")
@@ -39,4 +47,3 @@ async def fire_pulse(req: FireHPMPulseRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return orbital_hpm_grid.get_grid_metrics()
-

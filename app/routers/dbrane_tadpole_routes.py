@@ -13,8 +13,12 @@ router = APIRouter(
 
 class CancelTadpoleRequest(BaseModel):
     stack_id: str = Field(..., description="Target D-Brane stack ID")
-    compensatory_flux_quanta: int = Field(default=1, ge=1, le=100, description="Compensatory Ramond-Ramond flux quanta")
-    green_schwarz_boost: float = Field(default=1.0, ge=0.1, le=10.0, description="Green-Schwarz axion coupling boost")
+    compensatory_flux_quanta: int = Field(
+        default=1, ge=1, le=100, description="Compensatory Ramond-Ramond flux quanta"
+    )
+    green_schwarz_boost: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Green-Schwarz axion coupling boost"
+    )
 
 
 @router.get("/stacks")
@@ -40,4 +44,3 @@ async def cancel_tadpole(req: CancelTadpoleRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     filt = get_dbrane_tadpole_filter()
     return filt.get_filter_metrics()
-

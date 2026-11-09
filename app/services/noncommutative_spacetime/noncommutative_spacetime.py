@@ -92,10 +92,15 @@ class NonCommutativeSpacetimeProtector:
         modulated_damping_db = base_damping + (10.0 * math.log10(gain)) + (order * 0.75)
 
         # Moyal star product truncation error ~ O(theta^{order + 1})
-        star_product_truncation_error = (effective_theta / self.PLANCK_LENGTH_SQ) ** (order / 2.0) * 1e-16
+        star_product_truncation_error = (effective_theta / self.PLANCK_LENGTH_SQ) ** (
+            order / 2.0
+        ) * 1e-16
 
         # Phase space coherence
-        coherence_pct = min(99.999, manifold["phase_space_coherence_pct"] * (1.0 + 0.00003 * (gain - 1.0)))
+        coherence_pct = min(
+            99.999,
+            manifold["phase_space_coherence_pct"] * (1.0 + 0.00003 * (gain - 1.0)),
+        )
 
         # Coordinate commutator norm ||[x^mu, x^nu]||
         commutator_norm = effective_theta
@@ -140,4 +145,3 @@ _noncommutative_spacetime_protector = NonCommutativeSpacetimeProtector()
 def get_noncommutative_spacetime_protector() -> NonCommutativeSpacetimeProtector:
     """Return the global NonCommutativeSpacetimeProtector singleton instance."""
     return _noncommutative_spacetime_protector
-

@@ -21,15 +21,25 @@ router = APIRouter(
 
 class EvaluateGeomagneticStormRequest(BaseModel):
     substation_id: str = Field(..., description="Target EHV substation identifier")
-    kp_index: float = Field(..., description="Planetary geomagnetic Kp storm index (0.0 to 9.0+)")
-    db_dt_nt_per_min: float = Field(..., description="Rate of magnetic field change in nT/min")
+    kp_index: float = Field(
+        ..., description="Planetary geomagnetic Kp storm index (0.0 to 9.0+)"
+    )
+    db_dt_nt_per_min: float = Field(
+        ..., description="Rate of magnetic field change in nT/min"
+    )
     measured_gic_amps: float = Field(..., description="Quasi-DC GIC current in Amperes")
 
 
 class TriggerNeutralBlockingRequest(BaseModel):
-    substation_id: str = Field(..., description="Substation to shield with series capacitor / NGR")
-    damping_resistance_ohms: float = Field(12.5, description="Neutral grounding damping resistance in ohms")
-    tripping_latency_ms: float = Field(9.4, description="Breaker actuation time in milliseconds")
+    substation_id: str = Field(
+        ..., description="Substation to shield with series capacitor / NGR"
+    )
+    damping_resistance_ohms: float = Field(
+        12.5, description="Neutral grounding damping resistance in ohms"
+    )
+    tripping_latency_ms: float = Field(
+        9.4, description="Breaker actuation time in milliseconds"
+    )
 
 
 @router.get("/substations")
@@ -39,7 +49,10 @@ async def list_substations_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Retrieves all monitored EHV power grid transmission substations."""
-    return {"status": "success", "substations": geomagnetic_solar_shield.list_substations()}
+    return {
+        "status": "success",
+        "substations": geomagnetic_solar_shield.list_substations(),
+    }
 
 
 @router.get("/substations/{substation_id}")
@@ -102,5 +115,7 @@ async def get_geomagnetic_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet telemetry for planetary geomagnetic CME power grid shielding."""
-    return {"status": "success", "metrics": geomagnetic_solar_shield.get_geomagnetic_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": geomagnetic_solar_shield.get_geomagnetic_metrics(),
+    }

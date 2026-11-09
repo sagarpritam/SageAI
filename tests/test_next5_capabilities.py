@@ -12,11 +12,13 @@ from httpx import ASGITransport, AsyncClient
 
 from app.core.security import create_access_token
 from app.main import app
-from app.services.cloud_posture.cspm_service import CSPMService, cspm_service
-from app.services.supply_chain.sbom_scanner import SBOMScanner, sbom_scanner
-from app.services.ztna.microsegmentation_service import ZTNAMicrosegmentationService, ztna_service
-from app.services.adversary.mitre_emulator import MitreAdversaryEmulator, mitre_emulator
-from app.services.easm.shadow_it_hunter import ShadowITHunterService, shadow_it_hunter
+from app.services.adversary.mitre_emulator import MitreAdversaryEmulator
+from app.services.cloud_posture.cspm_service import CSPMService
+from app.services.easm.shadow_it_hunter import ShadowITHunterService
+from app.services.supply_chain.sbom_scanner import SBOMScanner
+from app.services.ztna.microsegmentation_service import (
+    ZTNAMicrosegmentationService,
+)
 
 
 @pytest.fixture
@@ -29,15 +31,36 @@ def test_cspm_benchmark_and_toxic_combinations():
     """Verify CIS Benchmark evaluation and detection of toxic IAM + public exposure paths."""
     service = CSPMService()
     test_assets = [
-        {"name": "alb-ingress", "type": "LOAD_BALANCER", "cloud": "AWS", "is_public": True, "has_admin_iam": True},
-        {"name": "backup-bucket", "type": "S3_BUCKET", "cloud": "AWS", "is_public": True},
-        {"name": "bastion-host", "type": "SECURITY_GROUP", "cloud": "AWS", "open_ssh": True},
+        {
+            "name": "alb-ingress",
+            "type": "LOAD_BALANCER",
+            "cloud": "AWS",
+            "is_public": True,
+            "has_admin_iam": True,
+        },
+        {
+            "name": "backup-bucket",
+            "type": "S3_BUCKET",
+            "cloud": "AWS",
+            "is_public": True,
+        },
+        {
+            "name": "bastion-host",
+            "type": "SECURITY_GROUP",
+            "cloud": "AWS",
+            "open_ssh": True,
+        },
     ]
 
-    result = service.evaluate_cis_benchmarks(test_assets, org_id="test-org", actor="Pytest-CSPM")
+    result = service.evaluate_cis_benchmarks(
+        test_assets, org_id="test-org", actor="Pytest-CSPM"
+    )
     assert result["status"] == "COMPLETED"
     assert len(result["toxic_combinations"]) >= 1
-    assert "prod" not in result["toxic_combinations"][0]["asset"] or "alb" in result["toxic_combinations"][0]["asset"]
+    assert (
+        "prod" not in result["toxic_combinations"][0]["asset"]
+        or "alb" in result["toxic_combinations"][0]["asset"]
+    )
     assert len(result["findings"]) >= 2
     assert "merkle_seal" in result
     assert result["merkle_seal"]["status"] == "CRYPTOGRAPHICALLY_VERIFIED"
@@ -58,7 +81,9 @@ def test_supply_chain_cyclonedx_sbom_and_typosquatting():
     service = SBOMScanner()
     manifest = "requests==2.20.0\nfastapi==0.115.0\nrequsts==1.0.0"
 
-    scan = service.scan_supply_chain(manifest, project_name="TestApp", org_id="test-org")
+    scan = service.scan_supply_chain(
+        manifest, project_name="TestApp", org_id="test-org"
+    )
     assert scan["status"] == "SUCCESS"
     assert scan["total_components"] == 3
     assert scan["vulnerabilities_count"] >= 1
@@ -85,7 +110,11 @@ def test_ztna_contextual_trust_scoring():
     # Trusted session
     trusted_context = {
         "device": {"is_managed": True, "disk_encrypted": True, "edr_active": True},
-        "auth": {"user_id": "ciso@org.com", "mfa_type": "FIDO2_WEBAUTHN", "has_mtls_cert": True},
+        "auth": {
+            "user_id": "ciso@org.com",
+            "mfa_type": "FIDO2_WEBAUTHN",
+            "has_mtls_cert": True,
+        },
         "behavior": {"impossible_travel_flag": False, "tor_exit_node": False},
     }
     trusted_eval = service.evaluate_contextual_trust(trusted_context)
@@ -107,7 +136,9 @@ def test_ztna_contextual_trust_scoring():
 def test_ztna_microsegmentation_policy_synthesis():
     """Verify generation of Cilium L7 NetworkPolicy blocking lateral movement."""
     service = ZTNAMicrosegmentationService()
-    policy = service.generate_microsegmentation_policy("frontend-web", "core-vault", [5432, 8000], "TCP")
+    policy = service.generate_microsegmentation_policy(
+        "frontend-web", "core-vault", [5432, 8000], "TCP"
+    )
 
     assert policy["policy_type"] == "Cilium L7 Identity-Aware NetworkPolicy"
     assert policy["lateral_movement_blocked"] is True
@@ -155,7 +186,9 @@ async def test_next5_fastapi_endpoints():
     """Verify FastAPI endpoints across all 5 capabilities with bearer token auth."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"})
+        token = create_access_token(
+            {"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"}
+        )
         auth_headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Unauthenticated request to CSPM should be rejected
@@ -165,7 +198,17 @@ async def test_next5_fastapi_endpoints():
         # 2. CSPM Audit
         cspm_res = await client.post(
             "/cspm/audit",
-            json={"cloud_assets": [{"name": "app-alb", "type": "LOAD_BALANCER", "cloud": "AWS", "is_public": True, "has_admin_iam": True}]},
+            json={
+                "cloud_assets": [
+                    {
+                        "name": "app-alb",
+                        "type": "LOAD_BALANCER",
+                        "cloud": "AWS",
+                        "is_public": True,
+                        "has_admin_iam": True,
+                    }
+                ]
+            },
             headers=auth_headers,
         )
         assert cspm_res.status_code == 200
@@ -183,7 +226,12 @@ async def test_next5_fastapi_endpoints():
         # 4. ZTNA Evaluate Trust
         ztna_res = await client.post(
             "/ztna/evaluate-trust",
-            json={"session_context": {"device": {"is_managed": True, "disk_encrypted": True}, "auth": {"mfa_type": "FIDO2_WEBAUTHN", "has_mtls_cert": True}}},
+            json={
+                "session_context": {
+                    "device": {"is_managed": True, "disk_encrypted": True},
+                    "auth": {"mfa_type": "FIDO2_WEBAUTHN", "has_mtls_cert": True},
+                }
+            },
             headers=auth_headers,
         )
         assert ztna_res.status_code == 200

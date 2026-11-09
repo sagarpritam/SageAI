@@ -13,8 +13,12 @@ router = APIRouter(
 
 class GovernScalingRequest(BaseModel):
     domain_id: str = Field(..., description="Target Horava foliation domain ID")
-    target_exponent_z: float = Field(default=3.0, ge=1.0, le=4.0, description="Dynamical critical exponent z")
-    foliation_damping_gain: float = Field(default=1.0, ge=0.1, le=10.0, description="Foliation-preserving damping gain")
+    target_exponent_z: float = Field(
+        default=3.0, ge=1.0, le=4.0, description="Dynamical critical exponent z"
+    )
+    foliation_damping_gain: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Foliation-preserving damping gain"
+    )
 
 
 @router.get("/domains")
@@ -40,4 +44,3 @@ async def govern_scaling(req: GovernScalingRequest) -> Dict[str, Any]:
 async def get_metrics() -> Dict[str, Any]:
     governor = get_horava_lifshitz_governor()
     return governor.get_governor_metrics()
-

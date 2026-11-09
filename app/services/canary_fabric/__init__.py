@@ -8,4 +8,3 @@ from app.services.canary_fabric.canary_fabric_service import (
 )
 
 __all__ = ["CanaryFabricService", "canary_fabric_service"]
-

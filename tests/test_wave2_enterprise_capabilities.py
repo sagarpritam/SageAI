@@ -30,14 +30,41 @@ def anyio_backend():
 def test_ai_soc_neural_alert_triage():
     """Verify alert clustering, noise reduction, and tiered triage."""
     sample_alerts = [
-        {"source_ip": "198.51.100.42", "target_asset": "prod-api", "type": "sqli_probe", "severity": "LOW"},
-        {"source_ip": "198.51.100.42", "target_asset": "prod-api", "type": "xss_probe", "severity": "LOW"},
-        {"source_ip": "198.51.100.42", "target_asset": "prod-api", "type": "port_sweep", "severity": "INFO"},
-        {"source_ip": "203.0.113.88", "target_asset": "k8s-pod-auth", "type": "ebpf_setns_escape", "severity": "CRITICAL"},
-        {"source_ip": "203.0.113.88", "target_asset": "k8s-pod-auth", "type": "honeytoken_aws_access", "severity": "CRITICAL"},
+        {
+            "source_ip": "198.51.100.42",
+            "target_asset": "prod-api",
+            "type": "sqli_probe",
+            "severity": "LOW",
+        },
+        {
+            "source_ip": "198.51.100.42",
+            "target_asset": "prod-api",
+            "type": "xss_probe",
+            "severity": "LOW",
+        },
+        {
+            "source_ip": "198.51.100.42",
+            "target_asset": "prod-api",
+            "type": "port_sweep",
+            "severity": "INFO",
+        },
+        {
+            "source_ip": "203.0.113.88",
+            "target_asset": "k8s-pod-auth",
+            "type": "ebpf_setns_escape",
+            "severity": "CRITICAL",
+        },
+        {
+            "source_ip": "203.0.113.88",
+            "target_asset": "k8s-pod-auth",
+            "type": "honeytoken_aws_access",
+            "severity": "CRITICAL",
+        },
     ]
 
-    report = ai_soc_engine.triage_alerts(sample_alerts, actor="Pytest-SOC", org_id="test-org")
+    report = ai_soc_engine.triage_alerts(
+        sample_alerts, actor="Pytest-SOC", org_id="test-org"
+    )
 
     assert report["status"] == "COMPLETED"
     assert report["raw_alert_count"] == 5
@@ -68,11 +95,17 @@ def test_threat_hunting_query_forge_and_execution():
     assert "sequence by host.id" in queries["elastic_eql"]
 
     mock_events = [
-        {"id": "EVT-01", "process": "powershell.exe", "command_line": "powershell.exe -enc aW52b2tlLW1pbWlrYXR6"},
+        {
+            "id": "EVT-01",
+            "process": "powershell.exe",
+            "command_line": "powershell.exe -enc aW52b2tlLW1pbWlrYXR6",
+        },
         {"id": "EVT-02", "process": "nginx", "command_line": "nginx -s reload"},
     ]
 
-    hunt = threat_hunter_service.execute_hunt(hypothesis, mock_events, actor="Pytest-Hunter", org_id="test-org")
+    hunt = threat_hunter_service.execute_hunt(
+        hypothesis, mock_events, actor="Pytest-Hunter", org_id="test-org"
+    )
     assert hunt["status"] == "COMPLETED"
     assert hunt["confirmed_threat_count"] >= 1
     assert hunt["hunt_verdict"] == "THREATS_DETECTED"
@@ -90,6 +123,7 @@ def test_anti_ransomware_entropy_and_containment():
 
     # High entropy (random byte simulation)
     import os
+
     random_bytes = os.urandom(1024)
     high_entropy = anti_ransomware_service.calculate_entropy(random_bytes)
     assert high_entropy > 7.5
@@ -99,7 +133,9 @@ def test_anti_ransomware_entropy_and_containment():
     assert len(canaries) >= 4
 
     # Simulate attack
-    sim = anti_ransomware_service.simulate_attack(actor="Pytest-Ransomware", org_id="test-org")
+    sim = anti_ransomware_service.simulate_attack(
+        actor="Pytest-Ransomware", org_id="test-org"
+    )
     assert sim["threat_level"] == "CRITICAL_RANSOMWARE_ATTACK"
     assert sim["containment_status"] == "AUTONOMOUS_CONTAINMENT_EXECUTED"
     assert len(sim["offending_pids_isolated"]) >= 1
@@ -153,7 +189,10 @@ def test_cti_stix_bundle_generation_and_taxii():
     assert any("APT28" in a["name"] for a in actors)
 
     indicators = [
-        {"type": "sha256", "value": "8f7e6d5c4b3a21098f7e6d5c4b3a21098f7e6d5c4b3a21098f7e6d5c4b3a2109"},
+        {
+            "type": "sha256",
+            "value": "8f7e6d5c4b3a21098f7e6d5c4b3a21098f7e6d5c4b3a21098f7e6d5c4b3a2109",
+        },
         {"type": "ip", "value": "198.51.100.89"},
     ]
 
@@ -190,13 +229,24 @@ async def test_fastapi_wave2_endpoints():
     """Verify all 5 new capability FastAPI router endpoints with JWT authentication."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        token = create_access_token({"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"})
+        token = create_access_token(
+            {"sub": "ciso@enterprise.com", "role": "admin", "org": "corp-grid"}
+        )
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. AI SOC Triage
         soc_res = await client.post(
             "/ai-soc/triage",
-            json={"raw_alerts": [{"source_ip": "1.2.3.4", "target_asset": "web", "type": "sqli", "severity": "LOW"}]},
+            json={
+                "raw_alerts": [
+                    {
+                        "source_ip": "1.2.3.4",
+                        "target_asset": "web",
+                        "type": "sqli",
+                        "severity": "LOW",
+                    }
+                ]
+            },
             headers=headers,
         )
         assert soc_res.status_code == 200
@@ -241,4 +291,3 @@ async def test_fastapi_wave2_endpoints():
         taxii_res = await client.get("/cti/taxii/collections", headers=headers)
         assert taxii_res.status_code == 200
         assert len(taxii_res.json()["collections"]) >= 3
-

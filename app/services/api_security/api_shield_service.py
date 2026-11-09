@@ -85,42 +85,50 @@ class APIShieldService:
 
             # 1. BOLA / IDOR detection (Object ID in path without tenant binding)
             if re.search(r"\{[a-zA-Z_]+id\}", path):
-                vulnerabilities.append({
-                    "vuln_id": f"api-bola-{ep.get('endpoint_id')}",
-                    "endpoint": f"{method} {path}",
-                    "service": ep.get("service"),
-                    "category": "API1: Broken Object Level Authorization (BOLA / IDOR)",
-                    "severity": "CRITICAL",
-                    "description": f"Endpoint '{path}' accepts raw object IDs in the URL path. Without verified tenant scope checks, attacker can substitute IDs to access cross-tenant records.",
-                    "remediation": "Enforce row-level ownership assertions and validate authenticated user tenant against target object tenant.",
-                })
+                vulnerabilities.append(
+                    {
+                        "vuln_id": f"api-bola-{ep.get('endpoint_id')}",
+                        "endpoint": f"{method} {path}",
+                        "service": ep.get("service"),
+                        "category": "API1: Broken Object Level Authorization (BOLA / IDOR)",
+                        "severity": "CRITICAL",
+                        "description": f"Endpoint '{path}' accepts raw object IDs in the URL path. Without verified tenant scope checks, attacker can substitute IDs to access cross-tenant records.",
+                        "remediation": "Enforce row-level ownership assertions and validate authenticated user tenant against target object tenant.",
+                    }
+                )
 
             # 2. Mass Assignment detection (POST profile allows unchecked schema)
             if method in ["POST", "PUT", "PATCH"] and "update" in path:
-                vulnerabilities.append({
-                    "vuln_id": f"api-mass-assign-{ep.get('endpoint_id')}",
-                    "endpoint": f"{method} {path}",
-                    "service": ep.get("service"),
-                    "category": "API3: Broken Object Property Level Authorization (Mass Assignment)",
-                    "severity": "HIGH",
-                    "description": "JSON payload schema is not strictly bounded. An attacker can inject privileged properties like 'is_admin': true or 'role': 'superadmin'.",
-                    "remediation": "Apply Pydantic / TypeScript DTO strict allowlists prohibiting unknown field assignment.",
-                })
+                vulnerabilities.append(
+                    {
+                        "vuln_id": f"api-mass-assign-{ep.get('endpoint_id')}",
+                        "endpoint": f"{method} {path}",
+                        "service": ep.get("service"),
+                        "category": "API3: Broken Object Property Level Authorization (Mass Assignment)",
+                        "severity": "HIGH",
+                        "description": "JSON payload schema is not strictly bounded. An attacker can inject privileged properties like 'is_admin': true or 'role': 'superadmin'.",
+                        "remediation": "Apply Pydantic / TypeScript DTO strict allowlists prohibiting unknown field assignment.",
+                    }
+                )
 
             # 3. BFLA detection (Sensitive DELETE endpoint)
             if method == "DELETE" and "purge" in path:
-                vulnerabilities.append({
-                    "vuln_id": f"api-bfla-{ep.get('endpoint_id')}",
-                    "endpoint": f"{method} {path}",
-                    "service": ep.get("service"),
-                    "category": "API5: Broken Function Level Authorization (BFLA)",
-                    "severity": "CRITICAL",
-                    "description": f"High-impact administrative action '{method} {path}' relies on client-side role claims rather than cryptographic server authorization.",
-                    "remediation": "Enforce server-side role check with cryptographic HMAC token and step-up authentication.",
-                })
+                vulnerabilities.append(
+                    {
+                        "vuln_id": f"api-bfla-{ep.get('endpoint_id')}",
+                        "endpoint": f"{method} {path}",
+                        "service": ep.get("service"),
+                        "category": "API5: Broken Function Level Authorization (BFLA)",
+                        "severity": "CRITICAL",
+                        "description": f"High-impact administrative action '{method} {path}' relies on client-side role claims rather than cryptographic server authorization.",
+                        "remediation": "Enforce server-side role check with cryptographic HMAC token and step-up authentication.",
+                    }
+                )
 
         critical_count = sum(1 for v in vulnerabilities if v["severity"] == "CRITICAL")
-        api_security_score = max(0, 100 - (critical_count * 30 + len(vulnerabilities) * 10))
+        api_security_score = max(
+            0, 100 - (critical_count * 30 + len(vulnerabilities) * 10)
+        )
 
         report = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -134,7 +142,11 @@ class APIShieldService:
         # Merkle Audit
         audit_chain.record_action(
             action="API_SECURITY_BOLA_AUDIT",
-            details={"endpoints": len(ep_list), "vulns": len(vulnerabilities), "score": api_security_score},
+            details={
+                "endpoints": len(ep_list),
+                "vulns": len(vulnerabilities),
+                "score": api_security_score,
+            },
             org_id="system-api-shield",
             actor="SageAI-APIShield",
         )
@@ -150,13 +162,13 @@ class APIShieldService:
             "default allow = false\n\n"
             "# 1. Block BOLA: Validate tenant scope match\n"
             "allow {\n"
-            "    input.method == \"GET\"\n"
+            '    input.method == "GET"\n'
             "    input.user.tenant_id == input.resource.tenant_id\n"
             "}\n\n"
             "# 2. Block BFLA: Require ADMIN role for destructive paths\n"
             "allow {\n"
-            "    input.method == \"DELETE\"\n"
-            "    input.user.role == \"ADMIN\"\n"
+            '    input.method == "DELETE"\n'
+            '    input.user.role == "ADMIN"\n'
             "    input.user.mfa_verified == true\n"
             "}\n\n"
             "# 3. Block Mass Assignment: Reject unauthorized property injection\n"
@@ -189,4 +201,3 @@ class APIShieldService:
 
 # Global instance
 api_shield_service = APIShieldService()
-

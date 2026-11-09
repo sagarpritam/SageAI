@@ -5,11 +5,17 @@ from pydantic import BaseModel, Field
 
 from app.services.mantle_geoneutrino import deep_mantle_geoneutrino_mesh
 
-router = APIRouter(prefix="/api/mantle-geoneutrino", tags=["Deep Mantle Geoneutrino Tomography (Cap 79)"])
+router = APIRouter(
+    prefix="/api/mantle-geoneutrino",
+    tags=["Deep Mantle Geoneutrino Tomography (Cap 79)"],
+)
 
 
 class ReconstructMantleRequest(BaseModel):
-    region_label: str = Field(default="YELLOWSTONE_CALDERA_SUPERPLUME", example="YELLOWSTONE_CALDERA_SUPERPLUME")
+    region_label: str = Field(
+        default="YELLOWSTONE_CALDERA_SUPERPLUME",
+        example="YELLOWSTONE_CALDERA_SUPERPLUME",
+    )
     depth_target_km: float = Field(default=2890.0, ge=100.0, le=6371.0)
     observation_days: float = Field(default=60.0, ge=1.0, le=730.0)
 
@@ -34,4 +40,3 @@ async def reconstruct_tomography(req: ReconstructMantleRequest) -> Dict[str, Any
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return deep_mantle_geoneutrino_mesh.get_mesh_metrics()
-

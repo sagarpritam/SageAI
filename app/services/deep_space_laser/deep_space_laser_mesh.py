@@ -157,7 +157,8 @@ class DeepSpaceLaserMesh:
         total_frames = sum(t["frames_transmitted"] for t in self._terminals.values())
         return {
             "active_interplanetary_terminals": len(self._terminals),
-            "total_authenticated_frames_relayed": total_frames + len(self._transmission_events),
+            "total_authenticated_frames_relayed": total_frames
+            + len(self._transmission_events),
             "max_distance_optical_channel_km": 225000000.0,
             "mean_point_ahead_precision_urad": 1.15,
             "photon_delivery_success_rate_pct": 99.98,
@@ -166,4 +167,3 @@ class DeepSpaceLaserMesh:
 
 # Singleton instance
 deep_space_laser_mesh = DeepSpaceLaserMesh()
-

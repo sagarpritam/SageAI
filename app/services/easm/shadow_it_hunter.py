@@ -19,10 +19,30 @@ logger = logging.getLogger("SageAI.easm")
 
 # Common Subdomain Takeover Fingerprints
 TAKEOVER_SIGNATURES = [
-    {"service": "AWS S3 Bucket", "cname_pattern": "s3.amazonaws.com", "response_fingerprint": "NoSuchBucket", "risk": "CRITICAL"},
-    {"service": "GitHub Pages", "cname_pattern": "github.io", "response_fingerprint": "There isn't a GitHub Pages site here", "risk": "HIGH"},
-    {"service": "Heroku App", "cname_pattern": "herokudns.com", "response_fingerprint": "No such app", "risk": "HIGH"},
-    {"service": "Azure Traffic Manager", "cname_pattern": "trafficmanager.net", "response_fingerprint": "404 Not Found", "risk": "HIGH"},
+    {
+        "service": "AWS S3 Bucket",
+        "cname_pattern": "s3.amazonaws.com",
+        "response_fingerprint": "NoSuchBucket",
+        "risk": "CRITICAL",
+    },
+    {
+        "service": "GitHub Pages",
+        "cname_pattern": "github.io",
+        "response_fingerprint": "There isn't a GitHub Pages site here",
+        "risk": "HIGH",
+    },
+    {
+        "service": "Heroku App",
+        "cname_pattern": "herokudns.com",
+        "response_fingerprint": "No such app",
+        "risk": "HIGH",
+    },
+    {
+        "service": "Azure Traffic Manager",
+        "cname_pattern": "trafficmanager.net",
+        "response_fingerprint": "404 Not Found",
+        "risk": "HIGH",
+    },
 ]
 
 
@@ -45,11 +65,49 @@ class ShadowITHunterService:
         """
         # Simulated discovery pipeline across Certificate Transparency logs and DNS resolution
         subdomains = [
-            {"subdomain": f"api.{target_domain}", "ip": "198.51.100.12", "cname": None, "status": 200, "grade": "A", "is_shadow": False},
-            {"subdomain": f"auth.{target_domain}", "ip": "198.51.100.15", "cname": None, "status": 200, "grade": "A", "is_shadow": False},
-            {"subdomain": f"staging-api.{target_domain}", "ip": "203.0.113.88", "cname": None, "status": 200, "grade": "C", "is_shadow": True, "reason": "Unauthenticated staging environment exposed to public internet"},
-            {"subdomain": f"docs.{target_domain}", "ip": "185.199.108.153", "cname": "corp-docs.github.io", "status": 404, "grade": "F", "is_shadow": True, "reason": "Dangling CNAME pointing to unclaimed GitHub Pages"},
-            {"subdomain": f"legacy-portal.{target_domain}", "ip": "198.51.100.99", "cname": None, "status": 200, "grade": "D", "is_shadow": True, "reason": "Deprecated admin portal with TLS 1.0 enabled"},
+            {
+                "subdomain": f"api.{target_domain}",
+                "ip": "198.51.100.12",
+                "cname": None,
+                "status": 200,
+                "grade": "A",
+                "is_shadow": False,
+            },
+            {
+                "subdomain": f"auth.{target_domain}",
+                "ip": "198.51.100.15",
+                "cname": None,
+                "status": 200,
+                "grade": "A",
+                "is_shadow": False,
+            },
+            {
+                "subdomain": f"staging-api.{target_domain}",
+                "ip": "203.0.113.88",
+                "cname": None,
+                "status": 200,
+                "grade": "C",
+                "is_shadow": True,
+                "reason": "Unauthenticated staging environment exposed to public internet",
+            },
+            {
+                "subdomain": f"docs.{target_domain}",
+                "ip": "185.199.108.153",
+                "cname": "corp-docs.github.io",
+                "status": 404,
+                "grade": "F",
+                "is_shadow": True,
+                "reason": "Dangling CNAME pointing to unclaimed GitHub Pages",
+            },
+            {
+                "subdomain": f"legacy-portal.{target_domain}",
+                "ip": "198.51.100.99",
+                "cname": None,
+                "status": 200,
+                "grade": "D",
+                "is_shadow": True,
+                "reason": "Deprecated admin portal with TLS 1.0 enabled",
+            },
         ]
 
         takeover_vulnerabilities = []
@@ -63,15 +121,17 @@ class ShadowITHunterService:
             if cname:
                 for sig in TAKEOVER_SIGNATURES:
                     if sig["cname_pattern"] in cname and sub.get("status") == 404:
-                        takeover_vulnerabilities.append({
-                            "subdomain": sub["subdomain"],
-                            "vulnerable_cname": cname,
-                            "service": sig["service"],
-                            "severity": sig["risk"],
-                            "mitre_attack": "T1584.001",
-                            "description": f"Subdomain '{sub['subdomain']}' has a dangling CNAME pointing to an unclaimed {sig['service']}.",
-                            "remediation": f"Immediately remove dangling CNAME record '{cname}' in DNS or claim the resource on {sig['service']}.",
-                        })
+                        takeover_vulnerabilities.append(
+                            {
+                                "subdomain": sub["subdomain"],
+                                "vulnerable_cname": cname,
+                                "service": sig["service"],
+                                "severity": sig["risk"],
+                                "mitre_attack": "T1584.001",
+                                "description": f"Subdomain '{sub['subdomain']}' has a dangling CNAME pointing to an unclaimed {sig['service']}.",
+                                "remediation": f"Immediately remove dangling CNAME record '{cname}' in DNS or claim the resource on {sig['service']}.",
+                            }
+                        )
 
         # Calculate overall perimeter grade
         critical_count = len(takeover_vulnerabilities)
@@ -118,4 +178,3 @@ class ShadowITHunterService:
 
 # Global singleton
 shadow_it_hunter = ShadowITHunterService()
-

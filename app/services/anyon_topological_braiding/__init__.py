@@ -7,4 +7,3 @@ __all__ = [
     "TopologicalAnyonBraidingMatrix",
     "anyon_topological_braiding",
 ]
-

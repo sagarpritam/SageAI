@@ -81,7 +81,7 @@ class SpinFoamGeometryQuantizer:
         gain = max(0.5, min(float(amplitude_gain), 3.0))
 
         # Planck area l_Pl^2
-        l_pl_sq = self.PLANCK_LENGTH_METERS ** 2
+        l_pl_sq = self.PLANCK_LENGTH_METERS**2
 
         # Casimir operator C_2 = j * (j + 1)
         casimir = j * (j + 1.0)
@@ -99,10 +99,13 @@ class SpinFoamGeometryQuantizer:
         intertwiner_norm = 1.0 - (0.0001 / (j + 0.5))
 
         # Coherence percentage
-        coherence_pct = min(99.999, simplex["vertex_amplitude_coherence_pct"] * (1.0 + 0.00005 * (gain - 1.0)))
+        coherence_pct = min(
+            99.999,
+            simplex["vertex_amplitude_coherence_pct"] * (1.0 + 0.00005 * (gain - 1.0)),
+        )
 
         # Discrete volume quantum of the dual 4-simplex (Ponzano-Regge-Freidel-Krasnov)
-        volume_quantum_m3 = (l_pl_sq ** 1.5) * (j ** 1.5) * 1.84
+        volume_quantum_m3 = (l_pl_sq**1.5) * (j**1.5) * 1.84
 
         telemetry = {
             "simplex_id": simplex_id,
@@ -144,4 +147,3 @@ _spin_foam_geometry_quantizer = SpinFoamGeometryQuantizer()
 def get_spin_foam_geometry_quantizer() -> SpinFoamGeometryQuantizer:
     """Return the global SpinFoamGeometryQuantizer singleton instance."""
     return _spin_foam_geometry_quantizer
-

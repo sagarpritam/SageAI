@@ -8,4 +8,3 @@ from app.services.ransomware.anti_ransomware_service import (
 )
 
 __all__ = ["AntiRansomwareService", "anti_ransomware_service"]
-

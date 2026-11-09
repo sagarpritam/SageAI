@@ -24,7 +24,9 @@ router = APIRouter(prefix="/enclave", tags=["Zero Egress & Sovereign Enclave"])
 
 
 class EncryptPayloadRequest(BaseModel):
-    plaintext: str = Field(..., description="Sensitive data to encrypt inside regional enclave")
+    plaintext: str = Field(
+        ..., description="Sensitive data to encrypt inside regional enclave"
+    )
     enclave_key: str = Field(..., description="Client enclave passphrase (min 8 chars)")
     region: Optional[str] = Field("eu-central-1", description="Target sovereign region")
 
@@ -35,7 +37,9 @@ class DecryptPayloadRequest(BaseModel):
 
 
 class SanitizeEgressRequest(BaseModel):
-    text: str = Field(..., description="Payload, logs, or prompt to scrub for zero-egress compliance")
+    text: str = Field(
+        ..., description="Payload, logs, or prompt to scrub for zero-egress compliance"
+    )
 
 
 @router.get("/regions")
@@ -135,4 +139,3 @@ async def verify_sovereignty_drill(
         actor=user_id,
     )
     return result
-

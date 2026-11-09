@@ -27,7 +27,9 @@ class EvaluatePromptRequest(BaseModel):
 class SynthesizeAntibodyRequest(BaseModel):
     model_id: str = Field(..., description="Target model identifier")
     attack_signature: str = Field(..., description="Adversarial pattern or signature")
-    attack_type: Optional[str] = Field("LATENT_ADVERSARIAL_PERTURBATION", description="Attack classification")
+    attack_type: Optional[str] = Field(
+        "LATENT_ADVERSARIAL_PERTURBATION", description="Attack classification"
+    )
 
 
 @router.get("/models")
@@ -63,7 +65,9 @@ async def evaluate_prompt_endpoint(
 ):
     """Evaluates prompt against latent space antibodies and applies dynamic neural micro-mutation."""
     try:
-        res = ai_immune_mutation_guard.evaluate_prompt_immune_response(body.model_id, body.prompt)
+        res = ai_immune_mutation_guard.evaluate_prompt_immune_response(
+            body.model_id, body.prompt
+        )
         return {"status": "success", "evaluation": res}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -95,5 +99,7 @@ async def get_immune_metrics_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Returns fleet metrics for the self-evolving AI Immune System."""
-    return {"status": "success", "metrics": ai_immune_mutation_guard.get_immune_metrics()}
-
+    return {
+        "status": "success",
+        "metrics": ai_immune_mutation_guard.get_immune_metrics(),
+    }
