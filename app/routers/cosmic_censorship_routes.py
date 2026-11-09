@@ -35,3 +35,4 @@ async def enforce_horizon(req: EnforceCensorshipRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return cosmic_censorship_enforcer.get_enforcer_metrics()
+

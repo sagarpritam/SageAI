@@ -35,3 +35,4 @@ async def trigger_reheat_cycle(req: TriggerReheatingCycleRequest) -> Dict[str, A
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return inflaton_reheating_pump.get_pump_metrics()
+

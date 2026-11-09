@@ -35,3 +35,4 @@ async def generate_power(req: GenerateMHDPowerRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return deep_crustal_mhd_vault.get_vault_metrics()
+

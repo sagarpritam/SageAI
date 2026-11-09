@@ -215,3 +215,4 @@ def test_deep_crustal_mhd_api():
     r_met = client.get("/api/deep-crustal-mhd/metrics")
     assert r_met.status_code == 200
     assert r_met.json()["status"] == "OPERATIONAL"
+

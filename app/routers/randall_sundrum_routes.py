@@ -35,3 +35,4 @@ async def stabilize_radion(req: StabilizeRadionRequest) -> Dict[str, Any]:
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     return randall_sundrum_stabilizer.get_stabilizer_metrics()
+

@@ -62,6 +62,9 @@ import {
   Binary,
   Mountain,
   Layers,
+  Wind,
+  RotateCcw,
+  Filter,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -181,9 +184,17 @@ import { InflatonReheatingStudio } from "@/components/InflatonReheatingStudio";
 import { RandallSundrumStudio } from "@/components/RandallSundrumStudio";
 import { CosmicCensorshipStudio } from "@/components/CosmicCensorshipStudio";
 import { DeepCrustalMHDStudio } from "@/components/DeepCrustalMHDStudio";
+import { RyuTakayanagiStudio } from "@/components/RyuTakayanagiStudio";
+import { DBraneTadpoleStudio } from "@/components/DBraneTadpoleStudio";
+import { NovikovGeodesicStudio } from "@/components/NovikovGeodesicStudio";
+import { MHDPlasmaStealthStudio } from "@/components/MHDPlasmaStealthStudio";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "ryu-takayanagi", label: "Ryu-Takayanagi Siphon", icon: Globe },
+  { id: "dbrane-tadpole", label: "D-Brane Tadpole", icon: Filter },
+  { id: "novikov-geodesic", label: "Novikov Geodesic", icon: RotateCcw },
+  { id: "mhd-plasma-stealth", label: "MHD Plasma Stealth", icon: Wind },
   { id: "inflaton-reheating", label: "Inflaton Reheating", icon: Flame },
   { id: "randall-sundrum", label: "Randall-Sundrum 5D", icon: Layers },
   { id: "cosmic-censorship", label: "Cosmic Censorship", icon: ShieldAlert },
@@ -348,6 +359,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "ryu-takayanagi" && <RyuTakayanagiStudio />}
+          {activeTab === "dbrane-tadpole" && <DBraneTadpoleStudio />}
+          {activeTab === "novikov-geodesic" && <NovikovGeodesicStudio />}
+          {activeTab === "mhd-plasma-stealth" && <MHDPlasmaStealthStudio />}
           {activeTab === "inflaton-reheating" && <InflatonReheatingStudio />}
           {activeTab === "randall-sundrum" && <RandallSundrumStudio />}
           {activeTab === "cosmic-censorship" && <CosmicCensorshipStudio />}

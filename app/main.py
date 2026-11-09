@@ -64,6 +64,7 @@ from app.routers import (
     d3fend_routes,
     dark_energy_routes,
     darkweb_radar_routes,
+    dbrane_tadpole_routes,
     deception_routes,
     deep_analysis_routes,
     deep_crustal_mhd_routes,
@@ -107,11 +108,13 @@ from app.routers import (
     marine_sonar_routes,
     mfa_routes,
     micro_hotpatch_routes,
+    mhd_plasma_stealth_routes,
     muon_tomography_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
     neutrino_array_routes,
     notification_routes,
+    novikov_geodesic_routes,
     org_routes,
     orbital_debris_routes,
     orbital_hpm_routes,
@@ -131,6 +134,7 @@ from app.routers import (
     regulatory_commander_routes,
     report_routes,
     rule_synthesizer_routes,
+    ryu_takayanagi_routes,
     sbom_vex_routes,
     scan_routes,
     schedule_routes,
@@ -400,6 +404,10 @@ app.include_router(inflaton_reheating_routes.router)
 app.include_router(randall_sundrum_routes.router)
 app.include_router(cosmic_censorship_routes.router)
 app.include_router(deep_crustal_mhd_routes.router)
+app.include_router(ryu_takayanagi_routes.router)
+app.include_router(dbrane_tadpole_routes.router)
+app.include_router(novikov_geodesic_routes.router)
+app.include_router(mhd_plasma_stealth_routes.router)
 
 
 # ---------------------
