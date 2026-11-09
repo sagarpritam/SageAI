@@ -13,22 +13,22 @@ router = APIRouter(
 
 class SyncClusterStateRequest(BaseModel):
     initiating_cluster_id: str = Field(
-        default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01"
+        default="CLUSTER-US-EAST-01", examples=["CLUSTER-US-EAST-01"]
     )
     target_cluster_id: str = Field(
-        default="CLUSTER-EU-CENTRAL-02", example="CLUSTER-EU-CENTRAL-02"
+        default="CLUSTER-EU-CENTRAL-02", examples=["CLUSTER-EU-CENTRAL-02"]
     )
     capabilities_count: int = Field(default=82, ge=1, le=100)
 
 
 class AutomatedFailoverRequest(BaseModel):
-    failing_cluster_id: str = Field(..., example="CLUSTER-EU-CENTRAL-02")
+    failing_cluster_id: str = Field(..., examples=["CLUSTER-EU-CENTRAL-02"])
     backup_cluster_id: str = Field(
-        default="CLUSTER-US-EAST-01", example="CLUSTER-US-EAST-01"
+        default="CLUSTER-US-EAST-01", examples=["CLUSTER-US-EAST-01"]
     )
     reason: str = Field(
         default="SIMULATED_REGIONAL_EMP_ISOLATION",
-        example="SIMULATED_REGIONAL_EMP_ISOLATION",
+        examples=["SIMULATED_REGIONAL_EMP_ISOLATION"],
     )
 
 

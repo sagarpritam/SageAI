@@ -11,7 +11,7 @@ import hashlib
 import random
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -144,9 +144,7 @@ class EnterpriseClusterFederationEngine:
 
         drift_ms = round(random.uniform(0.12, 0.48), 3)
 
-        sync_id = (
-            f"FED-SYNC-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        sync_id = f"FED-SYNC-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         event = CrossClusterSyncEvent(
             sync_id=sync_id,
             initiating_cluster=initiating_cluster_id,
@@ -157,7 +155,7 @@ class EnterpriseClusterFederationEngine:
             zero_trust_token_verified=True,
             failover_route_established=True,
             status="CONSENSUS_SYNCHRONIZED",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.sync_events.append(event)
 
@@ -201,7 +199,7 @@ class EnterpriseClusterFederationEngine:
             "state_loss_pct": 0.0,
             "merkle_verification": "CONSISTENT_ACROSS_QUORUM",
             "reason": reason,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     def get_federation_metrics(self) -> Dict[str, Any]:

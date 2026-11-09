@@ -11,8 +11,8 @@ router = APIRouter(
 
 
 class TomographicScanRequest(BaseModel):
-    station_id: str = Field(..., example="MUON-TEL-ALPS-GRANITE")
-    target_zone: str = Field(..., example="Mont Blanc Deep Shaft Adit-4")
+    station_id: str = Field(..., examples=["MUON-TEL-ALPS-GRANITE"])
+    target_zone: str = Field(..., examples=["Mont Blanc Deep Shaft Adit-4"])
     target_depth_meters: float = Field(default=450.0, ge=10.0, le=2500.0)
     exposure_time_hours: float = Field(default=12.0, ge=0.5, le=168.0)
 

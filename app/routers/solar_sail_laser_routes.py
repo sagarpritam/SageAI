@@ -11,9 +11,9 @@ router = APIRouter(
 
 
 class FireLaserPulseRequest(BaseModel):
-    array_id: str = Field(..., example="LASER-ARRAY-ATACAMA-01")
-    target_type: str = Field(..., example="RELATIVISTIC_LIGHTSAIL")
-    target_id: str = Field(..., example="STARSHOT-PROBE-ALPHA-01")
+    array_id: str = Field(..., examples=["LASER-ARRAY-ATACAMA-01"])
+    target_type: str = Field(..., examples=["RELATIVISTIC_LIGHTSAIL"])
+    target_id: str = Field(..., examples=["STARSHOT-PROBE-ALPHA-01"])
     beam_power_gw: float = Field(default=80.0, ge=1.0, le=120.0)
     duration_seconds: float = Field(default=120.0, ge=1.0, le=3600.0)
     target_mass_kg: float = Field(default=5.0, ge=0.001, le=100000000.0)

@@ -12,8 +12,10 @@ router = APIRouter(
 
 
 class TriggerDecouplingRequest(BaseModel):
-    station_id: str = Field(..., example="DYNAMO-ORBITAL-COIL-01")
-    threat_type: str = Field(default="HEMP_NUCLEAR_BURST", example="HEMP_NUCLEAR_BURST")
+    station_id: str = Field(..., examples=["DYNAMO-ORBITAL-COIL-01"])
+    threat_type: str = Field(
+        default="HEMP_NUCLEAR_BURST", examples=["HEMP_NUCLEAR_BURST"]
+    )
     simulated_e1_kv_m: float = Field(default=55.0, ge=1.0, le=200.0)
     simulated_rise_time_ns: float = Field(default=2.1, ge=0.1, le=50.0)
 

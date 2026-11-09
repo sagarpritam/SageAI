@@ -12,9 +12,9 @@ router = APIRouter(
 
 
 class MeasureDistortionRequest(BaseModel):
-    node_id: str = Field(..., example="QGRAV-NODE-GENEVA-01")
+    node_id: str = Field(..., examples=["QGRAV-NODE-GENEVA-01"])
     target_region: str = Field(
-        default="LOCAL_EARTH_GEOID_SECTOR_7", example="LOCAL_EARTH_GEOID_SECTOR_7"
+        default="LOCAL_EARTH_GEOID_SECTOR_7", examples=["LOCAL_EARTH_GEOID_SECTOR_7"]
     )
     integration_time_sec: float = Field(default=30.0, ge=1.0, le=3600.0)
 

@@ -8,7 +8,7 @@ decoupling against High-Altitude Electromagnetic Pulse (HEMP: E1, E2, E3) and CM
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -129,7 +129,7 @@ class MagnetosphereDynamoDecoupler:
         alfven_amplitude_t = round(random.uniform(1.2e-4, 3.8e-4), 6)
         mitigation_latency = round(station.hemp_e1_clamping_speed_ps / 1000.0, 3)
 
-        decoupling_id = f"EMP-DECOUP-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        decoupling_id = f"EMP-DECOUP-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         resp = EMPDecouplingResponse(
             decoupling_id=decoupling_id,
             station_id=station_id,
@@ -142,7 +142,7 @@ class MagnetosphereDynamoDecoupler:
             alfven_wave_injected_amplitude_t=alfven_amplitude_t,
             mitigation_latency_ns=mitigation_latency,
             verdict="HEMP_SURGE_DECOUPLED_AND_QUENCHED",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.responses.append(resp)
 

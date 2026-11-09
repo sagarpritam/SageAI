@@ -9,7 +9,7 @@ kinetic deflection using adaptive optics with high Strehl ratios.
 import math
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -164,7 +164,7 @@ class RelativisticSolarSailLaserMesh:
             lead_time_sec = 30.0 * 86400.0
             miss_dist_km = round((delta_v * lead_time_sec) / 1000.0, 2)
 
-        event_id = f"LASER-PULSE-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        event_id = f"LASER-PULSE-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         event = LaserPropulsionEvent(
             event_id=event_id,
             array_id=array_id,
@@ -179,7 +179,7 @@ class RelativisticSolarSailLaserMesh:
             projected_miss_distance_km=miss_dist_km,
             strehl_ratio=array.strehl_ratio,
             status="PULSE_DISCHARGE_SUCCESS",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.events.append(event)
 

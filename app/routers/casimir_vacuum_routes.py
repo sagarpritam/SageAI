@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 class HarvestVacuumFluxRequest(BaseModel):
-    resonator_id: str = Field(..., example="CASIMIR-CAVITY-DELFT-01")
+    resonator_id: str = Field(..., examples=["CASIMIR-CAVITY-DELFT-01"])
     pump_power_mw: float = Field(default=50.0, ge=1.0, le=500.0)
     pulse_duration_us: float = Field(default=100.0, ge=1.0, le=10000.0)
 

@@ -10,7 +10,7 @@ fail-safe divertor quench dump protocols to prevent uncontrolled annihilation bl
 import math
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -142,9 +142,7 @@ class SuperconductingAntimatterContainment:
 
         stability_sigma = round(5.8 + random.uniform(-0.3, 0.4), 2)
 
-        telemetry_id = (
-            f"AP-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        telemetry_id = f"AP-TEL-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         telem = AntimatterPlasmaTelemetry(
             telemetry_id=telemetry_id,
             cell_id=cell_id,
@@ -155,7 +153,7 @@ class SuperconductingAntimatterContainment:
             quench_dump_readiness_pct=99.98,
             stability_margin_sigma=stability_sigma,
             status="NOMINAL_CONFINED",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.telemetry_history.append(telem)
 
@@ -197,7 +195,7 @@ class SuperconductingAntimatterContainment:
             "rotating_wall_amplitude_v": cell.rotating_wall_amplitude_v,
             "diocotron_suppression_ratio_db": -24.8,
             "containment_integrity": "EXCELLENT",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     def execute_fail_safe_quench_divert(
@@ -228,7 +226,7 @@ class SuperconductingAntimatterContainment:
             "quench_diversion_duration_us": dump_time_us,
             "breach_probability": 0.0,
             "cell_state": "PURGED_SAFE_NEUTRALIZED",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     def get_matrix_metrics(self) -> Dict[str, Any]:

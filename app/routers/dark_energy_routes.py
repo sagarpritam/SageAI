@@ -12,9 +12,9 @@ router = APIRouter(
 
 
 class StabilizeInflatonFieldRequest(BaseModel):
-    harvester_id: str = Field(..., example="DARK-ENERGY-ATACAMA-01")
+    harvester_id: str = Field(..., examples=["DARK-ENERGY-ATACAMA-01"])
     target_metric_region: str = Field(
-        default="LOCAL_SOLAR_WARP_SECTOR_4", example="LOCAL_SOLAR_WARP_SECTOR_4"
+        default="LOCAL_SOLAR_WARP_SECTOR_4", examples=["LOCAL_SOLAR_WARP_SECTOR_4"]
     )
     coupling_factor: float = Field(default=1.0, ge=0.1, le=10.0)
 

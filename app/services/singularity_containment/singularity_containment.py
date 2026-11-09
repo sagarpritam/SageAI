@@ -9,7 +9,7 @@ runaway evaporation bursts while safely harvesting clean gravitational power.
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -123,9 +123,7 @@ class MicroSingularityHawkingContainment:
         pw_luminosity = round(cell.hawking_power_watts / 1e15, 2)
         balance_ratio = round(1.0 + random.uniform(-0.002, 0.003), 4)
 
-        telem_id = (
-            f"SING-TEL-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        telem_id = f"SING-TEL-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         telem = SingularityPowerTelemetry(
             telemetry_id=telem_id,
             cell_id=cell_id,
@@ -136,7 +134,7 @@ class MicroSingularityHawkingContainment:
             gravitational_flux_leakage_pct=0.00001,
             power_extraction_efficiency_pct=94.5,
             status="NOMINAL_HAWKING_POWER_EXTRACTED",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.telemetry_history.append(telem)
 
@@ -176,7 +174,7 @@ class MicroSingularityHawkingContainment:
             "previous_rate_kg_s": old_rate,
             "new_injection_rate_kg_s": new_rate,
             "mass_stabilization_state": "MASS_DRIFT_COMPENSATED",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     def get_matrix_metrics(self) -> Dict[str, Any]:

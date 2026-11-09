@@ -15,7 +15,7 @@ router = APIRouter(
 
 class LaunchCampaignRequest(BaseModel):
     target_domains: Optional[List[str]] = Field(
-        default=None, example=["ORBITAL_PNT", "QUANTUM_NETWORK", "PLASMA_SHIELD"]
+        default=None, examples=[["ORBITAL_PNT"], "QUANTUM_NETWORK", "PLASMA_SHIELD"]
     )
     intensity: float = Field(default=0.85, ge=0.1, le=1.0)
     target_capabilities_count: int = Field(default=79, ge=1, le=100)

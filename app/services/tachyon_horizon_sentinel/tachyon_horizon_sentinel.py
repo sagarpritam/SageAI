@@ -10,7 +10,7 @@ enabling pre-causal anticipatory shield engagement.
 import math
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -128,7 +128,7 @@ class TachyonHorizonCerenkovSentinel:
         # Signal intensity
         intensity_dbm = round(-52.4 + random.uniform(0.5, 3.2), 2)
 
-        alert_id = f"PRECAUSAL-ALERT-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        alert_id = f"PRECAUSAL-ALERT-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         alert = PreCausalThreatAlert(
             alert_id=alert_id,
             sentinel_id=sentinel_id,
@@ -136,11 +136,11 @@ class TachyonHorizonCerenkovSentinel:
             pre_causal_lead_time_us=lead_time_us,
             cerenkov_cone_angle_deg=cone_angle_deg,
             vacuum_polarization_intensity_dbm=intensity_dbm,
-            projected_causal_arrival_timestamp=datetime.utcnow().isoformat(),
+            projected_causal_arrival_timestamp=datetime.now(timezone.utc).isoformat(),
             anticipatory_countermeasure_triggered="AUTONOMOUS_SUB_MILLISECOND_SHIELD_PRE_ARMED",
             defense_engagement_readiness_pct=100.0,
             status="PRE_CAUSAL_ANTICIPATION_LOCKED",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.alerts.append(alert)
 

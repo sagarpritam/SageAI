@@ -11,9 +11,11 @@ router = APIRouter(
 
 
 class EstablishLinkRequest(BaseModel):
-    source_id: str = Field(..., example="EARTH-OCP-TENERIFE")
-    target_id: str = Field(..., example="LAGRANGE-L1-HALO-1")
-    requested_oam_modes: Optional[List[int]] = Field(default=None, example=[-1, 0, 1])
+    source_id: str = Field(..., examples=["EARTH-OCP-TENERIFE"])
+    target_id: str = Field(..., examples=["LAGRANGE-L1-HALO-1"])
+    requested_oam_modes: Optional[List[int]] = Field(
+        default=None, examples=[[-1], 0, 1]
+    )
     atmospheric_turbulence_index: float = Field(default=0.15, ge=0.0, le=1.0)
 
 

@@ -8,7 +8,7 @@ subterranean geological overburden, revealing clandestine void chambers and high
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -181,9 +181,7 @@ class SubsurfaceMuonTomographyMesh:
             void_conf = 12.0
             high_z_conf = 4.5
 
-        scan_id = (
-            f"MUON-SCAN-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        scan_id = f"MUON-SCAN-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         reconstruction_ms = round(random.uniform(18.5, 42.0), 2)
 
         result = MuonTomographyScanResult(
@@ -198,7 +196,7 @@ class SubsurfaceMuonTomographyMesh:
             high_z_material_confidence_pct=high_z_conf,
             spatial_resolution_meters=spatial_res_m,
             reconstruction_time_ms=reconstruction_ms,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.scans.append(result)
 

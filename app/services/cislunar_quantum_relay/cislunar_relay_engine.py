@@ -9,7 +9,7 @@ and relativistic Shapiro delay compensation.
 import math
 import random
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
@@ -194,7 +194,7 @@ class CisLunarQuantumLaserRelay:
             random.uniform(0.12, 0.45) * source.beam_divergence_urad, 3
         )
 
-        tx_id = f"CISLUNAR-TX-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        tx_id = f"CISLUNAR-TX-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         result = CisLunarTransmissionResult(
             transmission_id=tx_id,
             source_node=source_id,
@@ -208,7 +208,7 @@ class CisLunarQuantumLaserRelay:
             oam_aggregate_throughput_gbps=aggregate_gbps,
             beam_drift_correction_urad=drift_correction,
             link_status="LOCK_OPTIMAL" if qber < 0.05 else "DEGRADED_JITTER",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.transmissions.append(result)
         return {

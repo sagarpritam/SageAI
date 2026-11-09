@@ -11,13 +11,13 @@ router = APIRouter(
 
 
 class CompressPlasmaRequest(BaseModel):
-    cell_id: str = Field(..., example="CELL-ALPHA-PENNING-01")
+    cell_id: str = Field(..., examples=["CELL-ALPHA-PENNING-01"])
     delta_voltage_v: float = Field(default=0.5, ge=0.1, le=5.0)
     target_radius_mm: float = Field(default=1.45, ge=0.5, le=5.0)
 
 
 class QuenchDivertRequest(BaseModel):
-    cell_id: str = Field(..., example="CELL-ALPHA-PENNING-01")
+    cell_id: str = Field(..., examples=["CELL-ALPHA-PENNING-01"])
     reason: str = Field(default="SCHEDULED_SAFETY_DRILL")
 
 

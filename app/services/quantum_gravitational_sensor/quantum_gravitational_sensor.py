@@ -8,7 +8,7 @@ and topological curvature micro-defects with sensitivity Δg/g ~ 10^-18.
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
@@ -150,9 +150,7 @@ class QuantumGravitationalEntanglementSensor:
             confidence = 99.4
             status = "SPACETIME_GEODESIC_NOMINAL"
 
-        obs_id = (
-            f"QGRAV-OBS-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        obs_id = f"QGRAV-OBS-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         obs = MetricDistortionObservation(
             observation_id=obs_id,
             node_id=node_id,
@@ -165,7 +163,7 @@ class QuantumGravitationalEntanglementSensor:
             anomalous_mass_equivalent_kg=mass_equiv,
             confidence_score=confidence,
             status=status,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.observations.append(obs)
 

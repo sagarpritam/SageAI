@@ -13,13 +13,13 @@ router = APIRouter(
 
 class SwapEntanglementRequest(BaseModel):
     origin_node_id: str = Field(
-        default="QKD-EARTH-CANARY-01", example="QKD-EARTH-CANARY-01"
+        default="QKD-EARTH-CANARY-01", examples=["QKD-EARTH-CANARY-01"]
     )
     relay_node_id: str = Field(
-        default="QKD-RELAY-LAGRANGE-L1-03", example="QKD-RELAY-LAGRANGE-L1-03"
+        default="QKD-RELAY-LAGRANGE-L1-03", examples=["QKD-RELAY-LAGRANGE-L1-03"]
     )
     destination_node_id: str = Field(
-        default="QKD-PROBE-MARS-ORBIT-04", example="QKD-PROBE-MARS-ORBIT-04"
+        default="QKD-PROBE-MARS-ORBIT-04", examples=["QKD-PROBE-MARS-ORBIT-04"]
     )
 
 

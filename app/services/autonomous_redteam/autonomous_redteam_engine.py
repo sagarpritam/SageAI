@@ -8,7 +8,7 @@ Computes containment scores, cascade mitigation latency, and planetary resilienc
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
@@ -155,7 +155,7 @@ class AutonomousRedTeamCluster:
                 }
             )
 
-        campaign_id = f"REDTEAM-CAMP-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
+        campaign_id = f"REDTEAM-CAMP-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         verdict = "ALL_VECTORS_DEFLECTED_ZERO_CASCADE"
 
         result = RedTeamCampaignResult(
@@ -169,7 +169,7 @@ class AutonomousRedTeamCluster:
             systemic_resilience_score=resilience_score,
             detailed_findings=findings,
             verdict=verdict,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.campaigns.append(result)
 

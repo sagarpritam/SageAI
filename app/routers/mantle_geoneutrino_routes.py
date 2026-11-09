@@ -14,7 +14,7 @@ router = APIRouter(
 class ReconstructMantleRequest(BaseModel):
     region_label: str = Field(
         default="YELLOWSTONE_CALDERA_SUPERPLUME",
-        example="YELLOWSTONE_CALDERA_SUPERPLUME",
+        examples=["YELLOWSTONE_CALDERA_SUPERPLUME"],
     )
     depth_target_km: float = Field(default=2890.0, ge=100.0, le=6371.0)
     observation_days: float = Field(default=60.0, ge=1.0, le=730.0)

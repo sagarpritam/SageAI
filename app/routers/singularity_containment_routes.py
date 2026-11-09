@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 class AdjustMatterFeedRequest(BaseModel):
-    cell_id: str = Field(..., example="SINGULARITY-VAULT-CERN-01")
+    cell_id: str = Field(..., examples=["SINGULARITY-VAULT-CERN-01"])
     delta_rate_kg_s: float = Field(default=0.05, ge=-1.0, le=1.0)
 
 

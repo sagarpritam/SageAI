@@ -9,7 +9,7 @@ and predicts ascending supervolcanic magma plume overpressure > 30 days prior to
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
@@ -151,9 +151,7 @@ class DeepMantleGeoneutrinoMesh:
             days_to_breach = None
             confidence = 94.2
 
-        inv_id = (
-            f"GEON-INV-{int(datetime.utcnow().timestamp())}-{random.randint(100, 999)}"
-        )
+        inv_id = f"GEON-INV-{int(datetime.now(timezone.utc).timestamp())}-{random.randint(100, 999)}"
         inversion = MantleTomographyInversion(
             inversion_id=inv_id,
             observatories_participating=obs_ids,
@@ -167,7 +165,7 @@ class DeepMantleGeoneutrinoMesh:
             magma_overpressure_status=overpressure_status,
             days_to_potential_breach=days_to_breach,
             early_warning_confidence_pct=confidence,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self.inversions.append(inversion)
 

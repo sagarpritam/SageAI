@@ -9,7 +9,7 @@ of deflection results, mitigation latencies, and resilience indices.
 import threading
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from app.services.autonomous_redteam.autonomous_redteam_engine import (
@@ -100,7 +100,7 @@ class AutonomousRedTeamDaemon:
         tick = DaemonExecutionTick(
             tick_id=self.total_ticks,
             campaign_id=res["campaign_id"],
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             attack_vectors=res["simulated_attack_vectors"],
             deflection_pct=res["deflection_success_pct"],
             mitigation_latency_ms=res["mean_mitigation_latency_ms"],
