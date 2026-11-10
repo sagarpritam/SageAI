@@ -11,22 +11,41 @@ export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get("action"); // 'setup', 'verify', or 'disable'
 
-  if (action === "setup") {
-    const res = await fetch(`${BACKEND}/auth/mfa/setup`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return NextResponse.json(await res.json(), { status: res.status });
-  }
+  try {
+    if (action === "setup") {
+      const res = await fetch(`${BACKEND}/auth/mfa/setup`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({ detail: "MFA setup failed" }));
+      return NextResponse.json(data, { status: res.status });
+    }
 
-  const { code } = await req.json();
-
-  if (action === "verify" || action === "disable") {
-    const res = await fetch(`${BACKEND}/auth/mfa/${action}?code=${code}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return NextResponse.json(await res.json(), { status: res.status });
+    if (action === "verify" || action === "disable") {
+      const body = await req.json().catch(() => ({}));
+      const code = typeof body.code === "string" ? body.code.trim() : "";
+      if (!code) {
+        return NextResponse.json({ error: "MFA code is required" }, { status: 400 });
+      }
+      const res = await fetch(`${BACKEND}/auth/mfa/${action}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json().catch(() => ({ detail: "MFA verification failed" }));
+      return NextResponse.json(data, { status: res.status });
+    }
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "Failed to connect to MFA service",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });

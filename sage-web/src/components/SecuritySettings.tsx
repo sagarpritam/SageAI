@@ -30,8 +30,19 @@ export function SecuritySettings() {
       });
       setMessage("Password updated successfully.");
       setCurrentPw(""); setNewPw(""); setConfirmPw("");
-    } catch {
-      setError("Failed to update password. Check your current password.");
+    } catch (err: unknown) {
+      let msg = "Failed to update password. Check your current password.";
+      if (axios.isAxiosError(err)) {
+        const detail = err.response?.data?.detail;
+        if (typeof detail === "string" && detail) {
+          msg = detail;
+        } else if (Array.isArray(detail) && detail[0]?.msg) {
+          msg = String(detail[0].msg);
+        } else if (typeof err.response?.data?.error === "string" && err.response.data.error) {
+          msg = err.response.data.error;
+        }
+      }
+      setError(msg);
     } finally {
       setSaving(false);
     }

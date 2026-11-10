@@ -59,6 +59,13 @@ export function NotificationBell() {
     } catch {}
   };
 
+  const markAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    try {
+      await axios.post("/api/notifications?action=read-all");
+    } catch {}
+  };
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -78,9 +85,19 @@ export function NotificationBell() {
         <div className="absolute right-0 top-12 w-80 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <h4 className="text-sm font-bold text-white">Notifications</h4>
-            <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300" aria-label="Close notifications">
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              {unread > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  Mark all read
+                </button>
+              )}
+              <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300" aria-label="Close notifications">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           <div className="max-h-80 overflow-y-auto">

@@ -28,12 +28,35 @@ export async function POST(req: Request) {
   const action = searchParams.get("action");
   const id = searchParams.get("id");
 
-  if (action === "read" && id) {
-    const res = await fetch(`${BACKEND}/notifications/${id}/read`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return NextResponse.json({ ok: true }, { status: res.ok ? 200 : res.status });
+  try {
+    if (action === "read" && id && /^\d+$/.test(id)) {
+      const res = await fetch(
+        `${BACKEND}/notifications/${encodeURIComponent(id)}/read`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json().catch(() => ({ ok: res.ok }));
+      return NextResponse.json(data, { status: res.ok ? 200 : res.status });
+    }
+
+    if (action === "read-all") {
+      const res = await fetch(`${BACKEND}/notifications/read-all`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({ ok: res.ok }));
+      return NextResponse.json(data, { status: res.ok ? 200 : res.status });
+    }
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "Failed to connect to notifications service",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });

@@ -380,7 +380,10 @@ export function SecurityPosture() {
       const a = document.createElement("a");
       a.href = url;
       a.download = `SageAI_sarif_${posture.scan_id.slice(0, 8)}.sarif.json`;
+      document.body.appendChild(a);
       a.click();
+      a.remove();
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch { /* no-op */ }
   };
 

@@ -67,8 +67,11 @@ export default async function RootLayout({
   let userEmail = null;
   if (token) {
     try {
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-      userEmail = payload.sub;
+      const payloadPart = token.split(".")[1];
+      if (payloadPart) {
+        const payload = JSON.parse(Buffer.from(payloadPart, "base64url").toString());
+        userEmail = payload.email || payload.sub || null;
+      }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {}
   }
@@ -84,7 +87,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-emerald-50 min-h-screen flex flex-col`}>
-        <header className="px-6 py-3 flex items-center justify-between border-b border-emerald-900/30 z-50 relative backdrop-blur-sm bg-black/80 sticky top-0">
+        <header className="px-6 py-3 flex items-center justify-between border-b border-emerald-900/30 z-40 relative backdrop-blur-sm bg-black/80 sticky top-0">
           <div className="flex items-center gap-6">
             <Link href="/" className="font-black text-xl tracking-tighter text-emerald-400 hover:text-emerald-300 transition-colors">SageAI</Link>
             {userEmail && (
@@ -115,7 +118,7 @@ export default async function RootLayout({
             )}
           </div>
         </header>
-        <main className="flex-1 w-full relative">
+        <main className="flex-1 w-full relative z-0">
           <AnalyticsProvider>
             {children}
           </AnalyticsProvider>

@@ -12,20 +12,34 @@ export async function GET(
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const res = await fetch(`${BACKEND}/reports/${id}/hackerone`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await fetch(`${BACKEND}/reports/${encodeURIComponent(id)}/hackerone`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  if (!res.ok) {
-    return NextResponse.json({ error: "HackerOne report generation failed" }, { status: res.status });
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "HackerOne report generation failed" },
+        { status: res.status }
+      );
+    }
+
+    const mdBuffer = await res.arrayBuffer();
+    const safePrefix = id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 8) || "scan";
+    return new NextResponse(mdBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/markdown",
+        "Content-Disposition": `attachment; filename="hackerone-${safePrefix}.md"`,
+      },
+    });
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "Failed to connect to report service",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      { status: 502 }
+    );
   }
-
-  const mdBuffer = await res.arrayBuffer();
-  return new NextResponse(mdBuffer, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/markdown",
-      "Content-Disposition": `attachment; filename="hackerone-${id.slice(0, 8)}.md"`,
-    },
-  });
 }

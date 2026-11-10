@@ -20,7 +20,7 @@ export async function GET(
     const lang = searchParams.get("lang") || "en";
 
     const res = await fetch(
-      `${BACKEND}/reports/${id}/debrief?lang=${encodeURIComponent(lang)}`,
+      `${BACKEND}/reports/${encodeURIComponent(id)}/debrief?lang=${encodeURIComponent(lang)}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,11 +28,16 @@ export async function GET(
       }
     );
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({
+      detail: "Failed to parse multilingual debrief",
+    }));
     return NextResponse.json(data, { status: res.status });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to generate multilingual debrief", detail: error?.message },
+      {
+        error: "Failed to generate multilingual debrief",
+        detail: error instanceof Error ? error.message : String(error),
+      },
       { status: 502 }
     );
   }
