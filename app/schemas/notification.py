@@ -70,3 +70,20 @@ class NotificationChannelResponse(NotificationChannelBase):
 class NotificationTestResponse(BaseModel):
     success: bool
     message: str
+
+
+class NotificationItemResponse(BaseModel):
+    id: int
+    type: str
+    title: str
+    message: str
+    is_read: bool
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class NotificationMarkReadResponse(BaseModel):
+    ok: bool
+    id: int
+    is_read: bool

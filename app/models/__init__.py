@@ -6,7 +6,7 @@ from app.models.asset_diff import AttackSurfaceDiff
 from app.models.audit_log import AuditLog
 from app.models.finding import Finding, FindingSeverity, FindingStatus
 from app.models.knowledge_graph import GraphEdge, GraphNode
-from app.models.notification import NotificationChannel
+from app.models.notification import Notification, NotificationChannel
 from app.models.organization import Organization
 from app.models.remediation_patch import PatchStatus, RemediationPatch
 from app.models.role import RoleEnum
@@ -22,6 +22,7 @@ __all__ = [
     "RoleEnum",
     "APIKey",
     "Webhook",
+    "Notification",
     "NotificationChannel",
     "ScanSchedule",
     "Asset",

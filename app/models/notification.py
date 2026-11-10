@@ -1,8 +1,16 @@
-"""NotificationChannel model for multi-channel alerting (Slack, Discord, Teams, Email)."""
+"""Notification models for outbound channels (Slack/Discord/Teams/Email) and in-app inbox."""
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -39,3 +47,34 @@ class NotificationChannel(Base):
 
     # Relationships
     organization = relationship("Organization", back_populates="notification_channels")
+
+
+class Notification(Base):
+    """In-app organization security & operational notification inbox item."""
+
+    __tablename__ = "notifications"
+    __table_args__ = (
+        UniqueConstraint(
+            "organization_id", "source_ref", name="uq_org_notification_source_ref"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    organization_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    source_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    type: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="security_alert"
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    is_read: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, index=True
+    )
+
+    organization = relationship("Organization")

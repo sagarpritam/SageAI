@@ -1,28 +1,38 @@
-"""API routes for managing organization Notification Channels (Slack, Discord, Teams, Webhook)."""
+"""API routes for managing organization Notification Channels (Slack, Discord, Teams, Webhook)
+and the in-app security & operational notification inbox."""
 
 import logging
+from datetime import datetime, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlalchemy import select
+from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user
-from app.models.notification import NotificationChannel
+from app.models.notification import Notification, NotificationChannel
+from app.models.remediation_patch import RemediationPatch
+from app.models.scan import Scan
 from app.routers.webhook_routes import is_safe_webhook_url
 from app.schemas.notification import (
     NotificationChannelCreate,
     NotificationChannelResponse,
     NotificationChannelUpdate,
+    NotificationItemResponse,
+    NotificationMarkReadResponse,
     NotificationTestResponse,
 )
 from app.services.alerting.dispatcher import send_to_channel
 from app.services.audit_service import log_audit_event
+from app.services.incident_response.soar_engine import soar_engine
+from app.utils.helpers import utc_now
 
 logger = logging.getLogger("SageAI.notifications")
 router = APIRouter(prefix="/notifications/channels", tags=["Notifications"])
+inbox_router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 @router.get("", response_model=List[NotificationChannelResponse])
@@ -239,3 +249,191 @@ async def test_notification_channel(
             success=False,
             message="Test alert delivery failed. Please verify the Webhook URL and channel permissions.",
         )
+
+
+def _parse_iso_datetime(value: object) -> datetime:
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, str) and value:
+        try:
+            dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+    return utc_now()
+
+
+async def _sync_org_notifications(org_id: str, db: AsyncSession) -> None:
+    """Idempotently populate in-app notifications from scans, autofix patches, and SOAR incidents."""
+    existing_stmt = select(Notification.source_ref).where(
+        Notification.organization_id == org_id
+    )
+    existing_refs = set((await db.execute(existing_stmt)).scalars().all())
+    added = False
+
+    scans_stmt = (
+        select(Scan)
+        .where(
+            Scan.organization_id == org_id,
+            Scan.status.in_(["completed", "failed"]),
+        )
+        .order_by(Scan.created_at.desc())
+        .limit(10)
+    )
+    for scan in (await db.execute(scans_stmt)).scalars().all():
+        source_ref = f"scan:{scan.id}:{scan.status}"
+        if source_ref in existing_refs:
+            continue
+        existing_refs.add(source_ref)
+        notif_type = "scan_completed" if scan.status == "completed" else "scan_failed"
+        title = (
+            f"Scan completed: {scan.target}"
+            if scan.status == "completed"
+            else f"Scan failed: {scan.target}"
+        )
+        message = (
+            f"Risk score {scan.risk_score} ({scan.risk_level}) · {scan.scan_type} scan"
+        )
+        db.add(
+            Notification(
+                organization_id=org_id,
+                source_ref=source_ref,
+                type=notif_type,
+                title=title[:200],
+                message=message,
+                is_read=False,
+                created_at=scan.created_at or utc_now(),
+            )
+        )
+        added = True
+
+    patches_stmt = (
+        select(RemediationPatch)
+        .where(RemediationPatch.organization_id == org_id)
+        .order_by(RemediationPatch.created_at.desc())
+        .limit(10)
+    )
+    for patch in (await db.execute(patches_stmt)).scalars().all():
+        patch_status = (
+            patch.status.value if hasattr(patch.status, "value") else str(patch.status)
+        )
+        source_ref = f"patch:{patch.id}:{patch_status}"
+        if source_ref in existing_refs:
+            continue
+        existing_refs.add(source_ref)
+        db.add(
+            Notification(
+                organization_id=org_id,
+                source_ref=source_ref,
+                type="autofix",
+                title=f"AutoFix {patch_status}: {patch.file_path}"[:200],
+                message=f"{patch.vulnerability_type} ({patch.severity}) in {patch.repository}",
+                is_read=False,
+                created_at=patch.created_at or utc_now(),
+            )
+        )
+        added = True
+
+    for incident in soar_engine.list_incidents(limit=10, org_id=org_id):
+        if incident.get("org_id") != org_id:
+            continue
+        incident_id = incident.get("incident_id", "")
+        if not incident_id:
+            continue
+        source_ref = f"incident:{incident_id}"
+        if source_ref in existing_refs:
+            continue
+        existing_refs.add(source_ref)
+        severity = incident.get("severity", "HIGH")
+        source = incident.get("source", "SOAR")
+        db.add(
+            Notification(
+                organization_id=org_id,
+                source_ref=source_ref,
+                type="security_alert",
+                title=f"[{severity}] {incident.get('title', 'Security Incident')}"[
+                    :200
+                ],
+                message=f"Source: {source} · Status: {incident.get('status', 'OPEN')}",
+                is_read=False,
+                created_at=_parse_iso_datetime(incident.get("created_at")),
+            )
+        )
+        added = True
+
+    if added:
+        try:
+            await db.commit()
+        except IntegrityError:
+            await db.rollback()
+
+
+@inbox_router.get("", response_model=List[NotificationItemResponse])
+@limiter.limit("60/minute")
+async def list_notifications(
+    request: Request,
+    limit: int = 30,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List recent security, scan, and AutoFix notifications for the user's organization."""
+    org_id = current_user["org"]
+    await _sync_org_notifications(org_id, db)
+
+    clamped_limit = max(1, min(limit, 100))
+    stmt = (
+        select(Notification)
+        .where(Notification.organization_id == org_id)
+        .order_by(Notification.created_at.desc(), Notification.id.desc())
+        .limit(clamped_limit)
+    )
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+@inbox_router.post(
+    "/{notification_id}/read", response_model=NotificationMarkReadResponse
+)
+@limiter.limit("60/minute")
+async def mark_notification_read(
+    request: Request,
+    notification_id: int,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Mark an organization notification as read."""
+    stmt = select(Notification).where(
+        Notification.id == notification_id,
+        Notification.organization_id == current_user["org"],
+    )
+    result = await db.execute(stmt)
+    notification = result.scalar_one_or_none()
+    if not notification:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found"
+        )
+
+    notification.is_read = True
+    await db.commit()
+    return NotificationMarkReadResponse(ok=True, id=notification.id, is_read=True)
+
+
+@inbox_router.post("/read-all")
+@limiter.limit("30/minute")
+async def mark_all_notifications_read(
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Mark all unread notifications in the organization as read."""
+    stmt = (
+        update(Notification)
+        .where(
+            Notification.organization_id == current_user["org"],
+            Notification.is_read.is_(False),
+        )
+        .values(is_read=True)
+    )
+    await db.execute(stmt)
+    await db.commit()
+    return {"ok": True}

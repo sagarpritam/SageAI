@@ -309,6 +309,7 @@ app.add_api_route(
 )
 app.include_router(email_report_routes.router)
 app.include_router(notification_routes.router)
+app.include_router(notification_routes.inbox_router)
 app.include_router(ci_routes.router)
 app.include_router(copilot_routes.router)
 app.include_router(copilot_routes.threat_feed_router)

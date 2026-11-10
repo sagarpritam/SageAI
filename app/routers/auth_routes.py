@@ -7,6 +7,7 @@ from app.core.rate_limit import limiter
 from app.core.security import (
     create_access_token,
     create_refresh_token,
+    get_current_user,
     hash_password,
     needs_rehash,
     verify_password,
@@ -14,7 +15,13 @@ from app.core.security import (
 )
 from app.models.organization import Organization
 from app.models.user import User
-from app.schemas.auth import RefreshTokenRequest, TokenResponse, UserCreate, UserLogin
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    RefreshTokenRequest,
+    TokenResponse,
+    UserCreate,
+    UserLogin,
+)
 from app.services.mfa_service import verify_totp
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -143,3 +150,38 @@ async def refresh_session(
         access_token=new_access_token,
         refresh_token=new_refresh_token,
     )
+
+
+@router.post("/change-password")
+@limiter.limit("10/minute")
+async def change_password(
+    request: Request,
+    payload: ChangePasswordRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update the authenticated user's password after verifying the current password."""
+    result = await db.execute(select(User).where(User.id == current_user["sub"]))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    if not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect",
+        )
+
+    if payload.current_password == payload.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from current password",
+        )
+
+    user.password_hash = hash_password(payload.new_password)
+    await db.commit()
+
+    return {"message": "Password updated successfully"}

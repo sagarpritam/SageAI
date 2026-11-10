@@ -174,7 +174,12 @@ async def run_deep_search(
     try:
         from app.services.agent.deep_search_agent import DeepSearchAgent
 
-        agent = DeepSearchAgent(org_id=getattr(user, "org_id", "system"))
+        org_id = (
+            user.get("org", "system")
+            if isinstance(user, dict)
+            else getattr(user, "org_id", "system")
+        )
+        agent = DeepSearchAgent(org_id=org_id)
         result = await agent.run(
             target=req.target,
             target_type=req.target_type,

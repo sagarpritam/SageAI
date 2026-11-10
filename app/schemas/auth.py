@@ -87,3 +87,17 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
     model_config = ConfigDict(extra="forbid")
+
+
+class ChangePasswordRequest(BaseModel):
+    """Authenticated password update request body."""
+
+    current_password: str
+    new_password: str
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_new_password_strength(cls, v: str) -> str:
+        return validate_password_complexity(v)
