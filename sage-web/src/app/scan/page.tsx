@@ -14,7 +14,7 @@ import { ExportButton } from "@/components/ExportButton";
 import { ShareButton } from "@/components/ShareButton";
 import axios from "axios";
 import posthog from "posthog-js";
-import { SITE_URL } from "@/lib/platform";
+import { PLATFORM_VERSION, SITE_URL } from "@/lib/platform";
 
 interface RiskData {
   risk_score: number;
@@ -384,7 +384,7 @@ export default function Home() {
                 {scanId && <ShareButton scanId={scanId} />}
                 {scanId && <ExportButton scanId={scanId} />}
                 <a 
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("I just scanned my site with SageAI v6.8.0 — found " + vulnerabilities.length + " vulnerabilities. Run your own autonomous pentest in 60 seconds.")}&url=${encodeURIComponent(SITE_URL)}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just scanned my site with SageAI v${PLATFORM_VERSION} — found ` + vulnerabilities.length + " vulnerabilities. Run your own autonomous pentest in 60 seconds.")}&url=${encodeURIComponent(SITE_URL)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => posthog.capture('viral_share_twitter_clicked')}

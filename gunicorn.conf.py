@@ -6,7 +6,9 @@ import os
 # Server
 port = os.getenv("PORT", "8000")
 bind = f"0.0.0.0:{port}"
-_default_workers = 2 if os.getenv("K_SERVICE") else min(multiprocessing.cpu_count() * 2 + 1, 4)
+_default_workers = (
+    2 if os.getenv("K_SERVICE") else min(multiprocessing.cpu_count() * 2 + 1, 4)
+)
 workers = int(os.getenv("WEB_CONCURRENCY", str(_default_workers)))
 worker_class = "uvicorn.workers.UvicornWorker"
 worker_connections = 1000

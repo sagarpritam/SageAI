@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v6.8.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v6.9.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("6.8.0");
-    expect(healthJson.version).toBe("6.8.0");
+    expect(healthJson.platform_version).toBe("6.9.0");
+    expect(healthJson.version).toBe("6.9.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -424,6 +424,41 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
       data: { title: "E2E Tabletop" },
     });
     expect(regRes.status()).toBe(200);
+
+    // Wave 29 studios (Caps 107-109 & Option B) return 200 deterministically offline
+    const g2List = await request.get("/api/m-theory-g2/manifolds");
+    expect(g2List.status()).toBe(200);
+    const g2Sim = await request.post("/api/m-theory-g2/compactify-flux", {
+      data: { manifold_id: "G2-JOYCE-ORBIFOLD-01", eleven_d_radius_planck: 18.5 },
+    });
+    expect(g2Sim.status()).toBe(200);
+    expect(((await g2Sim.json()) as { status?: string }).status).toBe("M_THEORY_G2_COMPACTIFIED");
+
+    const happyList = await request.get("/api/happy-holographic-qec/tessellations");
+    expect(happyList.status()).toBe(200);
+    const happySim = await request.post("/api/happy-holographic-qec/correct-erasure", {
+      data: { tessellation_id: "HAPPY-PENTAGON-5-4-01", boundary_erasure_pct: 28.0 },
+    });
+    expect(happySim.status()).toBe(200);
+    expect(((await happySim.json()) as { status?: string }).status).toBe("HAPPY_BULK_RECONSTRUCTED");
+
+    const kthList = await request.get("/api/ktheory-dbrane/cycles");
+    expect(kthList.status()).toBe(200);
+    const kthSim = await request.post("/api/ktheory-dbrane/classify-charge", {
+      data: { cycle_id: "KTHEORY-ABS-SPIN7-01", chern_character_rank: 16 },
+    });
+    expect(kthSim.status()).toBe(200);
+    expect(((await kthSim.json()) as { status?: string }).status).toBe("KTHEORY_CHARGE_CLASSIFIED_STABLE");
+
+    const kugList = await request.get("/api/kugelblitz-hawking/cores");
+    expect(kugList.status()).toBe(200);
+    const kugSim = await request.post("/api/kugelblitz-hawking/harvest-power", {
+      data: { core_id: "KUGELBLITZ-ORBITAL-L4-01", singularity_mass_1e10_kg: 5.0 },
+    });
+    expect(kugSim.status()).toBe(200);
+    const kugBody = (await kugSim.json()) as { status?: string; net_electrical_output_gw?: number };
+    expect(kugBody.status).toBe("KUGELBLITZ_HAWKING_POWER_OPTIMAL");
+    expect(Number(kugBody.net_electrical_output_gw)).toBeGreaterThan(125.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

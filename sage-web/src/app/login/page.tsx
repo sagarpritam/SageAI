@@ -27,7 +27,13 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, domain: email.split("@")[1] || "sageai.internal" }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        status?: string;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Enterprise SSO initiation failed");
+      }
       if (data.status === "success") {
         // Complete ACS federation authentication
         const mockAssertion = btoa(`<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Subject><saml:NameID>${email}</saml:NameID></saml:Subject></saml:Assertion>`);
@@ -36,16 +42,21 @@ export default function LoginPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ SAMLResponse: mockAssertion }),
         });
-        const acsData = await acsRes.json();
-        if (acsData.success || acsData.access_token) {
+        const acsData = (await acsRes.json().catch(() => ({}))) as {
+          success?: boolean;
+          access_token?: string;
+          error?: string;
+        };
+        if (acsRes.ok && (acsData.success || acsData.access_token)) {
           router.push("/dashboard");
           router.refresh();
           return;
         }
+        throw new Error(acsData.error || "Enterprise SSO verification failed");
       }
       throw new Error(data.error || "Enterprise SSO initiation failed");
-    } catch (err: any) {
-      setError(err?.message || "Enterprise SSO federation failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Enterprise SSO federation failed");
     } finally {
       setLoading(false);
     }
@@ -67,18 +78,18 @@ export default function LoginPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error || "Authentication failed");
 
       // Success!
       router.push("/dashboard");
       router.refresh(); // Force middleware check
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err.message === "mfa_required") {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Authentication failed";
+      if (msg === "mfa_required") {
         setShowMfa(true);
       } else {
-        setError(err.message);
+        setError(msg);
       }
     } finally {
       setLoading(false);
@@ -177,7 +188,10 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium flex items-center gap-2">
+              <div
+                role="alert"
+                className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium flex items-center gap-2"
+              >
                 <ShieldAlert className="w-4 h-4 shrink-0" />
                 {error === "mfa_required" ? "Please enter your multi-factor authentication code." : error}
               </div>

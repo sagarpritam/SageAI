@@ -121,9 +121,9 @@ export default function Features() {
     {
       icon: <Atom className="w-8 h-8 text-emerald-400" />,
       badge: `${PLATFORM_WAVES_RANGE}`,
-      title: "Trans-Century Frontier (Caps 100–106)",
+      title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), String Field Theory Vertex Integrator (Cap 104), Calabi-Yau Mirror Symmetry (Cap 105), and Fibonacci Anyon Braid Compiler (Cap 106).",
+        "Includes Centesimal Quantum Gravity (Cap 100), String Field Theory (Cap 104), 11D M-Theory G2 Compactifier (Cap 107), Holographic AdS/CFT HaPPY QEC (Cap 108), and Topological K-Theory D-Branes (Cap 109).",
     },
   ];
 

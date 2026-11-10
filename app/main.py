@@ -91,6 +91,7 @@ from app.routers import (
     gdpr_routes,
     geomagnetic_shield_routes,
     gravitational_seismic_routes,
+    happy_holographic_routes,
     haps_stratosphere_routes,
     horava_lifshitz_routes,
     hypersonic_defense_routes,
@@ -105,8 +106,11 @@ from app.routers import (
     intrusion_routes,
     itdr_routes,
     kms_hsm_routes,
+    ktheory_dbrane_routes,
+    kugelblitz_hawking_routes,
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
+    m_theory_g2_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
     malware_routes,
@@ -436,6 +440,10 @@ app.include_router(string_field_theory_routes.router)
 app.include_router(mirror_symmetry_routes.router)
 app.include_router(fibonacci_anyon_routes.router)
 app.include_router(monopole_battery_routes.router)
+app.include_router(m_theory_g2_routes.router)
+app.include_router(happy_holographic_routes.router)
+app.include_router(ktheory_dbrane_routes.router)
+app.include_router(kugelblitz_hawking_routes.router)
 
 
 # ---------------------

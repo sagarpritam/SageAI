@@ -566,7 +566,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-106 including Centesimal Quantum Gravity (Cap 100), String Field Theory (Cap 104), Mirror Symmetry (Cap 105), Fibonacci Anyons (Cap 106).`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including M-Theory G2 (Cap 107), HaPPY Holographic QEC (Cap 108), K-Theory D-Branes (Cap 109), and Kugelblitz Hawking Gen.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -737,7 +737,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 28 String Field & Anyons Live', time: '2m ago' },
+    { title: 'Wave 29 M-Theory & HaPPY QEC Live', time: '2m ago' },
     { title: '1,770 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];
@@ -776,7 +776,7 @@ const CaseStudies = () => {
     },
     {
       company: 'HealthSecure',
-      challenge: 'Needed GDPR Art. 44, HIPAA & SOC 2 evidence across 134 microservices.',
+      challenge: `Needed GDPR Art. 44, HIPAA & SOC 2 evidence across ${PLATFORM_DASHBOARD_MODULES_COUNT} microservices.`,
       solution: 'Enabled EU Zero-Egress Enclaves with SHA-256 Merkle & Groth16 ZK-SNARK proofs.',
       result: 'Audit-ready in 48 hours.'
     }
@@ -1070,7 +1070,7 @@ const DashboardPreview = () => {
           <div className="md:col-span-3 space-y-6">
             <div className="space-y-2">
               <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Active Studios</div>
-              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 28 String Field'].map((item, i) => (
+              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 29 M-Theory G2'].map((item, i) => (
                 <div key={item} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>
                   {item}
                 </div>
@@ -1495,7 +1495,7 @@ const SAGE_LOG_LINES = [
   "[+] Auditing TLS & KMS for HNDL Quantum Risk (FIPS 203 ML-KEM-768)...",
   "[!] CRITICAL: AWS_SECRET_KEY scrubbed inside Zero-Egress Enclave",
   "[+] Validating SagePatch Phase 04 AST remediation PR #142...",
-  "[+] SHA-256 Merkle Seal anchored. 134 Studios nominal."
+  `[+] SHA-256 Merkle Seal anchored. ${PLATFORM_DASHBOARD_MODULES_COUNT} Studios nominal.`
 ];
 
 const Terminal = () => {
@@ -1822,7 +1822,7 @@ const LandingPage = () => {
               <div className="mt-4 flex items-center justify-center gap-6 text-[10px] font-mono text-zinc-500 uppercase tracking-widest flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                  106 Sovereign Capabilities
+                  {PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
@@ -1873,7 +1873,7 @@ const LandingPage = () => {
         <BentoGrid />
       </section>
 
-      {/* Sovereign Defense Grid & Waves 1-28 Showcase */}
+      {/* Sovereign Defense Grid & Waves 1-29 Showcase */}
       <SovereignArchitectureShowcase />
 
       {/* System Anatomy Section */}
@@ -2124,7 +2124,7 @@ const LandingPage = () => {
                   { icon: Lock, title: "PQC & AES-256-GCM", desc: "ML-KEM-768 / ML-DSA-65 encryption & TLS 1.3 transport." },
                   { icon: Shield, title: "Zero-Egress Enclaves", desc: "SAML 2.0 SSO, RBAC & 0-byte outbound telemetry mode." },
                   { icon: Eye, title: "Merkle Audit Ledger", desc: "Tamper-evident cryptographic logs & SARIF/VEX bundles." },
-                  { icon: Activity, title: "Autonomous SOAR", desc: "Real-time attack-path quarantine across 134 studios." }
+                  { icon: Activity, title: "Autonomous SOAR", desc: `Real-time attack-path quarantine across ${PLATFORM_DASHBOARD_MODULES_COUNT} studios.` }
                 ].map((item, i) => (
                   <motion.div
                     key={i}

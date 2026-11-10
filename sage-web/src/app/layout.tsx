@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { PLATFORM_VERSION, SITE_URL } from "@/lib/platform";
+import {
+  PLATFORM_CAPABILITIES_COUNT,
+  PLATFORM_DASHBOARD_MODULES_COUNT,
+  PLATFORM_VERSION,
+  PLATFORM_WAVES_RANGE,
+  SITE_URL,
+} from "@/lib/platform";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +25,7 @@ export const metadata: Metadata = {
     default: "SageAI — Autonomous AI Pentester",
     template: "%s | SageAI"
   },
-  description: `SageAI v${PLATFORM_VERSION}: Sovereign Autonomous AI Cybersecurity Platform featuring the 10-Pillar Defense Grid, 5-LLM Consensus, NIST FIPS 203/204 Post-Quantum Enclaves, SagePatch AST Auto-Fix, and 134 Command Center Studios (Waves 1–28 · 106 Capabilities).`,
+  description: `SageAI v${PLATFORM_VERSION}: Sovereign Autonomous AI Cybersecurity Platform featuring the 10-Pillar Defense Grid, 5-LLM Consensus, NIST FIPS 203/204 Post-Quantum Enclaves, SagePatch AST Auto-Fix, and ${PLATFORM_DASHBOARD_MODULES_COUNT} Command Center Studios (${PLATFORM_WAVES_RANGE} · ${PLATFORM_CAPABILITIES_COUNT} Capabilities).`,
   keywords: [
     "cybersecurity",
     "AI security",
@@ -34,7 +40,7 @@ export const metadata: Metadata = {
   authors: [{ name: "SageAI Security Inc." }],
   openGraph: {
     title: `SageAI v${PLATFORM_VERSION} — Autonomous AI Pentester & Sovereign Defense Grid`,
-    description: "Run an autonomous AI pentest in 60 seconds backed by 134 defense studios, 5-LLM consensus, Zero-Egress enclaves, and SagePatch AST remediation.",
+    description: `Run an autonomous AI pentest in 60 seconds backed by ${PLATFORM_DASHBOARD_MODULES_COUNT} defense studios, 5-LLM consensus, Zero-Egress enclaves, and SagePatch AST remediation.`,
     url: SITE_URL,
     siteName: "SageAI",
     images: [

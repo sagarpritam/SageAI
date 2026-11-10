@@ -207,9 +207,22 @@ import StringFieldTheoryStudio from "@/components/StringFieldTheoryStudio";
 import MirrorSymmetryStudio from "@/components/MirrorSymmetryStudio";
 import FibonacciAnyonStudio from "@/components/FibonacciAnyonStudio";
 import MonopoleBatteryStudio from "@/components/MonopoleBatteryStudio";
+import MTheoryG2Studio from "@/components/MTheoryG2Studio";
+import HaPPYHolographicStudio from "@/components/HaPPYHolographicStudio";
+import KTheoryDBraneStudio from "@/components/KTheoryDBraneStudio";
+import KugelblitzHawkingStudio from "@/components/KugelblitzHawkingStudio";
+import {
+  PLATFORM_CAPABILITIES_COUNT,
+  PLATFORM_VERSION,
+  PLATFORM_WAVES_RANGE,
+} from "@/lib/platform";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "m-theory-g2", label: "M-Theory G2 Compactifier (Cap 107)", icon: Atom },
+  { id: "happy-holographic-qec", label: "HaPPY Holographic QEC (Cap 108)", icon: Network },
+  { id: "ktheory-dbrane", label: "K-Theory D-Brane (Cap 109)", icon: Layers },
+  { id: "kugelblitz-hawking", label: "Kugelblitz Hawking Gen (Option B)", icon: Flame },
   { id: "string-field-theory", label: "String Field Theory (Cap 104)", icon: GitPullRequest },
   { id: "mirror-symmetry", label: "Mirror Symmetry (Cap 105)", icon: FlipHorizontal },
   { id: "fibonacci-anyon", label: "Fibonacci Anyons (Cap 106)", icon: Network },
@@ -459,7 +472,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                  v6.8.0 &bull; Waves 1&ndash;28 &bull; 106 Capabilities
+                  v{PLATFORM_VERSION} &bull; {PLATFORM_WAVES_RANGE} &bull; {PLATFORM_CAPABILITIES_COUNT} Capabilities
                 </span>
               </div>
               <p className="text-xs text-zinc-500 font-mono">
@@ -565,6 +578,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "m-theory-g2" && <MTheoryG2Studio />}
+          {activeTab === "happy-holographic-qec" && <HaPPYHolographicStudio />}
+          {activeTab === "ktheory-dbrane" && <KTheoryDBraneStudio />}
+          {activeTab === "kugelblitz-hawking" && <KugelblitzHawkingStudio />}
           {activeTab === "string-field-theory" && <StringFieldTheoryStudio />}
           {activeTab === "mirror-symmetry" && <MirrorSymmetryStudio />}
           {activeTab === "fibonacci-anyon" && <FibonacciAnyonStudio />}

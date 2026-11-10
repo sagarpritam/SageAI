@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Info,
   Loader2,
+  X,
 } from "lucide-react";
 import axios from "axios";
 
@@ -53,6 +54,7 @@ export default function ScanDetailPage() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloadError, setDownloadError] = useState("");
   const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,8 +62,19 @@ export default function ScanDetailPage() {
       try {
         const { data } = await axios.get(`/api/reports/${id}`);
         setReport(data);
-      } catch {
-        setError("Failed to load scan report. The scan may still be running.");
+      } catch (err: unknown) {
+        const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+        const errData = axios.isAxiosError(err)
+          ? (err.response?.data as { error?: string } | undefined)
+          : undefined;
+        if (status === 401) {
+          setError("Please sign in to view this scan report.");
+        } else {
+          setError(
+            errData?.error ||
+              "Failed to load scan report. The scan may still be running or backend service is offline."
+          );
+        }
       } finally {
         setLoading(false);
       }
@@ -71,14 +84,24 @@ export default function ScanDetailPage() {
 
   const downloadPdf = async () => {
     setDownloading("pdf");
+    setDownloadError("");
     try {
       const res = await fetch(`/api/scan/${id}/pdf`);
-      if (res.status === 402) {
-        alert("🔒 PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade.");
+      if (res.status === 401) {
+        setDownloadError("Please sign in to export PDF reports.");
         return;
       }
-      if (!res.ok) throw new Error("Download failed");
-      
+      if (res.status === 402) {
+        setDownloadError(
+          "PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade."
+        );
+        return;
+      }
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "PDF download failed.");
+      }
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -86,8 +109,8 @@ export default function ScanDetailPage() {
       a.download = `sageai-report-${id?.toString().slice(0, 8)}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      alert("PDF download failed.");
+    } catch (err: unknown) {
+      setDownloadError(err instanceof Error ? err.message : "PDF download failed.");
     } finally {
       setDownloading(null);
     }
@@ -95,8 +118,18 @@ export default function ScanDetailPage() {
 
   const downloadHackerOne = async () => {
     setDownloading("h1");
+    setDownloadError("");
     try {
       const res = await fetch(`/api/reports/${id}/hackerone`);
+      if (res.status === 401) {
+        setDownloadError("Please sign in to export HackerOne reports.");
+        return;
+      }
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "HackerOne report export failed.");
+      }
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -104,8 +137,10 @@ export default function ScanDetailPage() {
       a.download = `hackerone-${id?.toString().slice(0, 8)}.md`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      alert("HackerOne download failed.");
+    } catch (err: unknown) {
+      setDownloadError(
+        err instanceof Error ? err.message : "HackerOne report export failed."
+      );
     } finally {
       setDownloading(null);
     }
@@ -140,7 +175,7 @@ export default function ScanDetailPage() {
         )}
 
         {error && (
-          <div className="bg-red-950/30 border border-red-900/50 rounded-xl p-8 text-center">
+          <div role="alert" className="bg-red-950/30 border border-red-900/50 rounded-xl p-8 text-center">
             <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-3" />
             <p className="text-red-400 font-mono">{error}</p>
           </div>
@@ -194,6 +229,26 @@ export default function ScanDetailPage() {
                 HackerOne Report
               </button>
             </div>
+
+            {downloadError && (
+              <div
+                role="alert"
+                className="mb-6 bg-red-950/30 border border-red-900/50 rounded-xl px-4 py-3 text-red-300 font-mono text-sm flex items-center justify-between gap-3"
+              >
+                <span className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+                  {downloadError}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setDownloadError("")}
+                  className="text-red-400 hover:text-red-200 transition-colors"
+                  aria-label="Dismiss export error"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
             {/* Findings */}
             <h2 className="text-xl font-black text-white mb-4 flex items-center gap-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Shield, ArrowLeft, ExternalLink, Download } from "lucide-react";
+import { Shield, ArrowLeft, ExternalLink, Download, AlertTriangle, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
@@ -35,15 +35,23 @@ export default function HistoryPage() {
   const [scans, setScans] = useState<ScanItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchScans = async () => {
       try {
         const res = await axios.get("/api/scans");
         setScans(res.data || []);
-      } catch (e) {
-        console.error("Failed to load scan history", e);
-        setError("Could not load scan history. Is the backend running?");
+      } catch (e: unknown) {
+        const status = axios.isAxiosError(e) ? e.response?.status : undefined;
+        const errData = axios.isAxiosError(e)
+          ? (e.response?.data as { error?: string } | undefined)
+          : undefined;
+        if (status === 401) {
+          setError("Please sign in to view your scan history.");
+        } else {
+          setError(errData?.error || "Could not load scan history. Backend service is offline or unreachable.");
+        }
       } finally {
         setLoading(false);
       }
@@ -53,14 +61,24 @@ export default function HistoryPage() {
 
   const downloadPdf = async (e: React.MouseEvent, id: string) => {
     e.preventDefault();
+    setActionError(null);
     try {
       const res = await fetch(`/api/scan/${id}/pdf`);
-      if (res.status === 402) {
-        alert("🔒 PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade.");
+      if (res.status === 401) {
+        setActionError("Please sign in to export PDF reports.");
         return;
       }
-      if (!res.ok) throw new Error("Download failed");
-      
+      if (res.status === 402) {
+        setActionError(
+          "PDF Export requires a Pro or Enterprise plan. Please manage your billing in Settings to upgrade."
+        );
+        return;
+      }
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "PDF download failed.");
+      }
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -68,8 +86,8 @@ export default function HistoryPage() {
       a.download = `sageai-report-${id.toString().slice(0, 8)}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      alert("PDF download failed.");
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : "PDF download failed.");
     }
   };
 
@@ -108,11 +126,31 @@ export default function HistoryPage() {
         )}
 
         {error && (
-          <Card className="bg-red-950/30 border-red-900/50">
+          <Card role="alert" className="bg-red-950/30 border-red-900/50">
             <CardContent className="py-8 text-center text-red-400 font-mono">
               {error}
             </CardContent>
           </Card>
+        )}
+
+        {actionError && (
+          <div
+            role="alert"
+            className="mb-6 bg-red-950/30 border border-red-900/50 rounded-xl px-4 py-3 text-red-300 font-mono text-sm flex items-center justify-between gap-3"
+          >
+            <span className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+              {actionError}
+            </span>
+            <button
+              type="button"
+              onClick={() => setActionError(null)}
+              className="text-red-400 hover:text-red-200 transition-colors"
+              aria-label="Dismiss error"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         )}
 
         {!loading && !error && scans.length === 0 && (

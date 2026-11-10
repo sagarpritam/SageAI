@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 28 Waves (Capabilities 1 to 106).
+Live Multi-Domain Stress Test & Verification across All 29 Waves (Capabilities 1 to 109).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-28 (Caps 1-106)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-29 (Caps 1-109)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -616,6 +616,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 28 (Opt B): Monopole Proton Decay Catalysis",
         ),
+        # Wave 29 (Capabilities 107-109 & Option B Wave 29)
+        (
+            "GET",
+            "/api/m-theory-g2/manifolds",
+            None,
+            "Wave 29 (Cap 107): 11D M-Theory G2 Manifolds",
+        ),
+        (
+            "POST",
+            "/api/m-theory-g2/compactify-flux",
+            {
+                "manifold_id": "G2-JOYCE-ORBIFOLD-01",
+                "eleven_d_radius_planck": 18.5,
+                "flux_quantum_g4": 4,
+                "torsion_damping_gain": 1.15,
+            },
+            "Wave 29 (Cap 107): M-Theory G2 Flux Compactification",
+        ),
+        (
+            "GET",
+            "/api/happy-holographic-qec/tessellations",
+            None,
+            "Wave 29 (Cap 108): HaPPY Holographic Tessellations",
+        ),
+        (
+            "POST",
+            "/api/happy-holographic-qec/correct-erasure",
+            {
+                "tessellation_id": "HAPPY-PENTAGON-5-4-01",
+                "boundary_erasure_pct": 28.0,
+                "hyperbolic_layers": 5,
+                "recovery_gain": 1.15,
+            },
+            "Wave 29 (Cap 108): HaPPY Entanglement Wedge Recovery",
+        ),
+        (
+            "GET",
+            "/api/ktheory-dbrane/cycles",
+            None,
+            "Wave 29 (Cap 109): Topological K-Theory D-Brane Cycles",
+        ),
+        (
+            "POST",
+            "/api/ktheory-dbrane/classify-charge",
+            {
+                "cycle_id": "KTHEORY-ABS-SPIN7-01",
+                "chern_character_rank": 16,
+                "torsion_order_n": 4,
+                "anomaly_damping_gain": 1.12,
+            },
+            "Wave 29 (Cap 109): K-Theory D-Brane Charge Classification",
+        ),
+        (
+            "GET",
+            "/api/kugelblitz-hawking/cores",
+            None,
+            "Wave 29 (Opt B): Kugelblitz Hawking Cores",
+        ),
+        (
+            "POST",
+            "/api/kugelblitz-hawking/harvest-power",
+            {
+                "core_id": "KUGELBLITZ-ORBITAL-L4-01",
+                "singularity_mass_1e10_kg": 5.0,
+                "accretion_feed_mg_s": 1.58,
+                "penrose_coupling_gain": 1.1,
+            },
+            "Wave 29 (Opt B): Kugelblitz Hawking Power Harvest",
+        ),
     ]
 
 
@@ -645,7 +714,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-28, CAPS 1-106) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-29, CAPS 1-109) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -660,7 +729,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-28 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-29 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -717,7 +786,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-28){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-29){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -733,7 +802,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-28 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-29 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -781,7 +850,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-28, Capabilities 1-106) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-29, Capabilities 1-109) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–28 • Current",
-    range: "Capabilities 101–106 + Option B",
+    wave: "Waves 27–29 • Current",
+    range: "Capabilities 101–109 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Open-Closed String Field Theory Vertex Integrator, Calabi-Yau Mirror Symmetry, Fibonacci Anyon Braid Compiler & Monopole Catalyzed Battery.",
+    detail: "11D M-Theory G2 Compactifier, Holographic AdS/CFT HaPPY QEC, Topological K-Theory D-Branes, String Field Theory & Kugelblitz Hawking Generator.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 28 String Field orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 29 M-Theory & Holographic QEC orchestration.
           </p>
         </div>
 
@@ -204,7 +204,7 @@ export function SovereignArchitectureShowcase() {
           {[
             { id: "pillars" as const, label: "10-Pillar Sovereign Defense Grid", icon: Shield },
             { id: "enterprise" as const, label: "Multi-LLM, PQC & Zero-Egress Core", icon: Lock },
-            { id: "frontier" as const, label: `Waves 1–28 · v${PLATFORM_VERSION} Milestone`, icon: Atom },
+            { id: "frontier" as const, label: `${PLATFORM_WAVES_RANGE} · v${PLATFORM_VERSION} Milestone`, icon: Atom },
           ].map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -277,7 +277,7 @@ export function SovereignArchitectureShowcase() {
           </motion.div>
         )}
 
-        {/* Tab 3: Waves 1-28 Evolution */}
+        {/* Tab 3: Waves 1-29 Evolution */}
         {activeTab === "frontier" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

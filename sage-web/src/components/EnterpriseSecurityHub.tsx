@@ -25,6 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import axios from "axios";
+import { PLATFORM_VERSION } from "@/lib/platform";
 
 interface Capability {
   id: number;
@@ -185,7 +186,7 @@ export function EnterpriseSecurityHub() {
             <div className="flex items-center gap-2 mb-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                SOVEREIGN DEFENSE GRID v6.8.0
+                SOVEREIGN DEFENSE GRID v{PLATFORM_VERSION}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">
                 10/10 ACTIVE
