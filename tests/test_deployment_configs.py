@@ -63,10 +63,15 @@ def test_shell_scripts_use_lf_line_endings():
 def test_deployment_manifests_and_vercel_monorepo_integrity():
     root_pkg = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     assert "workspaces" not in root_pkg
+    assert "next" in root_pkg.get("dependencies", {})
 
     root_vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
     assert root_vercel["framework"] == "nextjs"
     assert root_vercel["outputDirectory"] == "sage-web/.next"
+    assert root_vercel["installCommand"].startswith("npm install --legacy-peer-deps")
+    assert (
+        "cd sage-web && npm install --legacy-peer-deps" in root_vercel["installCommand"]
+    )
 
     next_cfg = (ROOT / "sage-web" / "next.config.ts").read_text(encoding="utf-8")
     assert 'path.resolve(__dirname, "..")' not in next_cfg

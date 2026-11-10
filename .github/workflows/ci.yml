@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - run: pip install ruff bandit mypy safety
+      - run: pip install ruff bandit mypy safety alembic
       - run: ruff check app/ tests/ scripts/ sagestrike/ alembic/
       - run: ruff format --check app/ tests/ scripts/ sagestrike/ alembic/
       - run: mypy app/ sagestrike/ scripts/ tests/ alembic/ --ignore-missing-imports --check-untyped-defs
