@@ -5,24 +5,13 @@ import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
-
-
-def _normalize_async_db_url(url: str) -> str:
-    """Normalize sync Postgres/SQLite URLs to async drivers required by app.core.database."""
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+asyncpg://", 1)
-    if url.startswith("postgresql://") and "+asyncpg" not in url:
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    if url.startswith("sqlite://") and "+aiosqlite" not in url:
-        return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
-    return url
-
+from app.core.database import build_async_engine_config, normalize_async_db_url
 
 if env_db_url := os.environ.get("DATABASE_URL"):
-    os.environ["DATABASE_URL"] = _normalize_async_db_url(env_db_url)
+    os.environ["DATABASE_URL"] = normalize_async_db_url(env_db_url)
 
 import app.models  # noqa: F401, E402
 from app.core.config import settings  # noqa: E402
@@ -32,19 +21,19 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Override with DATABASE_URL from environment or app settings
-db_url = os.environ.get("DATABASE_URL") or settings.DATABASE_URL
-if db_url:
-    config.set_main_option("sqlalchemy.url", _normalize_async_db_url(db_url))
+# Resolve effective DATABASE_URL without triggering ConfigParser % interpolation failures
+raw_db_url = os.environ.get("DATABASE_URL") or settings.DATABASE_URL
+clean_db_url, db_connect_args = build_async_engine_config(raw_db_url)
+if clean_db_url:
+    config.set_main_option("sqlalchemy.url", clean_db_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode (SQL script output)."""
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=clean_db_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -66,10 +55,10 @@ def do_run_migrations(connection):
 
 async def run_async_migrations():
     """Run migrations in 'online' mode with async engine."""
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    connectable = create_async_engine(
+        clean_db_url,
         poolclass=pool.NullPool,
+        connect_args=db_connect_args,
     )
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

@@ -2,8 +2,8 @@
 # Stage 1: Install dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
+COPY .npmrc* package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 # Stage 2: Build the Next.js app
 FROM node:20-alpine AS builder
@@ -39,6 +39,9 @@ EXPOSE 3000 8080
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
 CMD ["sh", "-c", "if [ -f server.js ]; then node server.js; elif [ -f sage-web/server.js ]; then cd sage-web && node server.js; else npm start; fi"]
 

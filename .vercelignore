@@ -2,6 +2,29 @@
 .env*
 *.env*
 
+# Backend Python codebase (deployed to Cloud Run / Docker)
+api/
+app/
+sagestrike/
+alembic/
+scripts/
+requirements.txt
+requirements-dev.txt
+pyproject.toml
+alembic.ini
+gunicorn.conf.py
+Dockerfile*
+docker-entrypoint.sh
+docker-compose*.yml
+Caddyfile
+Procfile
+render.yaml
+railway.json
+railway.toml
+*.sh
+.agent/
+.agents/
+
 venv/
 venv2/
 .venv/

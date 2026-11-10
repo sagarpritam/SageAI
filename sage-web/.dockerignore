@@ -1,7 +1,11 @@
 node_modules
 .next
 .git
+.vercel
+playwright-report
+test-results
+*.log
+*.txt
 .env
-.env.local
-.env.production
+.env.*
 *.md

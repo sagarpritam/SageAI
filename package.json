@@ -2,9 +2,6 @@
   "name": "sageai",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "sage-web"
-  ],
   "scripts": {
     "dev": "npm run dev --prefix sage-web",
     "build": "npm run build --prefix sage-web",
@@ -12,6 +9,7 @@
     "lint": "npm run lint --prefix sage-web"
   },
   "dependencies": {
+    "next": "^16.4.3",
     "openai": "^6.29.0"
   },
   "overrides": {

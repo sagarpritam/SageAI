@@ -6,6 +6,7 @@ metadata:
 type: Opaque
 stringData:
   SECRET_KEY: "change-me-in-production-use-a-strong-key"
+  INTERNAL_SERVICE_KEY: "change-me-in-production-service-key-min-32-chars"
   POSTGRES_PASSWORD: "sageai_secret_2024"
   DATABASE_URL: "postgresql+asyncpg://sageai:sageai_secret_2024@postgres:5432/sageai"
 ---
@@ -21,5 +22,8 @@ data:
   APP_NAME: "SageAI Security Scanner"
   DEBUG: "False"
   RATE_LIMIT: "60/minute"
-  CORS_ORIGINS: "*"
-  REDIS_URL: "redis://redis:6379/0"
+  CORS_ORIGINS: "https://sageai.example.com,http://localhost:3000"
+  FRONTEND_URL: "https://sageai.example.com"
+  BACKEND_URL: "http://backend:8000"
+  INTERNAL_ALLOWED_IPS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+  REDIS_URL: "redis://redis:6379/1"

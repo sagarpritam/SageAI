@@ -34,12 +34,17 @@ qrcode
 
 # === API & HTTP ===
 httpx
+aiohttp>=3.10.11
+defusedxml>=0.7.1
+dnspython>=2.6.1
 stripe
 email-validator>=2.0.0
 
 # === AI & LLM ===
 google-generativeai
+openai>=1.0.0
 nemo-microservices
+PyYAML>=6.0.1
 
 # === PDF & Reporting ===
 reportlab

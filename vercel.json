@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd sage-web && npm install --legacy-peer-deps",
   "buildCommand": "cd sage-web && npm run build",
-  "installCommand": "cd sage-web && npm install",
+  "outputDirectory": "sage-web/.next",
   "framework": "nextjs"
 }

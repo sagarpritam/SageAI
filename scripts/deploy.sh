@@ -5,58 +5,52 @@
 set -e
 
 echo "==============================================="
-echo "🛡️   SageAI Version 3.0 Deployment (Docker)"
+echo "SageAI Version 3.0 Deployment (Docker)"
 echo "==============================================="
 
-# Check requirements
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker is not installed. Please install Docker first."
+    echo "Docker is not installed. Please install Docker first."
     exit 1
 fi
 
 if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-    echo "❌ Docker Compose is not installed."
+    echo "Docker Compose is not installed."
     exit 1
 fi
 
-# Ensure .env exists
 if [ ! -f ".env" ]; then
-    echo "⚠️  No .env file found. Creating from .env.example..."
+    echo "No .env file found. Creating from .env.example..."
     if [ -f ".env.example" ]; then
         cp .env.example .env
-        echo "✅ Created .env. Please configure your API signatures inside."
+        echo "Created .env. Please configure your API keys inside."
     else
-        echo "❌ .env.example is missing! Deployment halted."
+        echo ".env.example is missing! Deployment halted."
         exit 1
     fi
 fi
 
-echo "🚀 Building container images..."
-# Suppress build noise, show errors only
+echo "Building container images..."
 if docker compose version &> /dev/null; then
-  docker compose -f docker/docker-compose.yml build --no-cache
+  docker compose -f docker/docker-compose.yml build
 else
-  docker-compose -f docker/docker-compose.yml build --no-cache
+  docker-compose -f docker/docker-compose.yml build
 fi
 
-echo "🟢 Starting Docker services in detached mode..."
+echo "Starting Docker services in detached mode..."
 if docker compose version &> /dev/null; then
   docker compose -f docker/docker-compose.yml up -d
 else
   docker-compose -f docker/docker-compose.yml up -d
 fi
 
-echo "⏳ Waiting for PostgreSQL database system to initialize (10s)..."
-sleep 10
-
-echo "🗄️ Running Alembic database migrations inside the backend container..."
+echo "Applying Alembic database migrations inside backend container..."
 if docker compose version &> /dev/null; then
-  docker compose -f docker/docker-compose.yml exec -T backend alembic upgrade head
+  docker compose -f docker/docker-compose.yml exec -T backend python scripts/migrate.py
 else
-  docker-compose -f docker/docker-compose.yml exec -T backend alembic upgrade head
+  docker-compose -f docker/docker-compose.yml exec -T backend python scripts/migrate.py
 fi
 
-echo "🌱 Seeding initial platform data (Admins, Demo Org, Assets)..."
+echo "Seeding initial platform data..."
 if docker compose version &> /dev/null; then
   docker compose -f docker/docker-compose.yml exec -e ENV=development -T backend python scripts/seed_db.py
 else
@@ -65,12 +59,9 @@ fi
 
 echo ""
 echo "==============================================="
-echo "✅ DEPLOYMENT COMPLETE"
+echo "DEPLOYMENT COMPLETE"
 echo "==============================================="
-echo ""
-echo "🌐 Frontend URL:  http://localhost"
-echo "🔌 Backend API:   http://localhost:8000"
-echo "🏵️  Flower UI:    http://localhost:5555"
-echo ""
-echo "📝 Use 'docker compose -f docker/docker-compose.yml logs -f' to view application traces."
+echo "Frontend URL:  http://localhost"
+echo "Backend API:   http://localhost:8000"
+echo "Flower UI:     http://localhost:5555"
 echo "==============================================="

@@ -198,7 +198,7 @@ async def lifespan(app: FastAPI):
         )
 
     await init_db()
-    logger.info("✅ Database tables created (v2.0)")
+    logger.info("✅ Database schema verified (v2.0)")
 
     # Start War Room Manager
     asyncio.create_task(warroom_manager.start())

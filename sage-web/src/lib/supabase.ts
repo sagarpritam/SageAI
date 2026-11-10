@@ -5,7 +5,9 @@ const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
   "https://jiawtheciauiwhcgswde.supabase.co";
 
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "supabase-anon-key-not-configured";
 
 /**
  * Client-side Supabase client for Next.js browser components.

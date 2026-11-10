@@ -11,8 +11,8 @@ services:
     region: oregon
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
-    healthCheckPath: /
+    startCommand: python scripts/migrate.py && gunicorn app.main:app -c gunicorn.conf.py
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -22,6 +22,8 @@ services:
         generateValue: true
       - key: INTERNAL_SERVICE_KEY
         generateValue: true
+      - key: WEB_CONCURRENCY
+        value: "2"
       - key: ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
@@ -34,6 +36,10 @@ services:
         value: "false"
       - key: RATE_LIMIT
         value: 60/minute
+      - key: CORS_ORIGINS
+        value: https://sageai-dashboard.onrender.com,https://sage-web.vercel.app
+      - key: FRONTEND_URL
+        value: https://sageai-dashboard.onrender.com
       - key: PYTHON_VERSION
         value: 3.13.0
 
@@ -43,11 +49,14 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: cd sage-web && npm install --legacy-peer-deps && npm run build
-    startCommand: cd sage-web && npm start
+    buildCommand: cd sage-web && npm install --legacy-peer-deps && npm run build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public
+    startCommand: cd sage-web && HOSTNAME=0.0.0.0 PORT=${PORT:-10000} node .next/standalone/server.js
+    healthCheckPath: /
     envVars:
       - key: BACKEND_URL
         value: https://sageai-api.onrender.com
+      - key: INTERNAL_SERVICE_KEY
+        sync: false
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION

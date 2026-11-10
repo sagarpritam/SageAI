@@ -20,7 +20,7 @@ cp .env.production.example .env.production
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
 
 # 4. Apply database migrations
-docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
+docker compose -f docker-compose.prod.yml exec backend python scripts/migrate.py
 ```
 
 ### Full-Stack Service Map
@@ -29,7 +29,7 @@ docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 | :--- | :--- | :--- | :--- | :--- |
 | **Caddy** | `caddy:2-alpine` | `80, 443` | `https://${DOMAIN}`, `https://api.${DOMAIN}` | Automatic TLS |
 | **Frontend** | Next.js 16 Standalone | `3000` | Via Caddy `https://${DOMAIN}` | Node.js HTTP 200 |
-| **Backend** | FastAPI + Gunicorn | `8000` | Via Caddy `https://api.${DOMAIN}` | `curl http://localhost:8000/` |
+| **Backend** | FastAPI + Gunicorn | `8000` | Via Caddy `https://api.${DOMAIN}` | `curl http://localhost:8000/health` |
 | **Worker Fleet** | Celery Async Engine | N/A (Internal) | N/A | Process supervisor |
 | **Database** | PostgreSQL 16 Alpine | `5432` | Internal bridge only | `pg_isready -U sageai` |
 | **Cache/Queue** | Redis 7 Alpine | `6379` | Internal bridge only | `redis-cli ping` |
@@ -81,18 +81,17 @@ docker compose -f docker-compose.prod.yml up -d --scale worker=4
 For enterprise Kubernetes clusters (GKE, EKS, AKS):
 
 ```bash
-# 1. Create namespace and secrets
-kubectl create namespace sageai
-kubectl apply -f k8s/secrets.yaml
+# 1. Create namespace, secrets, and ConfigMap
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/config.yaml
 
-# 2. Deploy stateful backing services (or use Cloud SQL / ElastiCache)
-kubectl apply -f k8s/postgres.yaml
-kubectl apply -f k8s/redis.yaml
+# 2. Deploy stateful backing services (or use Cloud SQL / Supabase / ElastiCache)
+kubectl apply -f k8s/database.yaml
 
-# 3. Deploy application fleet with HPA autoscalers
-kubectl apply -f k8s/backend-deployment.yaml
-kubectl apply -f k8s/worker-deployment.yaml
-kubectl apply -f k8s/frontend-deployment.yaml
+# 3. Deploy application fleet with HPA autoscalers and Ingress
+kubectl apply -f k8s/backend.yaml
+kubectl apply -f k8s/worker.yaml
+kubectl apply -f k8s/frontend.yaml
 kubectl apply -f k8s/ingress.yaml
 ```
 

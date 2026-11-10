@@ -25,15 +25,8 @@ spec:
     - host: sageai.example.com  # ← Change to your domain
       http:
         paths:
-          # API routes → backend
+          # API routes → backend (/scan page stays routed to frontend)
           - path: /auth
-            pathType: Prefix
-            backend:
-              service:
-                name: backend
-                port:
-                  number: 8000
-          - path: /scan
             pathType: Prefix
             backend:
               service:
@@ -159,7 +152,14 @@ spec:
                 name: backend
                 port:
                   number: 8000
-          # Everything else → frontend
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
+          # Everything else → frontend (which handles /api/* proxies cleanly)
           - path: /
             pathType: Prefix
             backend:

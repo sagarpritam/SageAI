@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: worker
-          image: sageai-worker:latest
+          image: sageai/worker:latest
           command: ["celery", "-A", "app.worker", "worker", "--loglevel=info", "-c", "4", "-Q", "celery,scans,deep_scans"]
           envFrom:
             - configMapRef:
@@ -33,6 +33,15 @@ spec:
               value: "nmap"
             - name: NUCLEI_BIN
               value: "nuclei"
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "from app.tasks import celery_app; pong = celery_app.control.ping(timeout=3.0); raise SystemExit(0 if pong else 1)"
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
           resources:
             requests:
               memory: "512Mi"

@@ -8,6 +8,7 @@ requires-python = ">=3.11"
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+force-exclude = true
 exclude = [
     ".git",
     ".mypy_cache",
@@ -23,6 +24,7 @@ exclude = [
     "alembic",
     ".agent",
     ".agents",
+    "*.md",
 ]
 
 [tool.ruff.lint]

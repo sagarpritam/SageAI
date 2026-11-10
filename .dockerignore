@@ -31,4 +31,11 @@ deployment.zip
 frontend/
 sageai---autonomous-pentesting/
 sage-frontend/
-sage-web/
+sage-web/node_modules/
+sage-web/.next/
+sage-web/.env*
+sage-web/.vercel/
+sage-web/playwright-report/
+sage-web/test-results/
+sage-web/*.log
+sage-web/*.txt

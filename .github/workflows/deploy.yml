@@ -9,7 +9,6 @@ on:
 
 env:
   REGION: us-central1
-  SERVICE_NAME: sageai-api
 
 jobs:
   deploy:
@@ -44,10 +43,11 @@ jobs:
           service: sageai-backend
           image: gcr.io/${{ env.PROJECT_ID }}/sageai-backend:${{ github.sha }}
           region: ${{ env.REGION }}
-          flags: '--allow-unauthenticated'
-          env_vars: |
+          flags: '--allow-unauthenticated --memory=1Gi --cpu=1 --timeout=120 --max-instances=5 --port=8000'
+          env_vars: |-
             ENV=production
             DEBUG=false
+            WEB_CONCURRENCY=2
             DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
             SECRET_KEY=${{ secrets.PROD_SECRET_KEY }}
             NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}
@@ -58,27 +58,50 @@ jobs:
             AI_GATEWAY_API_KEY=${{ secrets.AI_GATEWAY_API_KEY }}
             AI_GATEWAY_URL=${{ secrets.AI_GATEWAY_URL || 'https://ai-gateway.vercel.sh/v1' }}
             INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
-            CORS_ORIGINS=${{ secrets.PROD_CORS_ORIGINS || 'https://sageai.io,https://app.sageai.io' }}
+            CORS_ORIGINS="${{ secrets.PROD_CORS_ORIGINS || 'https://sage-web.vercel.app,https://sage-web-sagarpritams-projects.vercel.app,https://sageai-v1.vercel.app,https://sageai-v1-unique.vercel.app,https://sage-ai.vercel.app,https://sageai.io,https://app.sageai.io' }}"
 
       - name: Deploy Frontend to Cloud Run
+        env:
+          FRONTEND_INTERNAL_KEY: ${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
         run: |
           BACKEND_URL=$(gcloud run services describe sageai-backend --region ${{ env.REGION }} --format 'value(status.url)')
           echo "Frontend will connect to Backend URL: $BACKEND_URL"
+          BACKEND_URL="$BACKEND_URL" python3 - <<'PY' > /tmp/frontend-env.yaml
+          import json, os
+          for k, v in (
+              ("NODE_ENV", "production"),
+              ("BACKEND_URL", os.environ["BACKEND_URL"]),
+              ("INTERNAL_SERVICE_KEY", os.environ.get("FRONTEND_INTERNAL_KEY", "")),
+          ):
+              print(f"{k}: {json.dumps(v)}")
+          PY
           gcloud run deploy sageai-frontend \
             --image gcr.io/${{ env.PROJECT_ID }}/sageai-frontend:${{ github.sha }} \
             --region ${{ env.REGION }} \
+            --port 3000 \
+            --memory 512Mi \
+            --cpu 1 \
+            --timeout 60 \
+            --max-instances 5 \
             --allow-unauthenticated \
             --quiet \
-            --set-env-vars NODE_ENV=production,BACKEND_URL=$BACKEND_URL,INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
+            --env-vars-file /tmp/frontend-env.yaml
+          rm -f /tmp/frontend-env.yaml
 
       - name: Verify Live Endpoints & Health Check
         run: |
           BACKEND_URL=$(gcloud run services describe sageai-backend --region ${{ env.REGION }} --format 'value(status.url)')
           FRONTEND_URL=$(gcloud run services describe sageai-frontend --region ${{ env.REGION }} --format 'value(status.url)')
           echo "Verifying Backend endpoint: $BACKEND_URL"
-          curl --fail --retry 5 --retry-delay 3 "$BACKEND_URL/health" || curl --fail "$BACKEND_URL/"
+          curl --fail --retry 5 --retry-delay 3 "$BACKEND_URL/health"
+          echo ""
+          echo "Verifying Backend DB readiness: $BACKEND_URL/health/ready"
+          curl --fail --retry 3 --retry-delay 2 "$BACKEND_URL/health/ready"
+          echo ""
           echo "Verifying Frontend endpoint: $FRONTEND_URL"
-          curl --fail -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" || true
+          STATUS=$(curl --fail --retry 5 --retry-delay 3 -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL")
+          echo "Frontend HTTP status: $STATUS"
+          test "$STATUS" -ge 200 -a "$STATUS" -lt 400
 
       - name: Deployment Summary & Live URLs
         if: always()

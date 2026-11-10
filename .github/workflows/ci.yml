@@ -1,6 +1,7 @@
 name: SageAI CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, develop]
   pull_request:
@@ -113,6 +114,14 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate compose configs & production Dockerfiles
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.prod.yml --env-file .env.production.example config --quiet
+          docker compose -f docker/docker-compose.yml config --quiet
+          docker build -t sageai-backend-prod -f docker/Dockerfile.backend .
+          docker build -t sageai-frontend-prod -f docker/Dockerfile.frontend .
 
       - name: Build full stack
         run: docker compose build

@@ -50,6 +50,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source
 COPY app/ ./app/
+COPY sagestrike/ ./sagestrike/
+COPY scripts/ ./scripts/
 COPY alembic/ ./alembic/
 COPY alembic.ini .
 
@@ -61,7 +63,7 @@ USER sageai
 
 # Health check inspecting Celery worker status
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD python -c "from app.tasks import celery_app; celery_app.control.ping(timeout=3.0)" || exit 0
+  CMD python -c "from app.tasks import celery_app; pong = celery_app.control.ping(timeout=3.0); raise SystemExit(0 if pong else 1)"
 
 ENTRYPOINT ["celery", "-A", "app.worker", "worker"]
 CMD ["--loglevel=info", "-c", "4", "-Q", "celery,scans,deep_scans"]

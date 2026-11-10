@@ -24,10 +24,11 @@ COPY --from=builder /install /usr/local
 
 # Copy application code
 COPY app/ ./app/
+COPY sagestrike/ ./sagestrike/
+COPY scripts/ ./scripts/
 COPY gunicorn.conf.py .
 COPY alembic.ini .
 COPY alembic/ ./alembic/
-COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
 
 # Create non-root user
 USER root

@@ -312,7 +312,9 @@ class EventBus:
         )
 
         events = []
-        for _event_id, event_data in events_data:
+        for _event_id, event_data in events_data or []:
+            if not event_data:
+                continue
             try:
                 # Parse event from stream
                 event_dict = dict(event_data)
@@ -337,7 +339,9 @@ class EventBus:
             # Production would use secondary index
             all_events = await self.redis_client.xrange(stream_key)
 
-            for _event_id, event_data in all_events:
+            for _event_id, event_data in all_events or []:
+                if not event_data:
+                    continue
                 if event_data.get("correlation_id") == correlation_id:
                     events.append(Event.from_dict(dict(event_data)))
 

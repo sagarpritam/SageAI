@@ -38,7 +38,7 @@ jobs:
       - name: Run Frontend Lint & Security Audit
         run: |
           cd sage-web
-          npm ci --prefer-offline || npm install
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
           npm run lint || true
 
       - name: Upload SAST Artifacts
