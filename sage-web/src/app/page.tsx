@@ -793,7 +793,7 @@ const Pricing = () => {
                 </div>
               ))}
             </div>
-            <Link href={plan.name === 'Pro' ? '/payment' : '/signin'}
+            <Link href={plan.name === 'Pro' ? '/pricing' : '/login'}
               className={`w-full py-4 rounded-full font-bold transition-all text-center ${plan.popular ? 'bg-emerald-500 text-black hover:bg-emerald-400' : 'bg-white/5 text-white hover:bg-white/10'}`}
             >
               {plan.button}
@@ -1447,8 +1447,8 @@ const Navbar = () => {
           <Link href="/features" className="hover:text-emerald-400 transition-colors">Features</Link>
           <Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">How it Works</Link>
           <Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing</Link>
-          <Link href="/signin" className="hover:text-emerald-400 transition-colors">Sign In</Link>
-          <Link href="/signin" className="px-5 py-2 bg-white text-black rounded-full hover:bg-emerald-400 transition-all font-semibold">
+          <Link href="/login" className="hover:text-emerald-400 transition-colors">Sign In</Link>
+          <Link href="/login" className="px-5 py-2 bg-white text-black rounded-full hover:bg-emerald-400 transition-all font-semibold">
             Get Started
           </Link>
         </div>
@@ -1470,8 +1470,8 @@ const Navbar = () => {
             <Link href="/features" onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-emerald-400 transition-colors">Features</Link>
             <Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-emerald-400 transition-colors">How it Works</Link>
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-emerald-400 transition-colors">Pricing</Link>
-            <Link href="/signin" onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-emerald-400 transition-colors">Sign In</Link>
-            <Link href="/signin" onClick={() => setMobileMenuOpen(false)} className="w-full px-5 py-3 bg-emerald-500 text-black rounded-lg font-semibold text-center">
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-emerald-400 transition-colors">Sign In</Link>
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full px-5 py-3 bg-emerald-500 text-black rounded-lg font-semibold text-center">
               Get Started
             </Link>
           </motion.div>
@@ -1824,7 +1824,7 @@ const LandingPage = () => {
                     placeholder="Enter your domain (e.g. startup.io)" 
                     className="bg-transparent border-none focus:ring-0 text-white placeholder-zinc-600 flex-grow px-4 py-3 text-sm font-mono"
                   />
-                  <Link href="/signin"
+                  <Link href="/login"
                     className="px-6 py-3 bg-emerald-500 text-black rounded-full font-bold text-sm hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                   >
                     Start Free Scan
@@ -2249,19 +2249,19 @@ const LandingPage = () => {
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Product</h4>
               <ul className="space-y-4 text-zinc-500 text-sm">
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Enterprise</a></li>
+                <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Features</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">Security</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Enterprise</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Company</h4>
               <ul className="space-y-4 text-zinc-500 text-sm">
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors">Contact</a></li>
+                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">About</Link></li>
+                <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Blog</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">Careers</Link></li>
+                <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Contact</Link></li>
               </ul>
             </div>
           </div>
@@ -2270,9 +2270,9 @@ const LandingPage = () => {
               © 2026 SageAI Security Inc. All rights reserved.
             </p>
             <div className="flex gap-8 text-xs text-zinc-600">
-              <a href="#" className="hover:text-zinc-400 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-zinc-400 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-zinc-400 transition-colors">Cookie Policy</a>
+              <Link href="/privacy" className="hover:text-zinc-400 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-zinc-400 transition-colors">Terms of Service</Link>
+              <Link href="/privacy" className="hover:text-zinc-400 transition-colors">Cookie Policy</Link>
             </div>
           </div>
         </div>

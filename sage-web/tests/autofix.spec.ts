@@ -114,7 +114,7 @@ test.describe('SagePatch AutoFix Review Flow E2E Tests', () => {
     await autofixTab.click();
 
     // Verify engine readiness banner
-    await expect(page.locator('text=SagePatch Remediation Engine Ready')).toBeVisible();
+    await expect(page.locator('text=SagePatch Remediation Engine Ready').first()).toBeVisible();
     await expect(page.locator('text=Phase 04 Verified')).toBeVisible();
 
     // Verify Review Queue tab and pending counter badge (1 proposed patch)
@@ -199,8 +199,9 @@ test.describe('SagePatch AutoFix Review Flow E2E Tests', () => {
     await page.goto('/dashboard');
     await page.locator('button:has-text("Auto-Fix")').click();
 
-    // Find Approve & Open Pull Request button
-    const approveBtn = page.locator('button:has-text("Approve & Open Pull Request")');
+    // Find Simulate PR and Approve & Open PR buttons
+    await expect(page.locator('button:has-text("Simulate PR")')).toBeVisible();
+    const approveBtn = page.locator('button:has-text("Approve & Open PR")');
     await expect(approveBtn).toBeVisible();
     await approveBtn.click();
 
@@ -261,20 +262,26 @@ test.describe('SagePatch AutoFix Review Flow E2E Tests', () => {
     await expect.poll(() => rejectPayload.reason).toBe(rejectionReasonText);
   });
 
-  test('User can switch between Review Queue and Scan & Propose Patch tabs', async ({ page }) => {
+  test('User can switch between Review Queue, Scan Repository, and Propose Sandbox Fix tabs', async ({ page }) => {
     await page.goto('/dashboard');
     await page.locator('button:has-text("Auto-Fix")').click();
 
-    // Switch to Scan & Propose Patch tab
-    const scanTabBtn = page.locator('button:has-text("Scan & Propose Patch")');
+    // Switch to Scan Repository tab
+    const scanTabBtn = page.locator('button:has-text("Scan Repository")');
     await expect(scanTabBtn).toBeVisible();
     await scanTabBtn.click();
 
     // Verify scan inputs are visible
     await expect(page.locator('text=Run SAST & Propose Fixes')).toBeVisible();
     await expect(page.locator('input[placeholder*="owner/repo"]')).toBeVisible();
-    await expect(page.locator('input[placeholder="main"]')).toBeVisible();
-    await expect(page.locator('button:has-text("Run SAST & Propose Patches")')).toBeVisible();
+    await expect(page.locator('input[placeholder="Branch"]')).toBeVisible();
+    await expect(page.locator('button:has-text("Start Remediation Scan")')).toBeVisible();
+
+    // Switch to Propose Sandbox Fix tab
+    const proposeTabBtn = page.locator('button:has-text("Propose Sandbox Fix")');
+    await expect(proposeTabBtn).toBeVisible();
+    await proposeTabBtn.click();
+    await expect(page.locator('button:has-text("Validate AST & Propose Patch")')).toBeVisible();
 
     // Switch back to Review Queue tab
     const queueTabBtn = page.locator('button:has-text("SagePatch Review Queue")');
