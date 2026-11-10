@@ -22,7 +22,7 @@ VT_API = "https://www.virustotal.com/api/v3"
 )
 async def check_url_reputation(url: str) -> list[dict]:
     """Check a URL's reputation on VirusTotal (70+ security vendors)."""
-    findings = []
+    findings: list[dict] = []
     from app.core.config import settings
 
     api_key = settings.VIRUSTOTAL_API_KEY

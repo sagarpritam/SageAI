@@ -36,6 +36,7 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
     dict with keys per module containing their findings list.
     """
     import asyncio
+    from typing import Any
 
     from app.services.intelligence.censys_intel import censys_scan
     from app.services.intelligence.darkweb_intel import darkweb_search
@@ -49,7 +50,7 @@ async def run_full_intelligence_sweep(target: str, target_type: str = "domain") 
     from app.services.intelligence.spiderfoot_intel import spiderfoot_scan
     from app.services.intelligence.urlhaus_intel import urlhaus_scan
 
-    results = {}
+    results: dict[str, Any] = {}
 
     # Domain / IP scans
     if target_type in ("domain", "ip"):

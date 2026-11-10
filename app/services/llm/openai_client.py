@@ -1,5 +1,7 @@
 """OpenAI LLM Client Implementation."""
 
+from typing import Optional
+
 import httpx
 
 from app.core.config import settings
@@ -21,7 +23,11 @@ class OpenAIClient(BaseLLM):
         return "gpt-4o-mini"
 
     async def generate(
-        self, prompt: str, system_message: str = "", model: str = None, **kwargs
+        self,
+        prompt: str,
+        system_message: str = "",
+        model: Optional[str] = None,
+        **kwargs,
     ) -> dict:
         if openai_breaker.is_open():
             raise RuntimeError("OpenAI API is currently unavailable (Circuit Open)")

@@ -193,11 +193,17 @@ async def set_github_token(
     db: AsyncSession = Depends(get_db),
 ):
     """Securely encrypt and store a GitHub Personal Access Token for the organization (admin only)."""
+    raw_token = (payload.token or payload.pat or "").strip()
+    if not raw_token:
+        raise HTTPException(
+            status_code=422, detail="A non-empty GitHub token or pat is required"
+        )
+
     org = await db.get(Organization, current_user["org"])
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
 
-    org.github_token_encrypted = encrypt(payload.token)
+    org.github_token_encrypted = encrypt(raw_token)
     await db.commit()
 
     return {"message": "GitHub token securely stored."}

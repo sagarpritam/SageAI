@@ -20,7 +20,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.dspm")
 
 # Sensitive Data Discovery Patterns
-SENSITIVE_PATTERNS = [
+SENSITIVE_PATTERNS: List[Dict[str, Any]] = [
     {
         "category": "PCI_DSS",
         "name": "Credit Card Number",

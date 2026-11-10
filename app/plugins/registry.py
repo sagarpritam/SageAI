@@ -140,4 +140,4 @@ async def run_all_plugins(
 
     tasks = [run_plugin(p.name, target, **kwargs) for p in plugins]
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    return [r for r in results if r is not None and not isinstance(r, Exception)]
+    return [r for r in results if isinstance(r, PluginResult)]

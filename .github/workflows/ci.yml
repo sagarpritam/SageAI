@@ -22,10 +22,10 @@ jobs:
       - run: pip install ruff bandit mypy safety
       - run: ruff check app/ tests/ scripts/
       - run: ruff format --check app/ tests/ scripts/
-      - run: mypy app/ --ignore-missing-imports || true
+      - run: mypy app/ --ignore-missing-imports
       - run: safety check --full-report || true # Don't fail yet, just report
       - run: bandit -r app/ -f json -o bandit-report.json --severity-level medium || true
-      - run: bandit -r app/ --severity-level high
+      - run: bandit -r app/ --severity-level medium
       - uses: actions/upload-artifact@v7
         if: always()
         with:

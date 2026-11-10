@@ -22,7 +22,7 @@ NVD_API = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 )
 async def search_cves(keyword: str, max_results: int = 5) -> list[dict]:
     """Search NVD for CVEs matching a keyword (e.g., 'apache 2.4', 'nginx', 'openssl')."""
-    findings = []
+    findings: list[dict] = []
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:

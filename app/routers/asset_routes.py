@@ -16,7 +16,6 @@ from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.core.security import get_current_user, require_role
 from app.models.asset import Asset, AssetStatus, AssetType
-from app.models.user import User
 from app.schemas.asset import DiscoveryRequest
 from app.services.asset_inventory.asset_discovery_service import discover_assets
 from app.services.audit_service import log_audit_event
@@ -102,7 +101,7 @@ async def trigger_discovery_sync(
 @router.get("/summary", summary="Get Asset Inventory Summary")
 async def get_asset_summary(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Returns aggregated counts for the organization's attack surface."""
     org_id = current_user["org"]
@@ -147,7 +146,7 @@ async def list_assets(
     limit: int = Query(100, le=500),
     offset: int = Query(0),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """List discovered assets with optional filtering by type, risk level, and status."""
     org_id = current_user["org"]
@@ -169,7 +168,7 @@ async def list_assets(
 @router.get("/high-risk", summary="Get High Risk Assets")
 async def get_high_risk_assets(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Return Critical and High risk assets sorted by risk score."""
     org_id = current_user["org"]
@@ -192,7 +191,7 @@ async def get_high_risk_assets(
 async def get_new_assets(
     hours: int = Query(24, ge=1, le=168),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Assets discovered in the last N hours."""
     from datetime import timedelta, timezone
@@ -214,7 +213,7 @@ async def get_new_assets(
 async def get_asset(
     asset_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Get full detail for a specific asset including Shodan/SSL data."""
     result = await db.execute(
@@ -271,7 +270,7 @@ async def delete_asset(
 async def get_asset_challenge(
     asset_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Retrieve DNS TXT and HTTP file challenge instructions to verify asset ownership."""
     result = await db.execute(
@@ -299,7 +298,7 @@ async def verify_asset_endpoint(
         default=None, description="dns or http (checks both if omitted)"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Execute live DNS TXT or HTTP file challenge checks to verify domain ownership."""
     result = await db.execute(

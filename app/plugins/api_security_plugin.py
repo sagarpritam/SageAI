@@ -10,6 +10,7 @@ Detects API security vulnerabilities:
 """
 
 import asyncio
+from typing import Any, Dict, List
 
 from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
 from app.utils.http_client import get_http_client
@@ -60,7 +61,7 @@ class APISecurityPlugin(SecurityPlugin):
     async def run(self, target: str, **kwargs) -> PluginResult:
         host = target.replace("https://", "").replace("http://", "").split("/")[0]
         base_url = f"https://{host}"
-        findings = []
+        findings: List[Dict[str, Any]] = []
         metadata = {"host": host, "api_paths_checked": len(API_DOC_PATHS)}
 
         async with get_http_client(follow_redirects=True, timeout=7) as client:
@@ -70,7 +71,7 @@ class APISecurityPlugin(SecurityPlugin):
             ]
             doc_results = await asyncio.gather(*doc_tasks, return_exceptions=True)
             for r in doc_results:
-                if r and not isinstance(r, Exception):
+                if isinstance(r, dict):
                     findings.append(r)
 
             # Check CORS misconfiguration

@@ -148,8 +148,12 @@ class DeceptionHoneypotService:
         self._canary_tokens[canary_value] = token_record
         return token_record
 
-    def list_canary_tokens(self) -> List[Dict[str, Any]]:
-        """Returns all registered canary tokens."""
+    def list_canary_tokens(self, org_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Returns registered canary tokens, optionally scoped to an organization."""
+        if org_id is not None:
+            return [
+                t for t in self._canary_tokens.values() if t.get("org_id") == org_id
+            ]
         return list(self._canary_tokens.values())
 
     def record_decoy_hit(

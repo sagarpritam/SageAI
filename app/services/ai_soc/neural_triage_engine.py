@@ -60,7 +60,7 @@ class NeuralTriageEngine:
         clusters: Dict[str, List[Dict[str, Any]]] = {}
 
         for alert in raw_alerts:
-            source_ip = alert.get("source_ip", "0.0.0.0")
+            source_ip = alert.get("source_ip", "unknown_ip")
             target_asset = alert.get("target_asset", "unknown_host")
             alert.get("type", alert.get("category", "generic_alert"))
 
@@ -125,9 +125,7 @@ class NeuralTriageEngine:
                 source_ip, target_asset, alert_types, tier
             )
 
-            incident_id = (
-                f"INC-SOC-{hashlib.md5(cluster_key.encode()).hexdigest()[:8].upper()}"
-            )
+            incident_id = f"INC-SOC-{hashlib.md5(cluster_key.encode(), usedforsecurity=False).hexdigest()[:8].upper()}"
 
             incidents.append(
                 {

@@ -518,7 +518,7 @@ class EnterpriseSecurityOrchestrator:
 
         # ── Capability 9: Autonomous Cyber Range & APT Attack Simulation ──
         logger.info("[DRILL 9/10] Synthesizing APT Cyber Range Kill Chain Coverage...")
-        cyber_range_metrics = {
+        cyber_range_metrics: Dict[str, Any] = {
             "scenario": scenario_name,
             "mitre_kill_chain_stages": [
                 {

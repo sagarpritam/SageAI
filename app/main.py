@@ -302,7 +302,10 @@ app.include_router(posture_routes.router)
 app.include_router(posture_routes.compliance_router)
 app.include_router(gdpr_routes.router)
 app.add_api_route(
-    "/export", gdpr_routes.export_data, methods=["GET", "POST"], tags=["Compliance"]
+    "/export", gdpr_routes.export_data, methods=["GET"], tags=["Compliance"]
+)
+app.add_api_route(
+    "/export", gdpr_routes.export_data, methods=["POST"], tags=["Compliance"]
 )
 app.include_router(email_report_routes.router)
 app.include_router(notification_routes.router)

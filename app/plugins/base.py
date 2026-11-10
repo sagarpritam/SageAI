@@ -24,8 +24,8 @@ class PluginMetadata:
         author: str,
         description: str,
         category: str,
-        tags: List[str] = None,
-        requires_tools: List[str] = None,
+        tags: Optional[List[str]] = None,
+        requires_tools: Optional[List[str]] = None,
         min_plan: str = "free",  # free | pro | enterprise
     ):
         self.name = name
@@ -46,7 +46,7 @@ class PluginResult:
         plugin_name: str,
         target: str,
         findings: List[Dict[str, Any]],
-        metadata: Dict[str, Any] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         error: Optional[str] = None,
     ):
         self.plugin_name = plugin_name

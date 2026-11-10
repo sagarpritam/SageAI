@@ -197,7 +197,7 @@ class APTAttributionService:
 
             # Add Capabilities/Malware
             for cap in act["diamond_model"]["capabilities"]:
-                cap_id = f"cap-{hashlib.md5(cap.encode()).hexdigest()[:6]}"
+                cap_id = f"cap-{hashlib.md5(cap.encode(), usedforsecurity=False).hexdigest()[:6]}"
                 if not any(n["id"] == cap_id for n in self._graph_nodes):
                     self._graph_nodes.append(
                         {"id": cap_id, "type": "attack-pattern", "label": cap}
@@ -212,7 +212,7 @@ class APTAttributionService:
 
         # Add IOCs
         for ioc in self._iocs.values():
-            ioc_id = f"ioc-{hashlib.md5(ioc['indicator'].encode()).hexdigest()[:6]}"
+            ioc_id = f"ioc-{hashlib.md5(ioc['indicator'].encode(), usedforsecurity=False).hexdigest()[:6]}"
             self._graph_nodes.append(
                 {
                     "id": ioc_id,

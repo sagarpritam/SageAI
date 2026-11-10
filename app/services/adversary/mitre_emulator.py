@@ -15,14 +15,14 @@ Provides:
 
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 
 logger = logging.getLogger("SageAI.adversary")
 
 # 14 MITRE ATT&CK Tactics with Core Techniques
-MITRE_TACTICS_CATALOG = [
+MITRE_TACTICS_CATALOG: List[Dict[str, Any]] = [
     {
         "id": "TA0043",
         "name": "Reconnaissance",

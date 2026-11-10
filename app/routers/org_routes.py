@@ -223,7 +223,7 @@ async def list_audit_logs(
             "resource_type": log.resource_type,
             "resource_id": log.resource_id,
             "user_id": log.user_id,
-            "details": json.loads(log.details) if log.details else {},
+            "details": json.loads(str(log.details)) if log.details else {},
             "ip_address": log.ip_address,
             "created_at": log.created_at.isoformat() if log.created_at else None,
         }

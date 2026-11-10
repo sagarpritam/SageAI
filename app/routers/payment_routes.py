@@ -37,7 +37,7 @@ async def create_checkout_session(current_user: dict = Depends(get_current_user)
                 }
             ],
             mode="payment",
-            metadata={"org_id": current_user.get("org")},
+            metadata={"org_id": str(current_user.get("org") or "")},
             success_url=f"{settings.FRONTEND_URL}/history?payment=success",
             cancel_url=f"{settings.FRONTEND_URL}/pricing?payment=cancelled",
         )

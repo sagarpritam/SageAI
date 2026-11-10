@@ -8,9 +8,10 @@ Fulfills Pillar VI (Enterprise Governance & Identity Federation) of the Master P
 
 import base64
 import hashlib
+import re
 import uuid
-import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
@@ -29,7 +30,7 @@ from app.services.audit_chain import audit_chain
 router = APIRouter(prefix="/auth/sso", tags=["Enterprise SSO"])
 
 # Enterprise SSO Configuration Store (persists in memory per org/default)
-DEFAULT_SSO_CONFIG = {
+DEFAULT_SSO_CONFIG: Dict[str, Any] = {
     "enabled": True,
     "provider_type": "SAML_2_0",  # SAML_2_0 or OIDC
     "idp_name": "Enterprise IdP (Okta / Entra ID)",
@@ -226,6 +227,35 @@ async def saml_initiate_login(
     }
 
 
+class _SAMLAssertionParser(HTMLParser):
+    """DTD-free parser extracting NameID/AttributeValue email from SAML XML."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._active_tag: Optional[str] = None
+        self._chunks: List[str] = []
+        self.extracted_email: Optional[str] = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
+        local = tag.split(":")[-1].lower()
+        if local in ("nameid", "attributevalue", "value"):
+            self._active_tag = local
+            self._chunks = []
+
+    def handle_data(self, data: str) -> None:
+        if self._active_tag is not None:
+            self._chunks.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        local = tag.split(":")[-1].lower()
+        if local == self._active_tag and self.extracted_email is None:
+            candidate = "".join(self._chunks).strip()
+            if "@" in candidate:
+                self.extracted_email = candidate.lower()
+            self._active_tag = None
+            self._chunks = []
+
+
 @router.post("/saml/acs", response_model=TokenResponse)
 @limiter.limit("60/minute")
 async def saml_assertion_consumer_service(
@@ -246,24 +276,24 @@ async def saml_assertion_consumer_service(
             detail=f"Invalid Base64-encoded SAMLResponse: {str(exc)}",
         )
 
-    # Parse XML and extract user email from NameID or Attribute
-    user_email = None
-    try:
-        # If it's pure XML, parse it
-        root = ET.fromstring(decoded_xml)
-        # Search for NameID
-        for elem in root.iter():
-            tag = elem.tag.split("}")[-1] if "}" in elem.tag else elem.tag
-            if tag == "NameID" and elem.text and "@" in elem.text:
-                user_email = elem.text.strip().lower()
-                break
-            if tag in ("AttributeValue", "value") and elem.text and "@" in elem.text:
-                user_email = elem.text.strip().lower()
-                break
-    except Exception:
-        # Fallback regex/string search in case of malformed mock XML
-        import re
+    if "<!DOCTYPE" in decoded_xml.upper() or "<!ENTITY" in decoded_xml.upper():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid SAML XML: DOCTYPE and ENTITY declarations are prohibited.",
+        )
 
+    # Parse XML safely without DTD/entity expansion and extract user email
+    user_email: Optional[str] = None
+    parser = _SAMLAssertionParser()
+    try:
+        parser.feed(decoded_xml)
+        parser.close()
+        user_email = parser.extracted_email
+    except Exception:
+        user_email = None
+
+    if not user_email:
+        # Fallback regex/string search for simplified text/XML test payloads
         match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", decoded_xml)
         if match:
             user_email = match.group(0).lower()
@@ -276,7 +306,9 @@ async def saml_assertion_consumer_service(
 
     # Check allowed domain if configured
     email_domain = user_email.split("@")[-1]
-    allowed_domains = DEFAULT_SSO_CONFIG.get("allowed_email_domains", [])
+    allowed_domains: List[str] = list(
+        DEFAULT_SSO_CONFIG.get("allowed_email_domains", [])
+    )
     if (
         "*" not in allowed_domains
         and allowed_domains

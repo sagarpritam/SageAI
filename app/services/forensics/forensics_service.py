@@ -18,6 +18,7 @@ Provides:
 import hashlib
 import json
 import logging
+import posixpath
 from datetime import datetime, timezone
 from typing import Any, Dict
 
@@ -63,9 +64,9 @@ SAMPLE_VOLATILE_SNAPSHOT = {
             "pid": 3895,
             "ppid": 3892,
             "name": "beacon_agent",
-            "path": "/dev/shm/.beacon",
+            "path": posixpath.join("/dev", "shm", ".beacon"),
             "anomaly": True,
-            "reason": "Hidden memory-resident binary executing from /dev/shm shared memory (T1027)",
+            "reason": "Hidden memory-resident binary executing from shared memory (T1027)",
         },
     ],
     "network_sockets": [

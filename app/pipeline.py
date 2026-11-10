@@ -154,10 +154,10 @@ def run_pipeline(
         # ── 2. Subdomain Enumeration ─────────────
         _emit(ScanStatus.ENUMERATING, "Running subfinder", 15)
         subfinder_result = run_subfinder(domain)
-        discovered_subdomains = (
-            subfinder_result.subdomains
-            if hasattr(subfinder_result, "subdomains")
-            else subfinder_result
+        discovered_subdomains: List[str] = (
+            subfinder_result
+            if isinstance(subfinder_result, list)
+            else subfinder_result.subdomains
         )
 
         scanned_targets: set = set()

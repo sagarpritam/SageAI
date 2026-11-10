@@ -188,7 +188,7 @@ def sanitize_findings_for_llm(findings: list[dict]) -> list[dict]:
     """Sanitize all findings before passing to AI analysis."""
     sanitized = []
     for f in findings:
-        clean = {}
+        clean: Dict[str, Any] = {}
         for key, value in f.items():
             if isinstance(value, str):
                 clean[key] = sanitize_for_llm(value, max_length=500)

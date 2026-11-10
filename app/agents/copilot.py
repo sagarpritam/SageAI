@@ -413,15 +413,17 @@ class CopilotAgent:
                 cve_target = (
                     cve_match.group(0).upper() if cve_match else "CVE-2024-DEFENSE"
                 )
-                rules = synth.synthesize_rules(
-                    cve_id=cve_target,
-                    title=f"Exploit pattern for {cve_target}",
-                    description=user_msg,
-                    attack_vector="network",
+                rules = synth.process_threat_item(
+                    {
+                        "cve_id": cve_target,
+                        "title": f"Exploit pattern for {cve_target}",
+                        "description": user_msg,
+                    }
                 )
+                waf_rule = rules.get("waf_patch", {}).get("modsecurity_rule", "")
                 tool_artifacts.append(
                     f"AUTONOMOUS THREAT DETECTION RULES ({cve_target}):\n"
-                    f"Virtual WAF (ModSecurity):\n```apache\n{rules.get('waf_rule', '')}\n```\n"
+                    f"Virtual WAF (ModSecurity):\n```apache\n{waf_rule}\n```\n"
                     f"Sigma Rule:\n```yaml\n{rules.get('sigma_rule', '')}\n```"
                 )
                 sources.append(
@@ -438,7 +440,7 @@ class CopilotAgent:
             try:
                 from app.services.deception.honeypot_service import honeypot_service
 
-                tokens = honeypot_service.list_tokens(org_id=org_id)
+                tokens = honeypot_service.list_canary_tokens(org_id=org_id)
                 tool_artifacts.append(
                     f"ACTIVE DECEPTION MESH & HONEYTOKENS:\n"
                     f"- Total Active Canary Tokens: {len(tokens)}\n"

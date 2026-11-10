@@ -91,15 +91,16 @@ async def ingest_alert(
     )
 
     try:
-        audit_chain.append(
-            event_type="INCIDENT_INGESTED",
+        audit_chain.record_action(
             actor=current_user.get("email", "system"),
-            payload={
+            action="INCIDENT_INGESTED",
+            details={
                 "incident_id": incident["incident_id"],
                 "title": incident["title"],
                 "severity": incident["severity"],
                 "source": incident["source"],
             },
+            org_id=org_id,
         )
     except Exception:
         pass

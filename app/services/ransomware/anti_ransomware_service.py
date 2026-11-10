@@ -89,7 +89,7 @@ class AntiRansomwareService:
         for directory in directories:
             for template in STANDARD_CANARY_FILES:
                 canary_path = f"{directory}/{template['name']}"
-                canary_id = f"CANARY-{hashlib.md5(canary_path.encode()).hexdigest()[:8].upper()}"
+                canary_id = f"CANARY-{hashlib.md5(canary_path.encode(), usedforsecurity=False).hexdigest()[:8].upper()}"
                 canary_record = {
                     "canary_id": canary_id,
                     "filename": template["name"],

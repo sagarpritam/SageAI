@@ -1,7 +1,7 @@
 """Base interface for LLM clients."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class BaseLLM(ABC):
@@ -24,7 +24,11 @@ class BaseLLM(ABC):
 
     @abstractmethod
     async def generate(
-        self, prompt: str, system_message: str = "", model: str = None, **kwargs
+        self,
+        prompt: str,
+        system_message: str = "",
+        model: Optional[str] = None,
+        **kwargs,
     ) -> Dict[str, Any]:
         """
         Generate a text completion.

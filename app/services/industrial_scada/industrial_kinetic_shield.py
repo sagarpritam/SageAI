@@ -118,6 +118,8 @@ class IndustrialKineticShield:
 
         envelope_key = plc["enforced_envelope"]
         envelope = self._safety_envelopes.get(envelope_key)
+        if not envelope:
+            raise ValueError(f"Safety envelope {envelope_key} not configured.")
         now = time.time()
 
         # Check safety envelope bounds

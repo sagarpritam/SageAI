@@ -199,7 +199,7 @@ class SandboxTaintVerifier:
                 names.append(n.id)
             elif isinstance(n, ast.Attribute):
                 chain = []
-                curr = n
+                curr: ast.AST = n
                 while isinstance(curr, ast.Attribute):
                     chain.append(curr.attr)
                     curr = curr.value

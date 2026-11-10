@@ -96,7 +96,7 @@ class ThreatHunterService:
             extracted_terms[1] if len(extracted_terms) > 1 else "external_connection"
         )
 
-        rule_id = f"sigma-{hashlib.md5(hypothesis.encode()).hexdigest()[:8]}"
+        rule_id = f"sigma-{hashlib.md5(hypothesis.encode(), usedforsecurity=False).hexdigest()[:8]}"
 
         # 1. Sigma YAML
         sigma_yaml = f"""title: SageAI Autonomous Threat Hunt - {primary_term.capitalize()}
@@ -195,7 +195,7 @@ DeviceProcessEvents
                     {
                         "event_id": event.get(
                             "id",
-                            f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}",
+                            f"EVT-{hashlib.md5(event_text.encode(), usedforsecurity=False).hexdigest()[:6]}",
                         ),
                         "matched_indicators": [
                             ind for ind in indicators if ind in event_text
@@ -210,7 +210,7 @@ DeviceProcessEvents
                     {
                         "event_id": event.get(
                             "id",
-                            f"EVT-{hashlib.md5(event_text.encode()).hexdigest()[:6]}",
+                            f"EVT-{hashlib.md5(event_text.encode(), usedforsecurity=False).hexdigest()[:6]}",
                         ),
                         "matched_indicators": [
                             ind for ind in indicators if ind in event_text
@@ -246,7 +246,7 @@ DeviceProcessEvents
 
         return {
             "status": "COMPLETED",
-            "hunt_id": f"HUNT-{hashlib.md5((hypothesis + str(total_analyzed)).encode()).hexdigest()[:8].upper()}",
+            "hunt_id": f"HUNT-{hashlib.md5((hypothesis + str(total_analyzed)).encode(), usedforsecurity=False).hexdigest()[:8].upper()}",
             "hypothesis": hypothesis,
             "executed_at": datetime.now(timezone.utc).isoformat(),
             "telemetry_events_scanned": total_analyzed,

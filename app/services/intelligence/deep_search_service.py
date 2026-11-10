@@ -420,7 +420,7 @@ class DeepSearchService:
         all_findings = []
 
         if target_type in ("domain", "ip"):
-            results = await asyncio.gather(
+            domain_results = await asyncio.gather(
                 shodan_scan(target),
                 censys_scan(target),
                 recon_ng_scan(target),
@@ -429,33 +429,33 @@ class DeepSearchService:
                 urlhaus_scan(target),
                 return_exceptions=True,
             )
-            for r in results:
-                if isinstance(r, list):
-                    all_findings.extend(r)
+            for item in domain_results:
+                if isinstance(item, list):
+                    all_findings.extend(item)
 
         if target_type in ("email", "phone"):
             try:
-                r = await osint_industries_lookup(target, target_type)
-                if isinstance(r, list):
-                    all_findings.extend(r)
+                lookup_res = await osint_industries_lookup(target, target_type)
+                if isinstance(lookup_res, list):
+                    all_findings.extend(lookup_res)
             except Exception:
                 pass
 
         if target_type in ("domain", "email", "username"):
-            results = await asyncio.gather(
+            breach_results = await asyncio.gather(
                 intelx_search(target),
                 darkweb_search(target),
                 return_exceptions=True,
             )
-            for r in results:
-                if isinstance(r, list):
-                    all_findings.extend(r)
+            for breach_item in breach_results:
+                if isinstance(breach_item, list):
+                    all_findings.extend(breach_item)
 
         if target_type in ("username", "email"):
             try:
-                r = await identity_resolve(target, target_type)
-                if isinstance(r, list):
-                    all_findings.extend(r)
+                id_res = await identity_resolve(target, target_type)
+                if isinstance(id_res, list):
+                    all_findings.extend(id_res)
             except Exception:
                 pass
 

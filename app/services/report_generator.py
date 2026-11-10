@@ -118,7 +118,7 @@ def _build_severity_pie(findings: list[dict]) -> Drawing | None:
     if not findings:
         return None
 
-    severity_counts = {}
+    severity_counts: dict[str, int] = {}
     for f in findings:
         sev = f.get("severity", "Low")
         severity_counts[sev] = severity_counts.get(sev, 0) + 1

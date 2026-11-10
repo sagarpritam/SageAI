@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.core.security import get_current_user
-from app.models.user import User
 from app.services.agent.orchestrator import AgentOrchestrator
 
 logger = logging.getLogger("SageAI.command")
@@ -22,7 +21,8 @@ class CommandRequest(BaseModel):
 
 @router.post("/command", response_model=Dict[str, Any])
 async def execute_ai_command(
-    payload: CommandRequest, current_user: User = Depends(get_current_user)
+    payload: CommandRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """
     Translates a natural language command into specific security tool operations,
@@ -38,11 +38,7 @@ async def execute_ai_command(
         raise HTTPException(status_code=400, detail="Command and target are required")
 
     try:
-        org_id = (
-            current_user.memberships[0].organization_id
-            if current_user.memberships
-            else "system"
-        )
+        org_id = current_user.get("org") or current_user.get("org_id") or "system"
         orchestrator = AgentOrchestrator(org_id=str(org_id))
 
         # This runs Planner -> Executor -> Analyzer -> Reporter

@@ -5,6 +5,7 @@ No cloud credentials required — passive HTTP/DNS checks only.
 """
 
 import asyncio
+from typing import Any, Dict, List
 
 from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
 from app.utils.http_client import get_http_client
@@ -57,8 +58,8 @@ class CloudScannerPlugin(SecurityPlugin):
     async def run(self, target: str, **kwargs) -> PluginResult:
         host = target.replace("https://", "").replace("http://", "").split("/")[0]
         base_name = host.split(".")[0]  # e.g. "example" from "example.com"
-        findings = []
-        metadata = {"host": host}
+        findings: List[Dict[str, Any]] = []
+        metadata: Dict[str, Any] = {"host": host}
 
         async with get_http_client(follow_redirects=False, timeout=6) as client:
             # Check exposed S3 buckets
@@ -69,7 +70,7 @@ class CloudScannerPlugin(SecurityPlugin):
 
             bucket_results = await asyncio.gather(*bucket_tasks, return_exceptions=True)
             for r in bucket_results:
-                if r and not isinstance(r, Exception):
+                if isinstance(r, dict):
                     findings.append(r)
 
             # Check exposed sensitive paths
@@ -79,7 +80,7 @@ class CloudScannerPlugin(SecurityPlugin):
             ]
             path_results = await asyncio.gather(*path_tasks, return_exceptions=True)
             for r in path_results:
-                if r and not isinstance(r, Exception):
+                if isinstance(r, dict):
                     findings.append(r)
 
             # Check Azure blob storage

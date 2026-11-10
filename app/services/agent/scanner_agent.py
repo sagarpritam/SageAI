@@ -108,9 +108,9 @@ class ScannerAgent:
         results = await asyncio.gather(
             *[run_tool(t) for t in tools], return_exceptions=True
         )
-        tool_results = {}
+        tool_results: Dict[str, Any] = {}
         for r in results:
-            if not isinstance(r, Exception):
+            if isinstance(r, tuple):
                 name, data = r
                 tool_results[name] = data
 

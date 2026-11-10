@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Type, TypeVar
+from typing import Any, Type, TypeVar
 
 from pydantic import BaseModel
 
@@ -53,20 +53,27 @@ def call_llm(
 
     logger.info(f"Calling AI Engine ({model}) for {response_model.__name__}...")
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": full_system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.2,
-        max_tokens=2048,
-        response_format={"type": "json_object"} if "llama3" not in model else None,
-        # Note: Some NVIDIA endpoints do not fully support robust JSON mode,
-        # so relying on prompt engineering via the schema is the safest cross-provider option.
-    )
+    messages: list[Any] = [
+        {"role": "system", "content": full_system_prompt},
+        {"role": "user", "content": prompt},
+    ]
+    if "llama3" not in model:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.2,
+            max_tokens=2048,
+            response_format={"type": "json_object"},
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.2,
+            max_tokens=2048,
+        )
 
-    content = response.choices[0].message.content.strip()
+    content = (response.choices[0].message.content or "").strip()
 
     # Clean up markdown if the LLM hallucinated it despite instructions
     if content.startswith("```json"):

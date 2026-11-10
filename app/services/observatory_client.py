@@ -22,7 +22,7 @@ OBSERVATORY_API = "https://observatory.mozilla.org/api/v2"
 )
 async def analyze_site(hostname: str) -> list[dict]:
     """Analyze a site using Mozilla HTTP Observatory."""
-    findings = []
+    findings: list[dict] = []
     hostname = hostname.replace("https://", "").replace("http://", "").split("/")[0]
 
     try:

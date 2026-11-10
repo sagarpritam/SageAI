@@ -22,7 +22,7 @@ CRTSH_API = "https://crt.sh"
 )
 async def search_certificates(domain: str) -> list[dict]:
     """Search Certificate Transparency logs for all certs issued for a domain."""
-    findings = []
+    findings: list[dict] = []
     domain = domain.replace("https://", "").replace("http://", "").split("/")[0]
 
     try:

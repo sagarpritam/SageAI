@@ -111,7 +111,8 @@ class SmartContractAuditor:
 
         # 2. Unprotected Emergency Drain Check (Missing Access Control)
         if re.search(r"function\s+emergencyDrain[^{]+external[^{]+{", code):
-            fn_decl = re.search(r"function\s+emergencyDrain[^{]+", code).group(0)
+            decl_match = re.search(r"function\s+emergencyDrain[^{]+", code)
+            fn_decl = decl_match.group(0) if decl_match else ""
             if "onlyOwner" not in fn_decl and "onlyRole" not in fn_decl:
                 vulnerabilities.append(
                     {

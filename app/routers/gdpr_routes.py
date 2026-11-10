@@ -1,5 +1,7 @@
 """GDPR and Data Privacy compliance routes."""
 
+from typing import Any, Dict
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,7 +35,7 @@ async def export_data(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    export_data = {
+    export_payload: Dict[str, Any] = {
         "user": {
             "id": str(user.id),
             "email": user.email,
@@ -50,7 +52,7 @@ async def export_data(
         )
         org = org_result.scalar_one_or_none()
         if org:
-            export_data["organization"] = {
+            export_payload["organization"] = {
                 "id": str(org.id),
                 "name": org.name,
                 "plan": org.plan,
@@ -58,7 +60,7 @@ async def export_data(
 
         scans_result = await db.execute(select(Scan).where(Scan.org_id == org_id))
         scans = scans_result.scalars().all()
-        export_data["scans"] = [
+        export_payload["scans"] = [
             {
                 "id": str(scan.id),
                 "target": scan.target,
@@ -68,7 +70,7 @@ async def export_data(
             for scan in scans
         ]
 
-    return export_data
+    return export_payload
 
 
 @router.delete("/delete")
@@ -94,7 +96,7 @@ async def delete_account(
         # Soft or hard delete logic here
         pass
 
-    background_tasks.add_task(scrub_data, user_id, org_id)
+    background_tasks.add_task(scrub_data, str(user_id or ""), str(org_id or ""))
 
     return {
         "message": "Account scheduled for deletion. All data will be purged within 30 days."

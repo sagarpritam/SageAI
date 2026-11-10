@@ -170,7 +170,7 @@ REMEDIATION = {
 # OpenAI / NVIDIA Integration
 # ---------------------
 async def ai_explain_finding(
-    finding_type: str, context: str = "", org_id: str = "", provider: str = None
+    finding_type: str, context: str = "", org_id: str = "", provider: str | None = None
 ) -> dict | None:
     """Use AI to generate a detailed vulnerability explanation.
 
@@ -224,7 +224,7 @@ Respond in JSON format with keys: summary, detail, impact, severity (Critical/Hi
 
 
 async def ai_analyze_scan(
-    findings: list[dict], org_id: str = "", provider: str = None
+    findings: list[dict], org_id: str = "", provider: str | None = None
 ) -> dict | None:
     """Use AI to generate an executive summary of all scan findings."""
     from app.services.ai_resilience import sanitize_findings_for_llm

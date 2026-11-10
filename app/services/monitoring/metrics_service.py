@@ -10,7 +10,7 @@ Collects operational signals:
 
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,7 +32,7 @@ def record_alert_dispatch_timing(latency_ms: float) -> None:
         _ALERT_LATENCY_SAMPLES.pop(0)
 
 
-def record_feed_sync_timestamp(ts: float = None) -> None:
+def record_feed_sync_timestamp(ts: Optional[float] = None) -> None:
     """Update threat intelligence feed synchronization timestamp."""
     global _LAST_FEED_SYNC_TIME
     _LAST_FEED_SYNC_TIME = ts if ts is not None else time.time()
@@ -82,7 +82,9 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
             NotificationChannel.channel_type, func.count(NotificationChannel.id)
         ).group_by(NotificationChannel.channel_type)
     )
-    active_channels = dict(channels_res.all())
+    active_channels: Dict[str, int] = {
+        str(ch): int(cnt) for ch, cnt in channels_res.all()
+    }
 
     # 3. Threat Feed Freshness & Stale Detection
     hours_since_sync = (now_ts - _LAST_FEED_SYNC_TIME) / 3600.0
@@ -116,7 +118,7 @@ async def get_operational_metrics(db: AsyncSession) -> Dict[str, Any]:
             "p95_latency_ms": alert_percentiles["p95"],
             "p99_latency_ms": alert_percentiles["p99"],
             "sla_compliant": alert_percentiles["p95"] < 1000.0,  # P95 under 1s SLA
-            "active_channels_count": sum(int(v) for v in active_channels.values()),
+            "active_channels_count": sum(active_channels.values()),
             "channels_breakdown": active_channels,
         },
         "threat_feed_intel": {

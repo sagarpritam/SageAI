@@ -27,7 +27,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.threat_modeling")
 
 # 24-Vector Enterprise STRIDE Knowledge Base (4 per category)
-STRIDE_KNOWLEDGE_BASE = [
+STRIDE_KNOWLEDGE_BASE: List[Dict[str, Any]] = [
     # ------------------ SPOOFING ------------------
     {
         "category": "Spoofing",

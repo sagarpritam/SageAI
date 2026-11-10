@@ -65,7 +65,7 @@ class ReconAgent:
 
         # Step 2: DNS enumeration
         try:
-            dns_results = await dns_scanner.scan_dns(target)
+            dns_results = await asyncio.to_thread(dns_scanner.scan_dns, target)
             dns_findings = dns_results
             for f in dns_results:
                 for sub in f.get("subdomains", []):
@@ -93,7 +93,7 @@ class ReconAgent:
             *[bounded_enrich(h) for h in top_hosts], return_exceptions=True
         )
         for r in results:
-            if not isinstance(r, Exception):
+            if isinstance(r, tuple):
                 host, data = r
                 if data:
                     shodan_entries[host] = data

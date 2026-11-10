@@ -11,6 +11,7 @@ Interchange Format), compatible with:
 import json
 import logging
 from datetime import datetime, timezone
+from typing import Any
 
 logger = logging.getLogger("sageai.sarif")
 
@@ -121,7 +122,7 @@ def _build_result(finding: dict, index: int, target: str) -> dict:
     severity = finding.get("severity", "info").lower()
     description = finding.get("description", f"Vulnerability detected: {ftype}")
 
-    result = {
+    result: dict[str, Any] = {
         "ruleId": f"sageai/{ftype.lower().replace(' ', '-')}",
         "ruleIndex": index,
         "level": SEVERITY_TO_SARIF_LEVEL.get(severity, "note"),
@@ -178,7 +179,7 @@ def generate_sarif(scan_data: dict) -> dict:
     created = scan_data.get("created_at", datetime.now(timezone.utc).isoformat())
 
     # Build unique rules from finding types
-    rules = []
+    rules: list[dict[str, Any]] = []
     rule_index_map: dict[str, int] = {}
 
     for finding in findings:
@@ -188,7 +189,7 @@ def generate_sarif(scan_data: dict) -> dict:
             rules.append(_build_rule(ftype, finding.get("severity", "info")))
 
     # Build results
-    results = []
+    results: list[dict[str, Any]] = []
     for finding in findings:
         ftype = finding.get("type", "Unknown")
         idx = rule_index_map.get(ftype, 0)

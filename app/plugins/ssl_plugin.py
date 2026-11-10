@@ -1,5 +1,7 @@
 """SageAI Plugin: SSL/TLS Scanner"""
 
+import asyncio
+
 from app.plugins.base import PluginMetadata, PluginResult, SecurityPlugin
 from app.services.ssl_scanner import scan_ssl
 
@@ -20,7 +22,7 @@ class SSLPlugin(SecurityPlugin):
     async def run(self, target: str, **kwargs) -> PluginResult:
         host = target.replace("https://", "").replace("http://", "").split("/")[0]
         try:
-            findings = await scan_ssl(host)
+            findings = await asyncio.to_thread(scan_ssl, host)
         except Exception as e:
             findings = [
                 {"type": "ssl_scan_error", "detail": str(e), "severity": "info"}

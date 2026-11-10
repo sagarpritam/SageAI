@@ -202,14 +202,16 @@ class CARTEngine:
                 node_frequencies[nid] += 1
 
         top_choke_point_id = (
-            max(node_frequencies, key=node_frequencies.get)
+            max(node_frequencies, key=lambda nid: node_frequencies[nid])
             if node_frequencies
             else None
         )
         top_choke_point_node = (
             nodes_map.get(top_choke_point_id) if top_choke_point_id else None
         )
-        paths_neutralized = node_frequencies.get(top_choke_point_id, 0)
+        paths_neutralized = (
+            node_frequencies.get(top_choke_point_id, 0) if top_choke_point_id else 0
+        )
         collapse_pct = round((paths_neutralized / max(1, len(all_paths))) * 100, 1)
 
         # Blast Radius

@@ -250,22 +250,22 @@ async def run_all_scans(target: str, scan_id: str = "") -> list[dict]:
         return_exceptions=True,
     )
 
-    for result in osint_results:
-        if isinstance(result, Exception):
-            logger.error(f"OSINT execution failed: {result}")
-        elif isinstance(result, list):
-            findings.extend(result)
-        elif isinstance(result, dict):
-            if result.get("status") == "success":
+    for osint_item in osint_results:
+        if isinstance(osint_item, Exception):
+            logger.error(f"OSINT execution failed: {osint_item}")
+        elif isinstance(osint_item, list):
+            findings.extend(osint_item)
+        elif isinstance(osint_item, dict):
+            if osint_item.get("status") == "success":
                 findings.append(
                     {
                         "type": "Identity Breach Intelligence",
-                        "description": f"Target appeared in {result.get('total_breaches', 0)} breaches/leaks.",
+                        "description": f"Target appeared in {osint_item.get('total_breaches', 0)} breaches/leaks.",
                         "severity": "High"
-                        if result.get("total_breaches", 0) > 0
+                        if osint_item.get("total_breaches", 0) > 0
                         else "Info",
                         "module": "breach_intel",
-                        "data": result,
+                        "data": osint_item,
                     }
                 )
 

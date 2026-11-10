@@ -11,7 +11,7 @@ Provides:
 
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from app.services.audit_chain import audit_chain
 
@@ -64,7 +64,7 @@ class ShadowITHunterService:
         Scans external domain perimeter for subdomains, shadow IT staging endpoints, and dangling DNS.
         """
         # Simulated discovery pipeline across Certificate Transparency logs and DNS resolution
-        subdomains = [
+        subdomains: List[Dict[str, Any]] = [
             {
                 "subdomain": f"api.{target_domain}",
                 "ip": "198.51.100.12",

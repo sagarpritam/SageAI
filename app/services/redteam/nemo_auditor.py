@@ -1,9 +1,10 @@
 import datetime
 import logging
-import urllib.request
+import urllib.parse
 import uuid
 from typing import Any, Dict, List, Optional, cast
 
+import httpx
 from nemo_microservices import NeMoMicroservices
 
 from app.core.config import settings
@@ -173,11 +174,11 @@ class NeMoAuditor:
         self._nemo_is_online = False
 
         # Initialize the NeMo Microservices client if configured
+        self._client: Optional[NeMoMicroservices] = None
         try:
             self._client = NeMoMicroservices(base_url=self.base_url)
         except Exception as e:
             logger.info(f"NeMo Auditor client running in autonomous hybrid mode: {e}")
-            self._client = None
 
     def _check_nemo_online(self) -> bool:
         """Fast non-blocking reachability check to prevent retry delays when NeMo is offline."""
@@ -189,12 +190,15 @@ class NeMoAuditor:
             self._nemo_is_online = False
             return False
 
+        parsed = urllib.parse.urlparse(self.base_url)
+        if parsed.scheme not in ("http", "https"):
+            self._nemo_online_checked = True
+            self._nemo_is_online = False
+            return False
+
         try:
-            req = urllib.request.Request(
-                self.base_url, headers={"User-Agent": "SageAI-Ping"}
-            )
-            with urllib.request.urlopen(req, timeout=0.2):
-                self._nemo_is_online = True
+            httpx.get(self.base_url, headers={"User-Agent": "SageAI-Ping"}, timeout=0.2)
+            self._nemo_is_online = True
         except Exception:
             self._nemo_is_online = False
 
@@ -470,9 +474,7 @@ class NeMoAuditor:
 
         if self._check_nemo_online() and self._client:
             try:
-                results = self._client.beta.audit.jobs.get(  # type: ignore[call-arg]
-                    namespace=namespace, name=job_id
-                )
+                results = self._client.beta.audit.jobs.retrieve(job_id=job_id)
                 return results.model_dump()
             except Exception as e:
                 logger.error(f"Failed to get remote NeMo audit results: {e}")

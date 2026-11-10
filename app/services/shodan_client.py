@@ -24,7 +24,7 @@ SHODAN_API = "https://internetdb.shodan.io"
 )
 async def lookup_ip(hostname: str) -> list[dict]:
     """Look up an IP in Shodan InternetDB for known ports, vulns, and services."""
-    findings = []
+    findings: list[dict] = []
 
     try:
         # Resolve hostname to IP

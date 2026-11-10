@@ -96,7 +96,7 @@ async def disable_mfa(
 
     result = await db.execute(select(User).where(User.id == current_user["sub"]))
     user = result.scalar_one_or_none()
-    if not user or not user.mfa_enabled:
+    if not user or not user.mfa_enabled or not user.mfa_secret:
         raise HTTPException(status_code=400, detail="MFA is not enabled")
 
     if not verify_totp(user.mfa_secret, totp_code):

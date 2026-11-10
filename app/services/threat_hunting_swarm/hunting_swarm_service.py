@@ -16,7 +16,7 @@ from app.services.audit_chain import audit_chain
 
 logger = logging.getLogger("SageAI.hunting_swarm")
 
-PRESET_HUNT_SCENARIOS = [
+PRESET_HUNT_SCENARIOS: List[Dict[str, Any]] = [
     {
         "topic": "Process Injection & Memory Hollowing",
         "technique": "T1055 (Process Injection)",

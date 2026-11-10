@@ -4,7 +4,12 @@ from pydantic import BaseModel, Field
 
 
 class GitHubTokenRequest(BaseModel):
-    token: str = Field(..., description="The GitHub Personal Access Token (PAT)")
+    token: Optional[str] = Field(
+        None, description="The GitHub Personal Access Token (PAT)"
+    )
+    pat: Optional[str] = Field(
+        None, description="Alias for token accepted from frontend clients"
+    )
 
 
 class IntegrationStatusResponse(BaseModel):

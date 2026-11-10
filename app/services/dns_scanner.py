@@ -14,7 +14,7 @@ def scan_dns(hostname: str) -> list[dict]:
     # Basic DNS resolution
     try:
         ips = socket.getaddrinfo(hostname, None)
-        unique_ips = {addr[4][0] for addr in ips}
+        unique_ips: set[str] = {str(addr[4][0]) for addr in ips}
         findings.append(
             {
                 "type": "dns_resolution",

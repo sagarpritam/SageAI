@@ -7,6 +7,7 @@ import logging
 import socket
 import ssl
 from datetime import datetime, timezone
+from typing import Any
 
 logger = logging.getLogger("sageai.ssl_scanner")
 
@@ -81,8 +82,11 @@ def scan_ssl(hostname: str, port: int = 443) -> list[dict]:
                     )
 
                 # Subject info
-                subject = dict(x[0] for x in (cert.get("subject") or []))  # type: ignore[index,arg-type]
-                issuer = dict(x[0] for x in (cert.get("issuer") or []))  # type: ignore[index,arg-type]
+                cert_dict: dict[str, Any] = cert if isinstance(cert, dict) else {}
+                raw_subject = cert_dict.get("subject") or ()
+                raw_issuer = cert_dict.get("issuer") or ()
+                subject = dict(x[0] for x in raw_subject if isinstance(x, tuple) and x)
+                issuer = dict(x[0] for x in raw_issuer if isinstance(x, tuple) and x)
                 findings.append(
                     {
                         "type": "ssl_info",

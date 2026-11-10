@@ -1,5 +1,6 @@
 import base64
 import logging
+from typing import Optional
 
 import httpx
 
@@ -66,7 +67,7 @@ class GitHubService:
 
     async def get_file_sha(
         self, owner: str, repo: str, file_path: str, branch: str
-    ) -> str:
+    ) -> Optional[str]:
         """Gets the existing blob SHA for a file to update it."""
         url = f"{self.base_url}/repos/{owner}/{repo}/contents/{file_path}?ref={branch}"
         async with httpx.AsyncClient() as client:

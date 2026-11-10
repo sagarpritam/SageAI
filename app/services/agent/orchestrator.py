@@ -3,7 +3,7 @@
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from app.services.llm.gateway import llm_gateway
 from app.services.tools import get_all_tools, get_tool
@@ -22,7 +22,7 @@ class AgentOrchestrator:
     4. Reporter -> generates summary
     """
 
-    def __init__(self, org_id: str = "system", provider: str = None):
+    def __init__(self, org_id: str = "system", provider: Optional[str] = None):
         self.org_id = org_id
         from app.core.config import settings
 
@@ -61,7 +61,7 @@ class AgentOrchestrator:
         self, target: str, selected_tools: List[str]
     ) -> Dict[str, Any]:
         """Execute selected tools concurrently."""
-        results = {}
+        results: Dict[str, Any] = {}
         valid_tools = []
 
         for name in selected_tools:
@@ -77,7 +77,7 @@ class AgentOrchestrator:
         raw_results = await asyncio.gather(*coros, return_exceptions=True)
 
         for tool, result in zip(valid_tools, raw_results):
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 results[tool.name] = {"error": str(result)}
             else:
                 results[tool.name] = result

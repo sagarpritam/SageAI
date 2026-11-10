@@ -338,6 +338,10 @@ class CVEIndexer:
         results.sort(key=rank_sort, reverse=True)
         return results[:limit]
 
+    def get_by_id(self, cve_id: str) -> Optional[ThreatVulnerability]:
+        """Synchronously retrieve a CVE entry from the in-memory index."""
+        return self._index.get(cve_id.strip().upper())
+
     async def get_cve(self, cve_id: str) -> Optional[ThreatVulnerability]:
         """Retrieve CVE details from index or fallback to live NVD query."""
         normalized = cve_id.strip().upper()

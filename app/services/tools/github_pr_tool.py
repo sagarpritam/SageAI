@@ -113,7 +113,7 @@ class GitHubPRTool(BaseTool):
         github = GitHubService(github_token)
         agent = DeveloperAgent(github, org_id=org_id)
 
-        results = {
+        results: Dict[str, Any] = {
             "repository": target,
             "total_findings": len(findings),
             "fixed": [],

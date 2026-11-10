@@ -2,42 +2,22 @@ import json
 import logging
 import random
 import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Dict, List, Optional, Set
 
 from fastapi import WebSocket
 
 from app.core.config import settings
 
-# Attempt to import SageStrike Event Bus
-try:
-    from sagestrike.event_bus import (
-        Event as _SsEvent,
-    )
-    from sagestrike.event_bus import (
-        EventBus as _SsEventBus,
-    )
-    from sagestrike.event_bus import (
-        EventPriority as _SsEventPriority,
-    )
-    from sagestrike.event_bus import (
-        EventType as _SsEventType,
-    )
-
-    _SAGESTRIKE_AVAILABLE = True
-except ImportError:
-    _SsEvent = None  # type: ignore[assignment]
-    _SsEventBus = None  # type: ignore[assignment]
-    _SsEventPriority = None  # type: ignore[assignment]
-    _SsEventType = None  # type: ignore[assignment]
-    _SAGESTRIKE_AVAILABLE = False
-
-# Fallback/Mock types for environments where sagestrike isn't installed
-from dataclasses import dataclass
-from enum import Enum
+_SsEventBus: Any
+EventType: Any
+EventPriority: Any
+Event: Any
 
 
-class EventType(Enum):
+class _FallbackEventType(Enum):
     SCAN_STARTED = "scan.started"
     SCAN_COMPLETED = "scan.completed"
     EXPLOIT_SUCCESS = "exploit.success"
@@ -46,7 +26,7 @@ class EventType(Enum):
     TELEMETRY = "telemetry"
 
 
-class EventPriority(Enum):
+class _FallbackEventPriority(Enum):
     LOW = 1
     NORMAL = 2
     HIGH = 3
@@ -54,12 +34,12 @@ class EventPriority(Enum):
 
 
 @dataclass
-class Event:
+class _FallbackEvent:
     id: str
-    type: EventType
+    type: _FallbackEventType
     source: str
     timestamp: datetime
-    priority: EventPriority
+    priority: _FallbackEventPriority
     payload: Dict
     target: Optional[str] = None
 
@@ -81,10 +61,32 @@ class Event:
         }
 
 
-if _SAGESTRIKE_AVAILABLE:
-    Event = _SsEvent  # type: ignore[assignment,misc]
-    EventPriority = _SsEventPriority  # type: ignore[assignment,misc]
-    EventType = _SsEventType  # type: ignore[assignment,misc]
+# Attempt to import SageStrike Event Bus
+try:
+    from sagestrike.event_bus import (
+        Event as _SsEvent,
+    )
+    from sagestrike.event_bus import (
+        EventBus as _LoadedEventBus,
+    )
+    from sagestrike.event_bus import (
+        EventPriority as _SsEventPriority,
+    )
+    from sagestrike.event_bus import (
+        EventType as _SsEventType,
+    )
+
+    Event = _SsEvent
+    EventPriority = _SsEventPriority
+    EventType = _SsEventType
+    _SsEventBus = _LoadedEventBus
+    _SAGESTRIKE_AVAILABLE = True
+except ImportError:
+    Event = _FallbackEvent
+    EventPriority = _FallbackEventPriority
+    EventType = _FallbackEventType
+    _SsEventBus = None
+    _SAGESTRIKE_AVAILABLE = False
 
 
 logger = logging.getLogger("SageAI.warroom")
@@ -247,7 +249,7 @@ class WarRoomManager:
         """Return the recent event history."""
         return list(reversed(self.event_history[-limit:]))
 
-    async def handle_bus_event(self, event: Event):
+    async def handle_bus_event(self, event: Any):
         """Callback for EventBus events."""
         event_dict = event.to_dict()
 
@@ -266,7 +268,7 @@ class WarRoomManager:
 
         await self.broadcast(event_dict)
 
-    def _generate_message(self, event: Event) -> str:
+    def _generate_message(self, event: Any) -> str:
         """Generate a human-readable message for the event."""
         etype = event.type.value if hasattr(event.type, "value") else str(event.type)
         target = event.target or "unknown target"

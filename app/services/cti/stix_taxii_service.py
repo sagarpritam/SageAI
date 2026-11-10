@@ -18,7 +18,7 @@ from app.services.audit_chain import audit_chain
 
 logger = logging.getLogger("SageAI.cti")
 
-STANDARD_THREAT_ACTORS = [
+STANDARD_THREAT_ACTORS: List[Dict[str, Any]] = [
     {
         "id": "threat-actor--b24e8156-8314-4c4e-9d0a-9e1234567890",
         "name": "APT28 (Fancy Bear / Strontium)",

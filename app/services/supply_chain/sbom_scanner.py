@@ -239,7 +239,7 @@ class SBOMScanner:
         cyclonedx_sbom = {
             "bomFormat": "CycloneDX",
             "specVersion": "1.5",
-            "serialNumber": f"urn:uuid:{hashlib.md5(f'{project_name}:{len(components)}'.encode()).hexdigest()}",
+            "serialNumber": f"urn:uuid:{hashlib.md5(f'{project_name}:{len(components)}'.encode(), usedforsecurity=False).hexdigest()}",
             "version": 1,
             "metadata": {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -276,7 +276,9 @@ class SBOMScanner:
         }
 
         # 4. Dependency Graph Nodes & Edges
-        graph_nodes = [{"id": project_name, "label": project_name, "type": "ROOT"}]
+        graph_nodes: List[Dict[str, Any]] = [
+            {"id": project_name, "label": project_name, "type": "ROOT"}
+        ]
         graph_edges = []
         for c in components:
             node_id = c["purl"]

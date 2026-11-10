@@ -6,6 +6,7 @@ react-force-graph or vis.js.
 """
 
 import logging
+from typing import Any, Optional
 
 from app.utils.hash import deterministic_sha256
 
@@ -26,7 +27,10 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
         return deterministic_sha256(label.lower(), length=12)
 
     def _add_node(
-        label: str, node_type: str, severity: str = "info", extra_data: dict = None
+        label: str,
+        node_type: str,
+        severity: str = "info",
+        extra_data: Optional[dict[str, Any]] = None,
     ):
         nid = _node_id(label)
         if nid not in nodes:
@@ -180,22 +184,21 @@ def build_link_graph(target: str, target_type: str, intel_results: dict) -> dict
                 gh_id = _add_node(f"GitHub/{user}", "social_account")
                 _add_edge(root_id, gh_id, "has_account", 2)
 
-    graph = {
-        "nodes": list(nodes.values()),
+    node_list: list[dict[str, Any]] = list(nodes.values())
+    node_types: dict[str, int] = {}
+    for node in node_list:
+        ntype = str(node["type"])
+        node_types[ntype] = node_types.get(ntype, 0) + 1
+
+    graph: dict[str, Any] = {
+        "nodes": node_list,
         "edges": edges,
         "stats": {
             "total_nodes": len(nodes),
             "total_edges": len(edges),
-            "node_types": {},
+            "node_types": node_types,
         },
     }
-
-    # Count node types
-    for node in graph["nodes"]:
-        ntype = node["type"]
-        graph["stats"]["node_types"][ntype] = (
-            graph["stats"]["node_types"].get(ntype, 0) + 1
-        )
 
     logger.info(f"Link analysis graph built: {len(nodes)} nodes, {len(edges)} edges")
     return graph

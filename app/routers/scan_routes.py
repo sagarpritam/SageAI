@@ -181,7 +181,7 @@ async def create_scan(
     # Run synchronous scans
     formatted_findings = []
     try:
-        raw_findings = await run_all_scans(target_url, scan_id=scan.id, db=db)
+        raw_findings = await run_all_scans(target_url, scan_id=scan.id)
 
         # Pass raw reconnaissance data to the AI agent to determine actual exploitability
         findings_data = analyze_findings(raw_findings)

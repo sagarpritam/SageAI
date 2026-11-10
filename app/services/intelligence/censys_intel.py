@@ -180,7 +180,7 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
         with socket.create_connection((hostname, 443), timeout=10) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
                 cert_raw = ssock.getpeercert()
-                cert: dict = cert_raw if isinstance(cert_raw, dict) else {}
+                peer_cert: dict = cert_raw if isinstance(cert_raw, dict) else {}
                 protocol = ssock.version() or "Unknown"
 
                 findings.append(
@@ -189,12 +189,12 @@ async def _censys_free_scan(hostname: str) -> list[dict]:
                         "type": "tls_inspection",
                         "severity": "info",
                         "title": f"Censys Radar: TLS {protocol} Active",
-                        "detail": f"Server supports {protocol}. Issuer: {cert.get('issuer', 'Unknown')}",
+                        "detail": f"Server supports {protocol}. Issuer: {peer_cert.get('issuer', 'Unknown')}",
                         "data": {
                             "protocol": protocol,
-                            "issuer": str(cert.get("issuer", "")),
-                            "subject": str(cert.get("subject", "")),
-                            "serial_number": str(cert.get("serialNumber", "")),
+                            "issuer": str(peer_cert.get("issuer", "")),
+                            "subject": str(peer_cert.get("subject", "")),
+                            "serial_number": str(peer_cert.get("serialNumber", "")),
                             "ip": ip,
                         },
                         "source": "Direct TLS Inspection (free)",

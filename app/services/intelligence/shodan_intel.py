@@ -20,7 +20,7 @@ SHODAN_REST_API = "https://api.shodan.io"
 
 async def shodan_scan(target: str) -> list[dict]:
     """Run Shodan intelligence scan on a target domain or IP."""
-    findings = []
+    findings: list[dict] = []
     api_key = settings.SHODAN_API_KEY
 
     # Resolve to IP
@@ -41,7 +41,7 @@ async def shodan_scan(target: str) -> list[dict]:
 
 async def _shodan_free_scan(ip: str) -> list[dict]:
     """Query Shodan InternetDB (free, no key)."""
-    findings = []
+    findings: list[dict] = []
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(f"{INTERNETDB_API}/{ip}")
@@ -128,7 +128,7 @@ async def _shodan_free_scan(ip: str) -> list[dict]:
 
 async def _shodan_pro_scan(ip: str, api_key: str) -> list[dict]:
     """Query full Shodan REST API (requires paid key)."""
-    findings = []
+    findings: list[dict] = []
     try:
         async with httpx.AsyncClient(timeout=20) as client:
             resp = await client.get(

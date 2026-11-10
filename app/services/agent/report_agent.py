@@ -7,7 +7,7 @@ Supports: Executive Summary, Technical Deep-dive, HackerOne format, PDF metadata
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from app.services.llm.gateway import llm_gateway
 
@@ -53,7 +53,7 @@ class ReportAgent:
         recon_result: Dict[str, Any],
         scanner_result: Dict[str, Any],
         exploit_result: Dict[str, Any],
-        knowledge_graph_paths: List[Dict] = None,
+        knowledge_graph_paths: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         """Generate the final consolidated security report."""
         logger.info(f"[ReportAgent] Generating report for {target}")
@@ -108,7 +108,7 @@ class ReportAgent:
             )
 
         # Severity breakdown
-        severity_counts = {}
+        severity_counts: Dict[str, int] = {}
         for f in all_findings:
             sev = f.get("severity", "Info")
             severity_counts[sev] = severity_counts.get(sev, 0) + 1

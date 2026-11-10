@@ -5,10 +5,10 @@ new open ports, new vulnerabilities, and newly discovered subdomains.
 """
 
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from sqlalchemy import desc, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.asset import Asset
 from app.models.asset_diff import AttackSurfaceDiff
@@ -46,7 +46,7 @@ def compute_asset_diff(prev_asset: Asset, curr_asset: Asset) -> Dict[str, Any]:
     except json.JSONDecodeError:
         prev_tech, curr_tech = [], []
 
-    diffs = {
+    diffs: Dict[str, Any] = {
         "ports": compute_list_diff(prev_ports, curr_ports),
         "technologies": compute_list_diff(prev_tech, curr_tech),
     }
@@ -64,8 +64,8 @@ def compute_asset_diff(prev_asset: Asset, curr_asset: Asset) -> Dict[str, Any]:
 
 
 async def generate_scan_diff(
-    db: Session, org_id: str, asset_value: str, current_scan_id: str
-) -> AttackSurfaceDiff:
+    db: AsyncSession, org_id: str, asset_value: str, current_scan_id: str
+) -> Optional[AttackSurfaceDiff]:
     """
     Finds the most recent prior scan for an asset, compares it against the current scan,
     and stores the diff in the database to track Attack Surface Drift.
@@ -95,7 +95,7 @@ async def generate_scan_diff(
             Scan.id != current_scan_id,
             Scan.status == "completed",
         )
-        .order_by(desc(Scan.ended_at))
+        .order_by(desc(Scan.created_at))
         .limit(1)
     )
     prev_res = await db.execute(stmt_prev)
@@ -107,13 +107,13 @@ async def generate_scan_diff(
 
     # 4. Compare vulnerability findings between the two scans for this target
     stmt_curr_findings = select(Finding).where(
-        Finding.scan_id == current_scan_id, Finding.target == asset_value
+        Finding.scan_id == current_scan_id, Finding.asset_identified == asset_value
     )
     curr_find_res = await db.execute(stmt_curr_findings)
     curr_findings = curr_find_res.scalars().all()
 
     stmt_prev_findings = select(Finding).where(
-        Finding.scan_id == prev_scan.id, Finding.target == asset_value
+        Finding.scan_id == prev_scan.id, Finding.asset_identified == asset_value
     )
     prev_find_res = await db.execute(stmt_prev_findings)
     prev_findings = prev_find_res.scalars().all()
@@ -127,7 +127,7 @@ async def generate_scan_diff(
     }
 
     # Default empty infrastructure diffs for Scan hooks
-    empty_diff = {"added": [], "removed": []}
+    empty_diff: Dict[str, list[Any]] = {"added": [], "removed": []}
 
     # 5. Save the AttackSurfaceDiff record
     diff_record = AttackSurfaceDiff(

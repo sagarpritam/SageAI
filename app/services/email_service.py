@@ -27,7 +27,7 @@ class EmailService:
             return False
 
         try:
-            params = {
+            params: resend.Emails.SendParams = {
                 "from": f"SageAI <{self.from_email}>",
                 "to": [to],
                 "subject": subject,
