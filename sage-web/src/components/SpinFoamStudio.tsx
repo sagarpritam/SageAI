@@ -40,10 +40,6 @@ export default function SpinFoamStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<QuantizeResult | null>(null);
 
-  useEffect(() => {
-    fetchSimplices();
-  }, []);
-
   const fetchSimplices = async () => {
     try {
       const res = await fetch('/api/spin-foam/simplices');
@@ -58,6 +54,10 @@ export default function SpinFoamStudio() {
       console.error('Failed to load spin-foam simplices', err);
     }
   };
+
+  useEffect(() => {
+    fetchSimplices();
+  }, []);
 
   const handleQuantize = async () => {
     setLoading(true);

@@ -76,10 +76,6 @@ export function DeepAnalysisPanel() {
   const [result, setResult] = useState<DeepAuditResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchVectors();
-  }, []);
-
   const fetchVectors = async () => {
     try {
       const res = await axios.get("/api/deep-analysis/vectors");
@@ -137,6 +133,10 @@ export function DeepAnalysisPanel() {
       ]);
     }
   };
+
+  useEffect(() => {
+    fetchVectors();
+  }, []);
 
   const toggleVector = (id: string) => {
     if (selectedVectors.includes(id)) {

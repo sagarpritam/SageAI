@@ -38,10 +38,6 @@ export function EBPFTelemetryMonitor() {
   const [quarantineTargetPid, setQuarantineTargetPid] = useState<string>("");
   const [quarantineResult, setQuarantineResult] = useState<any>(null);
 
-  useEffect(() => {
-    fetchTelemetry();
-  }, [severityFilter]);
-
   const fetchTelemetry = async () => {
     setLoading(true);
     try {
@@ -64,6 +60,10 @@ export function EBPFTelemetryMonitor() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTelemetry();
+  }, [severityFilter]);
 
   const handleQuarantine = async (pidToQuarantine: number) => {
     setLoading(true);

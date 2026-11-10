@@ -40,10 +40,6 @@ export default function MonopoleBatteryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CatalysisResult | null>(null);
 
-  useEffect(() => {
-    fetchTraps();
-  }, []);
-
   const fetchTraps = async () => {
     try {
       const res = await fetch('/api/monopole-battery/traps');
@@ -58,6 +54,10 @@ export default function MonopoleBatteryStudio() {
       console.error('Failed to load monopole traps', err);
     }
   };
+
+  useEffect(() => {
+    fetchTraps();
+  }, []);
 
   const handleCatalyze = async () => {
     setLoading(true);

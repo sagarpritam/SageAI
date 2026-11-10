@@ -44,10 +44,6 @@ export default function MirrorSymmetryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<InvertResult | null>(null);
 
-  useEffect(() => {
-    fetchManifolds();
-  }, []);
-
   const fetchManifolds = async () => {
     try {
       const res = await fetch('/api/mirror-symmetry/manifolds');
@@ -62,6 +58,10 @@ export default function MirrorSymmetryStudio() {
       console.error('Failed to load mirror pairs', err);
     }
   };
+
+  useEffect(() => {
+    fetchManifolds();
+  }, []);
 
   const handleInvert = async () => {
     setLoading(true);

@@ -40,10 +40,6 @@ export default function NonCommutativeSpacetimeStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<ProtectionResult | null>(null);
 
-  useEffect(() => {
-    fetchManifolds();
-  }, []);
-
   const fetchManifolds = async () => {
     try {
       const res = await fetch('/api/noncommutative-spacetime/manifolds');
@@ -58,6 +54,10 @@ export default function NonCommutativeSpacetimeStudio() {
       console.error('Failed to load non-commutative manifolds', err);
     }
   };
+
+  useEffect(() => {
+    fetchManifolds();
+  }, []);
 
   const handleProtect = async () => {
     setLoading(true);

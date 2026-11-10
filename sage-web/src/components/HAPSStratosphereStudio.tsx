@@ -338,7 +338,7 @@ export function HAPSStratosphereStudio() {
           {/* Console Logs */}
           <div className="rounded-lg border border-neutral-800 bg-black/60 p-3 font-mono text-[11px] text-neutral-400 h-32 overflow-y-auto space-y-1">
             {logs.length === 0 ? (
-              <span className="text-neutral-600">// Stratospheric HAPS telemetry standby...</span>
+              <span className="text-neutral-600">{"// Stratospheric HAPS telemetry standby..."}</span>
             ) : (
               logs.map((l, i) => (
                 <div key={i} className="leading-tight">

@@ -39,10 +39,6 @@ export default function StringFieldTheoryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CondenseResult | null>(null);
 
-  useEffect(() => {
-    fetchVertices();
-  }, []);
-
   const fetchVertices = async () => {
     try {
       const res = await fetch('/api/string-field-theory/vertices');
@@ -57,6 +53,10 @@ export default function StringFieldTheoryStudio() {
       console.error('Failed to load SFT vertices', err);
     }
   };
+
+  useEffect(() => {
+    fetchVertices();
+  }, []);
 
   const handleCondense = async () => {
     setLoading(true);

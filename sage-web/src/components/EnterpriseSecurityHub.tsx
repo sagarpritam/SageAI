@@ -83,10 +83,6 @@ export function EnterpriseSecurityHub() {
   const [reportMarkdown, setReportMarkdown] = useState<string>("");
   const [copiedHash, setCopiedHash] = useState<boolean>(false);
 
-  useEffect(() => {
-    fetchCapabilities();
-  }, []);
-
   const fetchCapabilities = async () => {
     setLoadingCaps(true);
     try {
@@ -100,6 +96,10 @@ export function EnterpriseSecurityHub() {
       setLoadingCaps(false);
     }
   };
+
+  useEffect(() => {
+    fetchCapabilities();
+  }, []);
 
   const handleRunFullDrill = async () => {
     setRunningDrill(true);

@@ -106,10 +106,6 @@ export function ZeroEgressEnclave() {
   const [drillResult, setDrillResult] = useState<SovereigntyDrillResult | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
 
-  useEffect(() => {
-    fetchRegions();
-  }, []);
-
   const fetchRegions = async () => {
     setLoadingRegions(true);
     try {
@@ -123,6 +119,10 @@ export function ZeroEgressEnclave() {
       setLoadingRegions(false);
     }
   };
+
+  useEffect(() => {
+    fetchRegions();
+  }, []);
 
   const handleEncrypt = async () => {
     setEncrypting(true);

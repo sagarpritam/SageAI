@@ -70,10 +70,6 @@ export function DetonationChamber() {
   const [detonation, setDetonation] = useState<DetonationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSamples();
-  }, []);
-
   const fetchSamples = async () => {
     try {
       const res = await axios.get("/api/malware/samples");
@@ -84,6 +80,10 @@ export function DetonationChamber() {
       // Fallback
     }
   };
+
+  useEffect(() => {
+    fetchSamples();
+  }, []);
 
   const runDetonation = async () => {
     setLoading(true);

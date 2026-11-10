@@ -52,10 +52,6 @@ export function SSOConfigPanel() {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchConfig();
-  }, []);
-
   const fetchConfig = async () => {
     setLoading(true);
     try {
@@ -69,6 +65,10 @@ export function SSOConfigPanel() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchConfig();
+  }, []);
 
   const handleCopy = (field: string, text: string) => {
     navigator.clipboard.writeText(text);

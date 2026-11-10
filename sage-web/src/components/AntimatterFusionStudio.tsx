@@ -44,10 +44,6 @@ export default function AntimatterFusionStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<PulseResult | null>(null);
 
-  useEffect(() => {
-    fetchThrusters();
-  }, []);
-
   const fetchThrusters = async () => {
     try {
       const res = await fetch('/api/antimatter-fusion/thrusters');
@@ -62,6 +58,10 @@ export default function AntimatterFusionStudio() {
       console.error('Failed to load ACF thrusters', err);
     }
   };
+
+  useEffect(() => {
+    fetchThrusters();
+  }, []);
 
   const handleIgnite = async () => {
     setLoading(true);

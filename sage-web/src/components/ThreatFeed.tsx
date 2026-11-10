@@ -48,7 +48,7 @@ export function ThreatFeed() {
 
     setSynthesizingId(item.id);
     try {
-      let res = await axios.get(`/api/rules/cve/${encodeURIComponent(item.id)}`).catch(() => null);
+      const res = await axios.get(`/api/rules/cve/${encodeURIComponent(item.id)}`).catch(() => null);
       if (res?.data?.bundle) {
         setRuleBundles((prev) => ({ ...prev, [item.id]: res.data.bundle }));
       } else {

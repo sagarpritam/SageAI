@@ -80,10 +80,6 @@ export function DefenseGridMonitor() {
   const [ledger, setLedger] = useState<AuditBlock[]>([]);
   const [chainLoading, setChainLoading] = useState(false);
 
-  useEffect(() => {
-    fetchAuditChain();
-  }, []);
-
   const fetchAuditChain = async () => {
     setChainLoading(true);
     try {
@@ -98,6 +94,10 @@ export function DefenseGridMonitor() {
       setChainLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAuditChain();
+  }, []);
 
   const handleWafInspect = async () => {
     setWafLoading(true);

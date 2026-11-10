@@ -39,10 +39,6 @@ export default function FibonacciAnyonStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CompileResult | null>(null);
 
-  useEffect(() => {
-    fetchBraids();
-  }, []);
-
   const fetchBraids = async () => {
     try {
       const res = await fetch('/api/fibonacci-anyon/braids');
@@ -57,6 +53,10 @@ export default function FibonacciAnyonStudio() {
       console.error('Failed to load Fibonacci anyon braids', err);
     }
   };
+
+  useEffect(() => {
+    fetchBraids();
+  }, []);
 
   const handleCompile = async () => {
     setLoading(true);

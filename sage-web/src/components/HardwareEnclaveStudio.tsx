@@ -50,7 +50,7 @@ export function HardwareEnclaveStudio() {
     setLoading(true);
     setUnsealResult(null);
     try {
-      let body: Record<string, any> = { platform };
+      const body: Record<string, any> = { platform };
       if (platform === "AWS_NITRO") {
         const pcr0 = simulateTampering
           ? "badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbad0"
@@ -93,7 +93,7 @@ export function HardwareEnclaveStudio() {
   const unsealSecret = async () => {
     setUnsealLoading(true);
     try {
-      let body: Record<string, any> = {
+      const body: Record<string, any> = {
         platform,
         secret_id: selectedSecret,
       };

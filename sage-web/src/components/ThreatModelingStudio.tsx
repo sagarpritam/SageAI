@@ -106,10 +106,6 @@ export function ThreatModelingStudio() {
   const dreadSeverity =
     dreadTotal >= 40 ? "CRITICAL" : dreadTotal >= 30 ? "HIGH" : dreadTotal >= 20 ? "MEDIUM" : "LOW";
 
-  useEffect(() => {
-    runThreatModelAnalysis();
-  }, [selectedTemplate]);
-
   const runThreatModelAnalysis = async () => {
     setLoading(true);
     try {
@@ -146,6 +142,10 @@ export function ThreatModelingStudio() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    runThreatModelAnalysis();
+  }, [selectedTemplate]);
 
   const handleCustomIngest = async () => {
     setLoading(true);

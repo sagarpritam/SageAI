@@ -37,10 +37,6 @@ export default function TeleparallelGravityStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<TelemetryResult | null>(null);
 
-  useEffect(() => {
-    fetchNodes();
-  }, []);
-
   const fetchNodes = async () => {
     try {
       const res = await fetch('/api/teleparallel-gravity/nodes');
@@ -55,6 +51,10 @@ export default function TeleparallelGravityStudio() {
       console.error('Failed to load tetrad nodes', err);
     }
   };
+
+  useEffect(() => {
+    fetchNodes();
+  }, []);
 
   const handleModulate = async () => {
     setLoading(true);

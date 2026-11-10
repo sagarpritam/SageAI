@@ -69,10 +69,6 @@ export function CyberRangeArena() {
   const [drillResult, setDrillResult] = useState<DrillResult | null>(null);
   const [activeStageIndex, setActiveStageIndex] = useState<number>(0);
 
-  useEffect(() => {
-    fetchScenarios();
-  }, []);
-
   const fetchScenarios = async () => {
     try {
       const res = await axios.get("/api/simulation/scenarios");
@@ -83,6 +79,10 @@ export function CyberRangeArena() {
       console.error("Failed to load scenarios", err);
     }
   };
+
+  useEffect(() => {
+    fetchScenarios();
+  }, []);
 
   const handleRunDrill = async () => {
     setRunning(true);

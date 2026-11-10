@@ -58,11 +58,6 @@ export function ThreatRuleSynthesizer() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTemplates();
-    loadRulesForCve("CVE-2024-21887");
-  }, []);
-
   const fetchTemplates = async () => {
     try {
       const res = await axios.get("/api/rules/templates");
@@ -90,6 +85,11 @@ export function ThreatRuleSynthesizer() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTemplates();
+    loadRulesForCve("CVE-2024-21887");
+  }, []);
 
   const handleSelectTemplate = (cveId: string) => {
     setSelectedCve(cveId);
