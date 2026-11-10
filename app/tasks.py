@@ -218,8 +218,9 @@ def cleanup_old_scans(days: int = 90):
         async with AsyncSessionLocal() as db:
             result = await db.execute(delete(Scan).where(Scan.created_at < cutoff))
             await db.commit()
+            deleted_count = int(getattr(result, "rowcount", 0) or 0)
             logger.info(
-                "Cleaned up %d old scan(s) older than %d days", result.rowcount, days
+                "Cleaned up %d old scan(s) older than %d days", deleted_count, days
             )
 
     _run_async(_cleanup())

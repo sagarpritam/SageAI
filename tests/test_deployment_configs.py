@@ -1,12 +1,14 @@
 """Regression tests for deployment manifests, DB URL normalization, and packaging parity."""
 
+import importlib
 import json
 import pathlib
 import tomllib
-
-import yaml
+from typing import Any
 
 from app.core.database import build_async_engine_config, normalize_async_db_url
+
+yaml: Any = importlib.import_module("yaml")
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -119,3 +121,40 @@ def test_deployment_manifests_and_vercel_monorepo_integrity():
 
     dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
     assert "sage-web/" not in dockerignore
+
+
+def test_vercelignore_anchors_root_paths():
+    raw_lines = (ROOT / ".vercelignore").read_text(encoding="utf-8").splitlines()
+    patterns = {
+        line.strip()
+        for line in raw_lines
+        if line.strip() and not line.strip().startswith("#")
+    }
+
+    # Unanchored patterns strip Next.js App Router files under sage-web/src/app/**
+    for forbidden_unanchored in (
+        "app/",
+        "api/",
+        "scripts/",
+        "tests/",
+        "docker/",
+        "k8s/",
+        "frontend/",
+    ):
+        assert forbidden_unanchored not in patterns, (
+            f"Unanchored pattern {forbidden_unanchored!r} in .vercelignore matches inside sage-web/"
+        )
+
+    for required_anchored in (
+        "/app/",
+        "/api/",
+        "/sagestrike/",
+        "/alembic/",
+        "/scripts/",
+        "/tests/",
+        "/docker/",
+        "/k8s/",
+    ):
+        assert required_anchored in patterns, (
+            f"Expected anchored backend exclusion {required_anchored!r} in .vercelignore"
+        )
