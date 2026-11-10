@@ -46,6 +46,7 @@ def main():
                 "tests/",
                 "scripts/",
                 "sagestrike/",
+                "alembic/",
             ],
         ),
         (
@@ -60,6 +61,7 @@ def main():
                 "tests/",
                 "scripts/",
                 "sagestrike/",
+                "alembic/",
             ],
         ),
         ("Pytest Test Suite", [sys.executable, "-m", "pytest", "-q"]),

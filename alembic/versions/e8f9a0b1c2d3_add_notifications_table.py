@@ -62,7 +62,19 @@ def upgrade() -> None:
         op.execute(
             'CREATE POLICY "deny_all_access" ON public.notifications FOR ALL USING (false);'
         )
-        op.execute("REVOKE ALL ON TABLE public.notifications FROM anon, authenticated;")
+        op.execute(
+            """
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+                    REVOKE ALL ON TABLE public.notifications FROM anon;
+                END IF;
+                IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+                    REVOKE ALL ON TABLE public.notifications FROM authenticated;
+                END IF;
+            END $$;
+            """
+        )
 
 
 def downgrade() -> None:

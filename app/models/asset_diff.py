@@ -29,10 +29,10 @@ class AttackSurfaceDiff(Base):
 
     # Store IDs of compared scans
     previous_scan_id = Column(
-        String, ForeignKey("scans.id", ondelete="SET NULL"), nullable=True
+        String, ForeignKey("scans.id", ondelete="SET NULL"), nullable=True, index=True
     )
     current_scan_id = Column(
-        String, ForeignKey("scans.id", ondelete="CASCADE"), nullable=False
+        String, ForeignKey("scans.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Diffs (stored as JSON encoded strings)

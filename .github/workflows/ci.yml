@@ -20,9 +20,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: pip install ruff bandit mypy safety
-      - run: ruff check app/ tests/ scripts/ sagestrike/
-      - run: ruff format --check app/ tests/ scripts/ sagestrike/
-      - run: mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
+      - run: ruff check app/ tests/ scripts/ sagestrike/ alembic/
+      - run: ruff format --check app/ tests/ scripts/ sagestrike/ alembic/
+      - run: mypy app/ sagestrike/ scripts/ tests/ alembic/ --ignore-missing-imports --check-untyped-defs
       - run: safety check --full-report || true # Don't fail yet, just report
       - run: bandit -r app/ sagestrike/ -f json -o bandit-report.json --severity-level medium || true
       - run: bandit -r app/ sagestrike/ --severity-level medium
@@ -73,10 +73,12 @@ jobs:
 
       - name: Alembic migration check
         run: |
-          alembic upgrade head || echo "Database initialized via SQLAlchemy Base.metadata"
-          alembic check || echo "No pending migrations"
+          python -m alembic heads
+          python -m alembic upgrade head
+          python -m alembic check
         env:
           DATABASE_URL: "postgresql+asyncpg://sageai:test_password@localhost:5432/sageai_test"
+          SECRET_KEY: "test-secret-key-for-ci"
 
       - run: pytest tests/ -v --tb=short --cov=app
         env:

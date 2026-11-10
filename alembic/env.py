@@ -7,10 +7,26 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-import app.models  # noqa: F401
 from alembic import context
-from app.core.config import settings
-from app.core.database import Base
+
+
+def _normalize_async_db_url(url: str) -> str:
+    """Normalize sync Postgres/SQLite URLs to async drivers required by app.core.database."""
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgresql://") and "+asyncpg" not in url:
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("sqlite://") and "+aiosqlite" not in url:
+        return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+    return url
+
+
+if env_db_url := os.environ.get("DATABASE_URL"):
+    os.environ["DATABASE_URL"] = _normalize_async_db_url(env_db_url)
+
+import app.models  # noqa: F401, E402
+from app.core.config import settings  # noqa: E402
+from app.core.database import Base  # noqa: E402
 
 config = context.config
 if config.config_file_name is not None:
@@ -19,11 +35,7 @@ if config.config_file_name is not None:
 # Override with DATABASE_URL from environment or app settings
 db_url = os.environ.get("DATABASE_URL") or settings.DATABASE_URL
 if db_url:
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
-    elif db_url.startswith("postgresql://") and "+asyncpg" not in db_url:
-        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    config.set_main_option("sqlalchemy.url", db_url)
+    config.set_main_option("sqlalchemy.url", _normalize_async_db_url(db_url))
 
 target_metadata = Base.metadata
 

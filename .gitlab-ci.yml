@@ -32,14 +32,18 @@ lint:
   stage: lint
   script:
     - pip install "ruff>=0.15.9" mypy
-    - ruff check app/ tests/ scripts/ sagestrike/
-    - ruff format --check app/ tests/ scripts/ sagestrike/
-    - mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
+    - ruff check app/ tests/ scripts/ sagestrike/ alembic/
+    - ruff format --check app/ tests/ scripts/ sagestrike/ alembic/
+    - mypy app/ sagestrike/ scripts/ tests/ alembic/ --ignore-missing-imports --check-untyped-defs
 
 test:
   stage: test
   script:
     - pip install -r requirements.txt -r requirements-dev.txt
+    - rm -f test.db alembic_ci.db
+    - DATABASE_URL="sqlite+aiosqlite:///./alembic_ci.db" python -m alembic upgrade head
+    - DATABASE_URL="sqlite+aiosqlite:///./alembic_ci.db" python -m alembic check
+    - rm -f alembic_ci.db
     - pytest tests/ -v --tb=short
 
 security:
