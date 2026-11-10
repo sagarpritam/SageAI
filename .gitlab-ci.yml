@@ -16,6 +16,7 @@ variables:
   SECRET_KEY: "test-secret-key-for-ci"
   ALGORITHM: "HS256"
   ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
 
 cache:
   paths:
@@ -25,13 +26,15 @@ stages:
   - lint
   - test
   - security
+  - frontend
 
 lint:
   stage: lint
   script:
-    - pip install ruff==0.15.5
-    - ruff check app/ tests/
-    - ruff format --check app/ tests/
+    - pip install "ruff>=0.15.9" mypy
+    - ruff check app/ tests/ scripts/ sagestrike/
+    - ruff format --check app/ tests/ scripts/ sagestrike/
+    - mypy app/ sagestrike/ scripts/ --ignore-missing-imports --check-untyped-defs
 
 test:
   stage: test
@@ -43,6 +46,14 @@ security:
   stage: security
   script:
     - pip install bandit
-    - bandit -r app/ -ll
+    - bandit -r app/ sagestrike/ -ll
   allow_failure: false
 
+frontend:
+  stage: frontend
+  image: node:20-alpine
+  script:
+    - cd sage-web
+    - npm install --legacy-peer-deps
+    - npm run lint
+    - npm run build

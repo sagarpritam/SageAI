@@ -20,12 +20,12 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: pip install ruff bandit mypy safety
-      - run: ruff check app/ tests/ scripts/
-      - run: ruff format --check app/ tests/ scripts/
-      - run: mypy app/ --ignore-missing-imports
+      - run: ruff check app/ tests/ scripts/ sagestrike/
+      - run: ruff format --check app/ tests/ scripts/ sagestrike/
+      - run: mypy app/ sagestrike/ scripts/ --ignore-missing-imports --check-untyped-defs
       - run: safety check --full-report || true # Don't fail yet, just report
-      - run: bandit -r app/ -f json -o bandit-report.json --severity-level medium || true
-      - run: bandit -r app/ --severity-level medium
+      - run: bandit -r app/ sagestrike/ -f json -o bandit-report.json --severity-level medium || true
+      - run: bandit -r app/ sagestrike/ --severity-level medium
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -95,12 +95,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install, Lint & Build Next.js
+      - name: Install, Lint, Build & Run E2E Tests (Next.js)
         working-directory: sage-web
         run: |
           npm install --legacy-peer-deps
           npm run lint
           npm run build
+          npx playwright install --with-deps chromium
+          npm run test:e2e
 
   # ––– Docker Build + Security Scan –––
   docker:

@@ -1,16 +1,22 @@
 """
-Live Multi-Domain Stress Test & Verification across All 15 Waves (Capabilities 1 to 67).
-Sends concurrent authenticated requests to core and advanced planetary/orbital endpoints,
+Live Multi-Domain Stress Test & Verification across All 28 Waves (Capabilities 1 to 106).
+Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
+
+Supports:
+- Live HTTP mode against a running FastAPI server (default, uses FASTAPI_URL env or http://127.0.0.1:8000)
+- In-process FastAPI TestClient verification via ``--in-process`` (for offline / CI smoke checks)
 """
 
+import argparse
 import concurrent.futures
 import os
 import statistics
 import sys
 import time
+from typing import Any, Dict, List, Optional, Tuple
 
-import requests
+import httpx
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -23,99 +29,173 @@ RED = "\033[91m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
-BASE_URL = os.environ.get("FASTAPI_URL", "http://127.0.0.1:8000")
+DEFAULT_BASE_URL = os.environ.get("FASTAPI_URL", "http://127.0.0.1:8000")
+
+EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
-def run_single_request(client, method, url, headers, json_data=None):
-    start = time.perf_counter()
-    if method == "GET":
-        resp = client.get(url, headers=headers, timeout=10)
-    elif method == "POST":
-        resp = client.post(url, headers=headers, json=json_data, timeout=10)
-    else:
-        raise ValueError(f"Unsupported method {method}")
-    elapsed_ms = (time.perf_counter() - start) * 1000.0
-    return resp.status_code, elapsed_ms, resp
-
-
-def run_live_all_waves_stress_test():
-    print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
-    print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN LIVE END-TO-END STRESS TEST (WAVES 1-15){RESET}".center(
-            78
-        )
-    )
-    print(f"{CYAN}{BOLD}{'=' * 80}{RESET}\n")
-
-    token = create_access_token({"sub": "stress-test-operator", "role": "admin"})
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-    }
-
-    session = requests.Session()
-
-    endpoints_to_test = [
-        # Wave 15 Endpoints
-        ("GET", f"{BASE_URL}/marine-sonar/nodes", None, "Wave 15: Marine Sonar Nodes"),
-        (
-            "POST",
-            f"{BASE_URL}/marine-sonar/analyze-acoustic",
-            {
-                "node_id": "sonar-node-giuk-gap-01",
-                "sound_velocity_mps": 1496.8,
-                "ambient_spl_db": 138.5,
-                "spectral_peak_hz": 420.0,
-                "acoustic_doppler_mps": 4.2,
-            },
-            "Wave 15: Marine Acoustic SOFAR Analysis",
-        ),
+def build_wave_endpoints() -> List[EndpointSpec]:
+    """Return representative functional & stress endpoints across Core and Waves 1-28 (Caps 1-106)."""
+    return [
+        # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
+        ("GET", "/health", None, "Core: Platform Health Check"),
         (
             "GET",
-            f"{BASE_URL}/orbital-debris/platforms",
+            "/security/enterprise-capabilities",
             None,
-            "Wave 15: Orbital Laser Platforms",
+            "Wave 1: Enterprise Capabilities Matrix",
         ),
-        (
-            "POST",
-            f"{BASE_URL}/orbital-debris/calculate-conjunction",
-            {
-                "platform_id": "laser-platform-helios-01",
-                "debris_size_cm": 4.5,
-                "relative_velocity_km_s": 7.82,
-                "miss_distance_meters": 115.0,
-                "collision_probability": 0.0085,
-            },
-            "Wave 15: Orbital Conjunction Laser Deflection",
-        ),
+        ("GET", "/warroom/events", None, "Wave 1: Real-Time War Room Events"),
+        ("GET", "/deception/decoys", None, "Wave 1: Deception Mesh Decoys"),
         (
             "GET",
-            f"{BASE_URL}/airgap-exploit-swarm/agents",
+            "/intrusion/audit-chain",
             None,
-            "Wave 15: Air-Gapped Swarm Agents",
+            "Wave 1: Cryptographic Merkle Audit Chain",
         ),
-        (
-            "POST",
-            f"{BASE_URL}/airgap-exploit-swarm/analyze-zero-day",
-            {
-                "binary_name": "embedded_scada_rtu.bin",
-                "binary_hash_sha256": "3fa85f6479940ae648e71a4f3832d20ab40beac7f289cfc3a9ec221b0f897e11",
-                "rop_gadgets_count": 18,
-                "symbolic_path_depth": 24,
-                "register_control_verified": True,
-            },
-            "Wave 15: Zero-Day Symbolic Enclave Analysis",
-        ),
-        # Wave 14 Endpoints
+        ("GET", "/rules/templates", None, "Wave 1: Detection Rule Templates"),
+        # Wave 2: Adversary Emulation & MITRE ATT&CK
+        ("GET", "/adversary/matrix", None, "Wave 2: MITRE ATT&CK Matrix"),
+        # Wave 3: Threat Hunting & DSPM & CTI
         (
             "GET",
-            f"{BASE_URL}/photonic-quantum/coprocessors",
+            "/threat-hunting/templates",
+            None,
+            "Wave 3: Threat Hunting Playbook Templates",
+        ),
+        ("GET", "/dspm/lineage", None, "Wave 3: DSPM Data Lineage Graph"),
+        ("GET", "/cti/threat-actors", None, "Wave 3: CTI STIX/TAXII Threat Actors"),
+        # Wave 4: Atomic Red Team, IaC Drift, SBOM/OpenVEX
+        ("GET", "/atomic-redteam/techniques", None, "Wave 4: Atomic Red Team Catalog"),
+        ("GET", "/iac-drift/scan", None, "Wave 4: IaC Drift Scanner"),
+        ("GET", "/sbom-vex/cyclonedx", None, "Wave 4: CycloneDX SBOM & OpenVEX"),
+        # Wave 5: ITDR, CART, KMS/HSM, BloodHound, API Shield, SDN, Darkweb, ZKP, D3FEND
+        ("GET", "/itdr/telemetry", None, "Wave 5: Identity Threat Telemetry (ITDR)"),
+        ("GET", "/cart/topology", None, "Wave 5: CART Attack Path Topology"),
+        ("GET", "/kms-hsm/keys", None, "Wave 5: Sovereign KMS/HSM Keys"),
+        (
+            "GET",
+            "/bloodhound/topology",
+            None,
+            "Wave 5: Active Directory Attack Topology",
+        ),
+        ("GET", "/api-shield/opa-rego", None, "Wave 5: API Shield OPA Rego Policy"),
+        ("GET", "/sdn-shield/isolations", None, "Wave 5: SDN Micro-Shield Isolations"),
+        ("GET", "/darkweb-radar/scan", None, "Wave 5: Dark Web Infostealer Radar"),
+        ("GET", "/zkp/proof", None, "Wave 5: ZKP zk-SNARK Compliance Proof"),
+        ("GET", "/d3fend/matrix", None, "Wave 5: MITRE D3FEND Countermeasure Matrix"),
+        # Wave 6: Enclave Attestation, Swarm, Canary Fabric, Deobfuscator, SPIFFE/SPIRE
+        (
+            "GET",
+            "/enclave-attestation/golden-measurements",
+            None,
+            "Wave 6: Hardware Enclave Golden PCRs",
+        ),
+        (
+            "GET",
+            "/threat-hunting-swarm/hunts",
+            None,
+            "Wave 6: Autonomous Hunting Swarm",
+        ),
+        ("GET", "/canary-fabric/tokens", None, "Wave 6: Synthetic Canary Honeytokens"),
+        (
+            "GET",
+            "/binary-deobfuscator/samples",
+            None,
+            "Wave 6: Symbolic Binary Deobfuscator",
+        ),
+        ("GET", "/workload-identity/svids", None, "Wave 6: SPIFFE/SPIRE X.509 SVIDs"),
+        # Wave 7-8: Hotpatch, CAS Redteam, APT Attribution, Forensics, Crossplane, Kyber VPN, Labyrinth, Airgap LLM
+        (
+            "GET",
+            "/micro-hotpatch/patches",
+            None,
+            "Wave 7: eBPF Kernel Micro-Hotpatches",
+        ),
+        (
+            "GET",
+            "/cas-redteam/campaigns",
+            None,
+            "Wave 7: Continuous Red-Team Swarm Campaigns",
+        ),
+        ("GET", "/apt-attribution/actors", None, "Wave 7: APT Attribution Graph"),
+        (
+            "GET",
+            "/cloud-forensics/snapshots",
+            None,
+            "Wave 7: Cloud Forensics RFC 3161 Snapshots",
+        ),
+        ("GET", "/crossplane-mesh/nodes", None, "Wave 8: Multi-Cloud Zero-Trust Mesh"),
+        ("GET", "/kyber-mesh-vpn/peers", None, "Wave 8: PQC Kyber WireGuard VPN Peers"),
+        ("GET", "/labyrinth-honeynet/mazes", None, "Wave 8: AI Honeynet Labyrinths"),
+        (
+            "GET",
+            "/airgap-llm-guard/models",
+            None,
+            "Wave 8: Air-Gapped Offline LLM Guard",
+        ),
+        # Wave 9-12: Firmware, SCADA, Regulatory, 5G, Orbital Laser, AI Immune, Subsea, BCI, Intergrid, Depoison, QKD, Drone
+        (
+            "GET",
+            "/firmware-attestation/devices",
+            None,
+            "Wave 9: UEFI/TPM Firmware Attestor",
+        ),
+        (
+            "GET",
+            "/industrial-scada/plcs",
+            None,
+            "Wave 9: ICS/SCADA Kinetic Shield PLCs",
+        ),
+        (
+            "GET",
+            "/regulatory-commander/incidents",
+            None,
+            "Wave 9: SEC 8-K & NIS2 Commander",
+        ),
+        ("GET", "/telecom-5g/slices", None, "Wave 10: 5G/6G RAN Slice Guard"),
+        ("GET", "/orbital-laser/satellites", None, "Wave 10: LEO Orbital Laser Mesh"),
+        ("GET", "/ai-immune/models", None, "Wave 10: AI Immune Mutation Guard"),
+        ("GET", "/subsea-cable/cables", None, "Wave 11: Subsea Optical Cable Guard"),
+        ("GET", "/neural-bci/operators", None, "Wave 11: Neural BCI Zero-Trust Gate"),
+        (
+            "GET",
+            "/intergrid-failover/interconnects",
+            None,
+            "Wave 11: National Inter-Grid Failover",
+        ),
+        ("GET", "/ai-depoison/adapters", None, "Wave 12: LoRA Backdoor De-Poisoning"),
+        ("GET", "/space-ground-qkd/links", None, "Wave 12: Space-Ground QKD Mesh"),
+        (
+            "GET",
+            "/drone-swarm-shield/sites",
+            None,
+            "Wave 12: Kinetic Drone Swarm Shield",
+        ),
+        # Wave 13: Neuromorphic SNN, Deep-Space Laser, Hypersonic Defense
+        ("GET", "/neuromorphic-snn/cores", None, "Wave 13: Neuromorphic SNN Cores"),
+        (
+            "GET",
+            "/deep-space-laser/terminals",
+            None,
+            "Wave 13: Deep-Space Laser Terminals",
+        ),
+        (
+            "GET",
+            "/hypersonic-defense/threats",
+            None,
+            "Wave 13: Hypersonic Defense Trackers",
+        ),
+        # Wave 14: Photonic Quantum, Geomagnetic Shield, HAPS Stratosphere
+        (
+            "GET",
+            "/photonic-quantum/coprocessors",
             None,
             "Wave 14: Photonic QPU Coprocessors",
         ),
         (
             "POST",
-            f"{BASE_URL}/photonic-quantum/evaluate-lattice",
+            "/photonic-quantum/evaluate-lattice",
             {
                 "coprocessor_id": "photonic-borealis-cvq-01",
                 "lattice_dimension": 1024,
@@ -127,13 +207,13 @@ def run_live_all_waves_stress_test():
         ),
         (
             "GET",
-            f"{BASE_URL}/geomagnetic-shield/substations",
+            "/geomagnetic-shield/substations",
             None,
             "Wave 14: Geomagnetic Substations",
         ),
         (
             "POST",
-            f"{BASE_URL}/geomagnetic-shield/evaluate-storm",
+            "/geomagnetic-shield/evaluate-storm",
             {
                 "substation_id": "substation-quebec-hydro-01",
                 "kp_index": 8.5,
@@ -142,15 +222,10 @@ def run_live_all_waves_stress_test():
             },
             "Wave 14: Solar CME GIC Shield",
         ),
-        (
-            "GET",
-            f"{BASE_URL}/haps-stratosphere/nodes",
-            None,
-            "Wave 14: HAPS Stratosphere Nodes",
-        ),
+        ("GET", "/haps-stratosphere/nodes", None, "Wave 14: HAPS Stratosphere Nodes"),
         (
             "POST",
-            f"{BASE_URL}/haps-stratosphere/monitor-flight",
+            "/haps-stratosphere/monitor-flight",
             {
                 "node_id": "haps-zephyr-norfolk-01",
                 "wind_velocity_mps": 32.5,
@@ -160,61 +235,479 @@ def run_live_all_waves_stress_test():
             },
             "Wave 14: HAPS Jet Stream Station-Keeping",
         ),
-        # Core Enterprise Security Routes
-        ("GET", f"{BASE_URL}/health", None, "Core: Platform Health Check"),
+        # Wave 15: Marine Sonar, Orbital Debris, Airgap Exploit Swarm
+        ("GET", "/marine-sonar/nodes", None, "Wave 15: Marine Sonar Nodes"),
+        (
+            "POST",
+            "/marine-sonar/analyze-acoustic",
+            {
+                "node_id": "sonar-node-giuk-gap-01",
+                "sound_velocity_mps": 1496.8,
+                "ambient_spl_db": 138.5,
+                "spectral_peak_hz": 420.0,
+                "acoustic_doppler_mps": 4.2,
+            },
+            "Wave 15: Marine Acoustic SOFAR Analysis",
+        ),
+        ("GET", "/orbital-debris/platforms", None, "Wave 15: Orbital Laser Platforms"),
+        (
+            "POST",
+            "/orbital-debris/calculate-conjunction",
+            {
+                "platform_id": "laser-platform-helios-01",
+                "debris_size_cm": 4.5,
+                "relative_velocity_km_s": 7.82,
+                "miss_distance_meters": 115.0,
+                "collision_probability": 0.0085,
+            },
+            "Wave 15: Orbital Conjunction Laser Deflection",
+        ),
+        (
+            "GET",
+            "/airgap-exploit-swarm/agents",
+            None,
+            "Wave 15: Air-Gapped Swarm Agents",
+        ),
+        (
+            "POST",
+            "/airgap-exploit-swarm/analyze-zero-day",
+            {
+                "binary_name": "embedded_scada_rtu.bin",
+                "binary_hash_sha256": "3fa85f6479940ae648e71a4f3832d20ab40beac7f289cfc3a9ec221b0f897e11",
+                "rop_gadgets_count": 18,
+                "symbolic_path_depth": 24,
+                "register_control_verified": True,
+            },
+            "Wave 15: Zero-Day Symbolic Enclave Analysis",
+        ),
+        # Wave 16: Neutrino Array, Cognitive EW, Optical Atomic Clock Mesh
+        ("GET", "/neutrino-array/detectors", None, "Wave 16: Deep Neutrino Detectors"),
+        ("GET", "/cognitive-ew/emitters", None, "Wave 16: Cognitive EW Radar Emitters"),
+        ("GET", "/atomic-clock/clocks", None, "Wave 16: Optical Atomic Clock Mesh"),
+        # Wave 17: Gravitational Seismic, Counter-Quantum, Plasma Shield
+        (
+            "GET",
+            "/gravitational-seismic/observatories",
+            None,
+            "Wave 17: Gravitational Seismic Observatories",
+        ),
+        (
+            "GET",
+            "/counter-quantum/interceptors",
+            None,
+            "Wave 17: Counter-Quantum Harvest Interceptors",
+        ),
+        (
+            "GET",
+            "/plasma-shield/platforms",
+            None,
+            "Wave 17: Spaceborne Directed Plasma Shield",
+        ),
+        # Wave 18: Cis-Lunar Relay, Muon Tomography, Antimatter Containment, Red-Team Cluster
+        (
+            "GET",
+            "/api/cislunar-relay/nodes",
+            None,
+            "Wave 18: Cis-Lunar Quantum Optical Relay",
+        ),
+        (
+            "GET",
+            "/api/muon-tomography/stations",
+            None,
+            "Wave 18: Subsurface Muon Tomography Stations",
+        ),
+        (
+            "GET",
+            "/api/antimatter-containment/cells",
+            None,
+            "Wave 18: Antimatter Penning Trap Cells",
+        ),
+        (
+            "GET",
+            "/api/redteam-cluster/agents",
+            None,
+            "Wave 18: Autonomous Red-Team Cluster Agents",
+        ),
+        # Wave 19: Relativistic Solar Sail Laser, Magnetosphere Dynamo, Deep-Mantle Geoneutrino
+        (
+            "GET",
+            "/api/solar-sail-laser/arrays",
+            None,
+            "Wave 19: Solar Sail Laser Propulsion Arrays",
+        ),
+        (
+            "GET",
+            "/api/magnetosphere-dynamo/stations",
+            None,
+            "Wave 19: Magnetosphere Dynamo HEMP Decoupler",
+        ),
+        (
+            "GET",
+            "/api/mantle-geoneutrino/observatories",
+            None,
+            "Wave 19: Mantle Geoneutrino Tomography",
+        ),
+        # Wave 20: Quantum Gravitational, Tachyon Horizon, Micro-Singularity, Cluster Federation
+        (
+            "GET",
+            "/api/quantum-gravitational/nodes",
+            None,
+            "Wave 20: Quantum Gravitational Metric Sensor",
+        ),
+        (
+            "GET",
+            "/api/tachyon-horizon/sentinels",
+            None,
+            "Wave 20: Pre-Causal Tachyon Horizon Sentinels",
+        ),
+        (
+            "GET",
+            "/api/singularity-containment/cells",
+            None,
+            "Wave 20: Micro-Singularity Waveguide Cells",
+        ),
+        (
+            "GET",
+            "/api/cluster-federation/clusters",
+            None,
+            "Wave 20: Multi-Region BFT Cluster Federation",
+        ),
+        # Wave 21: Dark Energy, Casimir Vacuum, Anyon Braiding, Interstellar QKD Space-Mesh
+        (
+            "GET",
+            "/api/dark-energy/harvesters",
+            None,
+            "Wave 21: Dark Energy Quintessence Harvesters",
+        ),
+        (
+            "GET",
+            "/api/casimir-vacuum/resonators",
+            None,
+            "Wave 21: Dynamic Casimir SQUID Resonators",
+        ),
+        (
+            "GET",
+            "/api/anyon-braiding/matrices",
+            None,
+            "Wave 21: Non-Abelian Anyon Braiding Matrices",
+        ),
+        (
+            "GET",
+            "/api/qkd-space-mesh/nodes",
+            None,
+            "Wave 21: Interstellar QKD Space-Mesh Nodes",
+        ),
+        # Wave 22: de Sitter Repulsion, Calabi-Yau 10D, Cauchy Chronology, Hyperspectral Swarm
+        (
+            "GET",
+            "/api/desitter-repulsion/grids",
+            None,
+            "Wave 22: de Sitter Horizon Repulsion Grids",
+        ),
+        (
+            "GET",
+            "/api/calabi-yau/manifolds",
+            None,
+            "Wave 22: 10D Calabi-Yau Moduli Manifolds",
+        ),
+        (
+            "GET",
+            "/api/cauchy-chronology/horizons",
+            None,
+            "Wave 22: Cauchy Chronology Horizons",
+        ),
+        (
+            "GET",
+            "/api/hyperspectral-interceptor/constellation",
+            None,
+            "Wave 22: Hyperspectral Interceptor Swarm",
+        ),
+        # Wave 23: Everett Branch, ER=EPR Wormhole Bridge, False Vacuum Shield, Orbital HPM
+        (
+            "GET",
+            "/api/everett-branch/branches",
+            None,
+            "Wave 23: Everett Many-Worlds Branches",
+        ),
+        (
+            "GET",
+            "/api/er-bridge/throats",
+            None,
+            "Wave 23: ER=EPR Wormhole Bridge Throats",
+        ),
+        (
+            "GET",
+            "/api/false-vacuum/chambers",
+            None,
+            "Wave 23: False Vacuum Decay Shield Chambers",
+        ),
+        (
+            "GET",
+            "/api/orbital-hpm/arrays",
+            None,
+            "Wave 23: Orbital HPM Directed-Energy Arrays",
+        ),
+        # Wave 24: Inflaton Reheating, Randall-Sundrum 5D, Cosmic Censorship, Deep-Crustal MHD
+        (
+            "GET",
+            "/api/inflaton-reheating/nodes",
+            None,
+            "Wave 24: Inflaton Reheating Nodes",
+        ),
+        (
+            "GET",
+            "/api/randall-sundrum/branes",
+            None,
+            "Wave 24: 5D Randall-Sundrum Branes",
+        ),
+        (
+            "GET",
+            "/api/cosmic-censorship/singularities",
+            None,
+            "Wave 24: Penrose Cosmic Censorship Horizons",
+        ),
+        (
+            "GET",
+            "/api/deep-crustal-mhd/vaults",
+            None,
+            "Wave 24: Deep-Crustal MHD Geothermal Vaults",
+        ),
+        # Wave 25: Ryu-Takayanagi, D-Brane Tadpole, Novikov Geodesic, Hypersonic MHD Stealth
+        (
+            "GET",
+            "/api/ryu-takayanagi/nodes",
+            None,
+            "Wave 25: Holographic Ryu-Takayanagi Nodes",
+        ),
+        (
+            "GET",
+            "/api/dbrane-tadpole/stacks",
+            None,
+            "Wave 25: D-Brane Orientifold Tadpole Stacks",
+        ),
+        (
+            "GET",
+            "/api/novikov-geodesic/loops",
+            None,
+            "Wave 25: Novikov Closed Geodesic Loops",
+        ),
+        (
+            "GET",
+            "/api/mhd-plasma-stealth/platforms",
+            None,
+            "Wave 25: Hypersonic MHD Plasma Stealth",
+        ),
+        # Wave 26: Asymptotic Safety, Horava-Lifshitz, Centesimal Quantum Gravity (Cap 100), MIF Fusion
+        (
+            "GET",
+            "/api/asymptotic-safety/nodes",
+            None,
+            "Wave 26: Asymptotic Safety RG Flow Nodes",
+        ),
+        (
+            "GET",
+            "/api/horava-lifshitz/domains",
+            None,
+            "Wave 26: Horava-Lifshitz Scaling Domains",
+        ),
+        (
+            "GET",
+            "/api/centesimal-quantum-gravity/fabrics",
+            None,
+            "Wave 26 (Cap 100): Centesimal Quantum Gravity",
+        ),
+        (
+            "GET",
+            "/api/magneto-inertial-fusion/reactors",
+            None,
+            "Wave 26: Magneto-Inertial Fusion Reactors",
+        ),
+        # Wave 27: Teleparallel Gravity, Spin-Foam, Non-Commutative Spacetime, Antimatter Fusion
+        (
+            "GET",
+            "/api/teleparallel-gravity/nodes",
+            None,
+            "Wave 27 (Cap 101): Teleparallel Gravity Nodes",
+        ),
+        (
+            "GET",
+            "/api/spin-foam/simplices",
+            None,
+            "Wave 27 (Cap 102): EPRL-FK Spin-Foam Simplices",
+        ),
+        (
+            "GET",
+            "/api/noncommutative-spacetime/manifolds",
+            None,
+            "Wave 27 (Cap 103): Non-Commutative Spacetime",
+        ),
+        (
+            "GET",
+            "/api/antimatter-fusion/thrusters",
+            None,
+            "Wave 27: Antimatter-Catalyzed Fusion Thrusters",
+        ),
+        # Wave 28: String Field Theory, Mirror Symmetry, Fibonacci Anyons, Monopole Battery (Caps 104-106 + Opt B)
+        (
+            "GET",
+            "/api/string-field-theory/vertices",
+            None,
+            "Wave 28 (Cap 104): String Field Theory Vertices",
+        ),
+        (
+            "POST",
+            "/api/string-field-theory/condense-tachyon",
+            {
+                "vertex_id": "SFT-VERTEX-WITTEN-01",
+                "coupling_g0": 0.5,
+                "truncation_level": 8,
+                "damping_gain": 1.15,
+            },
+            "Wave 28 (Cap 104): SFT Tachyon Vacuum Condensation",
+        ),
+        (
+            "GET",
+            "/api/mirror-symmetry/manifolds",
+            None,
+            "Wave 28 (Cap 105): Mirror Symmetry Manifolds",
+        ),
+        (
+            "POST",
+            "/api/mirror-symmetry/invert-hodge",
+            {
+                "manifold_id": "CY-MIRROR-FERMAT-QUINTIC-01",
+                "complex_modulus_z": 0.04,
+                "instanton_degree_max": 4,
+                "duality_coupling_gain": 1.05,
+            },
+            "Wave 28 (Cap 105): Hodge Diamond Mirror Inversion",
+        ),
+        (
+            "GET",
+            "/api/fibonacci-anyon/braids",
+            None,
+            "Wave 28 (Cap 106): Fibonacci Anyon Braids",
+        ),
+        (
+            "POST",
+            "/api/fibonacci-anyon/compile-braid",
+            {
+                "braid_id": "FIB-BRAID-TOPOLOGICAL-01",
+                "target_gate": "HADAMARD",
+                "braid_length_steps": 32,
+                "damping_gain": 1.15,
+            },
+            "Wave 28 (Cap 106): Fibonacci Braid Gate Compilation",
+        ),
+        (
+            "GET",
+            "/api/monopole-battery/traps",
+            None,
+            "Wave 28 (Opt B): Magnetic Monopole Traps",
+        ),
+        (
+            "POST",
+            "/api/monopole-battery/catalyze-decay",
+            {
+                "trap_id": "MONOPOLE-TRAP-ICELAND-01",
+                "proton_feed_ug_s": 1.25,
+                "confinement_boost": 1.05,
+                "load_demand_gw": 100.0,
+            },
+            "Wave 28 (Opt B): Monopole Proton Decay Catalysis",
+        ),
     ]
 
+
+def run_single_request(
+    client: Any,
+    method: str,
+    path: str,
+    headers: Dict[str, str],
+    json_data: Optional[Dict[str, Any]] = None,
+) -> Tuple[int, float, Any]:
+    start = time.perf_counter()
+    if method == "GET":
+        resp = client.get(path, headers=headers)
+    elif method == "POST":
+        resp = client.post(path, headers=headers, json=json_data)
+    else:
+        raise ValueError(f"Unsupported method {method}")
+    elapsed_ms = (time.perf_counter() - start) * 1000.0
+    return resp.status_code, elapsed_ms, resp
+
+
+def execute_stress_suite(
+    client: Any,
+    mode_label: str,
+    concurrent_workers: int,
+    total_requests: int,
+) -> None:
+    print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across multi-domain endpoints...{RESET}"
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-28, CAPS 1-106) [{mode_label}]{RESET}".center(
+            78
+        )
     )
-    for method, url, data, label in endpoints_to_test:
-        status, lat, resp = run_single_request(session, method, url, headers, data)
-        assert status == 200, f"Endpoint {label} returned HTTP {status}: {resp.text}"
+    print(f"{CYAN}{BOLD}{'=' * 80}{RESET}\n")
+
+    token = create_access_token({"sub": "stress-test-operator", "role": "admin"})
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+
+    endpoints_to_test = build_wave_endpoints()
+
+    print(
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-28 endpoints...{RESET}"
+    )
+    for method, path, data, label in endpoints_to_test:
+        status, lat, resp = run_single_request(client, method, path, headers, data)
+        assert status == 200, (
+            f"Endpoint {label} ({method} {path}) returned HTTP {status}: {resp.text}"
+        )
         print(f"  {GREEN}✓ {label}:{RESET} HTTP {status} in {lat:.2f}ms")
 
-    # Concurrency verification across endpoints
-    CONCURRENT_WORKERS = 8
-    TOTAL_REQUESTS = 32
-
     print(
-        f"\n{BOLD}[2/2] Launching Multi-Domain Concurrent Verification ({TOTAL_REQUESTS} requests, {CONCURRENT_WORKERS} threads)...{RESET}"
+        f"\n{BOLD}[2/2] Launching Multi-Domain Concurrent Verification ({total_requests} requests, {concurrent_workers} threads)...{RESET}"
     )
 
-    latencies = []
+    latencies: List[float] = []
     errors = 0
 
-    def worker_task(idx):
-        method, url, data, label = endpoints_to_test[idx % len(endpoints_to_test)]
+    def worker_task(idx: int) -> Tuple[float, Optional[str]]:
+        method, path, data, label = endpoints_to_test[idx % len(endpoints_to_test)]
         try:
-            status, lat, resp = run_single_request(session, method, url, headers, data)
+            status, lat, _ = run_single_request(client, method, path, headers, data)
             if status == 200:
                 return lat, None
-            else:
-                return lat, f"HTTP {status}"
+            return lat, f"{label} ({path}) -> HTTP {status}"
         except Exception as e:
-            return 0.0, str(e)
+            return 0.0, f"{label} ({path}) -> {e}"
 
     stress_start = time.perf_counter()
     with concurrent.futures.ThreadPoolExecutor(
-        max_workers=CONCURRENT_WORKERS
+        max_workers=concurrent_workers
     ) as executor:
-        futures = [executor.submit(worker_task, i) for i in range(TOTAL_REQUESTS)]
+        futures = [executor.submit(worker_task, i) for i in range(total_requests)]
         for f in concurrent.futures.as_completed(futures):
             lat, err = f.result()
             if err is None:
                 latencies.append(lat)
             else:
                 errors += 1
+                print(f"  {RED}✗ Worker failure:{RESET} {err}")
 
     total_time_s = time.perf_counter() - stress_start
-    throughput = TOTAL_REQUESTS / total_time_s
+    throughput = total_requests / total_time_s if total_time_s > 0 else 0.0
 
-    p50 = statistics.median(latencies) if latencies else 0
+    p50 = statistics.median(latencies) if latencies else 0.0
     latencies.sort()
-    p95_idx = int(len(latencies) * 0.95)
-    p99_idx = int(len(latencies) * 0.99)
-    p95 = latencies[p95_idx] if latencies else 0
-    p99 = latencies[p99_idx] if latencies else 0
+    p95_idx = min(int(len(latencies) * 0.95), len(latencies) - 1) if latencies else 0
+    p99_idx = min(int(len(latencies) * 0.99), len(latencies) - 1) if latencies else 0
+    p95 = latencies[p95_idx] if latencies else 0.0
+    p99 = latencies[p99_idx] if latencies else 0.0
 
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
@@ -223,9 +716,12 @@ def run_live_all_waves_stress_test():
         )
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
-    print(f"  Total Requests:         {BOLD}{TOTAL_REQUESTS}{RESET}")
     print(
-        f"  Successful Requests:    {GREEN}{len(latencies)} / {TOTAL_REQUESTS} (100%){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-28){RESET}"
+    )
+    print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
+    print(
+        f"  Successful Requests:    {GREEN}{len(latencies)} / {total_requests}{RESET}"
     )
     print(f"  Failed Requests:        {RED if errors else GREEN}{errors}{RESET}")
     print(f"  Total Duration:         {total_time_s:.3f} s")
@@ -237,9 +733,82 @@ def run_live_all_waves_stress_test():
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN LIVE SERVER STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-28 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
+def run_live_all_waves_stress_test(
+    in_process: bool = False,
+    base_url: str = DEFAULT_BASE_URL,
+    workers: int = 8,
+    total_requests: Optional[int] = None,
+) -> None:
+    endpoints_count = len(build_wave_endpoints())
+    req_count = (
+        total_requests if total_requests is not None else max(endpoints_count, 128)
+    )
+
+    if in_process:
+        from fastapi.testclient import TestClient
+
+        from app.core.security import get_current_user
+        from app.main import app
+
+        mock_user: Dict[str, Any] = {
+            "id": "stress-test-operator",
+            "username": "stress-test-operator",
+            "email": "stress@sageai.local",
+            "role": "admin",
+            "org_id": "stress-org",
+            "scopes": ["*"],
+        }
+
+        def override_user() -> Dict[str, Any]:
+            return mock_user
+
+        app.dependency_overrides[get_current_user] = override_user
+        try:
+            with TestClient(app) as test_client:
+                execute_stress_suite(test_client, "IN-PROCESS ASGI", workers, req_count)
+        finally:
+            app.dependency_overrides.pop(get_current_user, None)
+    else:
+        with httpx.Client(base_url=base_url.rstrip("/"), timeout=10.0) as http_client:
+            execute_stress_suite(
+                http_client, f"LIVE HTTP {base_url}", workers, req_count
+            )
+
+
 if __name__ == "__main__":
-    run_live_all_waves_stress_test()
+    parser = argparse.ArgumentParser(
+        description="SageAI All-Waves (Waves 1-28, Capabilities 1-106) Live & In-Process Stress Verifier"
+    )
+    parser.add_argument(
+        "--in-process",
+        action="store_true",
+        help="Run against FastAPI app in-process via TestClient instead of external FASTAPI_URL",
+    )
+    parser.add_argument(
+        "--base-url",
+        default=DEFAULT_BASE_URL,
+        help="Target FastAPI base URL for live HTTP mode",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=8,
+        help="Concurrent worker threads for load phase",
+    )
+    parser.add_argument(
+        "--requests",
+        type=int,
+        default=None,
+        help="Total concurrent requests in phase 2",
+    )
+    args = parser.parse_args()
+    run_live_all_waves_stress_test(
+        in_process=args.in_process,
+        base_url=args.base_url,
+        workers=args.workers,
+        total_requests=args.requests,
+    )
