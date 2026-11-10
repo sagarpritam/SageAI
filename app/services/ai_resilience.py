@@ -10,7 +10,7 @@ import re
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger("SageAI.ai_resilience")
 
@@ -156,7 +156,7 @@ THREAT_CATEGORIES = {
 }
 
 
-def sanitize_for_llm(text: str, max_length: int = 2000) -> str:
+def sanitize_for_llm(text: Optional[str], max_length: int = 2000) -> str:
     """Sanitize scanner output before sending to LLM.
 
     - Strips HTML/script tags

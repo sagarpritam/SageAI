@@ -34,7 +34,7 @@ lint:
     - pip install "ruff>=0.15.9" mypy
     - ruff check app/ tests/ scripts/ sagestrike/
     - ruff format --check app/ tests/ scripts/ sagestrike/
-    - mypy app/ sagestrike/ scripts/ --ignore-missing-imports --check-untyped-defs
+    - mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
 
 test:
   stage: test

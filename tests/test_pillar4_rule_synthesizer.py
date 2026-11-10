@@ -9,7 +9,7 @@ Verifies:
 6. Pre-loaded CVE lookup & bundle export
 """
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from app.services.threat_feed.pattern_synthesizer import (
     ThreatPatternSynthesizer,

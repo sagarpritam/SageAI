@@ -1,4 +1,4 @@
-import requests
+import httpx
 
 
 def test_rate_limiting():
@@ -9,7 +9,7 @@ def test_rate_limiting():
     # Send rapid requests
     for i in range(15):
         try:
-            resp = requests.post(
+            resp = httpx.post(
                 url,
                 json={
                     "email": f"abuse{i}@test.com",
@@ -19,7 +19,7 @@ def test_rate_limiting():
                 timeout=2,
             )
             responses.append(resp.status_code)
-        except requests.exceptions.ConnectionError:
+        except httpx.RequestError:
             print(
                 "Connection refused - server might not be running locally on port 8000."
             )

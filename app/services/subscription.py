@@ -3,7 +3,9 @@
 Defines plan tiers and their limits. Will be extended with Stripe integration.
 """
 
-PLAN_LIMITS = {
+from typing import Any, Dict
+
+PLAN_LIMITS: Dict[str, Dict[str, Any]] = {
     "free": {
         "display_name": "Free",
         "max_scans_per_month": 3,
@@ -63,7 +65,7 @@ PLAN_LIMITS = {
 }
 
 
-def get_plan(plan_name: str) -> dict:
+def get_plan(plan_name: str) -> Dict[str, Any]:
     """Get plan details by name."""
     return PLAN_LIMITS.get(plan_name, PLAN_LIMITS["free"])
 

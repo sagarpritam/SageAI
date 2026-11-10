@@ -22,7 +22,7 @@ jobs:
       - run: pip install ruff bandit mypy safety
       - run: ruff check app/ tests/ scripts/ sagestrike/
       - run: ruff format --check app/ tests/ scripts/ sagestrike/
-      - run: mypy app/ sagestrike/ scripts/ --ignore-missing-imports --check-untyped-defs
+      - run: mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
       - run: safety check --full-report || true # Don't fail yet, just report
       - run: bandit -r app/ sagestrike/ -f json -o bandit-report.json --severity-level medium || true
       - run: bandit -r app/ sagestrike/ --severity-level medium

@@ -64,6 +64,7 @@ def test_ai_model_depoison_service():
     assert excision["excision_latency_ms"] < 50.0
 
     updated_ad = ai_model_depoison_engine.get_adapter("lora-finance-analyst-v2")
+    assert updated_ad is not None
     assert updated_ad["status"] == "DEPOISONED_VERIFIED"
     assert updated_ad["backdoor_trigger_detected"] == "NEUTRALIZED_ABLATED"
 
@@ -110,6 +111,7 @@ def test_space_ground_qkd_service():
     assert eavesdrop_eval["action_recommended"] == "IMMEDIATE_PHOTON_SHUTTER_ABORT"
 
     updated_link = space_ground_qkd_mesh.get_link("link-qkd-svalbard-01")
+    assert updated_link is not None
     assert updated_link["status"] == "ABORTED_EAVESDROPPER_ISOLATED"
     assert updated_link["eavesdropping_aborts"] >= 1
 

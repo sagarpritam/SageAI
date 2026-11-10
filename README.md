@@ -3,9 +3,9 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-589%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Next.js](https://img.shields.io/badge/Next.js-416%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-640%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Tests](https://img.shields.io/badge/tests-592%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Next.js](https://img.shields.io/badge/Next.js-418%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-644%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
 [![Version](https://img.shields.io/badge/version-6.8.0%20String%20Field%20%26%20Monopole%20Catalysis%20Milestone-gold?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
@@ -634,7 +634,7 @@ python -m ruff check app/ tests/ scripts/ sagestrike/
 python -m ruff format --check app/ tests/ scripts/ sagestrike/
 
 # Static Type Checking
-python -m mypy app/ sagestrike/ scripts/ --ignore-missing-imports --check-untyped-defs
+python -m mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
 
 # Security SAST Scan
 python -m bandit -r app/ sagestrike/ --severity-level medium
@@ -648,16 +648,16 @@ cd sage-web && npm run lint && npm run build && npm run test:e2e
 
 ### Test Suite Summary:
 ```text
-- Total Pytest Test Suite: 589 / 589 passing across 93 test suites (100% pass rate)
-- Playwright E2E Suite: 13 / 13 Chromium specs passing (standalone SSR server)
-- Next.js Turbopack Build: 416 / 416 routes compiled with 0 errors
-- FastAPI Microservices: 640 endpoints registered across 152 routers (621 OpenAPI paths)
-- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs), and Bandit compliant
+- Total Pytest Test Suite: 592 / 592 passing across 93 test suites (100% pass rate)
+- Playwright E2E Suite: 18 / 18 Chromium specs passing (standalone SSR server)
+- Next.js Turbopack Build: 418 / 418 routes compiled with 0 errors
+- FastAPI Microservices: 644 endpoints registered across 151 routers (625 OpenAPI paths)
+- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests), and Bandit compliant
 ```
 
 ---
 
-## 📡 API Reference Overview (640 Endpoints)
+## 📡 API Reference Overview (644 Endpoints)
 
 ### 1. Enterprise Security Grid & Orchestrator
 | Method | Endpoint | Description |
@@ -804,7 +804,7 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database engine, JWT, rate limiting, telemetry
 │   ├── models/            # 17 SQLAlchemy models (Scan, Finding, Asset, RemediationPatch...)
-│   ├── routers/           # 152 API router modules (Core, Waves 1-28 Trans-Century Defense & Sovereignty)
+│   ├── routers/           # 151 API router modules (Core, Waves 1-28 Trans-Century Defense & Sovereignty)
 │   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
 │   │   ├── string_field_theory/        # 🆕 Wave 28: Open-Closed String Field Theory vertex integrator (Cap 104)
@@ -907,7 +907,7 @@ SageAI/
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
 │   ├── app/               # App Router pages (Dashboard, Scans, Intel, War Room, Command Center)
-│   ├── app/api/           # 412 API routes and proxy endpoints
+│   ├── app/api/           # 415 API routes and proxy endpoints
 │   └── components/        # 169 Tailwind & Lucide React UI Components (162 top-level studios & panels)
 │       ├── StringFieldTheoryStudio.tsx           # 🎻 Open-Closed String Field Theory Vertex Integrator
 │       ├── MirrorSymmetryStudio.tsx              # 🪞 Calabi-Yau Mirror Symmetry Hodge Diamond Inverter
@@ -987,8 +987,8 @@ SageAI/
 │       ├── CTIHub.tsx                            # OASIS STIX 2.1 bundle forge & TAXII 2.1
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
-├── sage-web/tests/        # 13 Playwright E2E specs (standalone Next.js server)
-├── tests/                 # 589 pytest tests across 93 test suites (100% passing)
+├── sage-web/tests/        # 18 Playwright E2E specs (standalone Next.js server)
+├── tests/                 # 592 pytest tests across 93 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

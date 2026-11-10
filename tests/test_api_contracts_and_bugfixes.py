@@ -20,8 +20,11 @@ import warnings
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
+import jwt
 import pytest
 
+from app.core.config import settings
+from app.core.security import JWT_AUDIENCE, JWT_ISSUER
 from app.main import app
 from app.plugins.ssl_plugin import SSLPlugin
 from app.services.agent.recon_agent import ReconAgent
@@ -422,3 +425,270 @@ async def test_verify_nvidia_live_handles_none_and_empty_key(monkeypatch):
     res = await verify_nvidia_live.audit_nvidia_nim_live(None)
     assert res["status"] == "SKIPPED"
     assert res["passed"] is True
+
+
+@pytest.mark.asyncio
+async def test_change_password_contract(client):
+    """POST /auth/change-password validates current password, complexity, and updates login credentials."""
+    uid = uuid.uuid4().hex[:8]
+    email = f"pw_{uid}@sageai-test.com"
+    old_pw = "InitialPass123!"
+    new_pw = "RotatedPass456@"
+
+    reg_res = await client.post(
+        "/auth/register",
+        json={
+            "email": email,
+            "password": old_pw,
+            "organization_name": f"PwOrg_{uid}",
+        },
+    )
+    assert reg_res.status_code == 201
+    token = reg_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    bad_curr = await client.post(
+        "/auth/change-password",
+        json={"current_password": "WrongPassword9!", "new_password": new_pw},
+        headers=headers,
+    )
+    assert bad_curr.status_code == 401
+
+    weak_pw = await client.post(
+        "/auth/change-password",
+        json={"current_password": old_pw, "new_password": "weak"},
+        headers=headers,
+    )
+    assert weak_pw.status_code == 422
+
+    same_pw = await client.post(
+        "/auth/change-password",
+        json={"current_password": old_pw, "new_password": old_pw},
+        headers=headers,
+    )
+    assert same_pw.status_code == 400
+
+    ok_res = await client.post(
+        "/auth/change-password",
+        json={"current_password": old_pw, "new_password": new_pw},
+        headers=headers,
+    )
+    assert ok_res.status_code == 200
+
+    old_login = await client.post(
+        "/auth/login", json={"email": email, "password": old_pw}
+    )
+    assert old_login.status_code == 401
+
+    new_login = await client.post(
+        "/auth/login", json={"email": email, "password": new_pw}
+    )
+    assert new_login.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_notifications_inbox_sync_and_tenant_isolation(client, db_session):
+    """GET /notifications syncs completed scans into org-scoped notifications and enforces tenant isolation on read."""
+    from app.models.scan import Scan
+
+    headers_a = await _register_and_login_admin(client, "notif_a")
+    headers_b = await _register_and_login_admin(client, "notif_b")
+
+    claims_a = jwt.decode(
+        headers_a["Authorization"].split(" ", 1)[1],
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        audience=JWT_AUDIENCE,
+        issuer=JWT_ISSUER,
+    )
+    claims_b = jwt.decode(
+        headers_b["Authorization"].split(" ", 1)[1],
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        audience=JWT_AUDIENCE,
+        issuer=JWT_ISSUER,
+    )
+
+    scan_a = Scan(
+        id=f"scan-{uuid.uuid4().hex[:10]}",
+        organization_id=claims_a["org"],
+        user_id=claims_a["sub"],
+        target="alpha.example.com",
+        scan_type="full",
+        risk_score=72,
+        risk_level="High",
+        status="completed",
+        progress=100,
+    )
+    scan_a2 = Scan(
+        id=f"scan-{uuid.uuid4().hex[:10]}",
+        organization_id=claims_a["org"],
+        user_id=claims_a["sub"],
+        target="gamma.example.com",
+        scan_type="full",
+        risk_score=30,
+        risk_level="Low",
+        status="completed",
+        progress=100,
+    )
+    scan_b = Scan(
+        id=f"scan-{uuid.uuid4().hex[:10]}",
+        organization_id=claims_b["org"],
+        user_id=claims_b["sub"],
+        target="beta.example.com",
+        scan_type="full",
+        risk_score=10,
+        risk_level="Low",
+        status="completed",
+        progress=100,
+    )
+    db_session.add_all([scan_a, scan_a2, scan_b])
+    await db_session.commit()
+
+    unauth_list = await client.get("/notifications")
+    assert unauth_list.status_code == 401
+
+    list_a = await client.get("/notifications", headers=headers_a)
+    assert list_a.status_code == 200
+    items_a = list_a.json()
+    assert any("alpha.example.com" in n["title"] for n in items_a)
+    assert any("gamma.example.com" in n["title"] for n in items_a)
+    assert all("beta.example.com" not in n["title"] for n in items_a)
+
+    target_notif = next(n for n in items_a if "alpha.example.com" in n["title"])
+    assert target_notif["type"] == "scan_completed"
+    assert target_notif["is_read"] is False
+
+    # Org B cannot mark Org A's notification read
+    cross_read = await client.post(
+        f"/notifications/{target_notif['id']}/read", headers=headers_b
+    )
+    assert cross_read.status_code == 404
+
+    # Org A marks notification read and state persists
+    mark_read = await client.post(
+        f"/notifications/{target_notif['id']}/read", headers=headers_a
+    )
+    assert mark_read.status_code == 200
+    assert mark_read.json()["is_read"] is True
+
+    list_a2 = await client.get("/notifications", headers=headers_a)
+    updated_notif = next(n for n in list_a2.json() if n["id"] == target_notif["id"])
+    assert updated_notif["is_read"] is True
+
+    # Org A read-all clears remaining Org A items without affecting Org B
+    read_all = await client.post("/notifications/read-all", headers=headers_a)
+    assert read_all.status_code == 200
+    assert read_all.json()["ok"] is True
+
+    list_a3 = await client.get("/notifications", headers=headers_a)
+    assert all(n["is_read"] is True for n in list_a3.json())
+
+    list_b = await client.get("/notifications", headers=headers_b)
+    assert list_b.status_code == 200
+    beta_notif = next(n for n in list_b.json() if "beta.example.com" in n["title"])
+    assert beta_notif["is_read"] is False
+
+
+@pytest.mark.asyncio
+async def test_deep_search_uses_jwt_org_and_report_sarif_export(
+    client, db_session, monkeypatch
+):
+    """POST /intelligence/deep-search passes JWT org_id and GET /reports/{id}/sarif exports valid SARIF JSON."""
+    from sqlalchemy import update
+
+    from app.models.organization import Organization
+    from app.models.scan import Scan
+    from app.services.agent.deep_search_agent import DeepSearchAgent
+
+    headers = await _register_and_login_admin(client, "ds_sarif")
+    claims = jwt.decode(
+        headers["Authorization"].split(" ", 1)[1],
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        audience=JWT_AUDIENCE,
+        issuer=JWT_ISSUER,
+    )
+
+    captured: dict[str, str] = {}
+
+    class _FakeDeepSearchAgent:
+        def __init__(self, org_id: str = "system"):
+            captured["org_id"] = org_id
+
+        async def run(
+            self,
+            target: str,
+            target_type: str = "domain",
+            max_depth: int = 3,
+            max_entities: int = 25,
+        ):
+            return {
+                "agent": "DeepSearchAgent",
+                "module": "THE_ABYSS",
+                "codename": "THE ABYSS",
+                "target": target,
+                "target_type": target_type,
+                "status": "complete",
+                "session_id": "ds-test-1",
+                "stats": {
+                    "total_entities": 1,
+                    "total_findings": 0,
+                    "max_depth_reached": 1,
+                    "max_depth_configured": max_depth,
+                    "duration_s": 0.1,
+                },
+                "graph": {"nodes": [], "edges": []},
+                "timeline": [],
+                "briefing": "Clean test run.",
+                "entities": {},
+            }
+
+    monkeypatch.setattr(
+        "app.services.agent.deep_search_agent.DeepSearchAgent",
+        _FakeDeepSearchAgent,
+    )
+    assert DeepSearchAgent is not None
+
+    ds_res = await client.post(
+        "/intelligence/deep-search",
+        json={"target": "example.com", "target_type": "domain", "max_depth": 2},
+        headers=headers,
+    )
+    assert ds_res.status_code == 200
+    assert captured["org_id"] == claims["org"]
+
+    await db_session.execute(
+        update(Organization).where(Organization.id == claims["org"]).values(plan="pro")
+    )
+    scan_id = f"sarif-{uuid.uuid4().hex[:8]}"
+    scan = Scan(
+        id=scan_id,
+        organization_id=claims["org"],
+        user_id=claims["sub"],
+        target="sarif-target.example.com",
+        scan_type="full",
+        risk_score=45,
+        risk_level="Medium",
+        status="completed",
+        progress=100,
+    )
+    scan.set_findings(
+        [
+            {
+                "type": "MISSING_SECURITY_HEADER",
+                "severity": "Medium",
+                "title": "Missing Content-Security-Policy header",
+                "description": "CSP header not present on HTTP response.",
+                "remediation": "Set a strict Content-Security-Policy header.",
+            }
+        ]
+    )
+    db_session.add(scan)
+    await db_session.commit()
+
+    sarif_res = await client.get(f"/reports/{scan_id}/sarif", headers=headers)
+    assert sarif_res.status_code == 200
+    sarif_doc = sarif_res.json()
+    assert sarif_doc["version"] == "2.1.0"
+    assert isinstance(sarif_doc["runs"], list) and len(sarif_doc["runs"]) == 1

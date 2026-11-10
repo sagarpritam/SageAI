@@ -72,10 +72,9 @@ def test_telecom_5g_slice_guard_service():
         reason="Rogue gNodeB interception detected",
     )
     assert quarantine["new_status"] == "ISOLATED_QUARANTINED"
-    assert (
-        telecom_5g_slice_guard.get_slice("slice-embb-surveillance-02")["status"]
-        == "ISOLATED_QUARANTINED"
-    )
+    updated_slice = telecom_5g_slice_guard.get_slice("slice-embb-surveillance-02")
+    assert updated_slice is not None
+    assert updated_slice["status"] == "ISOLATED_QUARANTINED"
 
     # Test metrics
     metrics = telecom_5g_slice_guard.get_telecom_metrics()

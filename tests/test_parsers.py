@@ -112,6 +112,7 @@ class TestNmapParser:
         result = parse_nmap_results(self.SAMPLE_RAW)
         port = result.hosts[0].ports[0]
         assert port.portid == "80"
+        assert port.service is not None
         assert port.service.name == "http"
         assert port.service.product == "nginx"
 

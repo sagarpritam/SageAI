@@ -184,6 +184,7 @@ def test_cognitive_ew_service():
     assert eng["effective_rcs_reduction_db"] <= -30.0
 
     updated_emitter = cognitive_ew_engine.get_emitter("emitter-aesa-xband-01")
+    assert updated_emitter is not None
     assert updated_emitter["threat_priority"] == "NEUTRALIZED"
 
     metrics = cognitive_ew_engine.get_metrics()

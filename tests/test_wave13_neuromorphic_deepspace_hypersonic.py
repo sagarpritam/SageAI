@@ -82,6 +82,7 @@ def test_neuromorphic_snn_service():
     assert clamp["clamp_energy_pj"] < 15.0
 
     updated_core = neuromorphic_snn_guard.get_core("core-loihi2-edge-01")
+    assert updated_core is not None
     assert updated_core["status"] == "HARDWARE_CLAMPED_SECURE"
     assert updated_core["clamps_active"] >= 1
 
