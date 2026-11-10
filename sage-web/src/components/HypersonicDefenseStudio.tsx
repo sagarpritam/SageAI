@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Rocket,
   ShieldCheck,
@@ -72,19 +72,17 @@ export function HypersonicDefenseStudio() {
   const [trackResult, setTrackResult] = useState<GlideTracking | null>(null);
   const [interceptResult, setInterceptResult] = useState<InterceptResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchThreats();
-  }, []);
-
-  async function fetchThreats() {
+  const fetchThreats = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/hypersonic-defense/threats");
       const data = await res.json();
       if (data.threats) {
         setThreats(data.threats);
-        if (!selectedThreat && data.threats.length > 0) {
+        if (!hasInitializedSelectionRef.current && data.threats.length > 0) {
+          hasInitializedSelectionRef.current = true;
           setSelectedThreat(data.threats[0]);
           setMach(data.threats[0].velocity_mach);
           setAltitude(data.threats[0].altitude_km);
@@ -95,7 +93,11 @@ export function HypersonicDefenseStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchThreats();
+  }, [fetchThreats]);
 
   async function handleTrack() {
     if (!selectedThreat) return;
@@ -260,6 +262,7 @@ export function HypersonicDefenseStudio() {
                 <div
                   key={threat.threat_id}
                   onClick={() => {
+                    hasInitializedSelectionRef.current = true;
                     setSelectedThreat(threat);
                     setMach(threat.velocity_mach);
                     setAltitude(threat.altitude_km);

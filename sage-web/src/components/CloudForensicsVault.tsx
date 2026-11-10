@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   HardDrive,
   ShieldCheck,
@@ -54,25 +54,25 @@ export function CloudForensicsVault() {
   const [incidentId, setIncidentId] = useState("INC-2026-9481");
   const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    fetchSnapshots();
-  }, []);
-
-  async function fetchSnapshots() {
+  const fetchSnapshots = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/cloud-forensics/snapshots");
       const data = await res.json();
       if (data.snapshots) {
         setSnapshots(data.snapshots);
-        if (!selectedSnapshot && data.snapshots.length > 0) {
-          setSelectedSnapshot(data.snapshots[0]);
+        if (data.snapshots.length > 0) {
+          setSelectedSnapshot((prev) => prev || data.snapshots[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchSnapshots();
+  }, [fetchSnapshots]);
 
   async function handleCreateSnapshot(e: React.FormEvent) {
     e.preventDefault();

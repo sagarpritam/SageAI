@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Waves,
   ShieldCheck,
@@ -55,25 +55,25 @@ export function SubseaCableStudio() {
   const [inspectionResult, setInspectionResult] = useState<InspectionResult | null>(null);
   const [cableLogs, setCableLogs] = useState<InspectionResult[]>([]);
 
-  useEffect(() => {
-    fetchCables();
-  }, []);
-
-  async function fetchCables() {
+  const fetchCables = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/subsea-cable/cables");
       const data = await res.json();
       if (data.cables) {
         setCables(data.cables);
-        if (!selectedCable && data.cables.length > 0) {
-          setSelectedCable(data.cables[0]);
+        if (data.cables.length > 0) {
+          setSelectedCable((prev) => prev || data.cables[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchCables();
+  }, [fetchCables]);
 
   async function handleInspect() {
     if (!selectedCable) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Radio,
   ShieldCheck,
@@ -73,7 +73,7 @@ export function CognitiveEWStudio() {
   const [engaging, setEngaging] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchEmittersAndMetrics = async () => {
+  const fetchEmittersAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [emitRes, metRes] = await Promise.all([
@@ -85,8 +85,8 @@ export function CognitiveEWStudio() {
 
       if (emitData.emitters) {
         setEmitters(emitData.emitters);
-        if (!selectedEmitterId && emitData.emitters.length > 0) {
-          setSelectedEmitterId(emitData.emitters[0].emitter_id);
+        if (emitData.emitters.length > 0) {
+          setSelectedEmitterId((prev) => prev || emitData.emitters[0].emitter_id);
         }
       }
       if (metData.metrics) {
@@ -97,11 +97,11 @@ export function CognitiveEWStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchEmittersAndMetrics();
-  }, []);
+  }, [fetchEmittersAndMetrics]);
 
   const handleSynthesize = async () => {
     if (!selectedEmitterId) return;

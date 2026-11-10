@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Compass,
   AlertOctagon,
@@ -42,25 +42,25 @@ export function LabyrinthHoneynetStudio() {
   const [trapping, setTrapping] = useState(false);
   const [trapResult, setTrapResult] = useState<any | null>(null);
 
-  useEffect(() => {
-    fetchMazes();
-  }, []);
-
-  async function fetchMazes() {
+  const fetchMazes = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/labyrinth-honeynet/mazes");
       const data = await res.json();
       if (data.mazes) {
         setMazes(data.mazes);
-        if (!selectedMaze && data.mazes.length > 0) {
-          setSelectedMaze(data.mazes[0]);
+        if (data.mazes.length > 0) {
+          setSelectedMaze((prev) => prev || data.mazes[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchMazes();
+  }, [fetchMazes]);
 
   async function handleSimulateProbe(e: React.FormEvent) {
     e.preventDefault();

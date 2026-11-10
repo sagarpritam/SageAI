@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Sun,
   ShieldCheck,
@@ -69,19 +69,19 @@ export function GeomagneticShieldStudio() {
   const [blockingEvent, setBlockingEvent] = useState<BlockingEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  const addLog = (msg: string) => {
+  const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
-  };
+  }, []);
 
-  const fetchSubstations = async () => {
+  const fetchSubstations = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/geomagnetic-shield/substations");
       const data = await res.json();
       if (data.status === "success" && data.substations) {
         setSubstations(data.substations);
-        if (!selectedSubstation && data.substations.length > 0) {
-          setSelectedSubstation(data.substations[0]);
+        if (data.substations.length > 0) {
+          setSelectedSubstation((prev) => prev || data.substations[0]);
         }
         addLog(`Loaded ${data.substations.length} EHV transmission power grid substations.`);
       }
@@ -90,11 +90,11 @@ export function GeomagneticShieldStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addLog]);
 
   useEffect(() => {
     fetchSubstations();
-  }, []);
+  }, [fetchSubstations]);
 
   const handleEvaluateStorm = async (simulateCME = false) => {
     if (!selectedSubstation) return;

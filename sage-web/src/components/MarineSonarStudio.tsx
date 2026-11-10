@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Waves,
   ShieldCheck,
@@ -70,19 +70,19 @@ export function MarineSonarStudio() {
   const [triangulation, setTriangulation] = useState<TriangulationEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  const addLog = (msg: string) => {
+  const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
-  };
+  }, []);
 
-  const fetchNodes = async () => {
+  const fetchNodes = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/marine-sonar/nodes");
       const data = await res.json();
       if (data.status === "success" && data.nodes) {
         setNodes(data.nodes);
-        if (!selectedNode && data.nodes.length > 0) {
-          setSelectedNode(data.nodes[0]);
+        if (data.nodes.length > 0) {
+          setSelectedNode((prev) => prev || data.nodes[0]);
         }
         addLog(`Loaded ${data.nodes.length} ocean floor hydrophone sonar arrays.`);
       }
@@ -91,11 +91,11 @@ export function MarineSonarStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addLog]);
 
   useEffect(() => {
     fetchNodes();
-  }, []);
+  }, [fetchNodes]);
 
   const handleAnalyze = async (simulateAUV = false) => {
     if (!selectedNode) return;

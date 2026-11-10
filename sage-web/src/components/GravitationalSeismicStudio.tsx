@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Activity,
   ShieldCheck,
@@ -68,7 +68,7 @@ export function GravitationalSeismicStudio() {
   const [simulateNuclearShock, setSimulateNuclearShock] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchObservatoriesAndMetrics = async () => {
+  const fetchObservatoriesAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [obsRes, metRes] = await Promise.all([
@@ -80,8 +80,8 @@ export function GravitationalSeismicStudio() {
 
       if (obsData.observatories) {
         setObservatories(obsData.observatories);
-        if (!selectedObsId && obsData.observatories.length > 0) {
-          setSelectedObsId(obsData.observatories[0].observatory_id);
+        if (obsData.observatories.length > 0) {
+          setSelectedObsId((prev) => prev || obsData.observatories[0].observatory_id);
         }
       }
       if (metData.metrics) {
@@ -92,11 +92,11 @@ export function GravitationalSeismicStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchObservatoriesAndMetrics();
-  }, []);
+  }, [fetchObservatoriesAndMetrics]);
 
   const handleAnalyzeStrain = async () => {
     if (!selectedObsId) return;

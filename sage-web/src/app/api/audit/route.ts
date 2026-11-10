@@ -8,7 +8,7 @@ export async function GET() {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const res = await fetch(`${BACKEND}/org/audit-log`, {
+  const res = await fetch(`${BACKEND}/org/audit-logs`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

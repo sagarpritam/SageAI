@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Zap,
   ShieldCheck,
@@ -50,19 +50,17 @@ export function InterGridFailoverStudio() {
   const [evaluating, setEvaluating] = useState(false);
   const [stabilityResult, setStabilityResult] = useState<StabilityResult | null>(null);
   const [islandingResult, setIslandingResult] = useState<any | null>(null);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchGrids();
-  }, []);
-
-  async function fetchGrids() {
+  const fetchGrids = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/intergrid-failover/interconnects");
       const data = await res.json();
       if (data.interconnects) {
         setGrids(data.interconnects);
-        if (!selectedGrid && data.interconnects.length > 0) {
+        if (!hasInitializedSelectionRef.current && data.interconnects.length > 0) {
+          hasInitializedSelectionRef.current = true;
           setSelectedGrid(data.interconnects[0]);
           setFrequencyHz(data.interconnects[0].nominal_frequency_hz);
         }
@@ -70,7 +68,11 @@ export function InterGridFailoverStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchGrids();
+  }, [fetchGrids]);
 
   async function handleEvaluateStability() {
     if (!selectedGrid) return;
@@ -232,6 +234,7 @@ export function InterGridFailoverStudio() {
                 <div
                   key={grid.grid_id}
                   onClick={() => {
+                    hasInitializedSelectionRef.current = true;
                     setSelectedGrid(grid);
                     setFrequencyHz(grid.nominal_frequency_hz);
                     setStabilityResult(null);

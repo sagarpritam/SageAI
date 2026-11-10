@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Cpu,
   ShieldCheck,
@@ -49,19 +49,15 @@ export function MicroHotpatchStudio() {
   const [symbolName, setSymbolName] = useState("_get_cpuid");
   const [strategy, setStrategy] = useState("UPROBE_TRAMPOLINE");
 
-  useEffect(() => {
-    fetchPatches();
-  }, []);
-
-  async function fetchPatches() {
+  const fetchPatches = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/micro-hotpatch/patches");
       const data = await res.json();
       if (data.patches) {
         setPatches(data.patches);
-        if (!selectedPatch && data.patches.length > 0) {
-          setSelectedPatch(data.patches[0]);
+        if (data.patches.length > 0) {
+          setSelectedPatch((prev) => prev || data.patches[0]);
         }
       }
     } catch (err) {
@@ -69,7 +65,11 @@ export function MicroHotpatchStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchPatches();
+  }, [fetchPatches]);
 
   async function handleInject(patchId: string) {
     setActionInProgress(patchId);

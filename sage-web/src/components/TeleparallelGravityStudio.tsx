@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Compass, RefreshCw, Activity, Shield, Layers, Radio } from 'lucide-react';
 
 interface TetradNode {
@@ -37,24 +37,24 @@ export default function TeleparallelGravityStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<TelemetryResult | null>(null);
 
-  const fetchNodes = async () => {
+  const fetchNodes = useCallback(async () => {
     try {
       const res = await fetch('/api/teleparallel-gravity/nodes');
       const data = await res.json();
       if (data.nodes) {
         setNodes(data.nodes);
-        if (data.nodes.length > 0 && !selectedNode) {
-          setSelectedNode(data.nodes[0].node_id);
+        if (data.nodes.length > 0) {
+          setSelectedNode((prev) => prev || data.nodes[0].node_id);
         }
       }
     } catch (err) {
       console.error('Failed to load tetrad nodes', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchNodes();
-  }, []);
+  }, [fetchNodes]);
 
   const handleModulate = async () => {
     setLoading(true);

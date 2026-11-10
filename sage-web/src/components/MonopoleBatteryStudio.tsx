@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BatteryCharging, RefreshCw, Activity, Shield, Zap, Gauge, Flame } from 'lucide-react';
 
 interface MonopoleTrap {
@@ -40,24 +40,24 @@ export default function MonopoleBatteryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CatalysisResult | null>(null);
 
-  const fetchTraps = async () => {
+  const fetchTraps = useCallback(async () => {
     try {
       const res = await fetch('/api/monopole-battery/traps');
       const data = await res.json();
       if (data.traps) {
         setTraps(data.traps);
-        if (data.traps.length > 0 && !selectedTrap) {
-          setSelectedTrap(data.traps[0].trap_id);
+        if (data.traps.length > 0) {
+          setSelectedTrap((prev) => prev || data.traps[0].trap_id);
         }
       }
     } catch (err) {
       console.error('Failed to load monopole traps', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTraps();
-  }, []);
+  }, [fetchTraps]);
 
   const handleCatalyze = async () => {
     setLoading(true);

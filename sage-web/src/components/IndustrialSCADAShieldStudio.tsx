@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   ShieldAlert,
   ShieldCheck,
@@ -50,29 +50,9 @@ export function IndustrialSCADAShieldStudio() {
   const [inspecting, setInspecting] = useState(false);
   const [inspectionResult, setInspectionResult] = useState<InspectionResult | null>(null);
   const [inspectionLogs, setInspectionLogs] = useState<InspectionResult[]>([]);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchPLCs();
-  }, []);
-
-  async function fetchPLCs() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/industrial-scada/plcs");
-      const data = await res.json();
-      if (data.plcs) {
-        setPlcs(data.plcs);
-        if (!selectedPlc && data.plcs.length > 0) {
-          setSelectedPlc(data.plcs[0]);
-          setDefaultValueForPlc(data.plcs[0]);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function setDefaultValueForPlc(plc: PLCRecord) {
+  const setDefaultValueForPlc = useCallback((plc: PLCRecord) => {
     if (plc.enforced_envelope.includes("RPM")) {
       setTestValue(4800);
     } else if (plc.enforced_envelope.includes("PH")) {
@@ -80,9 +60,32 @@ export function IndustrialSCADAShieldStudio() {
     } else {
       setTestValue(68.5);
     }
-  }
+  }, []);
+
+  const fetchPLCs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/industrial-scada/plcs");
+      const data = await res.json();
+      if (data.plcs) {
+        setPlcs(data.plcs);
+        if (!hasInitializedSelectionRef.current && data.plcs.length > 0) {
+          hasInitializedSelectionRef.current = true;
+          setSelectedPlc(data.plcs[0]);
+          setDefaultValueForPlc(data.plcs[0]);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [setDefaultValueForPlc]);
+
+  useEffect(() => {
+    fetchPLCs();
+  }, [fetchPLCs]);
 
   function handleSelectPlc(plc: PLCRecord) {
+    hasInitializedSelectionRef.current = true;
     setSelectedPlc(plc);
     setDefaultValueForPlc(plc);
     setInspectionResult(null);

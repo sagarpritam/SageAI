@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Atom,
   ShieldCheck,
@@ -63,19 +63,17 @@ export function SpaceGroundQKDStudio() {
   const [evaluation, setEvaluation] = useState<QBEREvaluation | null>(null);
   const [swapResult, setSwapResult] = useState<SwapResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchLinks();
-  }, []);
-
-  async function fetchLinks() {
+  const fetchLinks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/space-ground-qkd/links");
       const data = await res.json();
       if (data.links) {
         setLinks(data.links);
-        if (!selectedLink && data.links.length > 0) {
+        if (!hasInitializedSelectionRef.current && data.links.length > 0) {
+          hasInitializedSelectionRef.current = true;
           setSelectedLink(data.links[0]);
           setMeasuredQber(data.links[0].current_qber_pct);
         }
@@ -85,7 +83,11 @@ export function SpaceGroundQKDStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks]);
 
   async function handleEvaluateQBER() {
     if (!selectedLink) return;
@@ -234,6 +236,7 @@ export function SpaceGroundQKDStudio() {
                 <div
                   key={link.link_id}
                   onClick={() => {
+                    hasInitializedSelectionRef.current = true;
                     setSelectedLink(link);
                     setMeasuredQber(link.current_qber_pct);
                     setEvaluation(null);

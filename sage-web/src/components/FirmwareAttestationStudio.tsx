@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Cpu,
   ShieldCheck,
@@ -38,25 +38,25 @@ export function FirmwareAttestationStudio() {
   const [attesting, setAttesting] = useState(false);
   const [attestResult, setAttestResult] = useState<any | null>(null);
 
-  useEffect(() => {
-    fetchDevices();
-  }, []);
-
-  async function fetchDevices() {
+  const fetchDevices = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/firmware-attestation/devices");
       const data = await res.json();
       if (data.devices) {
         setDevices(data.devices);
-        if (!selectedDevice && data.devices.length > 0) {
-          setSelectedDevice(data.devices[0]);
+        if (data.devices.length > 0) {
+          setSelectedDevice((prev) => prev || data.devices[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchDevices();
+  }, [fetchDevices]);
 
   async function handleAttest(dev: DeviceRecord) {
     setAttesting(true);

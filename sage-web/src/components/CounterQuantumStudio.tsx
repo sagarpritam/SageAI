@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Lock,
   ShieldCheck,
@@ -63,7 +63,7 @@ export function CounterQuantumStudio() {
   const [trippingDecoherence, setTrippingDecoherence] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchInterceptorsAndMetrics = async () => {
+  const fetchInterceptorsAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [itRes, metRes] = await Promise.all([
@@ -75,8 +75,8 @@ export function CounterQuantumStudio() {
 
       if (itData.interceptors) {
         setInterceptors(itData.interceptors);
-        if (!selectedItId && itData.interceptors.length > 0) {
-          setSelectedItId(itData.interceptors[0].interceptor_id);
+        if (itData.interceptors.length > 0) {
+          setSelectedItId((prev) => prev || itData.interceptors[0].interceptor_id);
         }
       }
       if (metData.metrics) {
@@ -87,11 +87,11 @@ export function CounterQuantumStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchInterceptorsAndMetrics();
-  }, []);
+  }, [fetchInterceptorsAndMetrics]);
 
   const handleInjectChaff = async () => {
     if (!selectedItId) return;

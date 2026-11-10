@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Network, RefreshCw, Activity, Shield, Sparkles, Binary } from 'lucide-react';
 
 interface FibonacciBraid {
@@ -39,24 +39,24 @@ export default function FibonacciAnyonStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CompileResult | null>(null);
 
-  const fetchBraids = async () => {
+  const fetchBraids = useCallback(async () => {
     try {
       const res = await fetch('/api/fibonacci-anyon/braids');
       const data = await res.json();
       if (data.braids) {
         setBraids(data.braids);
-        if (data.braids.length > 0 && !selectedBraid) {
-          setSelectedBraid(data.braids[0].braid_id);
+        if (data.braids.length > 0) {
+          setSelectedBraid((prev) => prev || data.braids[0].braid_id);
         }
       }
     } catch (err) {
       console.error('Failed to load Fibonacci anyon braids', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchBraids();
-  }, []);
+  }, [fetchBraids]);
 
   const handleCompile = async () => {
     setLoading(true);

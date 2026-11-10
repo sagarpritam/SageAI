@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Cpu,
   ShieldCheck,
@@ -50,25 +50,25 @@ export function AirGapLLMGuardStudio() {
   const [paramSize, setParamSize] = useState(70.0);
   const [scanning, setScanning] = useState(false);
 
-  useEffect(() => {
-    fetchModels();
-  }, []);
-
-  async function fetchModels() {
+  const fetchModels = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/airgap-llm-guard/models");
       const data = await res.json();
       if (data.models) {
         setModels(data.models);
-        if (!selectedModel && data.models.length > 0) {
-          setSelectedModel(data.models[0]);
+        if (data.models.length > 0) {
+          setSelectedModel((prev) => prev || data.models[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
 
   async function handleScanModel(e: React.FormEvent) {
     e.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Orbit,
   ShieldCheck,
@@ -71,19 +71,19 @@ export function OrbitalDebrisStudio() {
   const [deflection, setDeflection] = useState<DeflectionEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  const addLog = (msg: string) => {
+  const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
-  };
+  }, []);
 
-  const fetchPlatforms = async () => {
+  const fetchPlatforms = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/orbital-debris/platforms");
       const data = await res.json();
       if (data.status === "success" && data.platforms) {
         setPlatforms(data.platforms);
-        if (!selectedPlatform && data.platforms.length > 0) {
-          setSelectedPlatform(data.platforms[0]);
+        if (data.platforms.length > 0) {
+          setSelectedPlatform((prev) => prev || data.platforms[0]);
         }
         addLog(`Loaded ${data.platforms.length} orbital laser debris deflector platforms.`);
       }
@@ -92,11 +92,11 @@ export function OrbitalDebrisStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addLog]);
 
   useEffect(() => {
     fetchPlatforms();
-  }, []);
+  }, [fetchPlatforms]);
 
   const handleCalculate = async (simulateASAT = false) => {
     if (!selectedPlatform) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Crosshair,
   ShieldCheck,
@@ -73,19 +73,15 @@ export function KineticDroneShieldStudio() {
   const [interception, setInterception] = useState<InterceptionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetchSites();
-  }, []);
-
-  async function fetchSites() {
+  const fetchSites = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/drone-swarm-shield/sites");
       const data = await res.json();
       if (data.sites) {
         setSites(data.sites);
-        if (!selectedSite && data.sites.length > 0) {
-          setSelectedSite(data.sites[0]);
+        if (data.sites.length > 0) {
+          setSelectedSite((prev) => prev || data.sites[0]);
         }
       }
     } catch (err) {
@@ -93,7 +89,11 @@ export function KineticDroneShieldStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchSites();
+  }, [fetchSites]);
 
   async function handleDetect() {
     if (!selectedSite) return;

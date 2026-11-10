@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AlertCircle, ShieldAlert, CheckCircle, FileCode, Upload, RefreshCw, Lock, Terminal, Activity, GitBranch, ExternalLink } from "lucide-react";
 import axios from "axios";
 
@@ -57,6 +57,27 @@ export function IncidentCenter() {
   const [reResult, setReResult] = useState<ReverseEngResult | null>(null);
   const [ingesting, setIngesting] = useState(false);
 
+  const fetchIncidents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("/api/incidents");
+      const list = res.data?.incidents || [];
+      setIncidents(list);
+      if (list.length > 0) {
+        setSelectedIncident((prev) => prev || list[0]);
+      }
+    } catch {
+      // Mock fallback
+      setIncidents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [fetchIncidents]);
+
   const handleIngestSimulatedAlert = async () => {
     setIngesting(true);
     setMessage(null);
@@ -84,27 +105,6 @@ export function IncidentCenter() {
       setIngesting(false);
     }
   };
-
-  const fetchIncidents = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get("/api/incidents");
-      const list = res.data?.incidents || [];
-      setIncidents(list);
-      if (list.length > 0 && !selectedIncident) {
-        setSelectedIncident(list[0]);
-      }
-    } catch {
-      // Mock fallback
-      setIncidents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchIncidents();
-  }, []);
 
   const handleExecuteAction = async (actionName: string) => {
     if (!selectedIncident || actionLoading) return;

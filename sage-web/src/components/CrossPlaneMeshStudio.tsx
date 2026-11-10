@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Network,
   ShieldCheck,
@@ -46,28 +46,23 @@ export function CrossPlaneMeshStudio() {
   const [targetPort, setTargetPort] = useState(8443);
   const [translating, setTranslating] = useState(false);
 
-  useEffect(() => {
-    fetchPolicies();
-    fetchHealth();
-  }, []);
-
-  async function fetchPolicies() {
+  const fetchPolicies = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/crossplane-mesh/policies");
       const data = await res.json();
       if (data.policies) {
         setPolicies(data.policies);
-        if (!selectedPolicy && data.policies.length > 0) {
-          setSelectedPolicy(data.policies[0]);
+        if (data.policies.length > 0) {
+          setSelectedPolicy((prev) => prev || data.policies[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchHealth() {
+  const fetchHealth = useCallback(async () => {
     try {
       const res = await fetch("/api/crossplane-mesh/health");
       const data = await res.json();
@@ -77,7 +72,12 @@ export function CrossPlaneMeshStudio() {
     } catch (err) {
       console.error("Failed to load health", err);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchPolicies();
+    fetchHealth();
+  }, [fetchPolicies, fetchHealth]);
 
   async function handleTranslatePolicy(e: React.FormEvent) {
     e.preventDefault();

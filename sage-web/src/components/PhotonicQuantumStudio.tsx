@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Sparkles,
   ShieldCheck,
@@ -68,19 +68,19 @@ export function PhotonicQuantumStudio() {
   const [firewallEvent, setFirewallEvent] = useState<FirewallEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  const addLog = (msg: string) => {
+  const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
-  };
+  }, []);
 
-  const fetchCoprocessors = async () => {
+  const fetchCoprocessors = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/photonic-quantum/coprocessors");
       const data = await res.json();
       if (data.status === "success" && data.coprocessors) {
         setCoprocessors(data.coprocessors);
-        if (!selectedNode && data.coprocessors.length > 0) {
-          setSelectedNode(data.coprocessors[0]);
+        if (data.coprocessors.length > 0) {
+          setSelectedNode((prev) => prev || data.coprocessors[0]);
         }
         addLog(`Loaded ${data.coprocessors.length} continuous-variable photonic quantum co-processors.`);
       }
@@ -89,11 +89,11 @@ export function PhotonicQuantumStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addLog]);
 
   useEffect(() => {
     fetchCoprocessors();
-  }, []);
+  }, [fetchCoprocessors]);
 
   const handleEvaluate = async (exploit = false) => {
     if (!selectedNode) return;

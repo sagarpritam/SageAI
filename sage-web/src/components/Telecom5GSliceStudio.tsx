@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Radio,
   ShieldCheck,
@@ -52,25 +52,25 @@ export function Telecom5GSliceStudio() {
   const [analysisResult, setAnalysisResult] = useState<AnomalyResult | null>(null);
   const [evalLogs, setEvalLogs] = useState<AnomalyResult[]>([]);
 
-  useEffect(() => {
-    fetchSlices();
-  }, []);
-
-  async function fetchSlices() {
+  const fetchSlices = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/telecom-5g/slices");
       const data = await res.json();
       if (data.slices) {
         setSlices(data.slices);
-        if (!selectedSlice && data.slices.length > 0) {
-          setSelectedSlice(data.slices[0]);
+        if (data.slices.length > 0) {
+          setSelectedSlice((prev) => prev || data.slices[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchSlices();
+  }, [fetchSlices]);
 
   async function handleAnalyze() {
     if (!selectedSlice) return;

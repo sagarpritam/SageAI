@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ShieldAlert,
   Sliders,
@@ -106,7 +106,7 @@ export function ThreatModelingStudio() {
   const dreadSeverity =
     dreadTotal >= 40 ? "CRITICAL" : dreadTotal >= 30 ? "HIGH" : dreadTotal >= 20 ? "MEDIUM" : "LOW";
 
-  const runThreatModelAnalysis = async () => {
+  const runThreatModelAnalysis = useCallback(async () => {
     setLoading(true);
     try {
       const components =
@@ -141,11 +141,11 @@ export function ThreatModelingStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTemplate]);
 
   useEffect(() => {
     runThreatModelAnalysis();
-  }, [selectedTemplate]);
+  }, [runThreatModelAnalysis]);
 
   const handleCustomIngest = async () => {
     setLoading(true);

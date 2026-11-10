@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Globe2,
   Shield,
@@ -46,25 +46,25 @@ export function APTAttributionCenter() {
   const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
-  useEffect(() => {
-    fetchActors();
-  }, []);
-
-  async function fetchActors() {
+  const fetchActors = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/apt-attribution/actors");
       const data = await res.json();
       if (data.actors) {
         setActors(data.actors);
-        if (!selectedActor && data.actors.length > 0) {
-          setSelectedActor(data.actors[0]);
+        if (data.actors.length > 0) {
+          setSelectedActor((prev) => prev || data.actors[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchActors();
+  }, [fetchActors]);
 
   async function handleAnalyzeIOC(e: React.FormEvent) {
     e.preventDefault();

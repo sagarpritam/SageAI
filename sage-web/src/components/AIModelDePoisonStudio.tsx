@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Cpu,
   ShieldCheck,
@@ -62,19 +62,15 @@ export function AIModelDePoisonStudio() {
   const [excisionResult, setExcisionResult] = useState<ExcisionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetchAdapters();
-  }, []);
-
-  async function fetchAdapters() {
+  const fetchAdapters = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/ai-depoison/adapters");
       const data = await res.json();
       if (data.adapters) {
         setAdapters(data.adapters);
-        if (!selectedAdapter && data.adapters.length > 0) {
-          setSelectedAdapter(data.adapters[0]);
+        if (data.adapters.length > 0) {
+          setSelectedAdapter((prev) => prev || data.adapters[0]);
         }
       }
     } catch (err) {
@@ -82,7 +78,11 @@ export function AIModelDePoisonStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchAdapters();
+  }, [fetchAdapters]);
 
   async function handleScan() {
     if (!selectedAdapter) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ShieldAlert,
   Radio,
@@ -49,25 +49,25 @@ export function KyberMeshVPNStudio() {
   const [overlayIp, setOverlayIp] = useState("10.220.0.25/32");
   const [registering, setRegistering] = useState(false);
 
-  useEffect(() => {
-    fetchPeers();
-  }, []);
-
-  async function fetchPeers() {
+  const fetchPeers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/kyber-mesh-vpn/peers");
       const data = await res.json();
       if (data.peers) {
         setPeers(data.peers);
-        if (!selectedPeer && data.peers.length > 0) {
-          setSelectedPeer(data.peers[0]);
+        if (data.peers.length > 0) {
+          setSelectedPeer((prev) => prev || data.peers[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchPeers();
+  }, [fetchPeers]);
 
   async function handleRegisterPeer(e: React.FormEvent) {
     e.preventDefault();

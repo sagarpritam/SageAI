@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Rocket, RefreshCw, Activity, Shield, Flame, Gauge, Zap } from 'lucide-react';
 
 interface ACFThruster {
@@ -44,24 +44,24 @@ export default function AntimatterFusionStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<PulseResult | null>(null);
 
-  const fetchThrusters = async () => {
+  const fetchThrusters = useCallback(async () => {
     try {
       const res = await fetch('/api/antimatter-fusion/thrusters');
       const data = await res.json();
       if (data.thrusters) {
         setThrusters(data.thrusters);
-        if (data.thrusters.length > 0 && !selectedThruster) {
-          setSelectedThruster(data.thrusters[0].thruster_id);
+        if (data.thrusters.length > 0) {
+          setSelectedThruster((prev) => prev || data.thrusters[0].thruster_id);
         }
       }
     } catch (err) {
       console.error('Failed to load ACF thrusters', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchThrusters();
-  }, []);
+  }, [fetchThrusters]);
 
   const handleIgnite = async () => {
     setLoading(true);

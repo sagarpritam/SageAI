@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Atom,
   ShieldCheck,
@@ -73,7 +73,7 @@ export function NeutrinoArrayStudio() {
   const [promptBurstSim, setPromptBurstSim] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchDetectorsAndMetrics = async () => {
+  const fetchDetectorsAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [detRes, metRes] = await Promise.all([
@@ -85,8 +85,8 @@ export function NeutrinoArrayStudio() {
 
       if (detData.detectors) {
         setDetectors(detData.detectors);
-        if (!selectedDetectorId && detData.detectors.length > 0) {
-          setSelectedDetectorId(detData.detectors[0].detector_id);
+        if (detData.detectors.length > 0) {
+          setSelectedDetectorId((prev) => prev || detData.detectors[0].detector_id);
         }
       }
       if (metData.metrics) {
@@ -97,11 +97,11 @@ export function NeutrinoArrayStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDetectorsAndMetrics();
-  }, []);
+  }, [fetchDetectorsAndMetrics]);
 
   const handleAnalyzeFlux = async () => {
     if (!selectedDetectorId) return;

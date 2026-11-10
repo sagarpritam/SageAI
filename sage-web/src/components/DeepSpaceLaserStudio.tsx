@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Globe,
   Radio,
@@ -67,19 +67,17 @@ export function DeepSpaceLaserStudio() {
   const [acquisition, setAcquisition] = useState<BeamAcquisition | null>(null);
   const [transmission, setTransmission] = useState<TransmissionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchTerminals();
-  }, []);
-
-  async function fetchTerminals() {
+  const fetchTerminals = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/deep-space-laser/terminals");
       const data = await res.json();
       if (data.terminals) {
         setTerminals(data.terminals);
-        if (!selectedTerminal && data.terminals.length > 0) {
+        if (!hasInitializedSelectionRef.current && data.terminals.length > 0) {
+          hasInitializedSelectionRef.current = true;
           setSelectedTerminal(data.terminals[0]);
           setPointAheadAngle(data.terminals[0].point_ahead_angle_urad);
         }
@@ -89,7 +87,11 @@ export function DeepSpaceLaserStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchTerminals();
+  }, [fetchTerminals]);
 
   async function handleAcquire() {
     if (!selectedTerminal) return;
@@ -230,6 +232,7 @@ export function DeepSpaceLaserStudio() {
                 <div
                   key={terminal.terminal_id}
                   onClick={() => {
+                    hasInitializedSelectionRef.current = true;
                     setSelectedTerminal(terminal);
                     setPointAheadAngle(terminal.point_ahead_angle_urad);
                     setAcquisition(null);

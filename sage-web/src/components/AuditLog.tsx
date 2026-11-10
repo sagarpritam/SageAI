@@ -5,11 +5,12 @@ import { ScrollText, Loader2, ShieldCheck, LogIn, Scan, Key, UserCog } from "luc
 import axios from "axios";
 
 interface AuditEntry {
-  id: number;
+  id: string | number;
   action: string;
-  actor_email: string;
-  details: string;
-  created_at: string;
+  actor_email?: string;
+  user_id?: string | null;
+  details: string | Record<string, unknown> | null;
+  created_at: string | null;
 }
 
 const actionIcons: Record<string, typeof LogIn> = {
@@ -85,8 +86,19 @@ export function AuditLog() {
         <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl overflow-hidden">
           <div className="max-h-[500px] overflow-y-auto">
             {entries.map((entry) => {
-              const Icon = actionIcons[entry.action] || ScrollText;
-              const color = actionColors[entry.action] || "text-zinc-400 bg-zinc-400/10";
+              const Icon = actionIcons[entry.action.toLowerCase()] || ScrollText;
+              const color =
+                actionColors[entry.action.toLowerCase()] || "text-zinc-400 bg-zinc-400/10";
+              const actorLabel = entry.actor_email || entry.user_id || "system";
+              const detailsText =
+                typeof entry.details === "string"
+                  ? entry.details
+                  : entry.details && Object.keys(entry.details).length > 0
+                    ? JSON.stringify(entry.details)
+                    : "No additional details";
+              const timestampLabel = entry.created_at
+                ? new Date(entry.created_at).toLocaleString()
+                : "—";
               return (
                 <div
                   key={entry.id}
@@ -102,13 +114,13 @@ export function AuditLog() {
                       </span>
                       <span className="text-xs text-zinc-600">•</span>
                       <span className="text-xs text-zinc-500 font-mono truncate">
-                        {entry.actor_email}
+                        {actorLabel}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-400">{entry.details}</p>
+                    <p className="text-xs text-zinc-400 break-words">{detailsText}</p>
                   </div>
                   <span className="text-xs text-zinc-600 font-mono shrink-0 whitespace-nowrap">
-                    {new Date(entry.created_at).toLocaleString()}
+                    {timestampLabel}
                   </span>
                 </div>
               );

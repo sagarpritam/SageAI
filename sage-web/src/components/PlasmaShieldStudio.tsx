@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -63,7 +63,7 @@ export function PlasmaShieldStudio() {
   const [firing, setFiring] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchPlatformsAndMetrics = async () => {
+  const fetchPlatformsAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [platRes, metRes] = await Promise.all([
@@ -75,8 +75,8 @@ export function PlasmaShieldStudio() {
 
       if (platData.platforms) {
         setPlatforms(platData.platforms);
-        if (!selectedPlatformId && platData.platforms.length > 0) {
-          setSelectedPlatformId(platData.platforms[0].platform_id);
+        if (platData.platforms.length > 0) {
+          setSelectedPlatformId((prev) => prev || platData.platforms[0].platform_id);
         }
       }
       if (metData.metrics) {
@@ -87,11 +87,11 @@ export function PlasmaShieldStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPlatformsAndMetrics();
-  }, []);
+  }, [fetchPlatformsAndMetrics]);
 
   const handleEngageWindow = async () => {
     if (!selectedPlatformId) return;

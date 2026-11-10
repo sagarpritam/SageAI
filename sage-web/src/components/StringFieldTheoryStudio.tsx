@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GitPullRequest, RefreshCw, Activity, Shield, Sparkles, Layers } from 'lucide-react';
 
 interface SFTVertex {
@@ -39,24 +39,24 @@ export default function StringFieldTheoryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<CondenseResult | null>(null);
 
-  const fetchVertices = async () => {
+  const fetchVertices = useCallback(async () => {
     try {
       const res = await fetch('/api/string-field-theory/vertices');
       const data = await res.json();
       if (data.vertices) {
         setVertices(data.vertices);
-        if (data.vertices.length > 0 && !selectedVertex) {
-          setSelectedVertex(data.vertices[0].vertex_id);
+        if (data.vertices.length > 0) {
+          setSelectedVertex((prev) => prev || data.vertices[0].vertex_id);
         }
       }
     } catch (err) {
       console.error('Failed to load SFT vertices', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchVertices();
-  }, []);
+  }, [fetchVertices]);
 
   const handleCondense = async () => {
     setLoading(true);

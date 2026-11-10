@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Terminal,
   Activity,
@@ -38,7 +38,7 @@ export function EBPFTelemetryMonitor() {
   const [quarantineTargetPid, setQuarantineTargetPid] = useState<string>("");
   const [quarantineResult, setQuarantineResult] = useState<any>(null);
 
-  const fetchTelemetry = async () => {
+  const fetchTelemetry = useCallback(async () => {
     setLoading(true);
     try {
       // 1. Fetch probes status
@@ -59,11 +59,11 @@ export function EBPFTelemetryMonitor() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [severityFilter]);
 
   useEffect(() => {
     fetchTelemetry();
-  }, [severityFilter]);
+  }, [fetchTelemetry]);
 
   const handleQuarantine = async (pidToQuarantine: number) => {
     setLoading(true);

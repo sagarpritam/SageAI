@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Target,
   Play,
@@ -142,25 +142,25 @@ export function RedTeamPanel() {
   const [evaluatingGuardrail, setEvaluatingGuardrail] = useState(false);
   const [guardrailResult, setGuardrailResult] = useState<GuardrailEvalResponse | null>(null);
 
-  const fetchTargets = async () => {
+  const fetchTargets = useCallback(async () => {
     setLoadingTargets(true);
     try {
       const res = await axios.get("/api/redteam");
       const list = res.data?.targets || [];
       setTargets(Array.isArray(list) ? list : []);
-      if (list.length > 0 && !selectedTarget) {
-        setSelectedTarget(list[0].name);
+      if (list.length > 0) {
+        setSelectedTarget((prev) => prev || list[0].name);
       }
     } catch {
       setTargets([]);
     } finally {
       setLoadingTargets(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTargets();
-  }, []);
+  }, [fetchTargets]);
 
   const handleToggleProbe = (id: string) => {
     setSelectedProbes((prev) =>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Maximize2, RefreshCw, Activity, Shield, Sparkles, Sliders } from 'lucide-react';
 
 interface NonCommManifold {
@@ -40,24 +40,24 @@ export default function NonCommutativeSpacetimeStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<ProtectionResult | null>(null);
 
-  const fetchManifolds = async () => {
+  const fetchManifolds = useCallback(async () => {
     try {
       const res = await fetch('/api/noncommutative-spacetime/manifolds');
       const data = await res.json();
       if (data.manifolds) {
         setManifolds(data.manifolds);
-        if (data.manifolds.length > 0 && !selectedManifold) {
-          setSelectedManifold(data.manifolds[0].manifold_id);
+        if (data.manifolds.length > 0) {
+          setSelectedManifold((prev) => prev || data.manifolds[0].manifold_id);
         }
       }
     } catch (err) {
       console.error('Failed to load non-commutative manifolds', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchManifolds();
-  }, []);
+  }, [fetchManifolds]);
 
   const handleProtect = async () => {
     setLoading(true);

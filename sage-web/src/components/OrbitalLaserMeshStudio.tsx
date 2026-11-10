@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Globe2,
   Lock,
@@ -46,9 +46,25 @@ export function OrbitalLaserMeshStudio() {
   const [rekeyResult, setRekeyResult] = useState<RekeyResult | null>(null);
   const [countdown, setCountdown] = useState<number>(45);
 
+  const fetchSatellites = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/orbital-laser/satellites");
+      const data = await res.json();
+      if (data.satellites) {
+        setSatellites(data.satellites);
+        if (data.satellites.length > 0) {
+          setSelectedSatellite((prev) => prev || data.satellites[0]);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchSatellites();
-  }, []);
+  }, [fetchSatellites]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -56,22 +72,6 @@ export function OrbitalLaserMeshStudio() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  async function fetchSatellites() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/orbital-laser/satellites");
-      const data = await res.json();
-      if (data.satellites) {
-        setSatellites(data.satellites);
-        if (!selectedSatellite && data.satellites.length > 0) {
-          setSelectedSatellite(data.satellites[0]);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleRekey() {
     if (!selectedSatellite) return;

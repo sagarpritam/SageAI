@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Layers, RefreshCw, Activity, Shield, Box, Sparkles } from 'lucide-react';
 
 interface SimplexComplex {
@@ -40,24 +40,24 @@ export default function SpinFoamStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<QuantizeResult | null>(null);
 
-  const fetchSimplices = async () => {
+  const fetchSimplices = useCallback(async () => {
     try {
       const res = await fetch('/api/spin-foam/simplices');
       const data = await res.json();
       if (data.simplices) {
         setSimplices(data.simplices);
-        if (data.simplices.length > 0 && !selectedSimplex) {
-          setSelectedSimplex(data.simplices[0].simplex_id);
+        if (data.simplices.length > 0) {
+          setSelectedSimplex((prev) => prev || data.simplices[0].simplex_id);
         }
       }
     } catch (err) {
       console.error('Failed to load spin-foam simplices', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchSimplices();
-  }, []);
+  }, [fetchSimplices]);
 
   const handleQuantize = async () => {
     setLoading(true);

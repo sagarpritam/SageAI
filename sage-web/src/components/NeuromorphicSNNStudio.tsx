@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Cpu,
   ShieldCheck,
@@ -68,19 +68,15 @@ export function NeuromorphicSNNStudio() {
   const [clampResult, setClampResult] = useState<ClampResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetchCores();
-  }, []);
-
-  async function fetchCores() {
+  const fetchCores = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/neuromorphic-snn/cores");
       const data = await res.json();
       if (data.cores) {
         setCores(data.cores);
-        if (!selectedCore && data.cores.length > 0) {
-          setSelectedCore(data.cores[0]);
+        if (data.cores.length > 0) {
+          setSelectedCore((prev) => prev || data.cores[0]);
         }
       }
     } catch (err) {
@@ -88,7 +84,11 @@ export function NeuromorphicSNNStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchCores();
+  }, [fetchCores]);
 
   async function handleClassify() {
     if (!selectedCore) return;

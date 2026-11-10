@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Crosshair,
   ShieldAlert,
@@ -55,19 +55,15 @@ export function CASRedTeamStudio() {
   const [loading, setLoading] = useState(false);
   const [runningRound, setRunningRound] = useState(false);
 
-  useEffect(() => {
-    fetchCampaigns();
-  }, []);
-
-  async function fetchCampaigns() {
+  const fetchCampaigns = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/cas-redteam/campaigns");
       const data = await res.json();
       if (data.campaigns) {
         setCampaigns(data.campaigns);
-        if (!selectedCampaign && data.campaigns.length > 0) {
-          setSelectedCampaign(data.campaigns[0]);
+        if (data.campaigns.length > 0) {
+          setSelectedCampaign((prev) => prev || data.campaigns[0]);
         }
       }
     } catch (err) {
@@ -75,7 +71,11 @@ export function CASRedTeamStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, [fetchCampaigns]);
 
   async function handleRunRound() {
     if (!selectedCampaign) return;

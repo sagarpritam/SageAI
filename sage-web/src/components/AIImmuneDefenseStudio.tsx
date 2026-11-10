@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Sparkles,
   ShieldAlert,
@@ -53,25 +53,25 @@ export function AIImmuneDefenseStudio() {
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
   const [immuneLogs, setImmuneLogs] = useState<EvaluationResult[]>([]);
 
-  useEffect(() => {
-    fetchModels();
-  }, []);
-
-  async function fetchModels() {
+  const fetchModels = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/ai-immune/models");
       const data = await res.json();
       if (data.models) {
         setModels(data.models);
-        if (!selectedModel && data.models.length > 0) {
-          setSelectedModel(data.models[0]);
+        if (data.models.length > 0) {
+          setSelectedModel((prev) => prev || data.models[0]);
         }
       }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
 
   async function handleEvaluatePrompt() {
     if (!selectedModel || !promptInput) return;

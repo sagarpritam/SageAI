@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   FileText,
   ShieldAlert,
@@ -48,6 +48,7 @@ export function RegulatoryIncidentCommanderStudio() {
   const [filingResult, setFilingResult] = useState<FilingResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [registrantName, setRegistrantName] = useState("SageAI Sovereign Enterprise Corp");
+  const hasInitializedRef = useRef(false);
 
   // New incident modal state
   const [showDeclareModal, setShowDeclareModal] = useState(false);
@@ -57,28 +58,7 @@ export function RegulatoryIncidentCommanderStudio() {
   const [newRecords, setNewRecords] = useState(50000);
   const [declaring, setDeclaring] = useState(false);
 
-  useEffect(() => {
-    fetchIncidents();
-  }, []);
-
-  async function fetchIncidents() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/regulatory-commander/incidents");
-      const data = await res.json();
-      if (data.incidents) {
-        setIncidents(data.incidents);
-        if (!selectedIncident && data.incidents.length > 0) {
-          setSelectedIncident(data.incidents[0]);
-          generateFiling(data.incidents[0].incident_id);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function generateFiling(incidentId: string) {
+  const requestFiling = useCallback(async (incidentId: string, name: string) => {
     setGenerating(true);
     try {
       const res = await fetch("/api/regulatory-commander/generate-sec-8k", {
@@ -86,7 +66,7 @@ export function RegulatoryIncidentCommanderStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           incident_id: incidentId,
-          registrant_name: registrantName,
+          registrant_name: name,
         }),
       });
       const data = await res.json();
@@ -96,9 +76,36 @@ export function RegulatoryIncidentCommanderStudio() {
     } finally {
       setGenerating(false);
     }
+  }, []);
+
+  const fetchIncidents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/regulatory-commander/incidents");
+      const data = await res.json();
+      if (data.incidents) {
+        setIncidents(data.incidents);
+        if (!hasInitializedRef.current && data.incidents.length > 0) {
+          hasInitializedRef.current = true;
+          setSelectedIncident(data.incidents[0]);
+          requestFiling(data.incidents[0].incident_id, "SageAI Sovereign Enterprise Corp");
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [requestFiling]);
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [fetchIncidents]);
+
+  function generateFiling(incidentId: string) {
+    return requestFiling(incidentId, registrantName);
   }
 
   function handleSelectIncident(inc: IncidentRecord) {
+    hasInitializedRef.current = true;
     setSelectedIncident(inc);
     generateFiling(inc.incident_id);
   }
@@ -120,6 +127,7 @@ export function RegulatoryIncidentCommanderStudio() {
       });
       const data = await res.json();
       if (data.incident) {
+        hasInitializedRef.current = true;
         setIncidents((prev) => [data.incident, ...prev]);
         setSelectedIncident(data.incident);
         generateFiling(data.incident.incident_id);

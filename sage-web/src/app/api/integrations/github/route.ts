@@ -20,14 +20,17 @@ export async function POST(req: Request) {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { pat } = await req.json();
+  if (!pat || typeof pat !== "string" || !pat.trim()) {
+    return NextResponse.json({ error: "GitHub PAT is required" }, { status: 400 });
+  }
 
   const res = await fetch(`${BACKEND}/integrations/github/setup`, {
     method: "POST",
-    headers: { 
+    headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ pat }),
+    body: JSON.stringify({ token: pat.trim() }),
   });
   return NextResponse.json(await res.json(), { status: res.status });
 }

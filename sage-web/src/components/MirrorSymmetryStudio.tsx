@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FlipHorizontal, RefreshCw, Activity, Shield, Sparkles, Orbit } from 'lucide-react';
 
 interface MirrorPair {
@@ -44,24 +44,24 @@ export default function MirrorSymmetryStudio() {
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<InvertResult | null>(null);
 
-  const fetchManifolds = async () => {
+  const fetchManifolds = useCallback(async () => {
     try {
       const res = await fetch('/api/mirror-symmetry/manifolds');
       const data = await res.json();
       if (data.manifolds) {
         setManifolds(data.manifolds);
-        if (data.manifolds.length > 0 && !selectedManifold) {
-          setSelectedManifold(data.manifolds[0].manifold_id);
+        if (data.manifolds.length > 0) {
+          setSelectedManifold((prev) => prev || data.manifolds[0].manifold_id);
         }
       }
     } catch (err) {
       console.error('Failed to load mirror pairs', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchManifolds();
-  }, []);
+  }, [fetchManifolds]);
 
   const handleInvert = async () => {
     setLoading(true);

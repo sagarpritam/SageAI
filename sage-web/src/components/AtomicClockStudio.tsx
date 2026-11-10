@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Clock,
   ShieldCheck,
@@ -65,7 +65,7 @@ export function AtomicClockStudio() {
   const [simulateSpoofing, setSimulateSpoofing] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
-  const fetchClocksAndMetrics = async () => {
+  const fetchClocksAndMetrics = useCallback(async () => {
     setLoading(true);
     try {
       const [clkRes, metRes] = await Promise.all([
@@ -77,8 +77,8 @@ export function AtomicClockStudio() {
 
       if (clkData.clocks) {
         setClocks(clkData.clocks);
-        if (!selectedClockId && clkData.clocks.length > 0) {
-          setSelectedClockId(clkData.clocks[0].clock_id);
+        if (clkData.clocks.length > 0) {
+          setSelectedClockId((prev) => prev || clkData.clocks[0].clock_id);
         }
       }
       if (metData.metrics) {
@@ -89,11 +89,11 @@ export function AtomicClockStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchClocksAndMetrics();
-  }, []);
+  }, [fetchClocksAndMetrics]);
 
   const handleSyncMesh = async () => {
     setSyncing(true);

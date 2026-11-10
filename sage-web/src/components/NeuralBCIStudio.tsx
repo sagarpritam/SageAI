@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Brain,
   ShieldCheck,
@@ -55,19 +55,17 @@ export function NeuralBCIStudio() {
   const [evaluating, setEvaluating] = useState(false);
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
   const [svidResult, setSvidResult] = useState<any | null>(null);
+  const hasInitializedSelectionRef = useRef(false);
 
-  useEffect(() => {
-    fetchOperators();
-  }, []);
-
-  async function fetchOperators() {
+  const fetchOperators = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/neural-bci/operators");
       const data = await res.json();
       if (data.operators) {
         setOperators(data.operators);
-        if (!selectedOperator && data.operators.length > 0) {
+        if (!hasInitializedSelectionRef.current && data.operators.length > 0) {
+          hasInitializedSelectionRef.current = true;
           setSelectedOperator(data.operators[0]);
           setP300Uv(data.operators[0].nominal_p300_uv);
           setN400Ms(data.operators[0].nominal_n400_ms);
@@ -76,7 +74,11 @@ export function NeuralBCIStudio() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchOperators();
+  }, [fetchOperators]);
 
   async function handleEvaluateIntent() {
     if (!selectedOperator) return;
@@ -234,6 +236,7 @@ export function NeuralBCIStudio() {
                 <div
                   key={op.operator_id}
                   onClick={() => {
+                    hasInitializedSelectionRef.current = true;
                     setSelectedOperator(op);
                     setP300Uv(op.nominal_p300_uv);
                     setN400Ms(op.nominal_n400_ms);

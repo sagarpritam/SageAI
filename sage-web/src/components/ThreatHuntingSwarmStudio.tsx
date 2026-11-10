@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Bot,
   Search,
@@ -43,15 +43,15 @@ export function ThreatHuntingSwarmStudio() {
   const [launching, setLaunching] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchHunts = async () => {
+  const fetchHunts = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/threat-hunting-swarm/hunts");
       if (res.ok) {
         const data = await res.json();
         setHunts(data.hunts || []);
-        if (data.hunts && data.hunts.length > 0 && !selectedHunt) {
-          setSelectedHunt(data.hunts[0]);
+        if (data.hunts && data.hunts.length > 0) {
+          setSelectedHunt((prev) => prev || data.hunts[0]);
         }
       }
     } catch (e) {
@@ -59,11 +59,11 @@ export function ThreatHuntingSwarmStudio() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchHunts();
-  }, []);
+  }, [fetchHunts]);
 
   const launchNewHunt = async (topic: string) => {
     setLaunching(true);
