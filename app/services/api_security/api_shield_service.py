@@ -25,7 +25,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.api_shield")
 
 # Sample Microservice API Endpoints to Audit
-DEFAULT_MICROSERVICES_CATALOG = [
+DEFAULT_MICROSERVICES_CATALOG: List[Dict[str, Any]] = [
     {
         "endpoint_id": "ep-01",
         "method": "GET",

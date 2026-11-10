@@ -58,7 +58,7 @@ class DeepSpaceLaserMesh:
             },
         ]
         for t in default_terminals:
-            self._terminals[t["terminal_id"]] = t
+            self._terminals[str(t["terminal_id"])] = t
 
     def list_terminals(self) -> List[Dict[str, Any]]:
         """Returns all monitored interplanetary deep-space optical terminals."""

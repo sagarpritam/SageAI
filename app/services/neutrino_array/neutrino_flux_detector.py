@@ -73,7 +73,7 @@ class NeutrinoFluxDetectorArray:
             },
         ]
         for d in default_detectors:
-            self._detectors[d["detector_id"]] = d
+            self._detectors[str(d["detector_id"])] = d
 
     def list_detectors(self) -> List[Dict[str, Any]]:
         return list(self._detectors.values())

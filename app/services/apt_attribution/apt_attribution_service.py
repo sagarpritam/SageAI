@@ -137,10 +137,10 @@ class APTAttributionService:
         ]
 
         for act in actors_data:
-            self._actors[act["actor_id"]] = act
+            self._actors[str(act["actor_id"])] = act
 
         # Populate STIX IOCs
-        iocs_data = [
+        iocs_data: List[Dict[str, Any]] = [
             {
                 "indicator": "194.26.29.112",
                 "indicator_type": "IPV4",
@@ -174,7 +174,7 @@ class APTAttributionService:
         ]
 
         for ioc in iocs_data:
-            self._iocs[ioc["indicator"]] = ioc
+            self._iocs[str(ioc["indicator"])] = ioc
 
         self._build_stix_graph()
 

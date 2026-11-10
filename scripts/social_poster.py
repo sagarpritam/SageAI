@@ -42,7 +42,7 @@ def generate_social_post(platform: str, audience: str) -> str:
             temperature=0.7,
             max_tokens=400,
         )
-        return response.choices[0].message.content.strip()
+        return (response.choices[0].message.content or "").strip()
     except Exception as e:
         return f"Error generating post: {str(e)}"
 

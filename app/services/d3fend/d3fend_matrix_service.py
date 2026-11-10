@@ -24,7 +24,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.d3fend")
 
 # Curated MITRE ATT&CK to D3FEND Countermeasure Mappings
-D3FEND_COUNTERMEASURE_CATALOG = [
+D3FEND_COUNTERMEASURE_CATALOG: List[Dict[str, Any]] = [
     {
         "d3fend_id": "D3-PSA",
         "d3fend_name": "Process Spawn Analysis",

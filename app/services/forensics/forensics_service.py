@@ -27,7 +27,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.forensics")
 
 # Sample Volatile Artifacts for Incident Detonations
-SAMPLE_VOLATILE_SNAPSHOT = {
+SAMPLE_VOLATILE_SNAPSHOT: Dict[str, Any] = {
     "target_host": "prod-k8s-node-04",
     "os_version": "Linux 6.8.0-31-generic x86_64",
     "processes": [

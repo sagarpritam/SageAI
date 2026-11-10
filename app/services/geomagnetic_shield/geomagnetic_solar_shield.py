@@ -55,7 +55,7 @@ class GeomagneticSolarShield:
             },
         ]
         for s in default_substations:
-            self._substations[s["substation_id"]] = s
+            self._substations[str(s["substation_id"])] = s
 
     def list_substations(self) -> List[Dict[str, Any]]:
         """Returns all monitored extra-high-voltage substations with GIC protection."""

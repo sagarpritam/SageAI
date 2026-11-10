@@ -18,7 +18,7 @@ class MicroHotpatchService:
 
     def _init_default_cve_catalog(self):
         """Initializes signature hotpatches for prominent real-world vulnerabilities."""
-        cves = [
+        cves: List[Dict[str, Any]] = [
             {
                 "cve_id": "CVE-2024-6387",
                 "title": "OpenSSH RegreSSHion Signal Handler Race Condition",

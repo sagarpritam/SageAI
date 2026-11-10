@@ -23,7 +23,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.infostealer")
 
 # Sample Infostealer Botnet Dumps for Simulation
-DEFAULT_INFOSTEALER_DUMPS = [
+DEFAULT_INFOSTEALER_DUMPS: List[Dict[str, Any]] = [
     {
         "log_id": "bot-lumma-882190",
         "malware_family": "LummaC2 v4.2",

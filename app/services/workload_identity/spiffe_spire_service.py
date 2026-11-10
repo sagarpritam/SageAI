@@ -89,7 +89,7 @@ class SpiffeSpireIdentityService:
 
     def __init__(self):
         self.svid_registry: Dict[str, Dict[str, Any]] = {
-            s["svid_id"]: s.copy() for s in DEFAULT_SVID_REGISTRY
+            str(s["svid_id"]): s.copy() for s in DEFAULT_SVID_REGISTRY
         }
         self.l7_policies: List[Dict[str, Any]] = CILIUM_L7_POLICIES.copy()
 

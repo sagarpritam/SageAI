@@ -58,7 +58,7 @@ class CrossPlaneMeshService:
         ]
 
         for node in mesh_nodes:
-            self._nodes[node["node_id"]] = node
+            self._nodes[str(node["node_id"])] = node
 
         default_policy_id = "pol-zt-001"
         self._policies[default_policy_id] = {

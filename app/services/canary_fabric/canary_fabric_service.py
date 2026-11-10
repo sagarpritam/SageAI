@@ -69,7 +69,7 @@ class CanaryFabricService:
 
     def __init__(self):
         self.canaries: Dict[str, Dict[str, Any]] = {
-            c["canary_id"]: c.copy() for c in DEFAULT_DEPLOYED_CANARIES
+            str(c["canary_id"]): c.copy() for c in DEFAULT_DEPLOYED_CANARIES
         }
         self.tripwire_events: List[Dict[str, Any]] = []
 

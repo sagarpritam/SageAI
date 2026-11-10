@@ -59,7 +59,7 @@ class OrbitalLaserMeshGuard:
             },
         ]
         for sat in nodes:
-            self._satellites[sat["satellite_id"]] = sat
+            self._satellites[str(sat["satellite_id"])] = sat
 
     def list_satellites(self) -> List[Dict[str, Any]]:
         """Returns all constellation satellites and active laser inter-links."""

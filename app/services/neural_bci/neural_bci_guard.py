@@ -53,7 +53,7 @@ class NeuralBCIGuard:
             },
         ]
         for op in default_operators:
-            self._operators[op["operator_id"]] = op
+            self._operators[str(op["operator_id"])] = op
 
     def list_operators(self) -> List[Dict[str, Any]]:
         """Returns all enrolled high-clearance neural BCI operators."""

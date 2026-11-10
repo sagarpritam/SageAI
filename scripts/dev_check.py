@@ -37,7 +37,16 @@ def main():
     steps = [
         (
             "Ruff Linter",
-            [sys.executable, "-m", "ruff", "check", "app/", "tests/", "scripts/"],
+            [
+                sys.executable,
+                "-m",
+                "ruff",
+                "check",
+                "app/",
+                "tests/",
+                "scripts/",
+                "sagestrike/",
+            ],
         ),
         (
             "Ruff Formatter",
@@ -50,6 +59,7 @@ def main():
                 "app/",
                 "tests/",
                 "scripts/",
+                "sagestrike/",
             ],
         ),
         ("Pytest Test Suite", [sys.executable, "-m", "pytest", "-q"]),

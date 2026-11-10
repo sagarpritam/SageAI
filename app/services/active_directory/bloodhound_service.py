@@ -26,7 +26,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.bloodhound")
 
 # Baseline Mock Enterprise Active Directory Topology
-DEFAULT_AD_GRAPH = {
+DEFAULT_AD_GRAPH: Dict[str, Any] = {
     "domain_name": "CORP.ENTERPRISE.LOCAL",
     "forest_functional_level": "Windows Server 2022",
     "nodes": [

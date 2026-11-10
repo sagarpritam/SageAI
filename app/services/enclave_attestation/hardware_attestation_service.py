@@ -23,7 +23,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.enclave_attestation")
 
 # Default Golden Reference Measurements for verified enclave images
-DEFAULT_GOLDEN_MEASUREMENTS = {
+DEFAULT_GOLDEN_MEASUREMENTS: Dict[str, Dict[str, Any]] = {
     "AWS_NITRO": {
         "PCR0": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",  # Enclave image
         "PCR1": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",  # Kernel cmdline
@@ -132,12 +132,18 @@ class HardwareEnclaveAttestationService:
                 "timestamp": now_iso,
             }
 
-        pcrs = doc.get("pcrs", {})
+        pcrs = doc.get("pcrs", {}) if isinstance(doc, dict) else {}
+        if not isinstance(pcrs, dict):
+            pcrs = {}
         actual_pcr0 = pcrs.get("0") or pcrs.get("PCR0")
         target_pcr0 = expected_pcr0 or self.golden_measurements["AWS_NITRO"]["PCR0"]
 
         # Validate PCR0 against Golden Reference
-        pcr0_valid = bool(actual_pcr0 and actual_pcr0.lower() == target_pcr0.lower())
+        pcr0_valid = bool(
+            isinstance(actual_pcr0, str)
+            and isinstance(target_pcr0, str)
+            and actual_pcr0.lower() == target_pcr0.lower()
+        )
         pcr1_valid = bool(
             pcrs.get("1") == self.golden_measurements["AWS_NITRO"].get("PCR1")
         )

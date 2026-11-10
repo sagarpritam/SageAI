@@ -58,7 +58,7 @@ class SpaceGroundQKDMesh:
             },
         ]
         for link in default_links:
-            self._links[link["link_id"]] = link
+            self._links[str(link["link_id"])] = link
 
     def list_links(self) -> List[Dict[str, Any]]:
         """Returns all space-ground QKD optical links."""

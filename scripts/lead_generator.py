@@ -44,7 +44,7 @@ def generate_cold_dm(target_name: str, target_role: str, target_company: str) ->
             temperature=0.7,
             max_tokens=200,
         )
-        return response.choices[0].message.content.strip()
+        return (response.choices[0].message.content or "").strip()
     except Exception as e:
         return f"Error generating DM: {str(e)}"
 

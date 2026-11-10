@@ -28,7 +28,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.cart")
 
 # Default Enterprise Attack Graph Topology
-DEFAULT_ATTACK_GRAPH = {
+DEFAULT_ATTACK_GRAPH: Dict[str, List[Dict[str, Any]]] = {
     "nodes": [
         {
             "id": "node-dmz-web",

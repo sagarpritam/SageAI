@@ -36,7 +36,7 @@ class RegulatoryIncidentCommander:
                 "GDPR_DPA_HOURS_REMAINING": 48,
             },
         }
-        self._incidents[default_inc["incident_id"]] = default_inc
+        self._incidents[str(default_inc["incident_id"])] = default_inc
 
     def list_incidents(self) -> List[Dict[str, Any]]:
         """Returns all declared major enterprise security incidents."""

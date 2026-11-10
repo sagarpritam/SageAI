@@ -72,7 +72,7 @@ class KyberMeshVPNService:
         ]
 
         for p in default_peers:
-            self._peers[p["peer_id"]] = p
+            self._peers[str(p["peer_id"])] = p
 
     def list_peers(self) -> List[Dict[str, Any]]:
         """Returns all registered post-quantum VPN mesh peers."""

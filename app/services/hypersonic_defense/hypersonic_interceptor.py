@@ -55,7 +55,7 @@ class HypersonicTrajectoryInterceptor:
             },
         ]
         for t in default_threats:
-            self._threats[t["threat_id"]] = t
+            self._threats[str(t["threat_id"])] = t
 
     def list_threats(self) -> List[Dict[str, Any]]:
         """Returns all currently tracked hypersonic maneuver threats."""

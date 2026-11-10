@@ -52,7 +52,7 @@ class AIModelDePoisonEngine:
             },
         ]
         for a in default_adapters:
-            self._adapters[a["adapter_id"]] = a
+            self._adapters[str(a["adapter_id"])] = a
 
     def list_adapters(self) -> List[Dict[str, Any]]:
         """Returns all registered fine-tuning LoRA adapters."""

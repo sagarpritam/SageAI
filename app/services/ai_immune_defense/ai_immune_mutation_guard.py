@@ -52,7 +52,7 @@ class AIImmuneMutationGuard:
             },
         ]
         for m in models:
-            self._models[m["model_id"]] = m
+            self._models[str(m["model_id"])] = m
 
     def _init_antibodies(self):
         self._antibodies = [

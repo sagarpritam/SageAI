@@ -29,7 +29,7 @@ from app.services.audit_chain import audit_chain
 logger = logging.getLogger("SageAI.iac_drift")
 
 # Baseline Mock Declared IaC Configurations
-DEFAULT_DECLARED_IAC = [
+DEFAULT_DECLARED_IAC: List[Dict[str, Any]] = [
     {
         "resource_id": "aws_security_group.sg_enterprise_bastion",
         "resource_type": "aws_security_group",
@@ -82,7 +82,7 @@ DEFAULT_DECLARED_IAC = [
 ]
 
 # Baseline Mock Runtime Cloud Assets (Showing Drift from Declared)
-DEFAULT_RUNTIME_STATE = [
+DEFAULT_RUNTIME_STATE: List[Dict[str, Any]] = [
     {
         "resource_id": "aws_security_group.sg_enterprise_bastion",
         "resource_type": "aws_security_group",

@@ -11,6 +11,7 @@ import os
 import random
 import sys
 import time
+from typing import List, TypedDict
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -34,6 +35,14 @@ def print_banner(title: str, color=CYAN):
     print(f"\n{color}{BOLD}{border}")
     print(f" {title.center(78)}")
     print(f"{border}{RESET}\n")
+
+
+class _HypersonicTarget(TypedDict):
+    id: str
+    mach: float
+    alt: float
+    skip: bool
+    blackout: bool
 
 
 def run_chaos_stress_drill():
@@ -149,7 +158,7 @@ def run_chaos_stress_drill():
         f"{CYAN}{BOLD}[Phase 3/3] Coordinated Multi-Axis Hypersonic Salvo Intercept{RESET}"
     )
     t_hyp = time.time()
-    targets = [
+    targets: List[_HypersonicTarget] = [
         {
             "id": "threat-hgv-glider-avangard",
             "mach": 24.5,

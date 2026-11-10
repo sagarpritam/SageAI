@@ -73,7 +73,7 @@ class LabyrinthDeceptionEngine:
         ]
 
         for m in default_mazes:
-            self._mazes[m["labyrinth_id"]] = m
+            self._mazes[str(m["labyrinth_id"])] = m
 
     def list_labyrinths(self) -> List[Dict[str, Any]]:
         """Returns all configured deceptive honeynet labyrinths."""

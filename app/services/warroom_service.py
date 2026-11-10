@@ -44,10 +44,10 @@ class _FallbackEvent:
     target: Optional[str] = None
 
     def to_dict(self):
-        etype = self.type.value if hasattr(self.type, "value") else str(self.type)
+        etype = self.type.value if isinstance(self.type, Enum) else str(self.type)
         eprio = (
             self.priority.value
-            if hasattr(self.priority, "value")
+            if isinstance(self.priority, Enum)
             else int(self.priority)
         )
         return {
@@ -116,7 +116,8 @@ SEED_LOCATIONS = [
 class WarRoomManager:
     """Manages real-time attack visualization state and WebSocket distribution."""
 
-    _instance = None
+    _instance: Optional["WarRoomManager"] = None
+    _initialized: bool = False
 
     def __new__(cls):
         if cls._instance is None:

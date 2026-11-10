@@ -55,7 +55,7 @@ class PhotonicQuantumCryptFirewall:
             },
         ]
         for c in default_coprocessors:
-            self._coprocessors[c["coprocessor_id"]] = c
+            self._coprocessors[str(c["coprocessor_id"])] = c
 
     def list_coprocessors(self) -> List[Dict[str, Any]]:
         """Returns all monitored photonic quantum cryptanalytic co-processors."""

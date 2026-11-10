@@ -12,8 +12,12 @@ Validates:
 """
 
 import base64
+import json
+import sys
+import types
 import uuid
 import warnings
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -309,3 +313,112 @@ async def test_github_setup_pat_and_token_plus_audit_logs_contract(client):
     assert isinstance(first["action"], str)
     assert isinstance(first["details"], dict)
     assert "created_at" in first
+
+
+def test_warroom_fallback_event_and_singleton():
+    """_FallbackEvent serializes both Enum and raw scalar type/priority and WarRoomManager is a singleton."""
+    from app.services.warroom_service import (
+        WarRoomManager,
+        _FallbackEvent,
+        _FallbackEventPriority,
+        _FallbackEventType,
+    )
+
+    now = datetime.now(timezone.utc)
+    enum_evt = _FallbackEvent(
+        id="evt-enum",
+        type=_FallbackEventType.TELEMETRY,
+        source="WarRoomTest",
+        timestamp=now,
+        priority=_FallbackEventPriority.CRITICAL,
+        payload={"ok": True},
+        target="https://example.com",
+    )
+    assert enum_evt.to_dict()["type"] == "telemetry"
+    assert enum_evt.to_dict()["priority"] == 4
+
+    raw_evt = _FallbackEvent(
+        id="evt-raw",
+        type="telemetry",  # type: ignore[arg-type]
+        source="WarRoomTest",
+        timestamp=now,
+        priority="3",  # type: ignore[arg-type]
+        payload={},
+    )
+    assert raw_evt.to_dict()["type"] == "telemetry"
+    assert raw_evt.to_dict()["priority"] == 3
+
+    mgr_a = WarRoomManager()
+    mgr_b = WarRoomManager()
+    assert mgr_a is mgr_b
+    assert mgr_a._initialized is True
+
+
+@pytest.mark.asyncio
+async def test_sagestrike_event_bus_and_exploit_framework_guards():
+    """EventBus._ensure_topics rejects unconnected kafka_admin and ExploitFramework validates RPC URL safely."""
+    kafka_stub = types.SimpleNamespace(
+        KafkaConsumer=object,
+        KafkaProducer=object,
+    )
+    kafka_admin_stub = types.SimpleNamespace(
+        KafkaAdminClient=object,
+        NewTopic=object,
+    )
+    with patch.dict(
+        sys.modules,
+        {"kafka": kafka_stub, "kafka.admin": kafka_admin_stub},
+    ):
+        from sagestrike.event_bus import EventBus
+
+        bus = EventBus(
+            kafka_brokers=["localhost:9092"],
+            redis_url="redis://localhost:6379",
+            service_name="test-bus",
+        )
+        with pytest.raises(RuntimeError, match="Kafka admin client not connected"):
+            await bus._ensure_topics()
+        sys.modules.pop("sagestrike.event_bus", None)
+
+    from sagestrike.exploit_engine import ExploitFramework
+
+    fw_ok = ExploitFramework(msf_rpc_url="https://msf.internal:55553/api/")
+    assert fw_ok.msf_client == {
+        "rpc_url": "https://msf.internal:55553/api/",
+        "transport": "msgpack-http",
+    }
+
+    fw_bad = ExploitFramework(msf_rpc_url="ftp://untrusted.local/xml")
+    assert fw_bad.msf_client is None
+
+
+def test_nitro_attestation_rejects_malformed_pcr_types():
+    """verify_nitro_attestation handles non-string pcrs['0'] or non-dict pcrs without crashing."""
+    from app.services.enclave_attestation.hardware_attestation_service import (
+        HardwareEnclaveAttestationService,
+    )
+
+    svc = HardwareEnclaveAttestationService()
+    for bad_payload in (
+        {"module_id": "enc-bad-int", "pcrs": {"0": 12345, "1": "abc"}},
+        {"module_id": "enc-bad-none", "pcrs": None},
+    ):
+        b64_doc = base64.b64encode(json.dumps(bad_payload).encode("utf-8")).decode(
+            "utf-8"
+        )
+        res = svc.verify_nitro_attestation(b64_doc)
+        assert res["valid"] is False
+        assert res["pcr_results"]["pcr0_valid"] is False
+
+
+@pytest.mark.asyncio
+async def test_verify_nvidia_live_handles_none_and_empty_key(monkeypatch):
+    """audit_nvidia_nim_live cleanly skips instead of raising AttributeError when API key is None."""
+    from scripts import verify_nvidia_live
+
+    monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+    monkeypatch.setattr(verify_nvidia_live.settings, "NVIDIA_API_KEY", None)
+
+    res = await verify_nvidia_live.audit_nvidia_nim_live(None)
+    assert res["status"] == "SKIPPED"
+    assert res["passed"] is True

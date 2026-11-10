@@ -61,7 +61,7 @@ class SubseaCableGuard:
             },
         ]
         for c in default_cables:
-            self._cables[c["cable_id"]] = c
+            self._cables[str(c["cable_id"])] = c
 
     def list_cables(self) -> List[Dict[str, Any]]:
         """Returns all monitored submarine fiber-optic cable trunks."""

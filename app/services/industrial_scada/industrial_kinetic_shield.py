@@ -93,7 +93,7 @@ class IndustrialKineticShield:
         ]
 
         for p in default_plcs:
-            self._plcs[p["plc_id"]] = p
+            self._plcs[str(p["plc_id"])] = p
 
     def list_plcs(self) -> List[Dict[str, Any]]:
         """Returns all monitored industrial PLCs, RTUs, and actuators."""

@@ -68,7 +68,7 @@ class GravitationalWaveSeismicMesh:
             },
         ]
         for obs in default_observatories:
-            self._observatories[obs["observatory_id"]] = obs
+            self._observatories[str(obs["observatory_id"])] = obs
 
     def list_observatories(self) -> List[Dict[str, Any]]:
         return list(self._observatories.values())

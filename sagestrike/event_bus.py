@@ -1,18 +1,20 @@
 """
 SageStrike Event Bus - Distributed event processing with Kafka and Redis
 """
+
 import asyncio
+import inspect
 import json
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Callable, Any
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from kafka import KafkaProducer, KafkaConsumer
-from kafka.admin import KafkaAdminClient, NewTopic
 import redis.asyncio as redis
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.admin import KafkaAdminClient, NewTopic
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("sagestrike.events")
@@ -41,6 +43,7 @@ class EventPriority(Enum):
 @dataclass
 class Event:
     """Base event structure"""
+
     id: str
     type: EventType
     source: str  # service/component that generated the event
@@ -111,7 +114,9 @@ class EventBus:
         self.redis_client: Optional[redis.Redis] = None
 
         # Handlers
-        self.handlers: Dict[EventType, List[EventHandler]] = {event_type: [] for event_type in EventType}
+        self.handlers: Dict[EventType, List[EventHandler]] = {
+            event_type: [] for event_type in EventType
+        }
         self.generic_handlers: List[EventHandler] = []
 
         # Running state
@@ -135,12 +140,17 @@ class EventBus:
 
         # Connect to Redis
         self.redis_client = redis.from_url(self.redis_url, decode_responses=True)
-        await self.redis_client.ping()
+        ping_res = self.redis_client.ping()
+        if inspect.isawaitable(ping_res):
+            await ping_res
 
         logger.info(f"Event bus connected for service {self.service_name}")
 
     async def _ensure_topics(self):
         """Ensure Kafka topics exist"""
+        if not self.kafka_admin:
+            raise RuntimeError("Kafka admin client not connected")
+
         existing_topics = self.kafka_admin.list_topics()
 
         topics_to_create = []
@@ -174,7 +184,9 @@ class EventBus:
             except Exception as e:
                 logger.error(f"Failed to create topics: {e}")
 
-    async def publish(self, event: Event, priority: EventPriority = EventPriority.NORMAL):
+    async def publish(
+        self, event: Event, priority: EventPriority = EventPriority.NORMAL
+    ):
         """Publish an event to Kafka"""
         if not self.kafka_producer:
             raise RuntimeError("Event bus not connected")
@@ -183,7 +195,7 @@ class EventBus:
         topic = f"sagestrike.{event.type.value}"
 
         try:
-            future = self.kafka_producer.send(
+            self.kafka_producer.send(
                 topic,
                 key=event.correlation_id or event.id,
                 value=event.to_dict(),
@@ -259,7 +271,7 @@ class EventBus:
                 # Poll for messages
                 message_batch = self.kafka_consumer.poll(timeout_ms=1000)
 
-                for topic_partition, messages in message_batch.items():
+                for _topic_partition, messages in message_batch.items():
                     for message in messages:
                         await self._process_message(message.value)
 
@@ -300,7 +312,7 @@ class EventBus:
         )
 
         events = []
-        for event_id, event_data in events_data:
+        for _event_id, event_data in events_data:
             try:
                 # Parse event from stream
                 event_dict = dict(event_data)
@@ -325,7 +337,7 @@ class EventBus:
             # Production would use secondary index
             all_events = await self.redis_client.xrange(stream_key)
 
-            for event_id, event_data in all_events:
+            for _event_id, event_data in all_events:
                 if event_data.get("correlation_id") == correlation_id:
                     events.append(Event.from_dict(dict(event_data)))
 
@@ -353,6 +365,7 @@ class EventBus:
 
 # ==================== EXAMPLE HANDLERS ====================
 
+
 class FindingsAggregatorHandler(EventHandler):
     """Aggregates findings into a database"""
 
@@ -360,7 +373,9 @@ class FindingsAggregatorHandler(EventHandler):
         if event.type not in [EventType.FINDING_DISCOVERED, EventType.EXPLOIT_SUCCESS]:
             return
 
-        logger.info(f"Aggregating finding: {event.payload.get('vulnerability', 'unknown')}")
+        logger.info(
+            f"Aggregating finding: {event.payload.get('vulnerability', 'unknown')}"
+        )
 
         # Would insert into PostgreSQL here
         # await db.execute("""
@@ -413,6 +428,7 @@ class RealTimeWebSocketHandler(EventHandler):
 
 # ==================== COORDINATOR ====================
 
+
 class ScanCoordinator:
     """Coordinates distributed scans using event bus"""
 
@@ -462,6 +478,7 @@ class ScanCoordinator:
 
 
 # ==================== MAIN ====================
+
 
 async def main():
     """Example usage"""

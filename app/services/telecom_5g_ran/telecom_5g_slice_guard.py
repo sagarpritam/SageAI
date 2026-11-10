@@ -58,7 +58,7 @@ class Telecom5GSliceGuard:
             },
         ]
         for s in default_slices:
-            self._slices[s["slice_id"]] = s
+            self._slices[str(s["slice_id"])] = s
 
     def list_slices(self) -> List[Dict[str, Any]]:
         """Returns all configured 3GPP 5G/6G core network slices."""

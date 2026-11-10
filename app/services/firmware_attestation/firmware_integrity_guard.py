@@ -80,7 +80,7 @@ class FirmwareIntegrityGuard:
         ]
 
         for n in default_nodes:
-            self._devices[n["device_id"]] = n
+            self._devices[str(n["device_id"])] = n
 
     def list_devices(self) -> List[Dict[str, Any]]:
         """Returns all monitored hardware devices and their firmware attestation status."""

@@ -58,7 +58,7 @@ class SpaceborneDirectedEnergyPlasmaShield:
             },
         ]
         for p in default_platforms:
-            self._platforms[p["platform_id"]] = p
+            self._platforms[str(p["platform_id"])] = p
 
     def list_platforms(self) -> List[Dict[str, Any]]:
         return list(self._platforms.values())

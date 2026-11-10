@@ -267,7 +267,7 @@ async def audit_nemo_microservices(base_url: str | None) -> dict[str, Any]:
 async def audit_nvidia_nim_live(api_key: str | None) -> dict[str, Any]:
     """Test live NVIDIA NIM connection, authentication, and inference."""
     key = (
-        api_key or settings.NVIDIA_API_KEY or os.getenv("NVIDIA_API_KEY", "")
+        api_key or settings.NVIDIA_API_KEY or os.getenv("NVIDIA_API_KEY") or ""
     ).strip()
     results: dict[str, Any] = {"name": "NVIDIA NIM Live Integration", "checks": []}
 

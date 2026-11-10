@@ -57,7 +57,7 @@ class AirGappedModelGuard:
         ]
 
         for m in trusted_models:
-            self._models[m["model_id"]] = m
+            self._models[str(m["model_id"])] = m
 
     def list_models(self) -> List[Dict[str, Any]]:
         """Returns all scanned and ingested sovereign models."""

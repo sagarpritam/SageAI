@@ -73,7 +73,7 @@ class OpticalAtomicClockMesh:
             },
         ]
         for c in default_clocks:
-            self._clocks[c["clock_id"]] = c
+            self._clocks[str(c["clock_id"])] = c
 
     def list_clocks(self) -> List[Dict[str, Any]]:
         return list(self._clocks.values())

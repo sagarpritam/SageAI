@@ -55,7 +55,7 @@ class KineticDroneShield:
             },
         ]
         for s in default_sites:
-            self._sites[s["site_id"]] = s
+            self._sites[str(s["site_id"])] = s
 
     def list_protected_sites(self) -> List[Dict[str, Any]]:
         """Returns all protected critical infrastructure airspace defense sites."""

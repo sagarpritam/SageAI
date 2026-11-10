@@ -63,7 +63,7 @@ class CognitiveEWEngine:
             },
         ]
         for e in default_emitters:
-            self._tracked_emitters[e["emitter_id"]] = e
+            self._tracked_emitters[str(e["emitter_id"])] = e
 
     def list_emitters(self) -> List[Dict[str, Any]]:
         return list(self._tracked_emitters.values())

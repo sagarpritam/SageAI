@@ -58,7 +58,7 @@ class NeuromorphicSNNGuard:
             },
         ]
         for c in default_cores:
-            self._cores[c["core_id"]] = c
+            self._cores[str(c["core_id"])] = c
 
     def list_cores(self) -> List[Dict[str, Any]]:
         """Returns all monitored neuromorphic edge silicon cores."""

@@ -39,7 +39,7 @@ class IncidentResponseEngine:
 
     def _seed_initial_incidents(self):
         """Seed realistic enterprise incidents so IncidentCenter is immediately actionable."""
-        seeds = [
+        seeds: List[Dict[str, Any]] = [
             {
                 "title": "Cloud IMDSv2 SSRF & AWS Credential Exfiltration Probe",
                 "severity": "CRITICAL",

@@ -9,6 +9,7 @@ Probes and evaluates connectivity for:
 """
 
 import asyncio
+import inspect
 import os
 import sys
 import time
@@ -301,7 +302,9 @@ async def test_database_and_cache() -> list[dict[str, Any]]:
 
         r = aioredis.from_url(redis_url, socket_timeout=2.0)
         start = time.perf_counter()
-        await r.ping()
+        ping_res = r.ping()
+        if inspect.isawaitable(ping_res):
+            await ping_res
         latency = int((time.perf_counter() - start) * 1000)
         await r.aclose()
         results.append(

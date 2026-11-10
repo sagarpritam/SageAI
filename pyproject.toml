@@ -19,7 +19,6 @@ exclude = [
     "node_modules",
     "frontend",
     "sage-web",
-    "sagestrike",
     "sageai---autonomous-pentesting",
     "alembic",
     ".agent",

@@ -55,7 +55,7 @@ class InterGridFailoverGuard:
             },
         ]
         for g in default_grids:
-            self._interconnects[g["grid_id"]] = g
+            self._interconnects[str(g["grid_id"])] = g
 
     def list_interconnects(self) -> List[Dict[str, Any]]:
         """Returns all monitored high-voltage transmission interconnections."""

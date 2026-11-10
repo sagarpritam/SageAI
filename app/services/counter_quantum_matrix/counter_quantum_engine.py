@@ -55,7 +55,7 @@ class CounterQuantumHarvestMatrix:
             },
         ]
         for it in default_interceptors:
-            self._interceptors[it["interceptor_id"]] = it
+            self._interceptors[str(it["interceptor_id"])] = it
 
     def list_interceptors(self) -> List[Dict[str, Any]]:
         return list(self._interceptors.values())

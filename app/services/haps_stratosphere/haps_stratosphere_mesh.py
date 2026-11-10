@@ -55,7 +55,7 @@ class HAPSStratosphereMesh:
             },
         ]
         for n in default_nodes:
-            self._nodes[n["node_id"]] = n
+            self._nodes[str(n["node_id"])] = n
 
     def list_nodes(self) -> List[Dict[str, Any]]:
         """Returns all monitored stratospheric HAPS surveillance platforms."""

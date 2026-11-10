@@ -47,7 +47,7 @@ def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
 
 
 # Pre-canned Identity Telemetry Scenarios for Testing & Simulation
-SAMPLE_IDENTITY_EVENTS = [
+SAMPLE_IDENTITY_EVENTS: List[Dict[str, Any]] = [
     {
         "event_id": "evt-okta-88219",
         "idp": "Okta",
