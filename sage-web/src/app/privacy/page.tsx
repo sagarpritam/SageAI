@@ -4,7 +4,7 @@ export default function PrivacyPage() {
       <div className="max-w-3xl mx-auto px-4">
         <h1 className="text-4xl font-bold text-emerald-400 font-mono mb-8">Privacy Policy</h1>
         <div className="space-y-6">
-          <p className="text-sm text-zinc-500">Last updated: May 15, 2026</p>
+          <p className="text-sm text-zinc-500">Last updated: November 11, 2026 &bull; SageAI v6.8.0</p>
           
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">1. Information We Collect</h2>
           <p>

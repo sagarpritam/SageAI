@@ -522,4 +522,90 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
+  test('Landing page displays v6.8.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
+
+    // Hero v6.8.0 metadata & live stats
+    await expect(page.locator('text=SageAI v6.8.0').first()).toBeVisible();
+    await expect(page.locator('text=106 Sovereign Capabilities').first()).toBeVisible();
+
+    // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
+    const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
+    await pillarsTab.scrollIntoViewIfNeeded();
+    await expect(pillarsTab).toBeVisible();
+    await expect(page.locator('text=Reverse Engineering Sandbox')).toBeVisible();
+    await expect(page.locator('text=Cryptographic Merkle Chain')).toBeVisible();
+
+    // Switch to Multi-LLM, PQC & Zero-Egress Core tab
+    await page.locator('button:has-text("Multi-LLM, PQC & Zero-Egress Core")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
+
+    // Switch to Waves 1-28 Milestone tab
+    await page.locator('button:has-text("Waves 1–28")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'String Field & Monopole Catalysis (v6.8.0)' })).toBeVisible();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
+
+    // 2026 CISA KEV vulnerability feed
+    await expect(page.locator('text=CVE-2026-0322').first()).toBeVisible();
+
+    // Reconciled Stripe pricing tiers on landing page
+    await expect(page.locator('#pricing')).toContainText('$199');
+    await expect(page.locator('#pricing')).toContainText('$499');
+    await expect(page.locator('#pricing')).toContainText('$2,000');
+
+    // Footer version badge updated
+    await expect(page.locator('footer')).toContainText('VERSION: 6.8.0-STABLE');
+  });
+
+  test('Pricing, Features, and How It Works pages showcase SageAI v6.8.0 metrics and tiers', async ({ page }) => {
+    await page.goto('/pricing');
+    await expect(page.locator('text=SageAI v6.8.0').first()).toBeVisible();
+    await expect(page.locator('text=$199').first()).toBeVisible();
+    await expect(page.locator('text=$499').first()).toBeVisible();
+    await expect(page.locator('text=$2,000').first()).toBeVisible();
+    await expect(page.locator('text=All 134 Studios (Waves 1–28)').first()).toBeVisible();
+
+    await page.goto('/features');
+    await expect(page.locator('text=v6.8.0').first()).toBeVisible();
+    await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
+    await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–106)').first()).toBeVisible();
+
+    await page.goto('/how-it-works');
+    await expect(page.locator('text=v6.8.0').first()).toBeVisible();
+    await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
+    await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
+    await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
+  });
+
+  test('Authenticated Command Center displays v6.8.0 badge and 134 active studios', async ({ context, page }) => {
+    await mockAuthenticatedSession(context, page);
+
+    await page.route('/api/notifications*', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+    await page.route('/api/scans*', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+    await page.route('/api/analytics*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ trend: [], severityCounts: { Critical: 0, High: 0, Medium: 0, Low: 0 }, totalCompleted: 0 }),
+      });
+    });
+
+    await page.goto('/dashboard');
+    await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
+    await expect(page.getByText(/v6\.8\.0\s+•\s+Waves 1–28\s+•\s+106 Capabilities/).first()).toBeVisible();
+    await expect(page.locator('text=134 Active Modules').first()).toBeVisible();
+
+    const searchInput = page.locator('input[placeholder="Search 134 modules..."]');
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill('String Field');
+    await expect(page.locator('button:has-text("String Field Theory (Cap 104)")')).toBeVisible();
+  });
+
 });

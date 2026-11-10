@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RiskGauge } from "@/components/RiskGauge";
 import { VulnerabilityList } from "@/components/VulnerabilityList";
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/platform';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ token: string }> }
@@ -24,7 +25,7 @@ export async function generateMetadata(
         openGraph: {
           title,
           description,
-          url: `https://sageai.vercel.app/report/${token}`,
+          url: `${SITE_URL}/report/${token}`,
           type: "website",
         },
         twitter: {

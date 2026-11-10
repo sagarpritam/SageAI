@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PLATFORM_VERSION } from "@/lib/platform";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -16,7 +17,8 @@ export async function GET() {
       database_pool: data.database_pool || null,
       uptime_seconds: 3600,
       scan_queue: 0,
-      version: data.version || "2.0.0",
+      version: data.version || PLATFORM_VERSION,
+      platform_version: PLATFORM_VERSION,
       environment: data.environment || "development",
     });
   } catch {

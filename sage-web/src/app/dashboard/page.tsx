@@ -456,8 +456,15 @@ export default function DashboardPage() {
               <Shield className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
-              <p className="text-xs text-zinc-500 font-mono">SageAI Enterprise Defense Grid &bull; 94 Active Modules</p>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-2xl font-black tracking-tight text-white">Command Center</h1>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  v6.8.0 &bull; Waves 1&ndash;28 &bull; 106 Capabilities
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 font-mono">
+                SageAI Sovereign Defense Grid &bull; {tabs.length} Active Modules &bull; 10-Pillar Orchestration
+              </p>
             </div>
           </div>
 
@@ -466,7 +473,7 @@ export default function DashboardPage() {
             <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search 94 modules..."
+              placeholder={`Search ${tabs.length} modules...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-zinc-900/80 border border-zinc-800 rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-colors font-mono"

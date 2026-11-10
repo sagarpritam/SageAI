@@ -188,7 +188,7 @@ export function ZeroEgressEnclave() {
             <div className="flex items-center gap-2 mb-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                ZERO DATA EGRESS ENCLAVES v2.5.0
+                ZERO DATA EGRESS ENCLAVES v6.8.0
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">
                 AES-256-GCM ENVELOPE

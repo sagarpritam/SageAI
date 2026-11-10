@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { PLATFORM_VERSION, SITE_URL } from "@/lib/platform";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,18 +14,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sageai.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "SageAI — Autonomous AI Pentester",
     template: "%s | SageAI"
   },
-  description: "Enterprise-grade vulnerability scanning, OSINT intelligence, and AI-powered threat analysis. Run a full pentest in 60 seconds.",
-  keywords: ["cybersecurity", "AI security", "pentesting", "vulnerability scanner", "OSINT"],
-  authors: [{ name: "SageAI" }],
+  description: `SageAI v${PLATFORM_VERSION}: Sovereign Autonomous AI Cybersecurity Platform featuring the 10-Pillar Defense Grid, 5-LLM Consensus, NIST FIPS 203/204 Post-Quantum Enclaves, SagePatch AST Auto-Fix, and 134 Command Center Studios (Waves 1–28 · 106 Capabilities).`,
+  keywords: [
+    "cybersecurity",
+    "AI security",
+    "autonomous pentesting",
+    "vulnerability scanner",
+    "OSINT",
+    "Post-Quantum Cryptography",
+    "FIPS 203",
+    "SOAR",
+    "SagePatch"
+  ],
+  authors: [{ name: "SageAI Security Inc." }],
   openGraph: {
-    title: "SageAI — Autonomous AI Pentester",
-    description: "Run a full AI-powered pentest on any domain in 60 seconds. Fix vulnerabilities before hackers find them.",
-    url: "https://sageai.vercel.app",
+    title: `SageAI v${PLATFORM_VERSION} — Autonomous AI Pentester & Sovereign Defense Grid`,
+    description: "Run an autonomous AI pentest in 60 seconds backed by 134 defense studios, 5-LLM consensus, Zero-Egress enclaves, and SagePatch AST remediation.",
+    url: SITE_URL,
     siteName: "SageAI",
     images: [
       {
@@ -39,8 +50,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SageAI — Autonomous AI Pentester",
-    description: "Run a full AI-powered pentest on any domain in 60 seconds.",
+    title: `SageAI v${PLATFORM_VERSION} — Autonomous AI Pentester`,
+    description: "Run an autonomous AI pentest in 60 seconds with 10-Pillar Sovereign Defense, 5-LLM Consensus, and SagePatch AST Auto-Fix.",
     images: ["/og-image.png"],
   },
 };

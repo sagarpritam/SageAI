@@ -5,20 +5,26 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
 import Link from 'next/link';
-import { 
-  Shield, 
-  Terminal as TerminalIcon, 
-  Zap, 
-  Lock, 
-  Search, 
-  Cpu, 
-  FileText, 
-  ChevronRight, 
-  CheckCircle2, 
+import { SovereignArchitectureShowcase } from '@/components/SovereignArchitectureShowcase';
+import {
+  PLATFORM_VERSION,
+  PLATFORM_MILESTONE,
+  PLATFORM_WAVES_RANGE,
+  PLATFORM_CAPABILITIES_COUNT,
+  PLATFORM_DASHBOARD_MODULES_COUNT,
+} from '@/lib/platform';
+import {
+  Shield,
+  Terminal as TerminalIcon,
+  Zap,
+  Lock,
+  Search,
+  Cpu,
+  FileText,
+  ChevronRight,
+  CheckCircle2,
   AlertTriangle,
   Globe,
   Activity,
@@ -28,8 +34,6 @@ import {
   Layers,
   Eye,
   Database,
-  Server,
-  Network,
   ArrowUpRight,
   ChevronUp,
   ShieldCheck,
@@ -40,18 +44,23 @@ import {
   Plus,
   Quote,
   ArrowRight,
-  CreditCard,
-  User,
-  Settings,
-  LogOut,
-  Key,
-  Mail,
-  Twitter,
-  Linkedin,
-  ArrowUp,
-  Calculator,
-  BarChart3
 } from 'lucide-react';
+
+const CYBER_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  x: `${(i * 37 + 13) % 94 + 3}%`,
+  y: `${(i * 53 + 7) % 92 + 4}%`,
+  duration: 5 + (i % 5),
+  delay: (i * 0.45) % 4.5,
+}));
+
+const MATRIX_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+const MATRIX_COLUMNS = Array.from({ length: 10 }, (_, colIdx) => ({
+  opacity: 0.25 + ((colIdx * 7) % 5) * 0.1,
+  text: Array.from(
+    { length: 50 },
+    (__, rowIdx) => MATRIX_CHARS[(colIdx * 17 + rowIdx * 11) % MATRIX_CHARS.length]
+  ).join(''),
+}));
 
 // --- Components ---
 
@@ -106,7 +115,7 @@ const LoadingScreen = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {['OSINT_MODULES', 'LLM_REASONING', 'EXPLOIT_ENGINE', 'THREAT_INTEL'].map((module, i) => (
+          {['THE_ABYSS_OSINT', 'FIVE_LLM_COUNCIL', 'PQC_FIPS_203_204', `GRID_v${PLATFORM_VERSION}`].map((module, i) => (
             <div key={module} className="flex items-center gap-2">
               <div className={`w-1.5 h-1.5 rounded-full ${progress > (i + 1) * 20 ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-zinc-800'}`} />
               <span className="text-[8px] font-mono text-zinc-600 tracking-widest">{module}</span>
@@ -227,9 +236,9 @@ const CyberHUD = () => {
 
 const AttackMap = () => {
   const [threats, setThreats] = useState([
-    { id: 1, type: 'SQLi', target: '192.168.1.45', origin: 'Moscow, RU' },
-    { id: 2, type: 'XSS', target: 'api.stark.io', origin: 'Beijing, CN' },
-    { id: 3, type: 'RCE', target: 'prod.oscorp.com', origin: 'Berlin, DE' }
+    { id: 1, type: 'CVE-2026-0322 RCE', target: '192.168.1.45', origin: 'Moscow, RU' },
+    { id: 2, type: 'IMDSv2 SSRF', target: 'api.stark.io', origin: 'Beijing, CN' },
+    { id: 3, type: 'C2 Beacon', target: 'prod.oscorp.com', origin: 'Berlin, DE' }
   ]);
 
   useEffect(() => {
@@ -237,7 +246,7 @@ const AttackMap = () => {
       setThreats(prev => {
         const newThreat = {
           id: Date.now(),
-          type: ['SQLi', 'XSS', 'RCE', 'BRUTE_FORCE', 'DDoS'][Math.floor(Math.random() * 5)],
+          type: ['SQLi', 'XSS', 'CVE-2026-88772', 'Prompt Injection', 'C2 Beacon'][Math.floor(Math.random() * 5)],
           target: ['10.0.0.1', '172.16.0.5', '192.168.1.100', 'api.sage.ai'][Math.floor(Math.random() * 4)],
           origin: ['Tokyo, JP', 'London, UK', 'New York, US', 'Paris, FR', 'Seoul, KR'][Math.floor(Math.random() * 5)]
         };
@@ -321,7 +330,7 @@ const AttackMap = () => {
                 className="space-y-0.5"
               >
                 <div className="text-[10px] text-zinc-500 font-mono uppercase">DETECTED: {threat.type} @ {threat.target}</div>
-                <div className="text-[10px] text-emerald-400 font-mono uppercase">NEUTRALIZED: SageAI Core v2.4</div>
+                <div className="text-[10px] text-emerald-400 font-mono uppercase">NEUTRALIZED: SageAI Core v{PLATFORM_VERSION}</div>
                 <div className="text-[8px] text-zinc-600 font-mono uppercase">ORIGIN: {threat.origin}</div>
               </motion.div>
             ))}
@@ -344,22 +353,22 @@ const CyberBackground = () => {
         className="absolute top-0 left-0 w-full h-1 bg-emerald-500/20 blur-[2px] z-10"
       />
 
-      {[...Array(20)].map((_, i) => (
+      {CYBER_PARTICLES.map((p, i) => (
         <motion.div
           key={i}
-          initial={{ 
-            x: Math.random() * 100 + "%", 
-            y: Math.random() * 100 + "%",
-            opacity: 0 
+          initial={{
+            x: p.x,
+            y: p.y,
+            opacity: 0
           }}
-          animate={{ 
+          animate={{
             opacity: [0, 0.2, 0],
             scale: [1, 1.5, 1]
           }}
-          transition={{ 
-            duration: Math.random() * 5 + 5,
+          transition={{
+            duration: p.duration,
             repeat: Infinity,
-            delay: Math.random() * 5
+            delay: p.delay
           }}
           className="absolute w-1 h-1 bg-emerald-500 rounded-full blur-[1px]"
         />
@@ -449,11 +458,11 @@ const Comparison = () => {
           <h3 className="text-xl font-bold mb-8 text-emerald-400">SageAI Autonomous</h3>
           <div className="space-y-6">
             {[
-              { label: 'Cost', value: '$49 / month', icon: CheckCircle2 },
+              { label: 'Starting Cost', value: '$199 / month', icon: CheckCircle2 },
               { label: 'Time', value: '60 Seconds', icon: CheckCircle2 },
-              { label: 'Frequency', value: 'Continuous 24/7', icon: CheckCircle2 },
-              { label: 'Reporting', value: 'Live Dashboard', icon: CheckCircle2 },
-              { label: 'Verification', value: 'AI Exploit Proof', icon: CheckCircle2 }
+              { label: 'Modules & Studios', value: `${PLATFORM_DASHBOARD_MODULES_COUNT} Active Studios`, icon: CheckCircle2 },
+              { label: 'Reporting', value: 'SARIF, PDF & Merkle ZKP', icon: CheckCircle2 },
+              { label: 'Verification', value: '5-LLM Consensus & AST PRs', icon: CheckCircle2 }
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between border-b border-emerald-500/10 pb-4">
                 <span className="text-sm text-zinc-400">{item.label}</span>
@@ -471,6 +480,16 @@ const Comparison = () => {
 };
 
 const Newsletter = () => {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSubscribed(true);
+    setEmail('');
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-24 text-center">
       <div className="glass p-12 md:p-20 rounded-[3rem] border-white/5 relative overflow-hidden">
@@ -481,18 +500,29 @@ const Newsletter = () => {
         </div>
         <h2 className="text-3xl md:text-5xl font-bold mb-6">Get the latest <span className="text-emerald-400">vulnerability</span> reports.</h2>
         <p className="text-zinc-500 mb-10 max-w-lg mx-auto">
-          Join 10,000+ security researchers. We send one email a week with the latest zero-day findings and AI security news.
+          Receive weekly CISA KEV advisories, post-quantum migration notes, and zero-day research straight from SageAI Core v{PLATFORM_VERSION}.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-          <input 
-            type="email" 
-            placeholder="hacker@startup.io" 
+        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="hacker@startup.io"
             className="flex-grow bg-zinc-950 border border-white/10 rounded-full px-6 py-4 text-white focus:border-emerald-500/50 focus:ring-0 transition-all outline-none"
           />
-          <button className="px-8 py-4 bg-emerald-500 text-black rounded-full font-bold hover:bg-emerald-400 transition-all">
+          <button
+            type="submit"
+            className="px-8 py-4 bg-emerald-500 text-black rounded-full font-bold hover:bg-emerald-400 transition-all"
+          >
             Subscribe
           </button>
-        </div>
+        </form>
+        {subscribed && (
+          <p className="mt-4 text-xs font-mono text-emerald-400">
+            [+] Subscribed — weekly CISA KEV &amp; zero-day digest queued.
+          </p>
+        )}
       </div>
     </div>
   );
@@ -504,13 +534,15 @@ const SystemStatusBar = () => {
       <div className="flex items-center gap-8 animate-marquee whitespace-nowrap">
         {[...Array(5)].map((_, i) => (
           <div key={i} className="flex items-center gap-4 text-[10px] font-mono text-emerald-400 uppercase tracking-widest">
-            <span className="flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" /> SYSTEM_STATUS: NOMINAL</span>
+            <span className="flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" /> SAGEAI_CORE: v{PLATFORM_VERSION} ({PLATFORM_WAVES_RANGE})</span>
             <span className="text-zinc-600">|</span>
-            <span>LATENCY: 12ms</span>
+            <span>CAPABILITIES: {PLATFORM_CAPABILITIES_COUNT}</span>
             <span className="text-zinc-600">|</span>
-            <span>ACTIVE_SCANS: 1,242</span>
+            <span>COMMAND_STUDIOS: {PLATFORM_DASHBOARD_MODULES_COUNT}</span>
             <span className="text-zinc-600">|</span>
-            <span>THREAT_LEVEL: LOW</span>
+            <span>CISA_KEV: 1,770_CVES</span>
+            <span className="text-zinc-600">|</span>
+            <span>PQC: FIPS_203/204_ACTIVE</span>
           </div>
         ))}
       </div>
@@ -520,19 +552,29 @@ const SystemStatusBar = () => {
 
 const InteractiveTerminal = () => {
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState<string[]>(['[+] SageAI v2.4.0 initialized.', '[+] Type "scan" to begin vulnerability assessment.', '[+] Type "help" for available commands.']);
-  
+  const [history, setHistory] = useState<string[]>([
+    `[+] SageAI v${PLATFORM_VERSION} (${PLATFORM_MILESTONE} · ${PLATFORM_WAVES_RANGE}) initialized.`,
+    `[+] ${PLATFORM_CAPABILITIES_COUNT} Capabilities | ${PLATFORM_DASHBOARD_MODULES_COUNT} Command Studios | 10-Pillar Sovereign Defense Grid online.`,
+    '[+] Type "help" for commands: scan, waves, pillars, pqc, status, clear, whoami.'
+  ]);
+
   const handleCommand = (e: React.FormEvent) => {
     e.preventDefault();
     const cmd = input.toLowerCase().trim();
     let response = '';
 
     if (cmd === 'scan') {
-      response = '[!] Starting autonomous scan... [!] Target: internal_network [!] Found: 3 critical vulnerabilities.';
+      response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
+    } else if (cmd === 'waves') {
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-106 including Centesimal Quantum Gravity (Cap 100), String Field Theory (Cap 104), Mirror Symmetry (Cap 105), Fibonacci Anyons (Cap 106).`;
+    } else if (cmd === 'pillars') {
+      response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
+    } else if (cmd === 'pqc') {
+      response = '[+] NIST FIPS 203 (ML-KEM-768) + FIPS 204 (ML-DSA-65) hybrid PQC active across US, EU & APAC Zero-Egress Enclaves.';
     } else if (cmd === 'help') {
-      response = 'Available commands: scan, status, clear, help, whoami';
+      response = 'Available commands: scan, waves, pillars, pqc, status, clear, help, whoami';
     } else if (cmd === 'status') {
-      response = '[+] All systems operational. AI Reasoning Engine at 98% efficiency.';
+      response = `[+] All systems nominal (v${PLATFORM_VERSION}). 5-LLM Consensus Council & ${PLATFORM_DASHBOARD_MODULES_COUNT} UI Studios ready.`;
     } else if (cmd === 'clear') {
       setHistory([]);
       setInput('');
@@ -695,9 +737,9 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'New Zero-Day in OpenSSL', time: '2m ago' },
-    { title: 'SageAI blocks 1.2M attacks', time: '15m ago' },
-    { title: 'Major Fintech breach avoided', time: '1h ago' }
+    { title: 'Wave 28 String Field & Anyons Live', time: '2m ago' },
+    { title: '1,770 CISA KEV CVEs Synced', time: '15m ago' },
+    { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];
 
   return (
@@ -724,99 +766,18 @@ const HackerNews = () => {
   );
 };
 
-const Pricing = () => {
-  const [isYearly, setIsYearly] = useState(false);
-
-  const plans = [
-    {
-      name: 'Starter',
-      price: isYearly ? '39' : '49',
-      features: ['1 Domain', 'Weekly Scans', 'Basic Reports', 'Slack Alerts'],
-      button: 'Start Free',
-      popular: false
-    },
-    {
-      name: 'Pro',
-      price: isYearly ? '79' : '99',
-      features: ['5 Domains', 'Daily Scans', 'Advanced Reports', 'CI/CD Integration', 'API Access'],
-      button: 'Go Pro',
-      popular: true
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      features: ['Unlimited Domains', 'Continuous Scanning', 'Custom Reports', 'Dedicated Support', 'On-premise Option'],
-      button: 'Contact Sales',
-      popular: false
-    }
-  ];
-
-  return (
-    <div className="max-w-7xl mx-auto px-6">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl md:text-5xl font-bold mb-6">Simple, <span className="text-emerald-400">Transparent</span> Pricing</h2>
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span className={`text-sm font-mono ${!isYearly ? 'text-white' : 'text-zinc-500'}`}>Monthly</span>
-          <button 
-            onClick={() => setIsYearly(!isYearly)}
-            className="w-12 h-6 bg-zinc-900 rounded-full p-1 relative transition-colors"
-          >
-            <motion.div 
-              animate={{ x: isYearly ? 24 : 0 }}
-              className="w-4 h-4 bg-emerald-500 rounded-full"
-            />
-          </button>
-          <span className={`text-sm font-mono ${isYearly ? 'text-white' : 'text-zinc-500'}`}>Yearly <span className="text-emerald-400 text-[10px] ml-1">(-20%)</span></span>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
-          <div key={plan.name} className={`glass p-8 rounded-[2.5rem] border-white/5 relative flex flex-col ${plan.popular ? 'border-emerald-500/30 bg-emerald-500/5' : ''}`}>
-            {plan.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-emerald-500 text-black text-[10px] font-bold rounded-full uppercase tracking-widest">
-                Most Popular
-              </div>
-            )}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">{plan.price === 'Custom' ? '' : '$'}{plan.price}</span>
-                {plan.price !== 'Custom' && <span className="text-zinc-500 text-sm">/mo</span>}
-              </div>
-            </div>
-            <div className="space-y-4 mb-10 flex-grow">
-              {plan.features.map((feature) => (
-                <div key={feature} className="flex items-center gap-3 text-sm text-zinc-400">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-            <Link href={plan.name === 'Pro' ? '/pricing' : '/login'}
-              className={`w-full py-4 rounded-full font-bold transition-all text-center ${plan.popular ? 'bg-emerald-500 text-black hover:bg-emerald-400' : 'bg-white/5 text-white hover:bg-white/10'}`}
-            >
-              {plan.button}
-            </Link>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const CaseStudies = () => {
   const cases = [
-    { 
-      company: 'FintechFlow', 
-      challenge: 'Manual pen-tests took 3 weeks, delaying bi-weekly releases.', 
-      solution: 'Integrated SageAI into CI/CD for instant vulnerability verification.',
+    {
+      company: 'FintechFlow',
+      challenge: 'Manual pen-tests took 3 weeks and delayed every release cycle.',
+      solution: 'Deployed 5-LLM Consensus & SagePatch AST Auto-Fix PRs across GitHub CI/CD.',
       result: '90% faster security sign-off.'
     },
-    { 
-      company: 'HealthSecure', 
-      challenge: 'Needed SOC2 compliance evidence for 50+ microservices.', 
-      solution: 'Automated evidence collection and continuous scanning.',
+    {
+      company: 'HealthSecure',
+      challenge: 'Needed GDPR Art. 44, HIPAA & SOC 2 evidence across 134 microservices.',
+      solution: 'Enabled EU Zero-Egress Enclaves with SHA-256 Merkle & Groth16 ZK-SNARK proofs.',
       result: 'Audit-ready in 48 hours.'
     }
   ];
@@ -860,41 +821,46 @@ const CaseStudies = () => {
 
 const VulnerabilityDatabase = () => {
   const vulns = [
-    { id: 'CVE-2024-1234', title: 'SQL Injection', severity: 'CRITICAL', description: 'Unsanitized input in login forms allowing database extraction.' },
-    { id: 'CVE-2024-5678', title: 'Broken Auth', severity: 'HIGH', description: 'Session fixation vulnerability in user authentication flow.' },
-    { id: 'CVE-2024-9012', title: 'XSS Payload', severity: 'MEDIUM', description: 'Stored cross-site scripting in user profile comments.' },
-    { id: 'CVE-2024-3456', title: 'RCE Exploit', severity: 'CRITICAL', description: 'Remote code execution via insecure deserialization.' }
+    { id: 'CVE-2026-0322', title: 'PAN-OS Code Injection', severity: 'CRITICAL', description: 'Unauthenticated root code execution in perimeter firewall endpoints tracked via CISA KEV.' },
+    { id: 'CVE-2026-88772', title: 'NetScaler Memory RCE', severity: 'CRITICAL', description: 'Out-of-bounds buffer flaw enabling pre-auth gateway takeover and C2 pivoting.' },
+    { id: 'CVE-2026-104935', title: 'Connect Secure Bypass', severity: 'HIGH', description: 'Authentication spoofing allowing command execution across edge VPN appliances.' },
+    { id: 'CVE-2026-76519', title: 'Cisco SEG Path Traversal', severity: 'HIGH', description: 'Relative path traversal enabling arbitrary file write on enterprise email gateways.' }
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-24">
+    <div id="vuln-db" className="max-w-6xl mx-auto px-6 py-24">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-5xl font-bold mb-4">Vulnerability <span className="text-emerald-400">Database</span></h2>
-        <p className="text-zinc-500">Browse the 50,000+ threats SageAI detects automatically.</p>
+        <p className="text-zinc-500">Live-synced across 1,770+ CISA KEV advisories &amp; 50,000+ NVD vulnerability signatures.</p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {vulns.map((vuln) => (
-          <motion.div 
+          <motion.div
             key={vuln.id}
             whileHover={{ y: -5 }}
-            className="glass p-6 rounded-2xl border-white/5 hover:border-emerald-500/30 transition-all group"
+            className="glass p-6 rounded-2xl border-white/5 hover:border-emerald-500/30 transition-all group flex flex-col justify-between"
           >
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-[10px] font-mono text-zinc-500">{vuln.id}</span>
-              <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${
-                vuln.severity === 'CRITICAL' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
-                vuln.severity === 'HIGH' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :
-                'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
-              }`}>
-                {vuln.severity}
-              </span>
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[10px] font-mono text-zinc-500">{vuln.id}</span>
+                <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${
+                  vuln.severity === 'CRITICAL' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                  vuln.severity === 'HIGH' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :
+                  'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                }`}>
+                  {vuln.severity}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors">{vuln.title}</h3>
+              <p className="text-xs text-zinc-500 leading-relaxed mb-4">{vuln.description}</p>
             </div>
-            <h3 className="text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors">{vuln.title}</h3>
-            <p className="text-xs text-zinc-500 leading-relaxed mb-4">{vuln.description}</p>
-            <button className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
-              View Exploit <ArrowRight className="w-3 h-3" />
-            </button>
+            <Link
+              href="/dashboard"
+              className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all"
+            >
+              Inspect in Intel Hub <ArrowRight className="w-3 h-3" />
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -943,7 +909,7 @@ const RiskCalculator = () => {
   const [dataSensitivity, setDataSensitivity] = useState(5); // 1-10
   
   const estimatedLoss = Math.round(employees * dataSensitivity * 1500);
-  const sageAICost = 588; // $49 * 12
+  const sageAICost = 2388; // Starter annual ($199 * 12)
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-24">
@@ -1089,7 +1055,7 @@ const DashboardPreview = () => {
               <div className="w-3 h-3 rounded-full bg-green-500/20" />
             </div>
             <div className="h-4 w-px bg-white/10 mx-2" />
-            <div className="text-xs font-mono text-zinc-500 tracking-widest uppercase">Dashboard / Scan Results</div>
+            <div className="text-xs font-mono text-zinc-500 tracking-widest uppercase">Command Center / {PLATFORM_DASHBOARD_MODULES_COUNT} Modules</div>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
@@ -1103,16 +1069,16 @@ const DashboardPreview = () => {
           {/* Sidebar Mock */}
           <div className="md:col-span-3 space-y-6">
             <div className="space-y-2">
-              <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Overview</div>
-              {['Active Scans', 'Vulnerabilities', 'Compliance', 'Settings'].map((item, i) => (
+              <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Active Studios</div>
+              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 28 String Field'].map((item, i) => (
                 <div key={item} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>
                   {item}
                 </div>
               ))}
             </div>
             <div className="pt-8 border-t border-white/5">
-              <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Recent Targets</div>
-              {['api.stark.io', 'staging.wayne.corp', 'prod.oscorp.com'].map((target) => (
+              <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Monitored Enclaves</div>
+              {['us-east-1 (FedRAMP)', 'eu-central-1 (GDPR)', 'ap-southeast-1 (PDPA)'].map((target) => (
                 <div key={target} className="px-4 py-2 text-xs font-mono text-zinc-500 hover:text-emerald-400 transition-colors cursor-pointer truncate">
                   {target}
                 </div>
@@ -1124,9 +1090,9 @@ const DashboardPreview = () => {
           <div className="md:col-span-9 space-y-8">
             <div className="grid grid-cols-3 gap-4">
               {[
-                { label: 'Critical', value: '1', color: 'text-red-500' },
-                { label: 'High', value: '3', color: 'text-orange-500' },
-                { label: 'Medium', value: '12', color: 'text-yellow-500' }
+                { label: 'Critical KEV', value: '1', color: 'text-red-500' },
+                { label: 'PQC Risks', value: '3', color: 'text-orange-500' },
+                { label: 'AST PRs Ready', value: '12', color: 'text-emerald-400' }
               ].map((stat) => (
                 <div key={stat.label} className="p-6 glass rounded-2xl border border-white/5">
                   <div className={`text-3xl font-bold mb-1 ${stat.color}`}>{stat.value}</div>
@@ -1137,15 +1103,15 @@ const DashboardPreview = () => {
 
             <div className="glass rounded-2xl border border-white/5 overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5 bg-white/2 flex items-center justify-between">
-                <div className="text-xs font-bold uppercase tracking-widest text-zinc-400">Vulnerability Log</div>
-                <div className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</div>
+                <div className="text-xs font-bold uppercase tracking-widest text-zinc-400">Consensus &amp; Defense Log</div>
+                <div className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE v{PLATFORM_VERSION}</div>
               </div>
               <div className="divide-y divide-white/5">
                 {[
-                  { title: "AWS Secret Key Leak", severity: "CRITICAL", target: "main.js", time: "2m ago" },
-                  { title: "SQL Injection (Blind)", severity: "HIGH", target: "/api/v1/users", time: "15m ago" },
-                  { title: "Insecure S3 Bucket", severity: "HIGH", target: "assets-bucket", time: "1h ago" },
-                  { title: "Outdated Nginx Version", severity: "MEDIUM", target: "192.168.1.1", time: "3h ago" }
+                  { title: "PAN-OS CVE-2026-0322 Mitigated (Virtual WAF)", severity: "CRITICAL", target: "gateway.prod", time: "2m ago" },
+                  { title: "HNDL TLS RSA-2048 -> ML-KEM-768 Migration", severity: "HIGH", target: "ingress-mesh", time: "12m ago" },
+                  { title: "AWS_SECRET_KEY Scrubbed in EU Enclave", severity: "HIGH", target: "eu-central-1", time: "41m ago" },
+                  { title: "SagePatch AST PR #142 Merged (SQLi Fix)", severity: "MEDIUM", target: "api/auth.py", time: "2h ago" }
                 ].map((vuln, i) => (
                   <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-white/2 transition-colors group cursor-pointer">
                     <div className="flex items-center gap-4">
@@ -1252,10 +1218,10 @@ const SystemAnatomy = () => {
         </div>
         
         {/* Pointers */}
-        <Pointer x="25" y="40" label="OSINT Ingress" description="Crawls subdomains, JS files, and public repos for initial attack vectors." />
-        <Pointer x="50" y="30" label="LLM Reasoning" description="Autonomous agents analyze findings to filter noise and plan multi-step exploits." />
-        <Pointer x="75" y="45" label="Vulnerability DB" description="Synced with CVE/NVD in real-time to identify the latest zero-day threats." />
-        <Pointer x="50" y="70" label="Exploit Proof" description="Automatically generates safe, non-destructive proofs of concept for every finding." />
+        <Pointer x="25%" y="40%" label="THE ABYSS + eBPF Ingress" description="Runs 9 OSINT engines + ring-0 eBPF syscall monitoring & Deception canaries." />
+        <Pointer x="50%" y="30%" label="5-LLM Consensus Council" description="GPT-4o, Claude 3.7, DeepSeek R1, Nemotron 70B & Gemini 2.5 debate exploit chains." />
+        <Pointer x="75%" y="45%" label="CISA KEV + PQC Enclave" description="1,770+ live KEVs sealed inside NIST FIPS 203/204 Zero-Egress Enclaves." />
+        <Pointer x="50%" y="70%" label="SagePatch AST & Merkle" description="Sandboxed AST verification opens human-gated PRs with SHA-256 Merkle proofs." />
       </div>
     </div>
   );
@@ -1265,7 +1231,7 @@ const BentoGrid = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-7xl mx-auto px-6 py-24">
       {/* Large Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -1276,25 +1242,27 @@ const BentoGrid = () => {
           <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
             <Target className="w-6 h-6 text-emerald-400" />
           </div>
-          <h3 className="text-3xl font-bold mb-4 glitch">Autonomous Attack Surface Mapping</h3>
-          <p className="text-zinc-400 max-w-md leading-relaxed">
-            SageAI continuously monitors your infrastructure, identifying new subdomains, exposed ports, and misconfigured cloud buckets as they appear.
+          <h3 className="text-3xl font-bold mb-4 glitch">10-Pillar Sovereign Defense Grid &amp; OSINT Hub</h3>
+          <p className="text-zinc-400 max-w-xl leading-relaxed">
+            Unites continuous EASM &amp; THE ABYSS (9 OSINT engines) with Reverse Engineering, Deception Canaries, Inline WAF, NIDS/C2 Beacons, UEBA &amp; SOAR containment.
           </p>
         </div>
         <div className="mt-12 flex items-center gap-4">
           <div className="flex -space-x-3">
-            {[1,2,3,4].map(i => (
+            {[1, 2, 3, 4].map(i => (
               <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-zinc-800 flex items-center justify-center text-[10px] font-bold">
-                {i === 4 ? '+50' : <div className="w-full h-full rounded-full bg-emerald-500/20" />}
+                {i === 4 ? `+${PLATFORM_CAPABILITIES_COUNT}` : <div className="w-full h-full rounded-full bg-emerald-500/20" />}
               </div>
             ))}
           </div>
-          <div className="text-xs text-zinc-500 font-mono">50+ OSINT modules active</div>
+          <div className="text-xs text-zinc-500 font-mono">
+            {PLATFORM_DASHBOARD_MODULES_COUNT} Command Center studios &bull; {PLATFORM_CAPABILITIES_COUNT} Capabilities ({PLATFORM_WAVES_RANGE})
+          </div>
         </div>
       </motion.div>
 
       {/* Small Card 1 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -1304,18 +1272,18 @@ const BentoGrid = () => {
         <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
           <Layers className="w-6 h-6 text-emerald-400" />
         </div>
-        <h3 className="text-xl font-bold mb-3 glitch">CI/CD Integration</h3>
+        <h3 className="text-xl font-bold mb-3 glitch">5-LLM Consensus &amp; SagePatch PRs</h3>
         <p className="text-zinc-400 text-sm leading-relaxed">
-          Scan every PR before it hits production. Native integrations with GitHub, GitLab, and Bitbucket.
+          Multi-AI debate across GPT-4o, Claude 3.7, DeepSeek R1, Nemotron 70B &amp; Gemini 2.5 Pro with sandboxed AST GitHub PRs.
         </p>
         <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
-          <span className="text-xs font-mono text-zinc-500">v2.4.0 Stable</span>
+          <span className="text-xs font-mono text-zinc-500">v{PLATFORM_VERSION} ({PLATFORM_WAVES_RANGE})</span>
           <ArrowUpRight className="w-4 h-4 text-emerald-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
         </div>
       </motion.div>
 
       {/* Small Card 2 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -1323,16 +1291,16 @@ const BentoGrid = () => {
         className="md:col-span-4 bento-card p-10 group"
       >
         <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
-          <Eye className="w-6 h-6 text-emerald-400" />
+          <Lock className="w-6 h-6 text-emerald-400" />
         </div>
-        <h3 className="text-xl font-bold mb-3 glitch">Zero False Positives</h3>
+        <h3 className="text-xl font-bold mb-3 glitch">PQC FIPS 203/204 &amp; Zero-Egress</h3>
         <p className="text-zinc-400 text-sm leading-relaxed">
-          Our LLM engine verifies every vulnerability by attempting a safe exploit, ensuring your team only sees real threats.
+          ML-KEM-768 + ML-DSA-65 post-quantum envelopes enforced across US, EU &amp; APAC enclaves with real-time secret scrubbing.
         </p>
       </motion.div>
 
       {/* Medium Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -1343,17 +1311,17 @@ const BentoGrid = () => {
           <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
             <FileText className="w-6 h-6 text-emerald-400" />
           </div>
-          <h3 className="text-2xl font-bold mb-4 glitch">Audit-Ready Compliance</h3>
+          <h3 className="text-2xl font-bold mb-4 glitch">Merkle &amp; Groth16 zk-SNARK Compliance</h3>
           <p className="text-zinc-400 text-sm leading-relaxed">
-            One-click SOC2, HIPAA, and ISO27001 reports. We provide the technical evidence your auditors need to sign off on your security posture.
+            Immutable SHA-256 hash chains and verifiable zero-knowledge proofs mapping SARIF/VEX findings to SOC 2 Type II, ISO/IEC 27001:2022, FedRAMP High, HIPAA, GDPR &amp; CNSA 2.0.
           </p>
         </div>
         <div className="w-full md:w-64 aspect-square glass rounded-2xl border-emerald-500/10 flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-emerald-500/5 animate-pulse" />
           <FileText className="w-20 h-20 text-emerald-500/20" />
           <div className="absolute bottom-4 left-4 right-4 h-2 bg-emerald-500/20 rounded-full overflow-hidden">
-            <motion.div 
-              animate={{ width: ["0", "85", "85"] }}
+            <motion.div
+              animate={{ width: ["0%", "85%", "85%"] }}
               transition={{ repeat: Infinity, duration: 3 }}
               className="h-full bg-emerald-500"
             />
@@ -1380,9 +1348,10 @@ const Navbar = () => {
   }, []);
 
   const searchResults = [
-    { id: 'CVE-2024-1234', title: 'SQL Injection' },
-    { id: 'CVE-2024-5678', title: 'Broken Auth' },
-    { id: 'CVE-2024-9012', title: 'XSS Payload' }
+    { id: 'CVE-2026-0322', title: 'PAN-OS Code Injection (CISA KEV)' },
+    { id: 'CVE-2026-88772', title: 'Citrix NetScaler Buffer RCE' },
+    { id: 'CVE-2026-104935', title: 'Ivanti Connect Secure Bypass' },
+    { id: 'HNDL-PQC-2030', title: 'NIST FIPS 203/204 Readiness' }
   ].filter(res => res.title.toLowerCase().includes(searchQuery.toLowerCase()) || res.id.toLowerCase().includes(searchQuery.toLowerCase()));
 
   useEffect(() => {
@@ -1423,10 +1392,14 @@ const Navbar = () => {
                 >
                   {searchResults.length > 0 ? (
                     searchResults.map((res) => (
-                      <div key={res.id} className="px-4 py-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-none">
+                      <a
+                        key={res.id}
+                        href="#vuln-db"
+                        className="block px-4 py-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-none"
+                      >
                         <div className="text-[10px] text-emerald-400 font-mono mb-1">{res.id}</div>
                         <div className="text-xs text-white font-bold">{res.title}</div>
-                      </div>
+                      </a>
                     ))
                   ) : (
                     <div className="px-4 py-3 text-[10px] text-zinc-500 font-mono">No results found.</div>
@@ -1513,18 +1486,16 @@ const TypewriterLine = ({ text, onComplete }: TypewriterLineProps) => {
 };
 
 const SAGE_LOG_LINES = [
-  "[+] Initializing SageAI Core...",
+  `[+] Initializing SageAI v${PLATFORM_VERSION} Core (${PLATFORM_WAVES_RANGE})...`,
   "[+] Target: staging.startup-app.io",
-  "[+] Mapping attack surface...",
-  "[+] 9 subdomains discovered",
-  "[+] Scanning ports 1-65535...",
-  "[!] Port 8080 open (Jenkins)",
-  "[+] Running LLM reasoning engine...",
-  "[+] Analyzing JS bundles for secrets...",
-  "[!] CRITICAL: AWS_SECRET_KEY found in main.js",
-  "[+] Testing SQL injection vectors...",
-  "[+] Generating exploit proof...",
-  "[+] Scanning complete. 1 Critical, 3 High found."
+  "[+] Launching THE ABYSS 9 OSINT modules + CISA KEV (1,770 CVEs)...",
+  "[+] eBPF Kernel SIEM: ring-0 syscall hooks attached (<0.2% CPU)",
+  "[!] Port 8080 open + PAN-OS CVE-2026-0322 perimeter mismatch",
+  "[+] Convening 5-LLM Consensus (GPT-4o / Claude 3.7 / DeepSeek R1 / Nemotron 70B / Gemini 2.5)...",
+  "[+] Auditing TLS & KMS for HNDL Quantum Risk (FIPS 203 ML-KEM-768)...",
+  "[!] CRITICAL: AWS_SECRET_KEY scrubbed inside Zero-Egress Enclave",
+  "[+] Validating SagePatch Phase 04 AST remediation PR #142...",
+  "[+] SHA-256 Merkle Seal anchored. 134 Studios nominal."
 ];
 
 const Terminal = () => {
@@ -1554,7 +1525,7 @@ const Terminal = () => {
         </div>
         <div className="flex items-center gap-2 ml-4">
           <TerminalIcon className="w-3 h-3 text-zinc-500" />
-          <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest">sage-scanner-v2.0</span>
+          <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest">sage-scanner-v{PLATFORM_VERSION}</span>
         </div>
       </div>
       <div className="p-6 font-mono text-sm h-64 overflow-y-auto scrollbar-hide">
@@ -1732,8 +1703,22 @@ const FeatureCard = ({ icon: Icon, title, description, delay }: { icon: any, tit
   </motion.div>
 );
 
-const PricingCard = ({ tier, price, features, highlighted = false }: { tier: string, price: string, features: string[], highlighted?: boolean }) => (
-  <motion.div 
+const PricingCard = ({
+  tier,
+  price,
+  features,
+  highlighted = false,
+  href = "/pricing",
+  ctaLabel,
+}: {
+  tier: string;
+  price: string;
+  features: string[];
+  highlighted?: boolean;
+  href?: string;
+  ctaLabel?: string;
+}) => (
+  <motion.div
     whileHover={{ scale: 1.02 }}
     className={`p-8 rounded-3xl border ${highlighted ? 'bg-zinc-900 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.1)]' : 'bg-zinc-950 border-white/5'} flex flex-col`}
   >
@@ -1744,19 +1729,22 @@ const PricingCard = ({ tier, price, features, highlighted = false }: { tier: str
         {price !== 'Free' && <span className="text-zinc-500 text-sm">/mo</span>}
       </div>
     </div>
-    
+
     <div className="space-y-4 mb-10 flex-grow">
       {features.map((f, i) => (
         <div key={i} className="flex items-center gap-3 text-sm text-zinc-400">
-          <CheckCircle2 className={`w-4 h-4 ${highlighted ? 'text-emerald-400' : 'text-zinc-600'}`} />
+          <CheckCircle2 className={`w-4 h-4 shrink-0 ${highlighted ? 'text-emerald-400' : 'text-zinc-600'}`} />
           {f}
         </div>
       ))}
     </div>
 
-    <button className={`w-full py-4 rounded-xl font-bold transition-all ${highlighted ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-white/5 text-white hover:bg-white/10'}`}>
-      {tier === 'Hacker' ? 'Start Scanning' : 'Upgrade to Pro'}
-    </button>
+    <Link
+      href={href}
+      className={`w-full py-4 rounded-xl font-bold transition-all text-center ${highlighted ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-white/5 text-white hover:bg-white/10'}`}
+    >
+      {ctaLabel || (highlighted ? 'Upgrade to Pro' : `Select ${tier}`)}
+    </Link>
   </motion.div>
 );
 
@@ -1781,16 +1769,16 @@ const LandingPage = () => {
             style={{ opacity, scale }}
             className="flex flex-col items-center text-center space-y-8"
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest"
             >
               <Zap className="w-3 h-3 fill-current" />
-              Autonomous Pentesting v2.0
+              SageAI v{PLATFORM_VERSION} &bull; {PLATFORM_WAVES_RANGE} &bull; {PLATFORM_CAPABILITIES_COUNT} Capabilities
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -1800,13 +1788,13 @@ const LandingPage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 glitch">That Never Sleeps.</span>
             </motion.h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-zinc-400 text-lg md:text-xl max-w-2xl leading-relaxed"
             >
-              SageAI acts as an automated hacker, doing in 60 seconds what usually takes human security engineers 60 hours. Enterprise-grade security for startups.
+              Sovereign cybersecurity engineered with our 10-Pillar Defense Grid, 5-LLM Consensus, NIST FIPS 203/204 Post-Quantum Enclaves, and SagePatch AST Auto-Fix across {PLATFORM_DASHBOARD_MODULES_COUNT} active Command Center studios.
             </motion.p>
 
             <motion.div 
@@ -1831,18 +1819,18 @@ const LandingPage = () => {
                   </Link>
                 </div>
               </div>
-              <div className="mt-4 flex items-center justify-center gap-6 text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+              <div className="mt-4 flex items-center justify-center gap-6 text-[10px] font-mono text-zinc-500 uppercase tracking-widest flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                  No Credit Card
+                  106 Sovereign Capabilities
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                  SOC2 Compliant
+                  SOC 2 &bull; ISO 27001 &bull; FedRAMP
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                  Instant Results
+                  PQC FIPS 203/204 Ready
                 </div>
               </div>
             </motion.div>
@@ -1884,6 +1872,9 @@ const LandingPage = () => {
         </div>
         <BentoGrid />
       </section>
+
+      {/* Sovereign Defense Grid & Waves 1-28 Showcase */}
+      <SovereignArchitectureShowcase />
 
       {/* System Anatomy Section */}
       <section className="py-24 bg-zinc-950/30 border-y border-white/5">
@@ -1967,32 +1958,48 @@ const LandingPage = () => {
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Simple, <span className="text-emerald-400">Transparent</span> Pricing</h2>
             <p className="text-zinc-500 max-w-2xl mx-auto">
-              Start for free and scale as your infrastructure grows. No hidden fees, no enterprise sales calls required.
+              Start with a free evaluation scan on sign-up, then scale cleanly across Starter, Pro, and full Enterprise Sovereign Defense Grid clusters.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <PricingCard 
-              tier="Hacker"
-              price="Free"
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <PricingCard
+              tier="Starter"
+              price="$199"
+              href="/pricing"
+              ctaLabel="Get Starter"
               features={[
-                "3 External Scans / month",
-                "Basic Vulnerability Mapping",
-                "Community Support",
-                "Standard PDF Reports"
+                "20 Autonomous Scans / month",
+                "Up to 5 Users",
+                "CISA KEV & NVD Vulnerability Feed",
+                "PDF & SARIF Exports"
               ]}
             />
-            <PricingCard 
+            <PricingCard
               tier="Pro"
-              price="$49"
+              price="$499"
               highlighted
+              href="/pricing"
+              ctaLabel="Upgrade to Pro"
               features={[
-                "Unlimited External Scans",
-                "CI/CD Integration",
-                "Webhook Alerts (Slack/Discord)",
-                "Advanced LLM Exploit Proofs",
-                "Priority Support",
-                "Custom Compliance Templates"
+                "100 Autonomous Scans / month",
+                "Up to 15 Users & RBAC",
+                "THE ABYSS 9-Module Deep Search",
+                "5-LLM Consensus & SagePatch AST PRs",
+                "Continuous ASM & Slack/Jira Alerts"
+              ]}
+            />
+            <PricingCard
+              tier="Enterprise"
+              price="$2,000"
+              href="/pricing"
+              ctaLabel="Deploy Sovereign Grid"
+              features={[
+                "Unlimited Scans & Unlimited Users",
+                `All ${PLATFORM_DASHBOARD_MODULES_COUNT} Studios (${PLATFORM_WAVES_RANGE})`,
+                "10-Pillar Sovereign Defense Grid & SOAR",
+                "Zero-Egress Enclaves & PQC FIPS 203/204",
+                "SAML 2.0 SSO, Merkle Ledger & Dedicated SLA"
               ]}
             />
           </div>
@@ -2066,16 +2073,24 @@ const LandingPage = () => {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-6">
                 <ShieldCheck className="w-3 h-3" />
-                Enterprise Grade
+                Zero-Egress &amp; Post-Quantum Ready
               </div>
               <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Security is not an <br /><span className="text-emerald-400">afterthought.</span></h2>
               <p className="text-zinc-400 text-lg mb-8">
-                SageAI is built to meet the most rigorous security standards. We help you stay compliant and audit-ready at all times.
+                SageAI v{PLATFORM_VERSION} is engineered for air-gapped sovereignty, Post-Quantum Cryptography (FIPS 203/204), and continuous compliance attestation across your entire stack.
               </p>
-              <div className="flex flex-wrap gap-4">
-                {['SOC2 Type II', 'HIPAA', 'ISO 27001', 'GDPR', 'PCI DSS'].map((std) => (
-                  <motion.div 
-                    key={std} 
+              <div className="flex flex-wrap gap-3">
+                {[
+                  'SOC 2 Type II',
+                  'ISO/IEC 27001:2022',
+                  'FedRAMP High',
+                  'CNSA 2.0 / PQC FIPS 203-204',
+                  'HIPAA',
+                  'GDPR Art. 44-49',
+                  'PCI DSS',
+                ].map((std) => (
+                  <motion.div
+                    key={std}
                     whileHover={{ scale: 1.05, borderColor: 'rgba(16, 185, 129, 0.5)' }}
                     className="px-4 py-2 glass rounded-lg border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest cursor-default"
                   >
@@ -2090,11 +2105,11 @@ const LandingPage = () => {
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={i}
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.5, 1],
                       opacity: [0.1, 0, 0.1]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 4,
                       repeat: Infinity,
                       delay: i * 1.3,
@@ -2106,13 +2121,13 @@ const LandingPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-6 relative z-10">
                 {[
-                  { icon: Lock, title: "Data Encryption", desc: "AES-256 at rest and TLS 1.3 in transit." },
-                  { icon: Shield, title: "Access Control", desc: "Strict RBAC and MFA for all internal systems." },
-                  { icon: Eye, title: "Audit Logs", desc: "Full immutable logs for every action taken." },
-                  { icon: Activity, title: "24/7 Monitoring", desc: "Real-time alerting for any security events." }
+                  { icon: Lock, title: "PQC & AES-256-GCM", desc: "ML-KEM-768 / ML-DSA-65 encryption & TLS 1.3 transport." },
+                  { icon: Shield, title: "Zero-Egress Enclaves", desc: "SAML 2.0 SSO, RBAC & 0-byte outbound telemetry mode." },
+                  { icon: Eye, title: "Merkle Audit Ledger", desc: "Tamper-evident cryptographic logs & SARIF/VEX bundles." },
+                  { icon: Activity, title: "Autonomous SOAR", desc: "Real-time attack-path quarantine across 134 studios." }
                 ].map((item, i) => (
-                  <motion.div 
-                    key={i} 
+                  <motion.div
+                    key={i}
                     whileHover={{ y: -5 }}
                     className="p-6 glass rounded-2xl border border-white/5"
                   >
@@ -2133,27 +2148,27 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Frequently Asked <span className="text-emerald-400">Questions</span></h2>
           </div>
-          
+
           <div className="space-y-4">
             {[
               {
                 q: "Is SageAI safe to run on production?",
-                a: "Yes. SageAI uses non-destructive exploit simulations. We verify vulnerabilities without causing downtime or data loss. You can also configure 'Safe Mode' for sensitive environments."
+                a: "Yes. SageAI uses non-destructive exploit simulations, deterministic proof-of-concept checks, and configurable Safe Mode guardrails so you verify real attack paths without downtime or data loss."
               },
               {
-                q: "How does the LLM reasoning engine work?",
-                a: "Our engine uses advanced language models trained on security research to analyze scan results. It chains multiple low-severity findings to identify complex attack paths that traditional scanners miss."
+                q: "How does the 5-LLM Multi-Model Consensus engine work?",
+                a: "Findings are cross-verified across 5 independent frontier models (Claude Sonnet 4, GPT-4o, Gemini Pro, Llama-3.3-70B, and DeepSeek R1) alongside 1,770+ live CISA KEV signatures—eliminating noise and chaining complex multi-hop attack paths."
               },
               {
-                q: "Can I integrate SageAI with my existing tools?",
-                a: "Absolutely. We offer native integrations with GitHub, GitLab, Slack, Discord, and Jira. You can also use our robust API to build custom workflows."
+                q: "What are Zero-Egress Enclaves and Post-Quantum FIPS 203/204 readiness?",
+                a: "Enterprise deployments run with zero external telemetry egress inside isolated enclaves while scanning TLS stacks, JWT signers, and keystores for NIST FIPS 203 (ML-KEM) & FIPS 204 (ML-DSA) readiness across our 10-Pillar Sovereign Defense Grid."
               },
               {
-                q: "What kind of reports do you provide?",
-                a: "We provide detailed technical reports for engineers, executive summaries for management, and audit-ready evidence for compliance frameworks like SOC2 and HIPAA."
+                q: "Can SageAI open autonomous fix PRs and integrate with my existing tools?",
+                a: `Yes. SagePatch generates compiler-verified AST diffs and opens GitHub or GitLab pull requests automatically, while streaming SARIF/VEX reports, Merkle audit proofs, and SOAR alerts across Jira, Slack, Discord, and SAML 2.0 SSO across all ${PLATFORM_DASHBOARD_MODULES_COUNT} studios.`
               }
             ].map((faq, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -2180,17 +2195,17 @@ const LandingPage = () => {
       <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
           <div className="flex justify-around h-full">
-            {[...Array(10)].map((_, i) => (
-              <div 
-                key={i} 
+            {MATRIX_COLUMNS.map((col, i) => (
+              <div
+                key={i}
                 className="matrix-rain text-emerald-500/30 font-mono text-[10px] whitespace-nowrap"
-                style={{ 
-                  writingMode: 'vertical-rl', 
+                style={{
+                  writingMode: 'vertical-rl',
                   animationDelay: `${i * 2}s`,
-                  opacity: Math.random() * 0.5 + 0.2
+                  opacity: col.opacity
                 }}
               >
-                {Array(50).fill(0).map(() => String.fromCharCode(0x30A0 + Math.random() * 96)).join('')}
+                {col.text}
               </div>
             ))}
           </div>
@@ -2198,7 +2213,7 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-emerald-500/10 blur-[150px] -z-10" />
         <div className="max-w-4xl mx-auto px-6 text-center glass p-12 md:p-20 rounded-[3rem] border-emerald-500/20 relative z-10">
           <div className="absolute top-0 right-0 p-8">
-            <motion.div 
+            <motion.div
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
               className="w-24 h-24 border border-emerald-500/20 rounded-full flex items-center justify-center"
@@ -2208,9 +2223,9 @@ const LandingPage = () => {
           </div>
           <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Ready to secure your <br /> <span className="text-emerald-400">infrastructure?</span></h2>
           <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
-            Join 500+ startups who trust SageAI for their continuous security monitoring.
+            Deploy SageAI v{PLATFORM_VERSION} ({PLATFORM_WAVES_RANGE}) with {PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities across {PLATFORM_DASHBOARD_MODULES_COUNT} autonomous command studios.
           </p>
-          
+
           <Link href="/dashboard" className="px-10 py-5 bg-white text-black rounded-full font-bold text-xl hover:bg-emerald-400 transition-all shadow-2xl block w-max mx-auto">
             Launch SageAI Workspace
           </Link>
@@ -2235,15 +2250,16 @@ const LandingPage = () => {
                 <span className="text-xl font-bold tracking-tighter">SAGE<span className="text-emerald-400">AI</span></span>
               </div>
               <p className="text-zinc-500 max-w-sm mb-8">
-                Autonomous AI penetration testing for the modern web. Secure your infrastructure in minutes, not months.
+                Autonomous multi-LLM cybersecurity &amp; sovereign defense mesh ({PLATFORM_WAVES_RANGE} &middot; {PLATFORM_CAPABILITIES_COUNT} capabilities across {PLATFORM_DASHBOARD_MODULES_COUNT} studios).
               </p>
-              <div className="flex items-center gap-6 text-[10px] font-mono text-zinc-600">
+              <div className="flex flex-wrap items-center gap-6 text-[10px] font-mono text-zinc-600">
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   SYSTEM STATUS: NOMINAL
                 </div>
                 <div>UPTIME: 99.99%</div>
-                <div>VERSION: 2.4.0-STABLE</div>
+                <div>VERSION: {PLATFORM_VERSION}-STABLE</div>
+                <div>{PLATFORM_MILESTONE.toUpperCase()}</div>
               </div>
             </div>
             <div>
@@ -2251,23 +2267,23 @@ const LandingPage = () => {
               <ul className="space-y-4 text-zinc-500 text-sm">
                 <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Features</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing</Link></li>
-                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">Security</Link></li>
-                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Enterprise</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">How It Works</Link></li>
+                <li><Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Command Center</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Company</h4>
               <ul className="space-y-4 text-zinc-500 text-sm">
-                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">About</Link></li>
-                <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Blog</Link></li>
-                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">Careers</Link></li>
-                <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Contact</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">Architecture</Link></li>
+                <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Capabilities</Link></li>
+                <li><Link href="/deep-search" className="hover:text-emerald-400 transition-colors">THE ABYSS</Link></li>
+                <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Sign In</Link></li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-zinc-600 text-xs">
-              © 2026 SageAI Security Inc. All rights reserved.
+              &copy; 2026 SageAI Security Inc. All rights reserved.
             </p>
             <div className="flex gap-8 text-xs text-zinc-600">
               <Link href="/privacy" className="hover:text-zinc-400 transition-colors">Privacy Policy</Link>
