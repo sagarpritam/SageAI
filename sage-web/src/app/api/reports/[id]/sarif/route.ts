@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   sanitizeFilenamePrefix,
   safeUpstreamJson,
@@ -24,7 +25,7 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(`${BACKEND}/reports/${encodeURIComponent(id)}/sarif`, {
+    const res = await fetchBackend(`${BACKEND}/reports/${encodeURIComponent(id)}/sarif`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

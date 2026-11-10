@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   safeJsonBody,
   safeUpstreamJson,
@@ -32,9 +33,9 @@ export async function GET(req: Request) {
   }
 
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetchBackend(endpoint, {
       headers: { Authorization: `Bearer ${token}` },
-    });
+    }, 45000);
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from redteam service",
     });
@@ -68,14 +69,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetchBackend(endpoint, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-    });
+    }, 45000);
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from redteam service",
     });

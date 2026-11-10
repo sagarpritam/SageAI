@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -10,7 +10,7 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/integrations/github/status`, {
+    const res = await fetchBackend(`${BACKEND}/integrations/github/status`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await safeUpstreamJson(res, {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/integrations/github/setup`, {
+    const res = await fetchBackend(`${BACKEND}/integrations/github/setup`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ export async function DELETE() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/integrations/github/remove`, {
+    const res = await fetchBackend(`${BACKEND}/integrations/github/remove`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });

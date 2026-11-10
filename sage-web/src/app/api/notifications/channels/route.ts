@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import {
+  fetchBackend,
+  safeJsonBody,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -9,11 +14,16 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/notifications/channels`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
+    const res = await fetchBackend(
+      `${BACKEND}/notifications/channels`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+      5000
+    );
+    if (!res.ok) return NextResponse.json([], { status: 200 });
+    const data = await safeUpstreamJson(res, []);
+    return NextResponse.json(data, { status: 200 });
   } catch {
     return NextResponse.json([], { status: 200 });
   }
@@ -24,20 +34,32 @@ export async function POST(req: NextRequest) {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
-    const res = await fetch(`${BACKEND}/notifications/channels`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const res = await fetchBackend(
+      `${BACKEND}/notifications/channels`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
       },
-      body: JSON.stringify(body),
+      5000
+    );
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from notification channels service",
     });
-    const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to create channel";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to connect to notification channels service" },
+      { status: 502 }
+    );
   }
 }

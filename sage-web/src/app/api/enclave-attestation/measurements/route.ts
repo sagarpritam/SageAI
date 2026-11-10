@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -11,11 +12,11 @@ export async function GET() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/enclave-attestation/golden-measurements`, {
+    const res = await fetchBackend(`${BACKEND}/enclave-attestation/golden-measurements`, {
       method: "GET",
       headers,
       cache: "no-store",
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();
@@ -37,11 +38,11 @@ export async function POST(req: Request) {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/enclave-attestation/golden-measurements`, {
+    const res = await fetchBackend(`${BACKEND}/enclave-attestation/golden-measurements`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();

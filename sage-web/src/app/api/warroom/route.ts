@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -9,7 +9,7 @@ export async function GET() {
   const token = cookieStore.get("sageai_jwt")?.value;
 
   try {
-    const res = await fetch(`${BACKEND}/warroom/events`, {
+    const res = await fetchBackend(`${BACKEND}/warroom/events`, {
       cache: "no-store",
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/warroom/events`, {
+    const res = await fetchBackend(`${BACKEND}/warroom/events`, {
       method: "POST",
       headers,
       body: JSON.stringify(parsed.data),

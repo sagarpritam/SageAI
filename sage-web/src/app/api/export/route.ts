@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, sanitizeExportFormat } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, sanitizeExportFormat } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -23,14 +23,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/export`, {
+    const res = await fetchBackend(`${BACKEND}/export`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ ...parsed.data, format: safeFormat }),
-    });
+    }, 45000);
 
     if (!res.ok) {
       return NextResponse.json({ error: "Export failed" }, { status: res.status });

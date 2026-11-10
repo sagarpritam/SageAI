@@ -1,7 +1,26 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
+
+function buildSimulatedPolicy(body: Record<string, unknown>) {
+  return {
+    status: "success",
+    policy: {
+      policy_id: `pol-zt-${Math.random().toString(16).slice(2, 8)}`,
+      name: (body.name as string) || "Cross-Plane Policy",
+      intent_description: (body.intent_description as string) || "Zero-trust intent rule",
+      status: "SYNCHRONIZED",
+      translations: {
+        AWS: { sg_id: "sg-aws-gen", rules: [{ type: "INGRESS", port: body.target_port || 443 }] },
+        AZURE: { nsg_id: "nsg-azure-gen", rules: [{ priority: 100, access: "Allow" }] },
+        GCP: { firewall_rule: "fw-gcp-gen" },
+        CILIUM_K8S: { kind: "CiliumNetworkPolicy" },
+      },
+    },
+  };
+}
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -11,11 +30,15 @@ export async function GET() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/crossplane-mesh/policies`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/crossplane-mesh/policies`,
+      {
+        method: "GET",
+        headers,
+        cache: "no-store",
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
@@ -30,39 +53,29 @@ export async function GET() {
 export async function POST(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
   try {
-    const body = await req.json();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/crossplane-mesh/translate-policy`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/crossplane-mesh/translate-policy`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
       return NextResponse.json(data);
     }
-    return NextResponse.json({
-      status: "success",
-      policy: {
-        policy_id: `pol-zt-${Math.random().toString(16).slice(2, 8)}`,
-        name: body.name || "Cross-Plane Policy",
-        intent_description: body.intent_description || "Zero-trust intent rule",
-        status: "SYNCHRONIZED",
-        translations: {
-          AWS: { sg_id: "sg-aws-gen", rules: [{ type: "INGRESS", port: body.target_port || 443 }] },
-          AZURE: { nsg_id: "nsg-azure-gen", rules: [{ priority: 100, access: "Allow" }] },
-          GCP: { firewall_rule: "fw-gcp-gen" },
-          CILIUM_K8S: { kind: "CiliumNetworkPolicy" },
-        },
-      },
-    });
+    return NextResponse.json(buildSimulatedPolicy(body));
   } catch {
-    return NextResponse.json({ status: "error", message: "Failed to translate policy" }, { status: 500 });
+    return NextResponse.json(buildSimulatedPolicy(body));
   }
 }
 

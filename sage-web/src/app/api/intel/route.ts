@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -24,7 +24,7 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/intel/modules`, {
+    const res = await fetchBackend(`${BACKEND}/intel/modules`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await safeUpstreamJson(res, { detail: "Intel modules error" });
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/intel/${targetModule}`, {
+    const res = await fetchBackend(`${BACKEND}/intel/${targetModule}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

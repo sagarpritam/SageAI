@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -18,11 +18,11 @@ export async function POST(req: Request) {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/haps-stratosphere/relay-sar`, {
+    const res = await fetchBackend(`${BACKEND}/haps-stratosphere/relay-sar`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await safeUpstreamJson(res, fallbackSar(body));

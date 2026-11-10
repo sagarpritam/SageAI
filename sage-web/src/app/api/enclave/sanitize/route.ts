@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/enclave/sanitize-egress`, {
+    const res = await fetchBackend(`${BACKEND}/enclave/sanitize-egress`, {
       method: "POST",
       headers,
       body: JSON.stringify(parsed.data),

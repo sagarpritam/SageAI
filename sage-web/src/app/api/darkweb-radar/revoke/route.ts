@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -13,11 +14,11 @@ export async function POST(req: Request) {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/darkweb-radar/revoke-token`, {
+    const res = await fetchBackend(`${BACKEND}/darkweb-radar/revoke-token`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();

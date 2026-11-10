@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend, safeUpstreamJson } from "@/lib/proxy-utils";
 
 export async function POST() {
   const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
@@ -11,25 +12,30 @@ export async function POST() {
   }
 
   try {
-    const res = await fetch(`${backendUrl}/billing/portal`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetchBackend(
+      `${backendUrl}/billing/portal`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+      15000
+    );
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
+      const err = await safeUpstreamJson<{ detail?: string }>(res, {});
       return NextResponse.json(
         { error: err.detail || "Failed to create portal session" },
         { status: res.status }
       );
     }
 
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from billing service",
+    });
     return NextResponse.json(data);
-  } catch (error) {
-    console.error("Portal route error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Backend unreachable" },
       { status: 502 }

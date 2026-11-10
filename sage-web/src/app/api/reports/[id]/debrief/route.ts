@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -27,13 +27,14 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/reports/${encodeURIComponent(id)}/debrief?lang=${encodeURIComponent(lang)}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
+      45000
     );
 
     const data = await safeUpstreamJson(res, {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,11 +15,11 @@ export async function POST(req: Request) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/ztna/synthesize-policy`, {
+    const res = await fetchBackend(`${BACKEND}/ztna/synthesize-policy`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();

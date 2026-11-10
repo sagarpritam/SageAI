@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
       ? `${BACKEND_URL}/auth/sso/config?org_id=${encodeURIComponent(orgId)}`
       : `${BACKEND_URL}/auth/sso/config`;
 
-    const res = await fetch(targetUrl);
+    const res = await fetchBackend(targetUrl);
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from SSO service",
     });

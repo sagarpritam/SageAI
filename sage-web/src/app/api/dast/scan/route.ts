@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -15,14 +15,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/dast/scan`, {
+    const res = await fetchBackend(`${BACKEND}/dast/scan`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(parsed.data),
-    });
+    }, 45000);
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from DAST service",
     });

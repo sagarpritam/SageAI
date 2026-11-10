@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -23,17 +23,30 @@ export async function POST(req: NextRequest) {
     const body = parsed.data;
     const isStream = body.stream !== false; // Default to streaming if not explicitly false
 
-    const backendRes = await fetch(`${BACKEND}/copilot/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        ...body,
-        stream: isStream,
-      }),
-    });
+    // Bound only initial connection/header handshake so long-running SSE streams complete uninterrupted.
+    const connectController = new AbortController();
+    const connectTimeout = setTimeout(() => connectController.abort(), 30000);
+    let backendRes: Response;
+    try {
+      backendRes = await fetchBackend(
+        `${BACKEND}/copilot/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...body,
+            stream: isStream,
+          }),
+          signal: connectController.signal,
+        },
+        30000
+      );
+    } finally {
+      clearTimeout(connectTimeout);
+    }
 
     if (!backendRes.ok) {
       return NextResponse.json(

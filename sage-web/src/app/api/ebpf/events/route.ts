@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -20,12 +20,13 @@ export async function GET(req: Request) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/ebpf/events?limit=${limit}&severity=${encodeURIComponent(severity)}`,
       {
         headers,
         cache: "no-store",
-      }
+      },
+      5000
     );
 
     if (res.ok) {

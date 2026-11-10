@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
+import {
+  fetchBackend,
+  isValidResourceId,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 export async function POST(
   _req: NextRequest,
@@ -20,7 +24,7 @@ export async function POST(
   }
 
   try {
-    const res = await fetch(`${backendUrl}/scan/${encodeURIComponent(id)}/share`, {
+    const res = await fetchBackend(`${backendUrl}/scan/${encodeURIComponent(id)}/share`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -42,8 +46,7 @@ export async function POST(
       error: "Invalid response from share service",
     });
     return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error connecting to backend:", error);
+  } catch {
     return NextResponse.json({ error: "Backend unreachable" }, { status: 502 });
   }
 }

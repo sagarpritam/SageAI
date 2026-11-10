@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   safeOptionalJsonBody,
   safeUpstreamJson,
@@ -30,7 +31,7 @@ export async function POST(
   }
 
   try {
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/incidents/${encodeURIComponent(id)}/remediate`,
       {
         method: "POST",
@@ -39,7 +40,8 @@ export async function POST(
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(parsed.data),
-      }
+      },
+      45000
     );
 
     const data = await safeUpstreamJson(res, {

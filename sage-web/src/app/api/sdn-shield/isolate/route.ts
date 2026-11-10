@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,11 +15,11 @@ export async function POST(req: Request) {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const endpoint = body.isolation_id ? "release" : "isolate";
-    const res = await fetch(`${BACKEND}/sdn-shield/${endpoint}`, {
+    const res = await fetchBackend(`${BACKEND}/sdn-shield/${endpoint}`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -9,9 +10,9 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/threat-feed`, {
+    const res = await fetchBackend(`${BACKEND}/threat-feed`, {
       headers: { Authorization: `Bearer ${token}` },
-    });
+    }, 5000);
     if (!res.ok) throw new Error();
     return NextResponse.json(await res.json());
   } catch {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   safeJsonBody,
   safeUpstreamJson,
@@ -27,7 +28,7 @@ export async function POST(
   }
 
   try {
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/autofix/patches/${encodeURIComponent(id)}/reject`,
       {
         method: "POST",

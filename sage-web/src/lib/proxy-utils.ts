@@ -438,6 +438,35 @@ export function isStandaloneOfflineMode(): boolean {
 }
 
 /**
+ * Error thrown immediately by fetchBackend when running in standalone Vercel/CI mode
+ * without BACKEND_URL configured, avoiding futile localhost:8000 dials.
+ */
+export class StandaloneOfflineError extends Error {
+  constructor(
+    message: string = "Backend service unavailable (configure BACKEND_URL)"
+  ) {
+    super(message);
+    this.name = "StandaloneOfflineError";
+  }
+}
+
+/**
+ * Fetches an upstream backend endpoint with an automatic abort timeout and
+ * standalone Vercel/CI fast-fail when BACKEND_URL is not configured.
+ */
+export async function fetchBackend(
+  url: string,
+  init: RequestInit = {},
+  timeoutMs: number = 10000
+): Promise<Response> {
+  if (isStandaloneOfflineMode()) {
+    throw new StandaloneOfflineError();
+  }
+  const signal = init.signal ?? AbortSignal.timeout(timeoutMs);
+  return fetch(url, { ...init, signal });
+}
+
+/**
  * Returns a standardized sanitized 502 Bad Gateway response for unreachable backends.
  */
 export function offlineBackendResponse(

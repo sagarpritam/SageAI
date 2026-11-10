@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   sanitizeFilenamePrefix,
   safeUpstreamJson,
@@ -24,11 +25,15 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(`${backendUrl}/reports/${encodeURIComponent(id)}/pdf`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetchBackend(
+      `${backendUrl}/reports/${encodeURIComponent(id)}/pdf`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+      45000
+    );
 
     if (!res.ok) {
       if (res.status === 402) {
@@ -54,8 +59,7 @@ export async function GET(
         "Content-Disposition": `attachment; filename="sageai-report-${safePrefix}.pdf"`,
       },
     });
-  } catch (e) {
-    console.error("PDF proxy error:", e);
+  } catch {
     return NextResponse.json(
       { error: "Backend unreachable" },
       { status: 502 }

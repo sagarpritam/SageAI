@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -13,10 +14,10 @@ export async function GET() {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/cti/taxii/collections`, {
+    const res = await fetchBackend(`${BACKEND}/cti/taxii/collections`, {
       method: "GET",
       headers,
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await res.json();

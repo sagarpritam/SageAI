@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   safeJsonBody,
   safeUpstreamJson,
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/incidents/${encodeURIComponent(incident_id)}/action`,
       {
         method: "POST",

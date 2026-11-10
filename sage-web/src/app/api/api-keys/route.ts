@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   isValidResourceId,
   safeJsonBody,
   safeUpstreamJson,
@@ -14,7 +15,7 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/api-keys`, {
+    const res = await fetchBackend(`${BACKEND}/api-keys`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await safeUpstreamJson(res, {
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/api-keys?name=${encodeURIComponent(name)}`, {
+    const res = await fetchBackend(`${BACKEND}/api-keys?name=${encodeURIComponent(name)}`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -74,7 +75,7 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/api-keys/${encodeURIComponent(id)}`, {
+    const res = await fetchBackend(`${BACKEND}/api-keys/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

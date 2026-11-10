@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/auth/change-password`, {
+    const res = await fetchBackend(`${BACKEND}/auth/change-password`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

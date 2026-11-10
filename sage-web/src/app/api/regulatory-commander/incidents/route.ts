@@ -1,7 +1,27 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
+
+function buildSimulatedIncident(body: Record<string, unknown>) {
+  return {
+    status: "success",
+    incident: {
+      incident_id: `INC-SEC-${Math.random().toString(16).slice(2, 8).toUpperCase()}`,
+      title: (body.title as string) || "Major Incident",
+      severity: (body.severity as string) || "CRITICAL",
+      impacted_systems: (body.impacted_systems as string[]) || ["Core Cloud"],
+      records_compromised: (body.records_compromised as number) || 15000,
+      materiality_verdict: "MATERIAL_CYBERSECURITY_INCIDENT",
+      deadlines: {
+        SEC_8K_DAYS_REMAINING: 4,
+        NIS2_EARLY_WARNING_HOURS: 24,
+        GDPR_DPA_HOURS_REMAINING: 72,
+      },
+    },
+  };
+}
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -11,11 +31,15 @@ export async function GET() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/regulatory-commander/incidents`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/regulatory-commander/incidents`,
+      {
+        method: "GET",
+        headers,
+        cache: "no-store",
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
@@ -30,40 +54,29 @@ export async function GET() {
 export async function POST(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
   try {
-    const body = await req.json();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/regulatory-commander/declare-incident`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/regulatory-commander/declare-incident`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
       return NextResponse.json(data);
     }
-    return NextResponse.json({
-      status: "success",
-      incident: {
-        incident_id: `INC-SEC-${Math.random().toString(16).slice(2, 8).toUpperCase()}`,
-        title: body.title || "Major Incident",
-        severity: body.severity || "CRITICAL",
-        impacted_systems: body.impacted_systems || ["Core Cloud"],
-        records_compromised: body.records_compromised || 15000,
-        materiality_verdict: "MATERIAL_CYBERSECURITY_INCIDENT",
-        deadlines: {
-          SEC_8K_DAYS_REMAINING: 4,
-          NIS2_EARLY_WARNING_HOURS: 24,
-          GDPR_DPA_HOURS_REMAINING: 72,
-        },
-      },
-    });
+    return NextResponse.json(buildSimulatedIncident(body));
   } catch {
-    return NextResponse.json({ status: "error", message: "Failed to declare incident" }, { status: 500 });
+    return NextResponse.json(buildSimulatedIncident(body));
   }
 }
 

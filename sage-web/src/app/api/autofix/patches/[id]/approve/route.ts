@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -24,7 +24,7 @@ export async function POST(
     : `${BACKEND}/autofix/patches/${encodeURIComponent(id)}/approve`;
 
   try {
-    const res = await fetch(targetUrl, {
+    const res = await fetchBackend(targetUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

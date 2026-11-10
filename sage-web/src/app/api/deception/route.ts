@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,10 +14,10 @@ export async function GET() {
 
   try {
     const [decoysRes, alertsRes] = await Promise.all([
-      fetch(`${BACKEND}/deception/decoys`, {
+      fetchBackend(`${BACKEND}/deception/decoys`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
-      fetch(`${BACKEND}/deception/alerts`, {
+      fetchBackend(`${BACKEND}/deception/alerts`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
     ]);

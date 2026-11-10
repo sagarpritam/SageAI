@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   try {
     if (action === "setup") {
-      const res = await fetch(`${BACKEND}/auth/mfa/setup`, {
+      const res = await fetchBackend(`${BACKEND}/auth/mfa/setup`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       if (!code) {
         return NextResponse.json({ error: "MFA code is required" }, { status: 400 });
       }
-      const res = await fetch(`${BACKEND}/auth/mfa/${action}`, {
+      const res = await fetchBackend(`${BACKEND}/auth/mfa/${action}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

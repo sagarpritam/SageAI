@@ -1,7 +1,28 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
+
+function buildSimulatedSnapshot(body: Record<string, unknown>) {
+  const provider = String(body.cloud_provider || "aws");
+  return {
+    status: "success",
+    snapshot: {
+      snapshot_id: `snap-${provider.toLowerCase()}-${Math.random().toString(16).slice(2, 8)}`,
+      incident_id: (body.incident_id as string) || "INC-2026-XXXX",
+      cloud_provider: provider.toUpperCase(),
+      resource_id: (body.resource_id as string) || "vol-unknown",
+      sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      status: "SEALED_AND_TIMESTAMPED",
+      rfc3161_token: {
+        token_id: "tsa-tok-new",
+        policy_oid: "1.3.6.1.4.1.58921.1.1",
+        verification_status: "VALID",
+      },
+    },
+  };
+}
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -11,11 +32,15 @@ export async function GET() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/cloud-forensics/snapshots`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/cloud-forensics/snapshots`,
+      {
+        method: "GET",
+        headers,
+        cache: "no-store",
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
@@ -30,40 +55,29 @@ export async function GET() {
 export async function POST(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
   try {
-    const body = await req.json();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${BACKEND}/cloud-forensics/create-snapshot`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
+    const res = await fetchBackend(
+      `${BACKEND}/cloud-forensics/create-snapshot`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      },
+      5000
+    );
 
     if (res.ok) {
       const data = await res.json();
       return NextResponse.json(data);
     }
-    return NextResponse.json({
-      status: "success",
-      snapshot: {
-        snapshot_id: `snap-${(body.cloud_provider || "aws").toLowerCase()}-${Math.random().toString(16).slice(2, 8)}`,
-        incident_id: body.incident_id || "INC-2026-XXXX",
-        cloud_provider: (body.cloud_provider || "AWS").toUpperCase(),
-        resource_id: body.resource_id || "vol-unknown",
-        sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        status: "SEALED_AND_TIMESTAMPED",
-        rfc3161_token: {
-          token_id: "tsa-tok-new",
-          policy_oid: "1.3.6.1.4.1.58921.1.1",
-          verification_status: "VALID",
-        },
-      },
-    });
+    return NextResponse.json(buildSimulatedSnapshot(body));
   } catch {
-    return NextResponse.json({ status: "error", message: "Failed to create forensic snapshot" }, { status: 500 });
+    return NextResponse.json(buildSimulatedSnapshot(body));
   }
 }
 

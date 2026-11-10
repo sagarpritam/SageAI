@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  fetchBackend,
   ALLOWED_COMPLIANCE_QUERY_FRAMEWORKS,
   safeUpstreamJson,
 } from "@/lib/proxy-utils";
@@ -23,11 +24,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(
+    const res = await fetchBackend(
       `${BACKEND}/compliance/report?framework=${encodeURIComponent(framework)}`,
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
+      45000
     );
 
     if (!res.ok) {

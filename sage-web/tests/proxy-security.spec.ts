@@ -322,4 +322,109 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     ).toContainText("BACKEND_URL");
     await expect(page.locator('button:has-text("Start Scan")')).toBeVisible();
   });
+
+  test("Unified fetchBackend rollout fails fast offline across core, streaming, billing, notification, and studio routes", async ({
+    request,
+  }) => {
+    const startMs = Date.now();
+
+    // Auth-gated core routes must reject unauthenticated callers before touching backend
+    for (const check of [
+      () => request.post("/api/checkout"),
+      () => request.post("/api/billing/portal"),
+      () => request.post("/api/copilot/chat", { data: { message: "hi" } }),
+      () => request.get("/api/scan/test-scan-1/pdf"),
+      () => request.post("/api/scan/test-scan-1/share"),
+      () => request.post("/api/notifications/channels", { data: { type: "slack" } }),
+    ]) {
+      const res = await check();
+      expect(res.status()).toBe(401);
+    }
+
+    // Authed core, SSE streaming, binary export, and notification channel routes fail cleanly with 502 (never 500)
+    const coreOfflineChecks: Array<() => Promise<import("@playwright/test").APIResponse>> = [
+      () => request.post("/api/checkout", { headers: AUTH_HEADERS }),
+      () => request.post("/api/billing/portal", { headers: AUTH_HEADERS }),
+      () =>
+        request.post("/api/copilot/chat", {
+          headers: AUTH_HEADERS,
+          data: { message: "summarize posture" },
+        }),
+      () =>
+        request.post("/api/intelligence/deep-search", {
+          headers: AUTH_HEADERS,
+          data: { query: "example.com" },
+        }),
+      () =>
+        request.post("/api/dast/scan", {
+          headers: AUTH_HEADERS,
+          data: { target: "https://example.com" },
+        }),
+      () =>
+        request.post("/api/export", {
+          headers: AUTH_HEADERS,
+          data: { type: "scans", format: "json" },
+        }),
+      () => request.get("/api/scan/test-scan-1/pdf", { headers: AUTH_HEADERS }),
+      () => request.post("/api/scan/test-scan-1/share", { headers: AUTH_HEADERS }),
+      () => request.post("/api/mfa?action=setup", { headers: AUTH_HEADERS }),
+      () => request.get("/api/reports/test-scan-1/sarif", { headers: AUTH_HEADERS }),
+      () => request.get("/api/auth/sso/config"),
+      () =>
+        request.post("/api/notifications/channels", {
+          headers: AUTH_HEADERS,
+          data: { type: "slack", target: "#secops" },
+        }),
+    ];
+
+    for (const runCheck of coreOfflineChecks) {
+      const res = await runCheck();
+      expect(res.status(), `Expected 502 offline on ${res.url()}`).toBe(502);
+      const body = (await res.json()) as Record<string, unknown>;
+      expect(typeof body.error).toBe("string");
+      expect(body.detail).toBeUndefined();
+    }
+
+    const notifChannelsGet = await request.get("/api/notifications/channels", {
+      headers: AUTH_HEADERS,
+    });
+    expect(notifChannelsGet.status()).toBe(200);
+    expect(await notifChannelsGet.json()).toEqual([]);
+
+    // Studio simulation routes & fixed POST simulation fallbacks return 200 without hitting 500
+    const zkpRes = await request.get("/api/zkp/proof");
+    expect(zkpRes.status()).toBe(200);
+
+    const depoisonRes = await request.post("/api/ai-depoison/scan", {
+      data: { adapter_id: "finance-lora" },
+    });
+    expect(depoisonRes.status()).toBe(200);
+
+    const casRes = await request.post("/api/cas-redteam/campaigns", {
+      data: { name: "E2E Drill" },
+    });
+    expect(casRes.status()).toBe(200);
+    const casBody = (await casRes.json()) as { status?: string; campaign?: { name?: string } };
+    expect(casBody.status).toBe("success");
+    expect(casBody.campaign?.name).toBe("E2E Drill");
+
+    const llmGuardRes = await request.post("/api/airgap-llm-guard/scan-artifact", {
+      data: { model_name: "Llama3-Test" },
+    });
+    expect(llmGuardRes.status()).toBe(200);
+    const llmBody = (await llmGuardRes.json()) as { model?: { name?: string } };
+    expect(llmBody.model?.name).toBe("Llama3-Test");
+
+    const forensicsRes = await request.post("/api/cloud-forensics/snapshots", {
+      data: { cloud_provider: "AWS" },
+    });
+    expect(forensicsRes.status()).toBe(200);
+
+    const regRes = await request.post("/api/regulatory-commander/incidents", {
+      data: { title: "E2E Tabletop" },
+    });
+    expect(regRes.status()).toBe(200);
+
+    expect(Date.now() - startMs).toBeLessThan(10000);
+  });
 });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/deception/simulate-attack`, {
+    const res = await fetchBackend(`${BACKEND}/deception/simulate-attack`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

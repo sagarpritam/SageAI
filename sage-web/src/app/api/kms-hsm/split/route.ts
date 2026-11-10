@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -19,11 +19,11 @@ export async function POST(req: Request) {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const endpoint = body.shares ? "reconstruct-secret" : "split-secret";
-    const res = await fetch(`${BACKEND}/kms-hsm/${endpoint}`, {
+    const res = await fetchBackend(`${BACKEND}/kms-hsm/${endpoint}`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 5000);
 
     if (res.ok) {
       const data = await safeUpstreamJson(res, getFallbackSplit(body));

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${BACKEND_URL}/auth/sso/saml/login`, {
+    const res = await fetchBackend(`${BACKEND_URL}/auth/sso/saml/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

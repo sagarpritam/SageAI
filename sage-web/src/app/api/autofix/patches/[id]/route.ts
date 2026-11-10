@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -18,7 +18,7 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(`${BACKEND}/autofix/patches/${encodeURIComponent(id)}`, {
+    const res = await fetchBackend(`${BACKEND}/autofix/patches/${encodeURIComponent(id)}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

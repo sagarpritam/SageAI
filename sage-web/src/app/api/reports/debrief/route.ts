@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { fetchBackend } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -103,11 +104,11 @@ export async function POST(req: NextRequest) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/reports/executive-debrief`, {
+    const res = await fetchBackend(`${BACKEND}/reports/executive-debrief`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-    });
+    }, 45000);
 
     if (res.ok) {
       const data = await res.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import { fetchBackend, safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 const DEFAULT_EMAIL_CONFIG = {
@@ -15,7 +15,7 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const res = await fetch(`${BACKEND}/email-reports/config`, {
+    const res = await fetchBackend(`${BACKEND}/email-reports/config`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return NextResponse.json(DEFAULT_EMAIL_CONFIG);
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${BACKEND}/email-reports/config`, {
+    const res = await fetchBackend(`${BACKEND}/email-reports/config`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
