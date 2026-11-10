@@ -3,7 +3,7 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-594%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Tests](https://img.shields.io/badge/tests-599%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
 [![Next.js](https://img.shields.io/badge/Next.js-418%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-644%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
 [![Version](https://img.shields.io/badge/version-6.8.0%20String%20Field%20%26%20Monopole%20Catalysis%20Milestone-gold?style=for-the-badge)](CHANGELOG.md)
@@ -517,7 +517,7 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │ REST API + WebSockets
 ┌───────────────────────────────────▼────────────────────────────────────┐
-│                  FastAPI Backend (640 Endpoints / 152 Routers)         │
+│                  FastAPI Backend (644 Endpoints / 151 Routers)         │
 │  Enterprise Orchestrator │ WAF │ NIDS │ UEBA │ SOAR │ Audit Chain      │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
 │  │  10-Pillar Sovereign Defense & Offense Grid                     │  │
@@ -540,31 +540,32 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 
 - **Backend**: Python 3.13+, FastAPI, SQLAlchemy (asyncpg), Pydantic v2, SlowAPI, PyJWT, Cryptography, ReportLab.
 - **Frontend**: Next.js 16.4.4 (Turbopack App Router), React 19, TypeScript 5, Tailwind CSS, Lucide React, Axios.
-- **Database & Storage**: PostgreSQL 17.6 on Supabase (`jiawtheciauiwhcgswde`) with Row-Level Security (RLS) on all 16 tables.
+- **Database & Storage**: PostgreSQL 17.6 on Supabase (`jiawtheciauiwhcgswde`) with Row-Level Security (RLS) on all 17 ORM tables.
 - **AI & Frontier Models**: OpenAI (GPT-4o), Anthropic (Claude 3.7), Google Gemini (Gemini 2.5), DeepSeek (R1), NVIDIA NIM (Nemotron 70B / NeMo Microservices).
 
 ---
 
-## 🗄️ Database Architecture (17 Models)
+## 🗄️ Database Architecture (17 Tables / 16 Model Modules)
 
 | Model | Table Name | Purpose |
 | :--- | :--- | :--- |
 | `Organization` | `organizations` | Multi-tenant tenant boundary & subscription tier |
 | `User` | `users` | User credentials, roles (`admin`, `manager`, `member`, `viewer`), MFA |
-| `Role` | `roles` | Granular permission matrix |
 | `Scan` | `scans` | Vulnerability assessment run metadata and execution state |
 | `Finding` | `findings` | Atomic vulnerability entries with CVSS scores, OWASP, and CWE |
 | `Asset` | `assets` | External attack surface inventory with verification challenges |
-| `AssetDiff` | `asset_diffs` | Historical attack surface delta snapshots |
+| `AttackSurfaceDiff` | `attack_surface_diffs` | Historical attack surface delta snapshots |
 | `ASMEvent` | `asm_events` | Attack surface state change events and webhook dispatches |
-| `KnowledgeGraph`| `knowledge_graph` | Security knowledge graph nodes and attack path relations |
+| `GraphNode` | `kg_nodes` | Security knowledge graph entity nodes |
+| `GraphEdge` | `kg_edges` | Security knowledge graph attack path relations |
 | `AgentLog` | `agent_logs` | AI reasoning steps, tool invocations, and execution trails |
 | `RemediationPatch`| `remediation_patches` | SagePatch proposals, unified diffs, and approval workflows |
 | `AuditLog` | `audit_logs` | High-level user activity and system audit log |
-| `ScanSchedule` | `schedules` | Cron-based continuous scanning configuration |
+| `ScanSchedule` | `scan_schedules` | Cron-based continuous scanning configuration |
 | `APIKey` | `api_keys` | Scoped programmatic developer API tokens |
 | `Webhook` | `webhooks` | Outbound HMAC-SHA256 signed event notifications |
 | `Notification` | `notifications` | In-app user notifications and dispatch status |
+| `NotificationChannel` | `notification_channels` | Tenant Slack, Discord, and webhook alert channel targets |
 
 ---
 
@@ -651,11 +652,11 @@ cd sage-web && npm run lint && npm run build && npm run test:e2e
 
 ### Test Suite Summary:
 ```text
-- Total Pytest Test Suite: 594 / 594 passing across 94 test suites (100% pass rate)
-- Playwright E2E Suite: 23 / 23 Chromium specs passing (standalone SSR server)
-- Next.js Turbopack Build: 418 / 418 routes compiled with 0 errors
-- FastAPI Microservices: 644 endpoints registered across 151 routers (625 OpenAPI paths)
-- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests/alembic), Alembic clean-DB schema check, and Bandit compliant
+- Total Pytest Test Suite: 599 / 599 passing across 95 test suites (100% pass rate)
+- Playwright E2E Suite: 27 / 27 Chromium specs passing across 3 suites (standalone SSR server)
+- Next.js Turbopack Build: 418 / 418 routes compiled with 0 errors (415 API routes)
+- FastAPI Microservices: 644 API endpoints registered across 151 routers (647 total routes / 625 OpenAPI paths)
+- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests/alembic), ESLint (--max-warnings 0), Alembic clean-DB schema check, and Bandit compliant
 ```
 
 ---
@@ -909,9 +910,11 @@ SageAI/
 │   │   └── warroom_service.py       # Distributed event streaming & War Room manager
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
-│   ├── app/               # App Router pages (Dashboard, Scans, Intel, War Room, Command Center)
+│   ├── app/               # 14 App Router pages (v6.8.0 Landing, Features, Pricing, Command Center...)
 │   ├── app/api/           # 415 API routes and proxy endpoints
-│   └── components/        # 169 Tailwind & Lucide React UI Components (162 top-level studios & panels)
+│   ├── lib/platform.ts    # Centralized v6.8.0 metrics, milestone metadata & SITE_URL
+│   └── components/        # 170 Tailwind & Lucide React UI Components (163 top-level panels; 134 mounted Command Center studios)
+│       ├── SovereignArchitectureShowcase.tsx     # Interactive v6.8.0 10-Pillar, PQC & Waves 1-28 Grid Showcase
 │       ├── StringFieldTheoryStudio.tsx           # 🎻 Open-Closed String Field Theory Vertex Integrator
 │       ├── MirrorSymmetryStudio.tsx              # 🪞 Calabi-Yau Mirror Symmetry Hodge Diamond Inverter
 │       ├── FibonacciAnyonStudio.tsx              # 🧬 Fibonacci Anyon Braid Compiler Studio
@@ -990,8 +993,8 @@ SageAI/
 │       ├── CTIHub.tsx                            # OASIS STIX 2.1 bundle forge & TAXII 2.1
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
-├── sage-web/tests/        # 23 Playwright E2E specs (standalone Next.js server)
-├── tests/                 # 594 pytest tests across 94 test suites (100% passing)
+├── sage-web/tests/        # 27 Playwright E2E specs across 3 suites (standalone Next.js server)
+├── tests/                 # 599 pytest tests across 95 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

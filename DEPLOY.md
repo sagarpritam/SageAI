@@ -43,18 +43,20 @@ The Next.js 16 frontend (`sage-web`) is optimized for Vercel deployment with Tur
 ### Steps to Deploy on Vercel
 
 1. Import repository on [Vercel](https://vercel.com/new).
-2. Configure **Root Directory** as `sage-web`.
+2. Keep **Root Directory** at repo root (`.`) to use the root [`vercel.json`](vercel.json) monorepo config (`cd sage-web && npm run build`) paired with [`.vercelignore`](.vercelignore) — or set Root Directory to `sage-web` for standalone Next.js builds.
 3. Set **Framework Preset** to `Next.js`.
 4. Add Environment Variables:
    - `BACKEND_URL`: `https://api.yourdomain.com` (Your FastAPI production backend)
+   - `INTERNAL_SERVICE_KEY`: Shared secret matching your FastAPI backend `INTERNAL_SERVICE_KEY`
+   - `NEXT_PUBLIC_APP_URL`: Canonical frontend URL (e.g., `https://sageai-security-platform.vercel.app`) for SEO metadata, `sitemap.xml`, and share links
    - `STRIPE_SECRET_KEY`: `sk_live_...`
    - `STRIPE_WEBHOOK_SECRET`: `whsec_...`
    - `STRIPE_PRO_PRICE_ID`: `price_...`
    - `GOOGLE_GENERATIVE_AI_API_KEY`: `AIza...`
-5. Click **Deploy**. Vercel will build all 53 static/dynamic routes in ~3 seconds.
+5. Click **Deploy**. Vercel will compile all 418 static and dynamic App Router routes (`/` through `/dashboard` across 134 studios + 415 API proxies).
 
 > [!TIP]
-> Both `vercel.json` and `.vercelignore` are included to keep serverless bundles compact and exclude heavy archives, build caches, and test artifacts.
+> Root [`vercel.json`](vercel.json) and path-anchored [`.vercelignore`](.vercelignore) (`/app/`, `/api/`, `/scripts/`, `/tests/`) ensure backend exclusions never strip `sage-web/src/app/**` or `sage-web/scripts/**` from the Vercel serverless bundle.
 
 ---
 
@@ -165,9 +167,9 @@ docker compose -f docker-compose.prod.yml exec backend alembic current
 
 ---
 
-## 8. Multi-AI Council & Enterprise Defense Grid Verification
+## 8. Multi-AI Council & 10-Pillar Sovereign Defense Grid Verification
 
-Verify all 6 pillars of the autonomous defense grid:
+Verify the autonomous defense grid endpoints:
 
 ```bash
 # 1. Multi-AI Council Telemetry (Claude, OpenAI, Gemini, DeepSeek, NVIDIA)

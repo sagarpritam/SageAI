@@ -608,4 +608,28 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('button:has-text("String Field Theory (Cap 104)")')).toBeVisible();
   });
 
+  test('Public pages and /login serve static assets without 404 or 5xx responses', async ({ page }) => {
+    const brokenResponses: Array<{ url: string; status: number }> = [];
+    page.on('response', (res) => {
+      if (!res.url().includes('/_vercel/') && (res.status() === 404 || res.status() >= 500)) {
+        brokenResponses.push({ url: res.url(), status: res.status() });
+      }
+    });
+
+    await page.goto('/login');
+    const gridAsset = await page.request.get('/grid-pattern.svg');
+    expect(gridAsset.status()).toBe(200);
+    const ogAsset = await page.request.get('/og-image.png');
+    expect(ogAsset.status()).toBe(200);
+
+    await page.goto('/');
+    await page.goto('/features');
+    await page.goto('/how-it-works');
+    await page.goto('/pricing');
+    await page.goto('/privacy');
+    await page.goto('/terms');
+
+    expect(brokenResponses).toEqual([]);
+  });
+
 });
