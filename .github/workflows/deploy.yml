@@ -58,7 +58,7 @@ jobs:
             AI_GATEWAY_API_KEY=${{ secrets.AI_GATEWAY_API_KEY }}
             AI_GATEWAY_URL=${{ secrets.AI_GATEWAY_URL || 'https://ai-gateway.vercel.sh/v1' }}
             INTERNAL_SERVICE_KEY=${{ secrets.INTERNAL_SERVICE_KEY || secrets.PROD_SECRET_KEY }}
-            CORS_ORIGINS="${{ secrets.PROD_CORS_ORIGINS || 'https://sageai-sec-v3-unique.vercel.app,https://sage-web.vercel.app,https://sage-web-sagarpritams-projects.vercel.app,https://sageai-v1.vercel.app,https://sageai-v1-unique.vercel.app,https://sage-ai.vercel.app,https://sageai.io,https://app.sageai.io' }}"
+            CORS_ORIGINS="${{ secrets.PROD_CORS_ORIGINS || 'https://sageai-security-platform.vercel.app,https://sageai-sec-v2.vercel.app,https://sageai-v1.vercel.app,https://sageai-v1-unique.vercel.app,https://sageai-sec-v3-unique.vercel.app,https://sage-ai-02.vercel.app,https://sage-web-sagarpritams-projects.vercel.app,https://sage-ai-sagarpritams-projects.vercel.app,https://sageai.io,https://app.sageai.io' }}"
 
       - name: Deploy Frontend to Cloud Run
         env:

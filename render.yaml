@@ -37,7 +37,7 @@ services:
       - key: RATE_LIMIT
         value: 60/minute
       - key: CORS_ORIGINS
-        value: https://sageai-dashboard.onrender.com,https://sageai-sec-v3-unique.vercel.app,https://sage-web.vercel.app
+        value: https://sageai-dashboard.onrender.com,https://sageai-security-platform.vercel.app,https://sageai-sec-v2.vercel.app,https://sageai-v1.vercel.app,https://sageai-v1-unique.vercel.app,https://sageai-sec-v3-unique.vercel.app,https://sage-ai-02.vercel.app,https://sage-web-sagarpritams-projects.vercel.app
       - key: FRONTEND_URL
         value: https://sageai-dashboard.onrender.com
       - key: PYTHON_VERSION

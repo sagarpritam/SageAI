@@ -236,4 +236,35 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
       }
     }
   });
+
+  test("Health and Auth proxy routes expose v6.8.0 metadata and avoid 500s when backend is offline", async ({
+    request,
+  }) => {
+    const healthRes = await request.get("/api/health");
+    expect(healthRes.status()).toBe(200);
+    const healthJson = (await healthRes.json()) as Record<string, unknown>;
+    expect(healthJson.platform_version).toBe("6.8.0");
+    expect(healthJson.version).toBe("6.8.0");
+    expect(healthJson.backend_configured).toBe(false);
+    expect(healthJson.mode).toBe("standalone-ui");
+
+    for (const authPath of [
+      "/api/auth/login",
+      "/api/auth/register",
+      "/api/auth/sso/saml/acs",
+    ]) {
+      const badJsonRes = await request.post(authPath, {
+        headers: { "Content-Type": "application/json" },
+        data: "{invalid",
+      });
+      expect(badJsonRes.status(), `Expected 400 for malformed JSON at ${authPath}`).toBe(400);
+
+      const offlineRes = await request.post(authPath, {
+        data: { email: "ops@sageai.io", password: "SecretPassword123!" },
+      });
+      expect(offlineRes.status(), `Expected clean 502 instead of 500 at ${authPath}`).toBe(502);
+      const errBody = (await offlineRes.json()) as Record<string, unknown>;
+      expect(typeof errBody.error).toBe("string");
+    }
+  });
 });

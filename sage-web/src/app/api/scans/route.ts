@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(req: NextRequest) {
+export async function GET() {
   const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
@@ -11,11 +11,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!process.env.BACKEND_URL && (process.env.VERCEL === "1" || process.env.CI === "true")) {
+    return NextResponse.json({ error: "Backend unreachable" }, { status: 502 });
+  }
+
   try {
     const res = await fetch(`${backendUrl}/scans`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) {
@@ -25,10 +30,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, []);
     return NextResponse.json(data);
-  } catch (e) {
-    console.error("Scans proxy error:", e);
+  } catch {
     return NextResponse.json(
       { error: "Backend unreachable" },
       { status: 502 }

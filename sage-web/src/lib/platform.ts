@@ -7,6 +7,6 @@ export const PLATFORM_FASTAPI_ROUTES_COUNT = 647;
 export const PLATFORM_NEXT_API_ROUTES_COUNT = 415;
 
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || "https://sageai-v1-unique.vercel.app"
+  process.env.NEXT_PUBLIC_APP_URL || "https://sageai-security-platform.vercel.app"
 ).replace(/\/+$/, "");
 

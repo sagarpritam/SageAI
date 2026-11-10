@@ -21,6 +21,9 @@ interface HealthData {
   scan_queue: number;
   uptime_seconds: number;
   version?: string;
+  platform_version?: string;
+  backend_configured?: boolean;
+  mode?: string;
   environment?: string;
 }
 
@@ -70,7 +73,11 @@ export function SystemHealth() {
       label: "API Server",
       status: health?.api || "unknown",
       icon: Server,
-      detail: health?.uptime_seconds ? `Uptime: ${formatUptime(health.uptime_seconds)}` : "—",
+      detail: health?.uptime_seconds
+        ? `Uptime: ${formatUptime(health.uptime_seconds)}`
+        : health?.backend_configured === false
+          ? "BACKEND_URL not configured (Standalone Edge UI)"
+          : "—",
     },
     {
       label: "Database",
@@ -82,7 +89,9 @@ export function SystemHealth() {
       detail:
         health?.database === "connected" || health?.database === "healthy"
           ? `${health.database_pool?.dialect?.toUpperCase() || "DB"} • ${health.database_latency_ms ?? 0}ms latency • ${health.database_pool?.pool_type || "Active"}`
-          : "Status unknown",
+          : health?.backend_configured === false
+            ? "Awaiting backend link"
+            : "Status unknown",
     },
     {
       label: "Scan Queue",
@@ -105,28 +114,44 @@ export function SystemHealth() {
   };
 
   const allHealthy = services.every((s) => s.status === "healthy" || s.status === "connected");
+  const isStandalone = health?.backend_configured === false;
 
   return (
     <div className="space-y-6">
       {/* Overall Status Banner */}
-      <div className={`flex items-center gap-3 p-4 rounded-xl border ${
+      <div className={`flex items-center justify-between gap-3 p-4 rounded-xl border ${
         allHealthy
           ? "bg-emerald-950/20 border-emerald-900/30"
-          : "bg-red-950/20 border-red-900/30"
+          : isStandalone
+            ? "bg-amber-950/20 border-amber-900/30"
+            : "bg-red-950/20 border-red-900/30"
       }`}>
-        {allHealthy ? (
-          <Wifi className="w-6 h-6 text-emerald-400" />
-        ) : (
-          <WifiOff className="w-6 h-6 text-red-400" />
-        )}
-        <div>
-          <p className={`text-sm font-bold ${allHealthy ? "text-emerald-400" : "text-red-400"}`}>
-            {allHealthy ? "All Systems Operational" : "Service Degradation Detected"}
-          </p>
-          <p className="text-xs text-zinc-500">
-            Last checked: {lastCheck?.toLocaleTimeString() || "—"}
-          </p>
+        <div className="flex items-center gap-3">
+          {allHealthy ? (
+            <Wifi className="w-6 h-6 text-emerald-400" />
+          ) : (
+            <WifiOff className={`w-6 h-6 ${isStandalone ? "text-amber-400" : "text-red-400"}`} />
+          )}
+          <div>
+            <p className={`text-sm font-bold ${allHealthy ? "text-emerald-400" : isStandalone ? "text-amber-400" : "text-red-400"}`}>
+              {allHealthy
+                ? "All Systems Operational"
+                : isStandalone
+                  ? "Frontend Edge Operational (Standalone UI Mode)"
+                  : "Service Degradation Detected"}
+            </p>
+            <p className="text-xs text-zinc-500">
+              {isStandalone
+                ? `Configure BACKEND_URL to connect FastAPI engine • Checked ${lastCheck?.toLocaleTimeString() || "—"}`
+                : `Last checked: ${lastCheck?.toLocaleTimeString() || "—"}`}
+            </p>
+          </div>
         </div>
+        {(health?.platform_version || health?.version) && (
+          <span className="text-xs font-mono px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-emerald-400">
+            v{health?.platform_version || health?.version}
+          </span>
+        )}
       </div>
 
       {/* Service Cards */}

@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { apiError, handleRouteError } from "@/lib/api-response";
+import { apiError } from "@/lib/api-response";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function POST(req: NextRequest) {
-  try {
-    const payload = await req.json();
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
 
+  if (!process.env.BACKEND_URL && (process.env.VERCEL === "1" || process.env.CI === "true")) {
+    return NextResponse.json(
+      { error: "SSO authentication backend not configured (set BACKEND_URL on Vercel)" },
+      { status: 502 }
+    );
+  }
+
+  try {
     const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip");
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (clientIp) {
@@ -16,17 +27,26 @@ export async function POST(req: NextRequest) {
     const backendRes = await fetch(`${BACKEND_URL}/auth/sso/saml/acs`, {
       method: "POST",
       headers,
-      body: JSON.stringify(payload),
+      body: JSON.stringify(parsed.data),
+      signal: AbortSignal.timeout(8000),
     });
 
-    const data = await backendRes.json();
+    const data = await safeUpstreamJson<{ detail?: string; access_token?: unknown }>(
+      backendRes,
+      {}
+    );
     if (!backendRes.ok) {
       return apiError(data.detail || "SAML Authentication failed", backendRes.status);
     }
 
-    const { access_token } = data;
+    if (typeof data.access_token !== "string" || !data.access_token) {
+      return NextResponse.json(
+        { error: "Invalid response from SAML service" },
+        { status: 502 }
+      );
+    }
 
-    // Create response and set HttpOnly cookie
+    const access_token = data.access_token;
     const response = NextResponse.json({ success: true, access_token });
     response.cookies.set("sageai_jwt", access_token, {
       httpOnly: true,
@@ -37,8 +57,10 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (err: unknown) {
-    return handleRouteError(err);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to connect to SAML authentication service" },
+      { status: 502 }
+    );
   }
 }
-
