@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
 
@@ -20,14 +21,14 @@ export async function GET(req: NextRequest) {
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, {});
       return NextResponse.json(data);
     }
-    const errData = await res.json().catch(() => ({}));
+    const errData = await safeUpstreamJson(res, {});
     return NextResponse.json(errData, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to export rule bundle", detail: error?.message },
+      { error: "Failed to export rule bundle" },
       { status: 502 }
     );
   }

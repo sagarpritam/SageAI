@@ -1,22 +1,28 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const res = await fetch(`${BACKEND}/integrations/all/status`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from integrations service",
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to connect to backend", details: String(error) },
-      { status: 500 }
+      { error: "Failed to connect to integrations service" },
+      { status: 502 }
     );
   }
 }

@@ -49,12 +49,9 @@ export async function POST(req: Request) {
       const data = await res.json().catch(() => ({ ok: res.ok }));
       return NextResponse.json(data, { status: res.ok ? 200 : res.status });
     }
-  } catch (err) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to connect to notifications service",
-        details: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Failed to connect to notifications service" },
       { status: 502 }
     );
   }

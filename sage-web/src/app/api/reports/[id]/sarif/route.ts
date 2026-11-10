@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import {
+  isValidResourceId,
+  sanitizeFilenamePrefix,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,6 +19,9 @@ export async function GET(
   }
 
   const { id } = await params;
+  if (!isValidResourceId(id)) {
+    return NextResponse.json({ error: "Invalid scan ID" }, { status: 400 });
+  }
 
   try {
     const res = await fetch(`${BACKEND}/reports/${encodeURIComponent(id)}/sarif`, {
@@ -21,9 +29,9 @@ export async function GET(
     });
 
     if (!res.ok) {
-      const data = await res
-        .json()
-        .catch(() => ({ detail: "SARIF export failed" }));
+      const data = await safeUpstreamJson<{ detail?: string }>(res, {
+        detail: "SARIF export failed",
+      });
       return NextResponse.json(
         { error: data.detail || "SARIF export failed" },
         { status: res.status }
@@ -31,7 +39,7 @@ export async function GET(
     }
 
     const sarifBuffer = await res.arrayBuffer();
-    const safePrefix = id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 8) || "scan";
+    const safePrefix = sanitizeFilenamePrefix(id.slice(0, 8), "scan");
     return new NextResponse(sarifBuffer, {
       status: 200,
       headers: {
@@ -39,14 +47,10 @@ export async function GET(
         "Content-Disposition": `attachment; filename="SageAI_sarif_${safePrefix}.sarif.json"`,
       },
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to connect to report service",
-        details: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Failed to connect to report service" },
       { status: 502 }
     );
   }
 }
-

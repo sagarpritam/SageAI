@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -17,13 +18,17 @@ export async function POST(req: Request) {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json().catch(() => ({ detail: "MFA setup failed" }));
+      const data = await safeUpstreamJson(res, { detail: "MFA setup failed" });
       return NextResponse.json(data, { status: res.status });
     }
 
     if (action === "verify" || action === "disable") {
-      const body = await req.json().catch(() => ({}));
-      const code = typeof body.code === "string" ? body.code.trim() : "";
+      const parsed = await safeOptionalJsonBody<{ code?: unknown }>(req);
+      if (!parsed.ok) {
+        return parsed.response;
+      }
+      const code =
+        typeof parsed.data.code === "string" ? parsed.data.code.trim() : "";
       if (!code) {
         return NextResponse.json({ error: "MFA code is required" }, { status: 400 });
       }
@@ -35,15 +40,14 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({ code }),
       });
-      const data = await res.json().catch(() => ({ detail: "MFA verification failed" }));
+      const data = await safeUpstreamJson(res, {
+        detail: "MFA verification failed",
+      });
       return NextResponse.json(data, { status: res.status });
     }
-  } catch (err) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to connect to MFA service",
-        details: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Failed to connect to MFA service" },
       { status: 502 }
     );
   }

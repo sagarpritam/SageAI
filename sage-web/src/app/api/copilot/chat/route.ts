@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -13,8 +14,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const parsed = await safeJsonBody<{ stream?: unknown }>(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
+    const body = parsed.data;
     const isStream = body.stream !== false; // Default to streaming if not explicitly false
 
     const backendRes = await fetch(`${BACKEND}/copilot/chat`, {
@@ -30,9 +36,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!backendRes.ok) {
-      const errText = await backendRes.text();
       return NextResponse.json(
-        { error: `Backend error: ${backendRes.statusText}`, detail: errText },
+        { error: `Backend error: ${backendRes.statusText || backendRes.status}` },
         { status: backendRes.status }
       );
     }
@@ -49,11 +54,13 @@ export async function POST(req: NextRequest) {
     }
 
     // JSON response fallback
-    const data = await backendRes.json();
+    const data = await safeUpstreamJson(backendRes, {
+      error: "Invalid response from SageAI Copilot backend",
+    });
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to connect to SageAI Copilot backend", detail: error?.message },
+      { error: "Failed to connect to SageAI Copilot backend" },
       { status: 502 }
     );
   }

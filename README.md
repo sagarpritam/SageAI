@@ -3,7 +3,7 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-592%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Tests](https://img.shields.io/badge/tests-594%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
 [![Next.js](https://img.shields.io/badge/Next.js-418%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-644%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
 [![Version](https://img.shields.io/badge/version-6.8.0%20String%20Field%20%26%20Monopole%20Catalysis%20Milestone-gold?style=for-the-badge)](CHANGELOG.md)
@@ -628,16 +628,19 @@ python scripts/dev_check.py
 
 # 2. Or run individual tools:
 # Linting & Style Check
-python -m ruff check app/ tests/ scripts/ sagestrike/
+python -m ruff check app/ tests/ scripts/ sagestrike/ alembic/
 
 # Code Formatting Check
-python -m ruff format --check app/ tests/ scripts/ sagestrike/
+python -m ruff format --check app/ tests/ scripts/ sagestrike/ alembic/
 
 # Static Type Checking
-python -m mypy app/ sagestrike/ scripts/ tests/ --ignore-missing-imports --check-untyped-defs
+python -m mypy app/ sagestrike/ scripts/ tests/ alembic/ --ignore-missing-imports --check-untyped-defs
 
 # Security SAST Scan
 python -m bandit -r app/ sagestrike/ --severity-level medium
+
+# Database Migration & Schema Drift Check
+python -m alembic heads && python -m alembic upgrade head && python -m alembic check
 
 # Full Test Suite
 pytest -q
@@ -648,11 +651,11 @@ cd sage-web && npm run lint && npm run build && npm run test:e2e
 
 ### Test Suite Summary:
 ```text
-- Total Pytest Test Suite: 592 / 592 passing across 93 test suites (100% pass rate)
-- Playwright E2E Suite: 18 / 18 Chromium specs passing (standalone SSR server)
+- Total Pytest Test Suite: 594 / 594 passing across 94 test suites (100% pass rate)
+- Playwright E2E Suite: 23 / 23 Chromium specs passing (standalone SSR server)
 - Next.js Turbopack Build: 418 / 418 routes compiled with 0 errors
 - FastAPI Microservices: 644 endpoints registered across 151 routers (625 OpenAPI paths)
-- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests), and Bandit compliant
+- Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests/alembic), Alembic clean-DB schema check, and Bandit compliant
 ```
 
 ---
@@ -987,8 +990,8 @@ SageAI/
 │       ├── CTIHub.tsx                            # OASIS STIX 2.1 bundle forge & TAXII 2.1
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
-├── sage-web/tests/        # 18 Playwright E2E specs (standalone Next.js server)
-├── tests/                 # 592 pytest tests across 93 test suites (100% passing)
+├── sage-web/tests/        # 23 Playwright E2E specs (standalone Next.js server)
+├── tests/                 # 594 pytest tests across 94 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

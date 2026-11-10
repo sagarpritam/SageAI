@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -21,16 +22,20 @@ export async function GET() {
       }),
     ]);
 
-    const decoys = decoysRes.ok ? await decoysRes.json() : { decoys: [] };
-    const alerts = alertsRes.ok ? await alertsRes.json() : { alerts: [] };
+    const decoys = decoysRes.ok
+      ? await safeUpstreamJson<{ decoys?: unknown[] }>(decoysRes, { decoys: [] })
+      : { decoys: [] };
+    const alerts = alertsRes.ok
+      ? await safeUpstreamJson<{ alerts?: unknown[] }>(alertsRes, { alerts: [] })
+      : { alerts: [] };
 
     return NextResponse.json({
       decoys: decoys.decoys || [],
       alerts: alerts.alerts || [],
     });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch deception data", detail: error?.message },
+      { error: "Failed to fetch deception data" },
       { status: 502 }
     );
   }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -11,11 +12,13 @@ export async function GET(req: NextRequest) {
       : `${BACKEND_URL}/auth/sso/config`;
 
     const res = await fetch(targetUrl);
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from SSO service",
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch SSO configuration", detail: error?.message },
+      { error: "Failed to fetch SSO configuration" },
       { status: 502 }
     );
   }

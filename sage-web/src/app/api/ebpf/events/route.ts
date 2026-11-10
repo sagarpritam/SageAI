@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -7,7 +8,10 @@ export async function GET(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
   const { searchParams } = new URL(req.url);
-  const limit = searchParams.get("limit") || "50";
+  const rawLimit = Number.parseInt(searchParams.get("limit") || "50", 10);
+  const limit = Number.isFinite(rawLimit)
+    ? Math.min(Math.max(rawLimit, 1), 500)
+    : 50;
   const severity = searchParams.get("severity") || "";
 
   try {
@@ -16,13 +20,16 @@ export async function GET(req: Request) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND}/ebpf/events?limit=${limit}&severity=${severity}`, {
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${BACKEND}/ebpf/events?limit=${limit}&severity=${encodeURIComponent(severity)}`,
+      {
+        headers,
+        cache: "no-store",
+      }
+    );
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, getFallbackEvents());
       return NextResponse.json(data);
     }
 
@@ -96,4 +103,3 @@ function getFallbackEvents() {
     ],
   };
 }
-

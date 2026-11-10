@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -11,26 +12,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const parsed = await safeOptionalJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json().catch(() => ({}));
     const res = await fetch(`${BACKEND}/deception/simulate-attack`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, {});
       return NextResponse.json(data);
     }
-    const errData = await res.json().catch(() => ({}));
+    const errData = await safeUpstreamJson(res, {});
     return NextResponse.json(errData, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to simulate deception journey", detail: error?.message },
+      { error: "Failed to simulate deception journey" },
       { status: 502 }
     );
   }

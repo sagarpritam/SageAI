@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
@@ -15,6 +16,9 @@ export async function GET(
   }
 
   const { id } = await params;
+  if (!isValidResourceId(id)) {
+    return NextResponse.json({ error: "Invalid CVE identifier" }, { status: 400 });
+  }
 
   try {
     const res = await fetch(`${BACKEND}/rules/cve/${encodeURIComponent(id)}`, {
@@ -25,16 +29,15 @@ export async function GET(
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, {});
       return NextResponse.json(data);
     }
-    const errData = await res.json().catch(() => ({}));
+    const errData = await safeUpstreamJson(res, {});
     return NextResponse.json(errData, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to synthesize rules for CVE", detail: error?.message },
+      { error: "Failed to synthesize rules for CVE" },
       { status: 502 }
     );
   }
 }
-

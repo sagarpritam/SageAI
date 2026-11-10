@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeOptionalJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -7,25 +8,29 @@ export async function POST(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
 
+  const parsed = await safeOptionalJsonBody<{ prompt?: unknown }>(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const prompt = typeof parsed.data.prompt === "string" ? parsed.data.prompt : "";
+
   try {
-    const body = await req.json();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const res = await fetch(`${BACKEND}/ai-spm/inspect-prompt`, {
       method: "POST",
       headers,
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, getFallbackInspection(prompt));
       return NextResponse.json(data);
     }
-    return NextResponse.json(getFallbackInspection(body.prompt || ""));
+    return NextResponse.json(getFallbackInspection(prompt));
   } catch {
-    const body = await req.json().catch(() => ({ prompt: "" }));
-    return NextResponse.json(getFallbackInspection(body.prompt || ""));
+    return NextResponse.json(getFallbackInspection(prompt));
   }
 }
 

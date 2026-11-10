@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -7,8 +8,12 @@ export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
 
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
@@ -17,19 +22,19 @@ export async function POST(req: NextRequest) {
     const res = await fetch(`${BACKEND}/enclave/encrypt`, {
       method: "POST",
       headers,
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await safeUpstreamJson(res, {});
       return NextResponse.json(data);
     }
 
-    const err = await res.json().catch(() => ({}));
+    const err = await safeUpstreamJson(res, {});
     return NextResponse.json(err, { status: res.status });
-  } catch (err: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Enclave encryption failed", detail: err?.message },
+      { error: "Enclave encryption failed" },
       { status: 502 }
     );
   }

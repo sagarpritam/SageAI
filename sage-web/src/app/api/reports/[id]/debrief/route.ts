@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -14,11 +15,18 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  try {
-    const { id } = await params;
-    const { searchParams } = new URL(req.url);
-    const lang = searchParams.get("lang") || "en";
+  const { id } = await params;
+  if (!isValidResourceId(id)) {
+    return NextResponse.json({ error: "Invalid scan ID" }, { status: 400 });
+  }
 
+  const { searchParams } = new URL(req.url);
+  const lang = searchParams.get("lang") || "en";
+  if (!isValidResourceId(lang)) {
+    return NextResponse.json({ error: "Invalid language code" }, { status: 400 });
+  }
+
+  try {
     const res = await fetch(
       `${BACKEND}/reports/${encodeURIComponent(id)}/debrief?lang=${encodeURIComponent(lang)}`,
       {
@@ -28,18 +36,14 @@ export async function GET(
       }
     );
 
-    const data = await res.json().catch(() => ({
+    const data = await safeUpstreamJson(res, {
       detail: "Failed to parse multilingual debrief",
-    }));
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to generate multilingual debrief",
-        detail: error instanceof Error ? error.message : String(error),
-      },
+      { error: "Failed to generate multilingual debrief" },
       { status: 502 }
     );
   }
 }
-

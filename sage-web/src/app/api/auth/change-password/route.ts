@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -10,27 +11,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
     const res = await fetch(`${BACKEND}/auth/change-password`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
-    const data = await res.json().catch(() => ({
+    const data = await safeUpstreamJson(res, {
       detail: res.ok ? "Password updated" : "Failed to update password",
-    }));
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to connect to authentication service",
-        details: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Failed to connect to authentication service" },
       { status: 502 }
     );
   }

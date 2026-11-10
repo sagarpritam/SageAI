@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -11,22 +12,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
     const res = await fetch(`${BACKEND}/autofix/propose`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from autofix service",
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to propose remediation patch", detail: error?.message },
+      { error: "Failed to propose remediation patch" },
       { status: 502 }
     );
   }

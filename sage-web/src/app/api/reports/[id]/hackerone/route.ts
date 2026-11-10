@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isValidResourceId, sanitizeFilenamePrefix } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -7,10 +8,14 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  if (!isValidResourceId(id)) {
+    return NextResponse.json({ error: "Invalid scan ID" }, { status: 400 });
+  }
 
   try {
     const res = await fetch(`${BACKEND}/reports/${encodeURIComponent(id)}/hackerone`, {
@@ -25,7 +30,7 @@ export async function GET(
     }
 
     const mdBuffer = await res.arrayBuffer();
-    const safePrefix = id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 8) || "scan";
+    const safePrefix = sanitizeFilenamePrefix(id.slice(0, 8), "scan");
     return new NextResponse(mdBuffer, {
       status: 200,
       headers: {
@@ -33,12 +38,9 @@ export async function GET(
         "Content-Disposition": `attachment; filename="hackerone-${safePrefix}.md"`,
       },
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
-      {
-        error: "Failed to connect to report service",
-        details: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Failed to connect to report service" },
       { status: 502 }
     );
   }

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import {
+  isValidResourceId,
+  sanitizeFilenamePrefix,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
@@ -14,9 +19,12 @@ export async function GET(
   }
 
   const { id } = await params;
+  if (!isValidResourceId(id)) {
+    return NextResponse.json({ error: "Invalid scan ID" }, { status: 400 });
+  }
 
   try {
-    const res = await fetch(`${backendUrl}/reports/${id}/pdf`, {
+    const res = await fetch(`${backendUrl}/reports/${encodeURIComponent(id)}/pdf`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -24,8 +32,11 @@ export async function GET(
 
     if (!res.ok) {
       if (res.status === 402) {
-         const err = await res.json().catch(() => ({}));
-         return NextResponse.json({ error: err.detail || "Upgrade required" }, { status: 402 });
+        const err = await safeUpstreamJson<{ detail?: string }>(res, {});
+        return NextResponse.json(
+          { error: err.detail || "Upgrade required" },
+          { status: 402 }
+        );
       }
       return NextResponse.json(
         { error: "PDF generation failed" },
@@ -34,12 +45,13 @@ export async function GET(
     }
 
     const pdfBuffer = await res.arrayBuffer();
+    const safePrefix = sanitizeFilenamePrefix(id, "report");
 
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="sageai-report-${id}.pdf"`,
+        "Content-Disposition": `attachment; filename="sageai-report-${safePrefix}.pdf"`,
       },
     });
   } catch (e) {
@@ -50,4 +62,3 @@ export async function GET(
     );
   }
 }
-

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
 
@@ -16,11 +17,13 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from incident service",
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch incidents", detail: error?.message },
+      { error: "Failed to fetch incidents" },
       { status: 502 }
     );
   }
@@ -34,22 +37,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const parsed = await safeJsonBody(req);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
   try {
-    const body = await req.json();
     const res = await fetch(`${BACKEND}/incidents/ingest`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsed.data),
     });
 
-    const data = await res.json();
+    const data = await safeUpstreamJson(res, {
+      error: "Invalid response from incident service",
+    });
     return NextResponse.json(data, { status: res.status });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to ingest incident", detail: error?.message },
+      { error: "Failed to ingest incident" },
       { status: 502 }
     );
   }
