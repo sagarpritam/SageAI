@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeJsonBody, safeUpstreamJson } from "@/lib/proxy-utils";
+import {
+  isStandaloneOfflineMode,
+  offlineBackendResponse,
+  safeJsonBody,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -8,6 +13,10 @@ export async function GET(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Autofix service not configured (set BACKEND_URL)");
+  }
 
   const url = new URL(req.url);
   const statusFilter = url.searchParams.get("status");
@@ -19,6 +28,7 @@ export async function GET(req: Request) {
     const res = await fetch(targetUrl, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(8000),
     });
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from autofix service",
@@ -42,6 +52,10 @@ export async function POST(req: Request) {
     return parsed.response;
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Autofix service not configured (set BACKEND_URL)");
+  }
+
   try {
     const res = await fetch(`${BACKEND}/autofix/propose`, {
       method: "POST",
@@ -50,6 +64,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(parsed.data),
+      signal: AbortSignal.timeout(8000),
     });
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from autofix service",

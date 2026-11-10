@@ -267,4 +267,59 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
       expect(typeof errBody.error).toBe("string");
     }
   });
+
+  test("Scan routes, public report SSR, and /scan UI degrade cleanly offline and robots.txt excludes private routes", async ({
+    context,
+    page,
+    request,
+  }) => {
+    const postScan = await request.post("/api/scan", {
+      headers: AUTH_HEADERS,
+      data: { target: "https://example.com" },
+    });
+    expect(postScan.status()).toBe(502);
+    const postBody = (await postScan.json()) as Record<string, unknown>;
+    expect(postBody.scan_id).toBeUndefined();
+    expect(typeof postBody.error).toBe("string");
+
+    const getScan = await request.get("/api/scan/test-scan-123", {
+      headers: AUTH_HEADERS,
+    });
+    expect(getScan.status()).toBe(502);
+    const getBody = (await getScan.json()) as Record<string, unknown>;
+    expect(getBody.status).toBeUndefined();
+
+    const reportRes = await request.get("/report/test-token-123");
+    expect(reportRes.status()).toBe(200);
+
+    const robotsRes = await request.get("/robots.txt");
+    expect(robotsRes.status()).toBe(200);
+    const robotsText = await robotsRes.text();
+    expect(robotsText).toContain("/deep-search/");
+    expect(robotsText).toContain("/report/");
+
+    await context.addCookies([
+      {
+        name: "sageai_jwt",
+        value: MOCK_E2E_JWT,
+        domain: "localhost",
+        path: "/",
+        httpOnly: true,
+        secure: false,
+        sameSite: "Lax",
+      },
+    ]);
+    await page.addInitScript(() => {
+      window.localStorage.setItem("sageai_onboarding_done", "true");
+    });
+
+    await page.goto("/scan");
+    await page.locator('input[placeholder="Enter domain (e.g. example.com)"]').fill("example.com");
+    await page.locator('button:has-text("Start Scan")').click();
+
+    await expect(
+      page.locator('[role="alert"]:not(#__next-route-announcer__)')
+    ).toContainText("BACKEND_URL");
+    await expect(page.locator('button:has-text("Start Scan")')).toBeVisible();
+  });
 });

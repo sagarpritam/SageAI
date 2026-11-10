@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { Redis } from "@upstash/redis";
 import {
   decodeJwtPayload,
+  isStandaloneOfflineMode,
+  offlineBackendResponse,
   safeJsonBody,
   safeUpstreamJson,
   validateScanTarget,
@@ -61,6 +63,12 @@ export async function POST(req: Request) {
     }
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse(
+      "Scan engine backend not configured (set BACKEND_URL on Vercel)"
+    );
+  }
+
   try {
     const backendRes = await fetch(`${backendUrl}/scan`, {
       method: "POST",
@@ -69,6 +77,7 @@ export async function POST(req: Request) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ target: cleanTarget }),
+      signal: AbortSignal.timeout(10000),
     });
 
     // Relay 402 Payment Required from backend
@@ -85,6 +94,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json(data, { status: backendRes.status });
   } catch {
-    return NextResponse.json({ scan_id: "mock-" + Date.now() });
+    return offlineBackendResponse("Failed to connect to scan engine service");
   }
 }

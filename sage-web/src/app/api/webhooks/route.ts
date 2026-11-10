@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
+  isStandaloneOfflineMode,
   isValidResourceId,
+  offlineBackendResponse,
   safeJsonBody,
   safeUpstreamJson,
 } from "@/lib/proxy-utils";
@@ -13,9 +15,14 @@ export async function GET() {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Webhook service not configured (set BACKEND_URL)");
+  }
+
   try {
     const res = await fetch(`${BACKEND}/webhooks`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
     });
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from webhook service",
@@ -39,6 +46,10 @@ export async function POST(req: Request) {
     return parsed.response;
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Webhook service not configured (set BACKEND_URL)");
+  }
+
   try {
     const res = await fetch(`${BACKEND}/webhooks`, {
       method: "POST",
@@ -47,6 +58,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(parsed.data),
+      signal: AbortSignal.timeout(8000),
     });
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from webhook service",
@@ -73,10 +85,15 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Invalid webhook ID" }, { status: 400 });
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Webhook service not configured (set BACKEND_URL)");
+  }
+
   try {
     const res = await fetch(`${BACKEND}/webhooks/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (res.status === 204) {

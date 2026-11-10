@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { safeUpstreamJson } from "@/lib/proxy-utils";
+import {
+  isStandaloneOfflineMode,
+  offlineBackendResponse,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -16,11 +20,21 @@ export async function GET() {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Analytics backend not configured (set BACKEND_URL)");
+  }
+
   try {
     // Fetch org stats and recent scans in parallel
     const [statsRes, scansRes] = await Promise.all([
-      fetch(`${BACKEND}/org/stats`, { headers: { Authorization: `Bearer ${token}` } }),
-      fetch(`${BACKEND}/scans`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`${BACKEND}/org/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(8000),
+      }),
+      fetch(`${BACKEND}/scans`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(8000),
+      }),
     ]);
 
     const stats = statsRes.ok ? await safeUpstreamJson<Record<string, unknown>>(statsRes, {}) : {};

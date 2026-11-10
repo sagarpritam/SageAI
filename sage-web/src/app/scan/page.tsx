@@ -26,6 +26,7 @@ export default function Home() {
   const router = useRouter();
   const [scanState, setScanState] = useState<"idle" | "running" | "completed">("idle");
   const [scanId, setScanId] = useState<string | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   
   // Results State
@@ -68,11 +69,11 @@ export default function Home() {
     isCompletedRef.current = false;
 
     setScanState("running");
+    setScanError(null);
     setLogs([]);
     posthog.capture('scan_initiated', { target });
-    
-    // Fallback ID if API fails
-    let newScanId = "mock-scan-id";
+
+    let newScanId: string | null = null;
 
     try {
       // Proxy through Next.js API for rate limiting 
@@ -85,30 +86,50 @@ export default function Home() {
         return;
       }
       
-      if (res.data?.scan_id) {
+      if (typeof res.data?.scan_id === "string" && res.data.scan_id) {
         newScanId = res.data.scan_id;
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      if (e.response?.status === 401) {
+    } catch (e: unknown) {
+      const status = axios.isAxiosError(e) ? e.response?.status : undefined;
+      const errData = axios.isAxiosError(e)
+        ? (e.response?.data as { error?: string; detail?: string; limitReached?: boolean } | undefined)
+        : undefined;
+
+      if (status === 401) {
         setScanState("idle");
         alert("Please sign in to scan.");
         return;
       }
-      if (e.response?.status === 402) {
+      if (status === 402) {
         setScanState("idle");
-        const msg = e.response?.data?.error || "Monthly scan limit reached. Upgrade to Pro for unlimited scans.";
+        const msg = errData?.error || "Monthly scan limit reached. Upgrade to Pro for unlimited scans.";
         alert("🔒 " + msg);
         router.push("/pricing");
         return;
       }
-      if (e.response?.status === 403 && e.response?.data?.limitReached) {
+      if (status === 403 && errData?.limitReached) {
         setScanState("idle");
         alert("Free limit reached! Redirecting to setup Founder Mode.");
         router.push("/pricing");
         return;
       }
-      console.warn("Backend not running or other error, falling back to mock scan.");
+
+      const fallbackMsg =
+        errData?.error ||
+        errData?.detail ||
+        "Scan engine backend unreachable (configure BACKEND_URL).";
+      setScanState("idle");
+      setScanError(fallbackMsg);
+      setLogs([`[-] ${fallbackMsg}`]);
+      return;
+    }
+
+    if (!newScanId) {
+      const missingIdMsg = "Scan engine did not return a scan ID.";
+      setScanState("idle");
+      setScanError(missingIdMsg);
+      setLogs([`[-] ${missingIdMsg}`]);
+      return;
     }
     
     setScanId(newScanId);
@@ -215,11 +236,14 @@ export default function Home() {
       pollTimerRef.current = null;
     }
 
+    let consecutiveErrors = 0;
+
     const checkStatus = async () => {
       if (isCompletedRef.current) return;
 
       try {
         const res = await axios.get(`/api/scan/${id}`);
+        consecutiveErrors = 0;
         const data = res.data;
 
         if (data.status === "completed") {
@@ -251,8 +275,17 @@ export default function Home() {
             return [...prev, logLine];
           });
         }
-      } catch (e) {
-        console.error("Poll Error", e);
+      } catch (e: unknown) {
+        consecutiveErrors += 1;
+        const status = axios.isAxiosError(e) ? e.response?.status : undefined;
+        if (status === 401 || status === 404 || status === 502 || status === 503 || consecutiveErrors >= 3) {
+          isPollingRef.current = false;
+          setScanState("idle");
+          const msg = "Scan telemetry interrupted: backend engine unavailable.";
+          setScanError(msg);
+          setLogs(prev => [...prev, `[-] ${msg}`]);
+          return;
+        }
       }
 
       setScanState(current => {
@@ -291,7 +324,7 @@ export default function Home() {
         </div>
 
         {/* Scan Input */}
-        <div className="w-full flex justify-center mb-16">
+        <div className="w-full flex flex-col items-center mb-16 gap-4">
           {scanState === "idle" && (
             <ScanInput onStartScan={startScan} isLoading={false} />
           )}
@@ -301,6 +334,14 @@ export default function Home() {
               <div className="w-full h-2 bg-emerald-900/30 rounded-full overflow-hidden">
                 <div className="h-full bg-emerald-500 w-full rounded-full animate-[progress_7s_ease-in-out_forwards]" />
               </div>
+            </div>
+          )}
+          {scanError && (
+            <div
+              role="alert"
+              className="w-full max-w-2xl rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-sm font-mono text-amber-300 text-center"
+            >
+              {scanError}
             </div>
           )}
         </div>

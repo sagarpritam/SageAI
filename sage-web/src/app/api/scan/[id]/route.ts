@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidResourceId, safeUpstreamJson } from "@/lib/proxy-utils";
+import {
+  isStandaloneOfflineMode,
+  isValidResourceId,
+  offlineBackendResponse,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 export async function GET(
   _req: Request,
@@ -19,11 +24,18 @@ export async function GET(
     return NextResponse.json({ error: "Invalid scan ID" }, { status: 400 });
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse(
+      "Scan status backend not configured (set BACKEND_URL on Vercel)"
+    );
+  }
+
   try {
     const backendRes = await fetch(`${backendUrl}/scan/${encodeURIComponent(id)}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (backendRes.status === 401) {
@@ -35,6 +47,6 @@ export async function GET(
     });
     return NextResponse.json(data, { status: backendRes.status });
   } catch {
-    return NextResponse.json({ status: "running" }); // Mock fallback when backend is down
+    return offlineBackendResponse("Failed to connect to scan status service");
   }
 }

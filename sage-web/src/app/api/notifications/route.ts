@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isStandaloneOfflineMode, offlineBackendResponse } from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("sageai_jwt")?.value;
-  if (!token) return NextResponse.json([], { status: 200 });
+  if (!token || isStandaloneOfflineMode()) return NextResponse.json([], { status: 200 });
 
   try {
     const res = await fetch(`${BACKEND}/notifications`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return NextResponse.json([], { status: 200 });
     return NextResponse.json(await res.json());
@@ -24,6 +26,10 @@ export async function POST(req: Request) {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Notifications service not configured (set BACKEND_URL)");
+  }
+
   const { searchParams } = new URL(req.url);
   const action = searchParams.get("action");
   const id = searchParams.get("id");
@@ -35,6 +41,7 @@ export async function POST(req: Request) {
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(5000),
         }
       );
       const data = await res.json().catch(() => ({ ok: res.ok }));
@@ -45,15 +52,13 @@ export async function POST(req: Request) {
       const res = await fetch(`${BACKEND}/notifications/read-all`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(5000),
       });
       const data = await res.json().catch(() => ({ ok: res.ok }));
       return NextResponse.json(data, { status: res.ok ? 200 : res.status });
     }
   } catch {
-    return NextResponse.json(
-      { error: "Failed to connect to notifications service" },
-      { status: 502 }
-    );
+    return offlineBackendResponse("Failed to connect to notifications service");
   }
 
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });

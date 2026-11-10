@@ -2,41 +2,80 @@ import { Shield, Sparkles, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { RiskGauge } from "@/components/RiskGauge";
 import { VulnerabilityList } from "@/components/VulnerabilityList";
-import type { Metadata } from 'next';
-import { SITE_URL } from '@/lib/platform';
+import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/platform";
+import { isStandaloneOfflineMode, isValidResourceId } from "@/lib/proxy-utils";
+
+interface PublicScanData {
+  target: string;
+  timestamp: string;
+  risk_summary: {
+    risk_score: number;
+    risk_level: string;
+  };
+  findings: Parameters<typeof VulnerabilityList>[0]["vulnerabilities"];
+}
+
+async function fetchPublicReport(token: string): Promise<{
+  data: PublicScanData | null;
+  error: string | null;
+}> {
+  if (!isValidResourceId(token)) {
+    return { data: null, error: "Invalid report link token." };
+  }
+
+  if (isStandaloneOfflineMode()) {
+    return {
+      data: null,
+      error: "Public report unavailable (backend not configured).",
+    };
+  }
+
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  try {
+    const res = await fetch(
+      `${backendUrl}/scan/public/${encodeURIComponent(token)}`,
+      {
+        cache: "no-store",
+        signal: AbortSignal.timeout(5000),
+      }
+    );
+    if (!res.ok) {
+      return { data: null, error: "Report not found or link has expired." };
+    }
+    const scanData = (await res.json()) as PublicScanData;
+    return { data: scanData, error: null };
+  } catch {
+    return { data: null, error: "Could not load report data." };
+  }
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<{ token: string }> }
 ): Promise<Metadata> {
   const { token } = await params;
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  const { data: scanData } = await fetchPublicReport(token);
 
-  try {
-    const res = await fetch(`${backendUrl}/scan/public/${token}`, { cache: "no-store" });
-    if (res.ok) {
-      const scanData = await res.json();
-      const findingCount = scanData.findings?.length || 0;
-      const title = `SageAI Pentest: ${scanData.target}`;
-      const description = `Autonomous AI pentest found ${findingCount} vulnerabilities on ${scanData.target} with a ${scanData.risk_summary?.risk_level || 'Medium'} risk level. View the full interactive security report.`;
-      
-      return {
+  if (scanData) {
+    const findingCount = scanData.findings?.length || 0;
+    const title = `SageAI Pentest: ${scanData.target}`;
+    const description = `Autonomous AI pentest found ${findingCount} vulnerabilities on ${scanData.target} with a ${scanData.risk_summary?.risk_level || "Medium"} risk level. View the full interactive security report.`;
+
+    return {
+      title,
+      description,
+      openGraph: {
         title,
         description,
-        openGraph: {
-          title,
-          description,
-          url: `${SITE_URL}/report/${token}`,
-          type: "website",
-        },
-        twitter: {
-          card: "summary_large_image",
-          title,
-          description,
-        }
-      };
-    }
-  } catch {
-    // Fallback to default
+        url: `${SITE_URL}/report/${token}`,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
   }
 
   return {
@@ -52,25 +91,7 @@ export default async function PublicReportPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
-
-  let scanData = null;
-  let error = null;
-
-  try {
-    const res = await fetch(`${backendUrl}/scan/public/${token}`, {
-      cache: "no-store", // Or revalidate if we want edge caching
-    });
-
-    if (!res.ok) {
-      error = "Report not found or link has expired.";
-    } else {
-      scanData = await res.json();
-    }
-  } catch (e) {
-    console.error("Failed to fetch public report", e);
-    error = "Could not load report data.";
-  }
+  const { data: scanData, error } = await fetchPublicReport(token);
 
   if (error || !scanData) {
     return (

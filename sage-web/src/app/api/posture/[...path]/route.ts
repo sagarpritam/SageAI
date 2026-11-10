@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isAllowedPosturePath, safeUpstreamJson } from "@/lib/proxy-utils";
+import {
+  isAllowedPosturePath,
+  isStandaloneOfflineMode,
+  offlineBackendResponse,
+  safeUpstreamJson,
+} from "@/lib/proxy-utils";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
 
@@ -20,6 +25,10 @@ export async function GET(
     );
   }
 
+  if (isStandaloneOfflineMode()) {
+    return offlineBackendResponse("Posture service not configured (set BACKEND_URL)");
+  }
+
   const subpath = path.join("/");
   const url = new URL(req.url);
   const queryString = url.searchParams.toString();
@@ -28,6 +37,7 @@ export async function GET(
   try {
     const res = await fetch(targetUrl, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) {

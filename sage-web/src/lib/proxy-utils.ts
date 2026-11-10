@@ -425,3 +425,23 @@ export async function safeUpstreamJson<T = unknown>(
     return fallback;
   }
 }
+
+/**
+ * Returns true when running in Vercel/CI without a configured BACKEND_URL
+ * so proxy handlers fail fast instead of dialing localhost:8000.
+ */
+export function isStandaloneOfflineMode(): boolean {
+  return (
+    !process.env.BACKEND_URL &&
+    (process.env.VERCEL === "1" || process.env.CI === "true")
+  );
+}
+
+/**
+ * Returns a standardized sanitized 502 Bad Gateway response for unreachable backends.
+ */
+export function offlineBackendResponse(
+  message: string = "Backend service unavailable (configure BACKEND_URL)"
+): NextResponse {
+  return NextResponse.json({ error: message }, { status: 502 });
+}

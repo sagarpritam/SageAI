@@ -653,7 +653,7 @@ cd sage-web && npm run lint && npm run build && npm run test:e2e
 ### Test Suite Summary:
 ```text
 - Total Pytest Test Suite: 599 / 599 passing across 95 test suites (100% pass rate)
-- Playwright E2E Suite: 28 / 28 Chromium specs passing across 3 suites (standalone SSR server)
+- Playwright E2E Suite: 29 / 29 Chromium specs passing across 3 suites (standalone SSR server)
 - Next.js Turbopack Build: 418 / 418 routes compiled with 0 errors (415 API routes)
 - FastAPI Microservices: 644 API endpoints registered across 151 routers (647 total routes / 625 OpenAPI paths)
 - Code Quality & Security: 100% Ruff lint/format, Mypy (--check-untyped-defs across app/sagestrike/scripts/tests/alembic), ESLint (--max-warnings 0), Alembic clean-DB schema check, and Bandit compliant
@@ -993,7 +993,7 @@ SageAI/
 │       ├── CTIHub.tsx                            # OASIS STIX 2.1 bundle forge & TAXII 2.1
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
-├── sage-web/tests/        # 28 Playwright E2E specs across 3 suites (standalone Next.js server)
+├── sage-web/tests/        # 29 Playwright E2E specs across 3 suites (standalone Next.js server)
 ├── tests/                 # 599 pytest tests across 95 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
