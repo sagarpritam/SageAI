@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v6.9.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.0.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("6.9.0");
-    expect(healthJson.version).toBe("6.9.0");
+    expect(healthJson.platform_version).toBe("7.0.0");
+    expect(healthJson.version).toBe("7.0.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -313,6 +313,12 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
       window.localStorage.setItem("sageai_onboarding_done", "true");
     });
 
+    const dialogs: string[] = [];
+    page.on("dialog", (dialog) => {
+      dialogs.push(`${dialog.type()}: ${dialog.message()}`);
+      void dialog.dismiss();
+    });
+
     await page.goto("/scan");
     await page.locator('input[placeholder="Enter domain (e.g. example.com)"]').fill("example.com");
     await page.locator('button:has-text("Start Scan")').click();
@@ -321,6 +327,7 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
       page.locator('[role="alert"]:not(#__next-route-announcer__)')
     ).toContainText("BACKEND_URL");
     await expect(page.locator('button:has-text("Start Scan")')).toBeVisible();
+    expect(dialogs).toEqual([]);
   });
 
   test("Unified fetchBackend rollout fails fast offline across core, streaming, billing, notification, and studio routes", async ({
@@ -459,6 +466,41 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     const kugBody = (await kugSim.json()) as { status?: string; net_electrical_output_gw?: number };
     expect(kugBody.status).toBe("KUGELBLITZ_HAWKING_POWER_OPTIMAL");
     expect(Number(kugBody.net_electrical_output_gw)).toBeGreaterThan(125.0);
+
+    // Wave 30 studios (Caps 110-112 & Option B) return 200 deterministically offline
+    const ampList = await request.get("/api/amplituhedron-scattering/geometries");
+    expect(ampList.status()).toBe(200);
+    const ampSim = await request.post("/api/amplituhedron-scattering/optimize-form", {
+      data: { geometry_id: "AMP-NMHV-2LOOP-02", particle_legs_n: 8, mhv_sector_k: 3 },
+    });
+    expect(ampSim.status()).toBe(200);
+    expect(((await ampSim.json()) as { status?: string }).status).toBe("AMPLITUHEDRON_FORM_CONVERGED");
+
+    const twList = await request.get("/api/twistor-holonomy/fibrations");
+    expect(twList.status()).toBe(200);
+    const twSim = await request.post("/api/twistor-holonomy/stabilize-holonomy", {
+      data: { fibration_id: "TWISTOR-PENROSE-CP3-01", helicity_charge_2s: 4 },
+    });
+    expect(twSim.status()).toBe(200);
+    expect(((await twSim.json()) as { status?: string }).status).toBe("TWISTOR_HOLONOMY_STABILIZED");
+
+    const csList = await request.get("/api/causal-set-lattice/posets");
+    expect(csList.status()).toBe(200);
+    const csSim = await request.post("/api/causal-set-lattice/enforce-poset", {
+      data: { poset_id: "CAUSAL-SPRINKLE-4D-01", sprinkling_density_factor: 1.25 },
+    });
+    expect(csSim.status()).toBe(200);
+    expect(((await csSim.json()) as { status?: string }).status).toBe("CAUSAL_POSET_LORENTZ_INVARIANT");
+
+    const schList = await request.get("/api/schwinger-vacuum/cavities");
+    expect(schList.status()).toBe(200);
+    const schSim = await request.post("/api/schwinger-vacuum/harvest-cascade", {
+      data: { cavity_id: "SCHWINGER-L5-OPTICAL-01", field_ratio_e_ec: 0.86 },
+    });
+    expect(schSim.status()).toBe(200);
+    const schBody = (await schSim.json()) as { status?: string; net_electrical_output_gw?: number };
+    expect(schBody.status).toBe("SCHWINGER_HARVEST_POWER_OPTIMAL");
+    expect(Number(schBody.net_electrical_output_gw)).toBeGreaterThan(155.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

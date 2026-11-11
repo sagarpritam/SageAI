@@ -522,13 +522,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v6.9.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v7.0.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v6.9.0 metadata & live stats
-    await expect(page.locator('text=SageAI v6.9.0').first()).toBeVisible();
-    await expect(page.locator('text=109 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v7.0.0 metadata & live stats
+    await expect(page.locator('text=SageAI v7.0.0').first()).toBeVisible();
+    await expect(page.locator('text=112 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -542,9 +542,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-29 Milestone tab
-    await page.locator('button:has-text("Waves 1–29")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'M-Theory 11D & AdS/CFT Holography (v6.9.0)' })).toBeVisible();
+    // Switch to Waves 1-30 Milestone tab
+    await page.locator('button:has-text("Waves 1–30")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Amplituhedron, Twistor & Causal Set Horizon (v7.0.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -556,31 +556,31 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 6.9.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 7.0.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v6.9.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v7.0.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v6.9.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v7.0.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 138 Studios (Waves 1–29)').first()).toBeVisible();
+    await expect(page.locator('text=All 142 Studios (Waves 1–30)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v6.9.0').first()).toBeVisible();
+    await expect(page.locator('text=v7.0.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–109)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–112)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v6.9.0').first()).toBeVisible();
+    await expect(page.locator('text=v7.0.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
   });
 
-  test('Authenticated Command Center displays v6.9.0 badge, 138 active studios, and Wave 29 modules', async ({ context, page }) => {
+  test('Authenticated Command Center displays v7.0.0 badge, 142 active studios, and Wave 30 modules', async ({ context, page }) => {
     await mockAuthenticatedSession(context, page);
 
     await page.route('/api/notifications*', async (route) => {
@@ -599,22 +599,22 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     await page.goto('/dashboard');
     await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
-    await expect(page.getByText(/v6\.9\.0\s+•\s+Waves 1–29\s+•\s+109 Capabilities/).first()).toBeVisible();
-    await expect(page.locator('text=138 Active Modules').first()).toBeVisible();
+    await expect(page.getByText(/v7\.0\.0\s+•\s+Waves 1–30\s+•\s+112 Capabilities/).first()).toBeVisible();
+    await expect(page.locator('text=142 Active Modules').first()).toBeVisible();
 
-    const searchInput = page.locator('input[placeholder="Search 138 modules..."]');
+    const searchInput = page.locator('input[placeholder="Search 142 modules..."]');
     await expect(searchInput).toBeVisible();
-    await searchInput.fill('M-Theory');
-    const g2Tab = page.locator('button:has-text("M-Theory G2 Compactifier (Cap 107)")');
-    await expect(g2Tab).toBeVisible();
-    await g2Tab.click();
-    await expect(page.locator('text=Capability 107: 11D M-Theory G2-Manifold Supergravity Compactifier').first()).toBeVisible();
+    await searchInput.fill('Amplituhedron');
+    const ampTab = page.locator('button:has-text("Amplituhedron Matrix (Cap 110)")');
+    await expect(ampTab).toBeVisible();
+    await ampTab.click();
+    await expect(page.locator('text=Capability 110: Amplituhedron Positive-Geometry Scattering Matrix Optimizer').first()).toBeVisible();
 
-    await searchInput.fill('Kugelblitz');
-    const kugTab = page.locator('button:has-text("Kugelblitz Hawking Gen (Option B)")');
-    await expect(kugTab).toBeVisible();
-    await kugTab.click();
-    await expect(page.locator('text=Option B Wave 29: Kugelblitz Micro-Black-Hole Hawking Power Generator').first()).toBeVisible();
+    await searchInput.fill('Schwinger');
+    const schTab = page.locator('button:has-text("Schwinger Vacuum Harvester (Option B)")');
+    await expect(schTab).toBeVisible();
+    await schTab.click();
+    await expect(page.locator('text=Option B Wave 30: Sovereign Zero-Point Schwinger-Vacua Pair-Production Harvester').first()).toBeVisible();
   });
 
   test('Public pages and /login serve static assets without 404 or 5xx responses', async ({ page }) => {

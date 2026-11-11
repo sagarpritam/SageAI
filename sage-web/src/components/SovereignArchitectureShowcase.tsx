@@ -63,7 +63,7 @@ const PILLARS = [
   {
     num: "05",
     name: "Threat Intel Hub & Rule Forge",
-    detail: "Syncs 1,770+ CISA KEV vulnerabilities and auto-synthesizes YARA, Sigma & Nuclei templates.",
+    detail: "Syncs 1,780+ CISA KEV vulnerabilities and auto-synthesizes YARA, Sigma & Nuclei templates.",
     mitre: "T1588 · T1587",
     icon: Flame,
   },
@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–29 • Current",
-    range: "Capabilities 101–109 + Option B",
+    wave: "Waves 27–30 • Current",
+    range: "Capabilities 101–112 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "11D M-Theory G2 Compactifier, Holographic AdS/CFT HaPPY QEC, Topological K-Theory D-Branes, String Field Theory & Kugelblitz Hawking Generator.",
+    detail: "Amplituhedron Scattering Optimizer, Penrose Twistor Holonomy, Causal Set Poset Lattice, M-Theory G2 & Schwinger Vacuum Harvester.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 29 M-Theory & Holographic QEC orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 30 Amplituhedron, Twistor & Causal Set orchestration.
           </p>
         </div>
 
@@ -277,7 +277,7 @@ export function SovereignArchitectureShowcase() {
           </motion.div>
         )}
 
-        {/* Tab 3: Waves 1-29 Evolution */}
+        {/* Tab 3: Waves 1-30 Evolution */}
         {activeTab === "frontier" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

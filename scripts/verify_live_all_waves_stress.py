@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 29 Waves (Capabilities 1 to 109).
+Live Multi-Domain Stress Test & Verification across All 30 Waves (Capabilities 1 to 112).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-29 (Caps 1-109)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-30 (Caps 1-112)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -685,6 +685,76 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 29 (Opt B): Kugelblitz Hawking Power Harvest",
         ),
+        # Wave 30: Amplituhedron, Penrose Twistor Holonomy, Causal Set Lattice & Schwinger Harvester
+        (
+            "GET",
+            "/api/amplituhedron-scattering/geometries",
+            None,
+            "Wave 30 (Cap 110): Amplituhedron Polytope List",
+        ),
+        (
+            "POST",
+            "/api/amplituhedron-scattering/optimize-form",
+            {
+                "geometry_id": "AMP-NMHV-2LOOP-02",
+                "particle_legs_n": 8,
+                "mhv_sector_k": 3,
+                "loop_order_l": 2,
+                "positivity_gain": 1.15,
+            },
+            "Wave 30 (Cap 110): Amplituhedron Canonical Form Optimize",
+        ),
+        (
+            "GET",
+            "/api/twistor-holonomy/fibrations",
+            None,
+            "Wave 30 (Cap 111): CP^3 Twistor Fibration List",
+        ),
+        (
+            "POST",
+            "/api/twistor-holonomy/stabilize-holonomy",
+            {
+                "fibration_id": "TWISTOR-PENROSE-CP3-01",
+                "helicity_charge_2s": 4,
+                "kodaira_deformation_eps": 0.08,
+                "shear_damping_gain": 1.2,
+            },
+            "Wave 30 (Cap 111): Twistor Holonomy Stabilize",
+        ),
+        (
+            "GET",
+            "/api/causal-set-lattice/posets",
+            None,
+            "Wave 30 (Cap 112): Causal Set Poset List",
+        ),
+        (
+            "POST",
+            "/api/causal-set-lattice/enforce-poset",
+            {
+                "poset_id": "CAUSAL-SPRINKLE-4D-01",
+                "sprinkling_density_factor": 1.25,
+                "target_dimension_d": 4.0,
+                "transitivity_damping_gain": 1.15,
+            },
+            "Wave 30 (Cap 112): Causal Set Poset Enforce",
+        ),
+        (
+            "GET",
+            "/api/schwinger-vacuum/cavities",
+            None,
+            "Wave 30 (Opt B): Schwinger Vacuum Cavity List",
+        ),
+        (
+            "POST",
+            "/api/schwinger-vacuum/harvest-cascade",
+            {
+                "cavity_id": "SCHWINGER-L5-OPTICAL-01",
+                "field_ratio_e_ec": 0.86,
+                "beam_pulse_hz": 120.0,
+                "recovery_coupling_gain": 1.12,
+            },
+            "Wave 30 (Opt B): Schwinger Pair-Cascade Power Harvest",
+        ),
     ]
 
 
@@ -714,7 +784,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-29, CAPS 1-109) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-30, CAPS 1-112) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -729,7 +799,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-29 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-30 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -786,7 +856,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-29){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-30){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -802,7 +872,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-29 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-30 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -850,7 +920,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-29, Capabilities 1-109) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-30, Capabilities 1-112) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

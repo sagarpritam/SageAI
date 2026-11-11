@@ -540,7 +540,7 @@ const SystemStatusBar = () => {
             <span className="text-zinc-600">|</span>
             <span>COMMAND_STUDIOS: {PLATFORM_DASHBOARD_MODULES_COUNT}</span>
             <span className="text-zinc-600">|</span>
-            <span>CISA_KEV: 1,770_CVES</span>
+            <span>CISA_KEV: 1,780_CVES</span>
             <span className="text-zinc-600">|</span>
             <span>PQC: FIPS_203/204_ACTIVE</span>
           </div>
@@ -566,7 +566,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including M-Theory G2 (Cap 107), HaPPY Holographic QEC (Cap 108), K-Theory D-Branes (Cap 109), and Kugelblitz Hawking Gen.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Amplituhedron (Cap 110), Twistor Holonomy (Cap 111), Causal Set Poset (Cap 112), and Schwinger Vacuum Harvester.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -737,8 +737,8 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 29 M-Theory & HaPPY QEC Live', time: '2m ago' },
-    { title: '1,770 CISA KEV CVEs Synced', time: '15m ago' },
+    { title: 'Wave 30 Amplituhedron & Twistors Live', time: '2m ago' },
+    { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];
 
@@ -831,7 +831,7 @@ const VulnerabilityDatabase = () => {
     <div id="vuln-db" className="max-w-6xl mx-auto px-6 py-24">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-5xl font-bold mb-4">Vulnerability <span className="text-emerald-400">Database</span></h2>
-        <p className="text-zinc-500">Live-synced across 1,770+ CISA KEV advisories &amp; 50,000+ NVD vulnerability signatures.</p>
+        <p className="text-zinc-500">Live-synced across 1,780+ CISA KEV advisories &amp; 50,000+ NVD vulnerability signatures.</p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1070,7 +1070,7 @@ const DashboardPreview = () => {
           <div className="md:col-span-3 space-y-6">
             <div className="space-y-2">
               <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Active Studios</div>
-              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 29 M-Theory G2'].map((item, i) => (
+              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 30 Amplituhedron'].map((item, i) => (
                 <div key={item} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>
                   {item}
                 </div>
@@ -1220,7 +1220,7 @@ const SystemAnatomy = () => {
         {/* Pointers */}
         <Pointer x="25%" y="40%" label="THE ABYSS + eBPF Ingress" description="Runs 9 OSINT engines + ring-0 eBPF syscall monitoring & Deception canaries." />
         <Pointer x="50%" y="30%" label="5-LLM Consensus Council" description="GPT-4o, Claude 3.7, DeepSeek R1, Nemotron 70B & Gemini 2.5 debate exploit chains." />
-        <Pointer x="75%" y="45%" label="CISA KEV + PQC Enclave" description="1,770+ live KEVs sealed inside NIST FIPS 203/204 Zero-Egress Enclaves." />
+        <Pointer x="75%" y="45%" label="CISA KEV + PQC Enclave" description="1,780+ live KEVs sealed inside NIST FIPS 203/204 Zero-Egress Enclaves." />
         <Pointer x="50%" y="70%" label="SagePatch AST & Merkle" description="Sandboxed AST verification opens human-gated PRs with SHA-256 Merkle proofs." />
       </div>
     </div>
@@ -1488,7 +1488,7 @@ const TypewriterLine = ({ text, onComplete }: TypewriterLineProps) => {
 const SAGE_LOG_LINES = [
   `[+] Initializing SageAI v${PLATFORM_VERSION} Core (${PLATFORM_WAVES_RANGE})...`,
   "[+] Target: staging.startup-app.io",
-  "[+] Launching THE ABYSS 9 OSINT modules + CISA KEV (1,770 CVEs)...",
+  "[+] Launching THE ABYSS 9 OSINT modules + CISA KEV (1,780 CVEs)...",
   "[+] eBPF Kernel SIEM: ring-0 syscall hooks attached (<0.2% CPU)",
   "[!] Port 8080 open + PAN-OS CVE-2026-0322 perimeter mismatch",
   "[+] Convening 5-LLM Consensus (GPT-4o / Claude 3.7 / DeepSeek R1 / Nemotron 70B / Gemini 2.5)...",
@@ -1873,7 +1873,7 @@ const LandingPage = () => {
         <BentoGrid />
       </section>
 
-      {/* Sovereign Defense Grid & Waves 1-29 Showcase */}
+      {/* Sovereign Defense Grid & Waves 1-30 Showcase */}
       <SovereignArchitectureShowcase />
 
       {/* System Anatomy Section */}
@@ -2157,7 +2157,7 @@ const LandingPage = () => {
               },
               {
                 q: "How does the 5-LLM Multi-Model Consensus engine work?",
-                a: "Findings are cross-verified across 5 independent frontier models (Claude Sonnet 4, GPT-4o, Gemini Pro, Llama-3.3-70B, and DeepSeek R1) alongside 1,770+ live CISA KEV signatures—eliminating noise and chaining complex multi-hop attack paths."
+                a: "Findings are cross-verified across 5 independent frontier models (Claude Sonnet 4, GPT-4o, Gemini Pro, Llama-3.3-70B, and DeepSeek R1) alongside 1,780+ live CISA KEV signatures—eliminating noise and chaining complex multi-hop attack paths."
               },
               {
                 q: "What are Zero-Egress Enclaves and Post-Quantum FIPS 203/204 readiness?",

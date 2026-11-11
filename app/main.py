@@ -29,6 +29,7 @@ from app.routers import (
     ai_spm_routes,
     airgap_exploit_routes,
     airgap_llm_guard_routes,
+    amplituhedron_scattering_routes,
     antimatter_containment_routes,
     antimatter_fusion_routes,
     anyon_braiding_routes,
@@ -51,6 +52,7 @@ from app.routers import (
     cas_redteam_swarm_routes,
     casimir_vacuum_routes,
     cauchy_chronology_routes,
+    causal_set_lattice_routes,
     centesimal_quantum_gravity_routes,
     ci_routes,
     cislunar_relay_routes,
@@ -151,6 +153,7 @@ from app.routers import (
     sbom_vex_routes,
     scan_routes,
     schedule_routes,
+    schwinger_vacuum_routes,
     sdn_shield_routes,
     simulation_routes,
     singularity_containment_routes,
@@ -168,6 +171,7 @@ from app.routers import (
     threat_hunting_routes,
     threat_hunting_swarm_routes,
     threat_modeling_routes,
+    twistor_holonomy_routes,
     web3_security_routes,
     webhook_routes,
     workload_identity_routes,
@@ -444,6 +448,10 @@ app.include_router(m_theory_g2_routes.router)
 app.include_router(happy_holographic_routes.router)
 app.include_router(ktheory_dbrane_routes.router)
 app.include_router(kugelblitz_hawking_routes.router)
+app.include_router(amplituhedron_scattering_routes.router)
+app.include_router(twistor_holonomy_routes.router)
+app.include_router(causal_set_lattice_routes.router)
+app.include_router(schwinger_vacuum_routes.router)
 
 
 # ---------------------

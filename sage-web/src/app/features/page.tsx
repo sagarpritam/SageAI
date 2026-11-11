@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), String Field Theory (Cap 104), 11D M-Theory G2 Compactifier (Cap 107), Holographic AdS/CFT HaPPY QEC (Cap 108), and Topological K-Theory D-Branes (Cap 109).",
+        "Includes Centesimal Quantum Gravity (Cap 100), M-Theory G2 (Cap 107), Amplituhedron Matrix (Cap 110), Penrose Twistor Holonomy (Cap 111), and Causal Set Poset Guard (Cap 112).",
     },
   ];
 

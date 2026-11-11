@@ -71,6 +71,7 @@ import {
   Maximize2,
   FlipHorizontal,
   BatteryCharging,
+  GitCommitHorizontal,
   X,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
@@ -211,6 +212,10 @@ import MTheoryG2Studio from "@/components/MTheoryG2Studio";
 import HaPPYHolographicStudio from "@/components/HaPPYHolographicStudio";
 import KTheoryDBraneStudio from "@/components/KTheoryDBraneStudio";
 import KugelblitzHawkingStudio from "@/components/KugelblitzHawkingStudio";
+import AmplituhedronScatteringStudio from "@/components/AmplituhedronScatteringStudio";
+import TwistorHolonomyStudio from "@/components/TwistorHolonomyStudio";
+import CausalSetLatticeStudio from "@/components/CausalSetLatticeStudio";
+import SchwingerVacuumStudio from "@/components/SchwingerVacuumStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -219,6 +224,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "amplituhedron-scattering", label: "Amplituhedron Matrix (Cap 110)", icon: Layers },
+  { id: "twistor-holonomy", label: "Twistor Holonomy (Cap 111)", icon: Compass },
+  { id: "causal-set-lattice", label: "Causal Set Poset (Cap 112)", icon: GitCommitHorizontal },
+  { id: "schwinger-vacuum", label: "Schwinger Vacuum Harvester (Option B)", icon: Zap },
   { id: "m-theory-g2", label: "M-Theory G2 Compactifier (Cap 107)", icon: Atom },
   { id: "happy-holographic-qec", label: "HaPPY Holographic QEC (Cap 108)", icon: Network },
   { id: "ktheory-dbrane", label: "K-Theory D-Brane (Cap 109)", icon: Layers },
@@ -578,6 +587,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "amplituhedron-scattering" && <AmplituhedronScatteringStudio />}
+          {activeTab === "twistor-holonomy" && <TwistorHolonomyStudio />}
+          {activeTab === "causal-set-lattice" && <CausalSetLatticeStudio />}
+          {activeTab === "schwinger-vacuum" && <SchwingerVacuumStudio />}
           {activeTab === "m-theory-g2" && <MTheoryG2Studio />}
           {activeTab === "happy-holographic-qec" && <HaPPYHolographicStudio />}
           {activeTab === "ktheory-dbrane" && <KTheoryDBraneStudio />}

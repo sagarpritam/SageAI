@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import Link from "next/link";
 import { ScanInput } from "@/components/ScanInput";
@@ -23,7 +22,6 @@ interface RiskData {
 }
 
 export default function Home() {
-  const router = useRouter();
   const [scanState, setScanState] = useState<"idle" | "running" | "completed">("idle");
   const [scanId, setScanId] = useState<string | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
@@ -81,11 +79,12 @@ export default function Home() {
       
       if (res.data?.limitReached) {
         setScanState("idle");
-        alert("Free limit reached! Redirecting to setup Founder Mode.");
-        router.push("/pricing");
+        const limitMsg = "Free scan limit reached! Upgrade on Pricing or configure Founder Mode to continue.";
+        setScanError(limitMsg);
+        setLogs([`[-] ${limitMsg}`]);
         return;
       }
-      
+
       if (typeof res.data?.scan_id === "string" && res.data.scan_id) {
         newScanId = res.data.scan_id;
       }
@@ -97,20 +96,23 @@ export default function Home() {
 
       if (status === 401) {
         setScanState("idle");
-        alert("Please sign in to scan.");
+        const authMsg = "Please sign in to launch an autonomous scan.";
+        setScanError(authMsg);
+        setLogs([`[-] ${authMsg}`]);
         return;
       }
       if (status === 402) {
         setScanState("idle");
         const msg = errData?.error || "Monthly scan limit reached. Upgrade to Pro for unlimited scans.";
-        alert("🔒 " + msg);
-        router.push("/pricing");
+        setScanError(msg);
+        setLogs([`[-] ${msg}`]);
         return;
       }
       if (status === 403 && errData?.limitReached) {
         setScanState("idle");
-        alert("Free limit reached! Redirecting to setup Founder Mode.");
-        router.push("/pricing");
+        const limitMsg = "Free scan limit reached! Upgrade on Pricing or configure Founder Mode to continue.";
+        setScanError(limitMsg);
+        setLogs([`[-] ${limitMsg}`]);
         return;
       }
 
@@ -339,9 +341,28 @@ export default function Home() {
           {scanError && (
             <div
               role="alert"
-              className="w-full max-w-2xl rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-sm font-mono text-amber-300 text-center"
+              className="w-full max-w-2xl rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-sm font-mono text-amber-300 text-center space-y-2"
             >
-              {scanError}
+              <div>{scanError}</div>
+              <div className="flex items-center justify-center gap-4 text-xs">
+                {scanError.toLowerCase().includes("sign in") && (
+                  <Link href="/login" className="underline text-emerald-400 hover:text-emerald-300">
+                    Sign In →
+                  </Link>
+                )}
+                {scanError.toLowerCase().includes("limit") && (
+                  <Link href="/pricing" className="underline text-emerald-400 hover:text-emerald-300">
+                    View Plans →
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setScanError(null)}
+                  className="text-zinc-400 hover:text-white underline"
+                >
+                  Dismiss
+                </button>
+              </div>
             </div>
           )}
         </div>
