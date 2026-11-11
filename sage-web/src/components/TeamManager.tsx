@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Users, Shield, UserCog, Lock } from "lucide-react";
+import { Users, Shield, UserCog, Lock, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface TeamUser {
@@ -15,18 +15,21 @@ export function TeamManager() {
   const [users, setUsers] = useState<TeamUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchUsers = useCallback(() => {
     setLoading(true);
-    axios.get("/api/org?action=users")
-      .then(r => setUsers(Array.isArray(r.data) ? r.data : []))
+    axios
+      .get("/api/org?action=users")
+      .then((r) => setUsers(Array.isArray(r.data) ? r.data : []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    axios.get("/api/org?action=plan")
-      .then(r => {
+    axios
+      .get("/api/org?action=plan")
+      .then((r) => {
         const p = r.data?.plan || "free";
         setPlan(p);
         if (p !== "free") fetchUsers();
@@ -39,11 +42,15 @@ export function TeamManager() {
   }, [fetchUsers]);
 
   const updateRole = async (userId: string, newRole: string) => {
+    setErrorMsg(null);
     try {
       await axios.patch("/api/org", { user_id: userId, role: newRole });
       fetchUsers();
-    } catch {
-      alert("Failed to update role");
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err)
+        ? err.response?.data?.error || err.response?.data?.detail || "Failed to update member role"
+        : "Failed to update member role";
+      setErrorMsg(String(msg));
     }
   };
 
@@ -73,26 +80,45 @@ export function TeamManager() {
       <h3 className="text-sm font-bold text-zinc-400 flex items-center gap-2">
         <Users className="w-4 h-4 text-emerald-400" /> Team Members
       </h3>
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-700/50 rounded-lg px-4 py-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
       {loading ? (
         <p className="text-zinc-500 font-mono text-sm animate-pulse">Loading team...</p>
       ) : users.length === 0 ? (
         <p className="text-zinc-600 font-mono text-sm">No team members found.</p>
       ) : (
         <div className="space-y-2">
-          {users.map(u => (
-            <div key={u.id} className="flex items-center justify-between bg-zinc-900/40 border border-zinc-800 rounded-lg px-4 py-3">
+          {users.map((u) => (
+            <div
+              key={u.id}
+              className="flex items-center justify-between bg-zinc-900/40 border border-zinc-800 rounded-lg px-4 py-3"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-emerald-900/40 flex items-center justify-center">
-                  {u.role === "admin" ? <Shield className="w-4 h-4 text-amber-400" /> : <UserCog className="w-4 h-4 text-zinc-400" />}
+                  {u.role === "admin" ? (
+                    <Shield className="w-4 h-4 text-amber-400" />
+                  ) : (
+                    <UserCog className="w-4 h-4 text-zinc-400" />
+                  )}
                 </div>
                 <div>
                   <p className="text-sm text-white font-mono">{u.email}</p>
-                  <p className="text-[10px] text-zinc-500">Joined {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</p>
+                  <p className="text-[10px] text-zinc-500">
+                    Joined {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
+                  </p>
                 </div>
               </div>
-              <select aria-label="Role"
+              <select
+                aria-label={`Role for ${u.email}`}
                 value={u.role}
-                onChange={e => updateRole(u.id, e.target.value)}
+                onChange={(e) => updateRole(u.id, e.target.value)}
                 className="bg-black/50 border border-zinc-700 rounded px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
               >
                 <option value="admin">Admin</option>
@@ -105,4 +131,3 @@ export function TeamManager() {
     </div>
   );
 }
-

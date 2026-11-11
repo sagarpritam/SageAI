@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 30 Waves (Capabilities 1 to 112).
+Live Multi-Domain Stress Test & Verification across All 31 Waves (Capabilities 1 to 115).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-30 (Caps 1-112)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-31 (Caps 1-115)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -755,6 +755,78 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 30 (Opt B): Schwinger Pair-Cascade Power Harvest",
         ),
+        # Wave 31: Witten Chern-Simons TQFT, AdS/BCFT QES Islands, Geometric Langlands & Lentz Soliton Warp
+        (
+            "GET",
+            "/api/chern-simons-tqft/manifolds",
+            None,
+            "Wave 31 (Cap 113): Chern-Simons 3-Manifold List",
+        ),
+        (
+            "POST",
+            "/api/chern-simons-tqft/evaluate-invariant",
+            {
+                "manifold_id": "CS-SU2-S3-TREFOIL-01",
+                "gauge_rank_n": 2,
+                "chern_simons_level_k": 8,
+                "knot_crossings": 4,
+                "framing_counterterm_gain": 1.2,
+            },
+            "Wave 31 (Cap 113): Chern-Simons Knot Invariant Evaluate",
+        ),
+        (
+            "GET",
+            "/api/quantum-extremal-island/horizons",
+            None,
+            "Wave 31 (Cap 114): Quantum Extremal Island Horizon List",
+        ),
+        (
+            "POST",
+            "/api/quantum-extremal-island/audit-page-curve",
+            {
+                "horizon_id": "QES-PAGE-JT-ADS2-01",
+                "bekenstein_hawking_entropy_s0": 180.0,
+                "evaporation_page_ratio": 1.35,
+                "cft_central_charge_c": 24,
+                "wormhole_saddle_gain": 1.25,
+            },
+            "Wave 31 (Cap 114): QES Page Curve Audit",
+        ),
+        (
+            "GET",
+            "/api/geometric-langlands/sheaves",
+            None,
+            "Wave 31 (Cap 115): Geometric Langlands Sheaf List",
+        ),
+        (
+            "POST",
+            "/api/geometric-langlands/sync-duality",
+            {
+                "sheaf_id": "LANGLANDS-SU3-PSU3-01",
+                "yang_mills_coupling_g": 1.18,
+                "theta_vacuum_angle_pi": 0.25,
+                "riemann_genus": 3,
+                "hecke_eigen_gain": 1.25,
+            },
+            "Wave 31 (Cap 115): Kapustin-Witten S-Duality Sync",
+        ),
+        (
+            "GET",
+            "/api/alcubierre-lentz-warp/corridors",
+            None,
+            "Wave 31 (Opt B): Alcubierre-Lentz Soliton Corridor List",
+        ),
+        (
+            "POST",
+            "/api/alcubierre-lentz-warp/engage-soliton",
+            {
+                "corridor_id": "LENTZ-SOLITON-LEO-GEO-01",
+                "target_velocity_c": 0.28,
+                "soliton_radius_m": 45.0,
+                "positive_plasma_recovery_gain": 1.15,
+            },
+            "Wave 31 (Opt B): Alcubierre-Lentz Soliton Engage",
+        ),
     ]
 
 
@@ -784,7 +856,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-30, CAPS 1-112) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-31, CAPS 1-115) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -799,7 +871,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-30 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-31 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -856,7 +928,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-30){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-31){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -872,7 +944,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-30 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-31 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -884,7 +956,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 128)
+        total_requests if total_requests is not None else max(endpoints_count, 144)
     )
 
     if in_process:
@@ -920,7 +992,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-30, Capabilities 1-112) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-31, Capabilities 1-115) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

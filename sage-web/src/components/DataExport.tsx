@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Database, Download, Loader2, FileJson, FileSpreadsheet, FileText } from "lucide-react";
+import {
+  Database,
+  Download,
+  Loader2,
+  FileJson,
+  FileSpreadsheet,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
 
 const exportTypes = [
   { id: "scans", label: "Scan Results", desc: "All completed scans with findings", icon: FileText },
@@ -19,15 +27,21 @@ export function DataExport() {
   const [selectedType, setSelectedType] = useState("scans");
   const [selectedFormat, setSelectedFormat] = useState("json");
   const [exporting, setExporting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleExport = async () => {
     setExporting(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: selectedType, format: selectedFormat }),
       });
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+        throw new Error(errData.error || errData.detail || "Export failed. Please try again.");
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -35,8 +49,8 @@ export function DataExport() {
       a.download = `sageai-${selectedType}.${selectedFormat}`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      alert("Export failed. Please try again.");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Export failed. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -48,6 +62,16 @@ export function DataExport() {
         <Database className="w-5 h-5 text-emerald-400" />
         <h3 className="text-sm font-bold text-white">Data Export</h3>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-700/50 rounded-lg px-4 py-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Export Type */}
       <div className="space-y-2">
@@ -61,7 +85,11 @@ export function DataExport() {
                 : "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700"
             }`}
           >
-            <et.icon className={`w-5 h-5 shrink-0 ${selectedType === et.id ? "text-emerald-400" : "text-zinc-500"}`} />
+            <et.icon
+              className={`w-5 h-5 shrink-0 ${
+                selectedType === et.id ? "text-emerald-400" : "text-zinc-500"
+              }`}
+            />
             <div>
               <p className="text-sm font-bold text-white">{et.label}</p>
               <p className="text-xs text-zinc-500">{et.desc}</p>

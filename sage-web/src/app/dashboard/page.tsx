@@ -216,6 +216,10 @@ import AmplituhedronScatteringStudio from "@/components/AmplituhedronScatteringS
 import TwistorHolonomyStudio from "@/components/TwistorHolonomyStudio";
 import CausalSetLatticeStudio from "@/components/CausalSetLatticeStudio";
 import SchwingerVacuumStudio from "@/components/SchwingerVacuumStudio";
+import ChernSimonsTQFTStudio from "@/components/ChernSimonsTQFTStudio";
+import QuantumExtremalIslandStudio from "@/components/QuantumExtremalIslandStudio";
+import GeometricLanglandsStudio from "@/components/GeometricLanglandsStudio";
+import AlcubierreLentzWarpStudio from "@/components/AlcubierreLentzWarpStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -224,6 +228,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "chern-simons-tqft", label: "Chern-Simons TQFT (Cap 113)", icon: Layers },
+  { id: "quantum-extremal-island", label: "QES Island Page Curve (Cap 114)", icon: Atom },
+  { id: "geometric-langlands", label: "Langlands S-Duality (Cap 115)", icon: Network },
+  { id: "alcubierre-lentz-warp", label: "Lentz Soliton Warp (Option B)", icon: Rocket },
   { id: "amplituhedron-scattering", label: "Amplituhedron Matrix (Cap 110)", icon: Layers },
   { id: "twistor-holonomy", label: "Twistor Holonomy (Cap 111)", icon: Compass },
   { id: "causal-set-lattice", label: "Causal Set Poset (Cap 112)", icon: GitCommitHorizontal },
@@ -587,6 +595,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "chern-simons-tqft" && <ChernSimonsTQFTStudio />}
+          {activeTab === "quantum-extremal-island" && <QuantumExtremalIslandStudio />}
+          {activeTab === "geometric-langlands" && <GeometricLanglandsStudio />}
+          {activeTab === "alcubierre-lentz-warp" && <AlcubierreLentzWarpStudio />}
           {activeTab === "amplituhedron-scattering" && <AmplituhedronScatteringStudio />}
           {activeTab === "twistor-holonomy" && <TwistorHolonomyStudio />}
           {activeTab === "causal-set-lattice" && <CausalSetLatticeStudio />}

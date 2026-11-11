@@ -122,6 +122,7 @@ export function RedTeamPanel() {
   const [tModel, setTModel] = useState("");
   const [tUri, setTUri] = useState("");
   const [creating, setCreating] = useState(false);
+  const [targetError, setTargetError] = useState<string | null>(null);
 
   // Audit Execution
   const [selectedProbes, setSelectedProbes] = useState<string[]>([
@@ -141,6 +142,7 @@ export function RedTeamPanel() {
   const [playgroundPrompt, setPlaygroundPrompt] = useState("");
   const [evaluatingGuardrail, setEvaluatingGuardrail] = useState(false);
   const [guardrailResult, setGuardrailResult] = useState<GuardrailEvalResponse | null>(null);
+  const [guardrailError, setGuardrailError] = useState<string | null>(null);
 
   const fetchTargets = useCallback(async () => {
     setLoadingTargets(true);
@@ -171,6 +173,7 @@ export function RedTeamPanel() {
   const handleCreateTarget = async () => {
     if (!tName || !tModel || !tUri) return;
     setCreating(true);
+    setTargetError(null);
     try {
       await axios.post("/api/redteam", {
         name: tName,
@@ -183,8 +186,11 @@ export function RedTeamPanel() {
       setTUri("");
       await fetchTargets();
       setActiveTab("audit");
-    } catch {
-      alert("Failed to register target");
+    } catch (e: unknown) {
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.detail || e.response?.data?.error || "Failed to register target"
+        : "Failed to register target";
+      setTargetError(msg);
     } finally {
       setCreating(false);
     }
@@ -220,6 +226,7 @@ export function RedTeamPanel() {
   const handleEvaluatePlayground = async () => {
     if (!playgroundPrompt.trim()) return;
     setEvaluatingGuardrail(true);
+    setGuardrailError(null);
     try {
       const res = await axios.post("/api/redteam", {
         _action: "evaluate-guardrail",
@@ -227,8 +234,11 @@ export function RedTeamPanel() {
         mode: "input",
       });
       setGuardrailResult(res.data?.evaluation || null);
-    } catch {
-      alert("Guardrail evaluation failed");
+    } catch (e: unknown) {
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.detail || e.response?.data?.error || "Guardrail evaluation failed"
+        : "Guardrail evaluation failed";
+      setGuardrailError(msg);
     } finally {
       setEvaluatingGuardrail(false);
     }
@@ -677,6 +687,21 @@ export function RedTeamPanel() {
                   )}
                 </button>
               </div>
+              {guardrailError && (
+                <div
+                  role="alert"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-red-500/40 bg-red-950/50 px-3 py-2 text-xs text-red-300"
+                >
+                  <span>{guardrailError}</span>
+                  <button
+                    type="button"
+                    onClick={() => setGuardrailError(null)}
+                    className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Guardrail Response */}
@@ -784,6 +809,21 @@ export function RedTeamPanel() {
                 "Save Target Endpoint"
               )}
             </button>
+            {targetError && (
+              <div
+                role="alert"
+                className="flex items-center justify-between gap-3 rounded-lg border border-red-500/40 bg-red-950/50 px-3 py-2 text-xs text-red-300"
+              >
+                <span>{targetError}</span>
+                <button
+                  type="button"
+                  onClick={() => setTargetError(null)}
+                  className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Registered Fleet Grid */}

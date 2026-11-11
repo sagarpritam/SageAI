@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mail, Plus, X, Save, Loader2, Clock, CheckCircle } from "lucide-react";
+import { Mail, Plus, X, Save, Loader2, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface EmailConfig {
@@ -29,11 +29,12 @@ export function EmailReportSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     axios
       .get("/api/email-reports")
-      .then((r) => setConfig(prev => ({ ...prev, ...r.data })))
+      .then((r) => setConfig((prev) => ({ ...prev, ...r.data })))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -56,12 +57,18 @@ export function EmailReportSettings() {
   const saveConfig = async () => {
     setSaving(true);
     setSaved(false);
+    setErrorMsg(null);
     try {
       await axios.post("/api/email-reports", config);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch {
-      alert("Failed to save email report configuration.");
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err)
+        ? err.response?.data?.error ||
+          err.response?.data?.detail ||
+          "Failed to save email report configuration."
+        : "Failed to save email report configuration.";
+      setErrorMsg(String(msg));
     } finally {
       setSaving(false);
     }
@@ -96,6 +103,16 @@ export function EmailReportSettings() {
           />
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-700/50 rounded-lg px-4 py-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {config.enabled && (
         <>

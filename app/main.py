@@ -29,6 +29,7 @@ from app.routers import (
     ai_spm_routes,
     airgap_exploit_routes,
     airgap_llm_guard_routes,
+    alcubierre_lentz_warp_routes,
     amplituhedron_scattering_routes,
     antimatter_containment_routes,
     antimatter_fusion_routes,
@@ -54,6 +55,7 @@ from app.routers import (
     cauchy_chronology_routes,
     causal_set_lattice_routes,
     centesimal_quantum_gravity_routes,
+    chern_simons_tqft_routes,
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
@@ -91,7 +93,9 @@ from app.routers import (
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
+    geometric_langlands_routes,
     geomagnetic_shield_routes,
+    geometric_langlands_routes,
     gravitational_seismic_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
@@ -141,6 +145,7 @@ from app.routers import (
     posture_routes,
     pqc_routes,
     qkd_space_mesh_routes,
+    quantum_extremal_island_routes,
     quantum_gravitational_routes,
     randall_sundrum_routes,
     ransomware_routes,
@@ -452,6 +457,10 @@ app.include_router(amplituhedron_scattering_routes.router)
 app.include_router(twistor_holonomy_routes.router)
 app.include_router(causal_set_lattice_routes.router)
 app.include_router(schwinger_vacuum_routes.router)
+app.include_router(chern_simons_tqft_routes.router)
+app.include_router(quantum_extremal_island_routes.router)
+app.include_router(geometric_langlands_routes.router)
+app.include_router(alcubierre_lentz_warp_routes.router)
 
 
 # ---------------------

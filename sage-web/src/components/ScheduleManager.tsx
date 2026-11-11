@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Clock, Plus, Trash2, RefreshCw } from "lucide-react";
+import { Clock, Plus, Trash2, RefreshCw, AlertCircle } from "lucide-react";
 import axios from "axios";
 
 interface Schedule {
@@ -20,6 +20,7 @@ export function ScheduleManager() {
   const [newTarget, setNewTarget] = useState("");
   const [newFreq, setNewFreq] = useState("weekly");
   const [creating, setCreating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSchedules = () => {
     setLoading(true);
@@ -35,24 +36,33 @@ export function ScheduleManager() {
   const handleCreate = async () => {
     if (!newTarget.trim()) return;
     setCreating(true);
+    setErrorMsg(null);
     try {
       await axios.post("/api/schedules", { target: newTarget, frequency: newFreq });
       setNewTarget("");
       fetchSchedules();
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to create schedule";
-      alert(msg);
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.detail || e.response?.data?.error || e.message
+        : e instanceof Error
+        ? e.message
+        : "Failed to create schedule";
+      setErrorMsg(msg);
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (id: string) => {
+    setErrorMsg(null);
     try {
       await axios.delete(`/api/schedules?id=${id}`);
       fetchSchedules();
-    } catch {
-      alert("Failed to delete schedule");
+    } catch (e: unknown) {
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.detail || e.response?.data?.error || "Failed to delete schedule"
+        : "Failed to delete schedule";
+      setErrorMsg(msg);
     }
   };
 
@@ -93,6 +103,24 @@ export function ScheduleManager() {
             {creating ? "Creating..." : "Add"}
           </button>
         </div>
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-red-500/40 bg-red-950/50 px-3 py-2 text-xs text-red-300"
+          >
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Schedule List */}

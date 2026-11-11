@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.0.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.1.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.0.0");
-    expect(healthJson.version).toBe("7.0.0");
+    expect(healthJson.platform_version).toBe("7.1.0");
+    expect(healthJson.version).toBe("7.1.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -501,6 +501,69 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     const schBody = (await schSim.json()) as { status?: string; net_electrical_output_gw?: number };
     expect(schBody.status).toBe("SCHWINGER_HARVEST_POWER_OPTIMAL");
     expect(Number(schBody.net_electrical_output_gw)).toBeGreaterThan(155.0);
+
+    // Wave 31 studios (Caps 113-115 & Option B) return 200 deterministically offline
+    const csTqftList = await request.get("/api/chern-simons-tqft/manifolds");
+    expect(csTqftList.status()).toBe(200);
+    const csTqftSim = await request.post("/api/chern-simons-tqft/evaluate-invariant", {
+      data: {
+        manifold_id: "CS-SU2-S3-TREFOIL-01",
+        gauge_rank_n: 2,
+        chern_simons_level_k: 8,
+        knot_crossings: 4,
+      },
+    });
+    expect(csTqftSim.status()).toBe(200);
+    expect(((await csTqftSim.json()) as { status?: string }).status).toBe(
+      "CHERN_SIMONS_INVARIANT_LOCKED"
+    );
+
+    const qesList = await request.get("/api/quantum-extremal-island/horizons");
+    expect(qesList.status()).toBe(200);
+    const qesSim = await request.post("/api/quantum-extremal-island/audit-page-curve", {
+      data: {
+        horizon_id: "QES-PAGE-JT-ADS2-01",
+        bekenstein_hawking_entropy_s0: 180.0,
+        evaporation_page_ratio: 1.35,
+      },
+    });
+    expect(qesSim.status()).toBe(200);
+    expect(((await qesSim.json()) as { status?: string }).status).toBe(
+      "QES_PAGE_CURVE_UNITARY"
+    );
+
+    const langList = await request.get("/api/geometric-langlands/sheaves");
+    expect(langList.status()).toBe(200);
+    const langSim = await request.post("/api/geometric-langlands/sync-duality", {
+      data: {
+        sheaf_id: "LANGLANDS-SU3-PSU3-01",
+        yang_mills_coupling_g: 1.18,
+        riemann_genus: 3,
+      },
+    });
+    expect(langSim.status()).toBe(200);
+    expect(((await langSim.json()) as { status?: string }).status).toBe(
+      "LANGLANDS_SDUALITY_LOCKED"
+    );
+
+    const warpList = await request.get("/api/alcubierre-lentz-warp/corridors");
+    expect(warpList.status()).toBe(200);
+    const warpSim = await request.post("/api/alcubierre-lentz-warp/engage-soliton", {
+      data: {
+        corridor_id: "LENTZ-SOLITON-LEO-GEO-01",
+        target_velocity_c: 0.28,
+        soliton_radius_m: 45.0,
+      },
+    });
+    expect(warpSim.status()).toBe(200);
+    const warpBody = (await warpSim.json()) as {
+      status?: string;
+      positive_energy_only_t00_ge_0?: boolean;
+      regenerative_bus_output_gw?: number;
+    };
+    expect(warpBody.status).toBe("LENTZ_SOLITON_TRANSIT_OPTIMAL");
+    expect(warpBody.positive_energy_only_t00_ge_0).toBe(true);
+    expect(Number(warpBody.regenerative_bus_output_gw)).toBeGreaterThan(160.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

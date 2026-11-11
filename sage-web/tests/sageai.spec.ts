@@ -522,13 +522,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v7.0.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v7.1.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v7.0.0 metadata & live stats
-    await expect(page.locator('text=SageAI v7.0.0').first()).toBeVisible();
-    await expect(page.locator('text=112 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v7.1.0 metadata & live stats
+    await expect(page.locator('text=SageAI v7.1.0').first()).toBeVisible();
+    await expect(page.locator('text=115 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -542,9 +542,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-30 Milestone tab
-    await page.locator('button:has-text("Waves 1–30")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Amplituhedron, Twistor & Causal Set Horizon (v7.0.0)' })).toBeVisible();
+    // Switch to Waves 1-31 Milestone tab
+    await page.locator('button:has-text("Waves 1–31")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Chern-Simons, QES Islands & Lentz Soliton Horizon (v7.1.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -556,31 +556,31 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 7.0.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 7.1.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v7.0.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v7.1.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v7.0.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v7.1.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 142 Studios (Waves 1–30)').first()).toBeVisible();
+    await expect(page.locator('text=All 146 Studios (Waves 1–31)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v7.0.0').first()).toBeVisible();
+    await expect(page.locator('text=v7.1.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–112)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–115)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v7.0.0').first()).toBeVisible();
+    await expect(page.locator('text=v7.1.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
   });
 
-  test('Authenticated Command Center displays v7.0.0 badge, 142 active studios, and Wave 30 modules', async ({ context, page }) => {
+  test('Authenticated Command Center displays v7.1.0 badge, 146 active studios, and Wave 31 modules', async ({ context, page }) => {
     await mockAuthenticatedSession(context, page);
 
     await page.route('/api/notifications*', async (route) => {
@@ -599,22 +599,22 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     await page.goto('/dashboard');
     await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
-    await expect(page.getByText(/v7\.0\.0\s+•\s+Waves 1–30\s+•\s+112 Capabilities/).first()).toBeVisible();
-    await expect(page.locator('text=142 Active Modules').first()).toBeVisible();
+    await expect(page.getByText(/v7\.1\.0\s+•\s+Waves 1–31\s+•\s+115 Capabilities/).first()).toBeVisible();
+    await expect(page.locator('text=146 Active Modules').first()).toBeVisible();
 
-    const searchInput = page.locator('input[placeholder="Search 142 modules..."]');
+    const searchInput = page.locator('input[placeholder="Search 146 modules..."]');
     await expect(searchInput).toBeVisible();
-    await searchInput.fill('Amplituhedron');
-    const ampTab = page.locator('button:has-text("Amplituhedron Matrix (Cap 110)")');
-    await expect(ampTab).toBeVisible();
-    await ampTab.click();
-    await expect(page.locator('text=Capability 110: Amplituhedron Positive-Geometry Scattering Matrix Optimizer').first()).toBeVisible();
+    await searchInput.fill('Chern-Simons');
+    const csTab = page.locator('button:has-text("Chern-Simons TQFT (Cap 113)")');
+    await expect(csTab).toBeVisible();
+    await csTab.click();
+    await expect(page.locator('text=Capability 113: Witten Chern-Simons 3-Manifold TQFT & Jones Knot Shield').first()).toBeVisible();
 
-    await searchInput.fill('Schwinger');
-    const schTab = page.locator('button:has-text("Schwinger Vacuum Harvester (Option B)")');
-    await expect(schTab).toBeVisible();
-    await schTab.click();
-    await expect(page.locator('text=Option B Wave 30: Sovereign Zero-Point Schwinger-Vacua Pair-Production Harvester').first()).toBeVisible();
+    await searchInput.fill('Lentz');
+    const warpTab = page.locator('button:has-text("Lentz Soliton Warp (Option B)")');
+    await expect(warpTab).toBeVisible();
+    await warpTab.click();
+    await expect(page.locator('text=Option B Wave 31: Sovereign Alcubierre-Lentz Solitonic Warp-Field Transit Matrix').first()).toBeVisible();
   });
 
   test('Public pages and /login serve static assets without 404 or 5xx responses', async ({ page }) => {
@@ -691,6 +691,103 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(
       page.locator('[role="alert"]:not(#__next-route-announcer__)')
     ).toContainText('Upstream backend unavailable for HackerOne export');
+
+    expect(dialogTriggered).toBe(false);
+    expect(downloadTriggered).toBe(false);
+  });
+
+  test('Settings WebhookManager and DataExport use inline confirmation and role="alert" instead of blocking dialogs', async ({ context, page }) => {
+    await mockAuthenticatedSession(context, page);
+
+    let dialogTriggered = false;
+    page.on('dialog', async (dialog) => {
+      dialogTriggered = true;
+      await dialog.dismiss();
+    });
+
+    let downloadTriggered = false;
+    page.on('download', () => {
+      downloadTriggered = true;
+    });
+
+    await page.route('/api/org*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          organization: 'SageAI Security',
+          plan: 'enterprise',
+          plan_details: {},
+          usage: { scans_used: 12, users_count: 5 },
+        }),
+      });
+    });
+
+    await page.route('/api/integrations/status', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          nvidia: { configured: false },
+          censys: { configured: false },
+          shodan: { configured: false },
+          github: { configured: false },
+        }),
+      });
+    });
+
+    await page.route('/api/webhooks*', async (route) => {
+      if (route.request().method() === 'DELETE') {
+        await route.fulfill({
+          status: 502,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Upstream webhook delete failed' }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'wh-e2e-1',
+            url: 'https://hooks.sageai.test/events',
+            events: ['scan.completed'],
+            secret: 'configured',
+          },
+        ]),
+      });
+    });
+
+    await page.route('/api/export', async (route) => {
+      await route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Upstream export backend offline' }),
+      });
+    });
+
+    await page.goto('/settings');
+    await page.locator('button:has-text("Enterprise")').click();
+
+    await expect(page.locator('text=https://hooks.sageai.test/events')).toBeVisible();
+    await page.locator('button[aria-label="Delete webhook https://hooks.sageai.test/events"]').click();
+
+    // Inline confirmation buttons appear without blocking confirm() dialog
+    const confirmDeleteBtn = page.locator('button:has-text("Confirm Delete")');
+    await expect(confirmDeleteBtn).toBeVisible();
+    await confirmDeleteBtn.click();
+
+    await expect(
+      page.locator('[role="alert"]:not(#__next-route-announcer__)')
+    ).toContainText('Upstream webhook delete failed');
+
+    // Export tab shows inline alert and avoids corrupted blob downloads
+    await page.locator('button:has-text("Export")').first().click();
+    await page.locator('button:has-text("Export Data")').click();
+    await expect(
+      page.locator('[role="alert"]:not(#__next-route-announcer__)')
+    ).toContainText('Upstream export backend offline');
 
     expect(dialogTriggered).toBe(false);
     expect(downloadTriggered).toBe(false);

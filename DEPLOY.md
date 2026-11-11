@@ -53,7 +53,7 @@ The Next.js 16 frontend (`sage-web`) is optimized for Vercel deployment with Tur
    - `STRIPE_WEBHOOK_SECRET`: `whsec_...`
    - `STRIPE_PRO_PRICE_ID`: `price_...`
    - `GOOGLE_GENERATIVE_AI_API_KEY`: `AIza...`
-5. Click **Deploy**. Vercel will compile all 442 static/API pages (456 total App Router routes spanning `/` through `/dashboard` across 142 studios + 439 API proxies).
+5. Click **Deploy**. Vercel will compile all 454 static/API pages (468 total App Router routes spanning `/` through `/dashboard` across 146 studios + 451 API proxies).
 
 > [!TIP]
 > Root [`vercel.json`](vercel.json) and path-anchored [`.vercelignore`](.vercelignore) (`/app/`, `/api/`, `/scripts/`, `/tests/`) ensure backend exclusions never strip `sage-web/src/app/**` or `sage-web/scripts/**` from the Vercel serverless bundle.

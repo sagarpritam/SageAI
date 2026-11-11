@@ -145,6 +145,9 @@ export function AutoFixPanel() {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [rejectionModalId, setRejectionModalId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [queueError, setQueueError] = useState<string | null>(null);
+  const [rejectError, setRejectError] = useState<string | null>(null);
+  const [simConfirmPatchId, setSimConfirmPatchId] = useState<string | null>(null);
 
   const fetchPatches = async () => {
     setLoadingPatches(true);
@@ -261,6 +264,8 @@ export function AutoFixPanel() {
 
   const handleApprove = async (patchId: string, simulate = false) => {
     setActionLoadingId(patchId);
+    setQueueError(null);
+    setSimConfirmPatchId(null);
     try {
       const url = simulate
         ? `/api/autofix/patches/${patchId}/approve?simulate=true`
@@ -269,20 +274,14 @@ export function AutoFixPanel() {
       await fetchPatches();
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        const detail = err.response?.data?.detail || err.message;
+        const detail = err.response?.data?.detail || err.response?.data?.error || err.message;
         if (detail.includes("GitHub token not configured") && !simulate) {
-          const trySim = confirm(
-            "GitHub token not configured for live repository dispatch.\n\nWould you like to approve this patch in Simulated PR Mode?"
-          );
-          if (trySim) {
-            await axios.post(`/api/autofix/patches/${patchId}/approve?simulate=true`);
-            await fetchPatches();
-            return;
-          }
+          setSimConfirmPatchId(patchId);
+        } else {
+          setQueueError(`Approval error: ${detail}`);
         }
-        alert(`Approval error: ${detail}`);
       } else {
-        alert("Failed to approve patch.");
+        setQueueError("Failed to approve patch.");
       }
     } finally {
       setActionLoadingId(null);
@@ -291,9 +290,10 @@ export function AutoFixPanel() {
 
   const handleReject = async (patchId: string) => {
     if (!rejectionReason.trim()) {
-      alert("Please specify a reason for rejecting the patch.");
+      setRejectError("Please specify a reason for rejecting the patch.");
       return;
     }
+    setRejectError(null);
     setActionLoadingId(patchId);
     try {
       await axios.post(`/api/autofix/patches/${patchId}/reject`, {
@@ -301,12 +301,15 @@ export function AutoFixPanel() {
       });
       setRejectionModalId(null);
       setRejectionReason("");
+      setRejectError(null);
       await fetchPatches();
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        alert(`Rejection error: ${err.response?.data?.detail || err.message}`);
+        setRejectError(
+          `Rejection error: ${err.response?.data?.detail || err.response?.data?.error || err.message}`
+        );
       } else {
-        alert("Failed to reject patch.");
+        setRejectError("Failed to reject patch.");
       }
     } finally {
       setActionLoadingId(null);
@@ -404,6 +407,25 @@ export function AutoFixPanel() {
               {loadingPatches ? "Refreshing..." : "↻ Refresh List"}
             </button>
           </div>
+
+          {queueError && (
+            <div
+              role="alert"
+              className="bg-red-950/40 border border-red-700/40 rounded-xl px-4 py-3 flex items-center justify-between gap-3"
+            >
+              <div className="flex items-center gap-2 text-xs text-red-300">
+                <XCircle className="w-4 h-4 text-red-400 shrink-0" />
+                <span>{queueError}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQueueError(null)}
+                className="text-xs text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
 
           {loadingPatches ? (
             <div className="p-8 text-center bg-zinc-900/40 rounded-xl border border-zinc-800 text-zinc-400 text-sm flex items-center justify-center gap-2">
@@ -570,36 +592,68 @@ export function AutoFixPanel() {
 
                     {/* Actions: Approve / Reject / Simulate (Only for proposed patches) */}
                     {isProposed && (
-                      <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-end gap-3 flex-wrap">
-                        <button
-                          onClick={() => setRejectionModalId(patch.id)}
-                          disabled={isActionLoading}
-                          className="px-3 py-1.5 rounded-lg border border-red-800/50 hover:bg-red-950/30 text-red-400 text-xs font-semibold transition-colors disabled:opacity-50"
-                        >
-                          Reject Patch
-                        </button>
-                        <button
-                          onClick={() => handleApprove(patch.id, true)}
-                          disabled={isActionLoading}
-                          className="px-3 py-1.5 rounded-lg border border-emerald-700/60 hover:bg-emerald-950/40 text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
-                        >
-                          <Play className="w-3 h-3 text-emerald-400" /> Simulate PR
-                        </button>
-                        <button
-                          onClick={() => handleApprove(patch.id, false)}
-                          disabled={isActionLoading}
-                          className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950 disabled:opacity-50"
-                        >
-                          {isActionLoading ? (
-                            <>
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Dispatching PR...
-                            </>
-                          ) : (
-                            <>
-                              <Check className="w-3.5 h-3.5" /> Approve & Open PR
-                            </>
-                          )}
-                        </button>
+                      <div className="pt-2 border-t border-zinc-800/80 space-y-3">
+                        {simConfirmPatchId === patch.id && (
+                          <div
+                            role="alert"
+                            className="p-3 rounded-lg bg-amber-950/40 border border-amber-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <p className="text-xs text-amber-200">
+                              GitHub token is not configured for live repository dispatch. Approve this patch in Simulated PR Mode instead?
+                            </p>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setSimConfirmPatchId(null)}
+                                className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs"
+                              >
+                                Dismiss
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleApprove(patch.id, true)}
+                                disabled={isActionLoading}
+                                className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold disabled:opacity-50"
+                              >
+                                Approve (Simulated PR)
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-end gap-3 flex-wrap">
+                          <button
+                            onClick={() => {
+                              setRejectError(null);
+                              setRejectionModalId(patch.id);
+                            }}
+                            disabled={isActionLoading}
+                            className="px-3 py-1.5 rounded-lg border border-red-800/50 hover:bg-red-950/30 text-red-400 text-xs font-semibold transition-colors disabled:opacity-50"
+                          >
+                            Reject Patch
+                          </button>
+                          <button
+                            onClick={() => handleApprove(patch.id, true)}
+                            disabled={isActionLoading}
+                            className="px-3 py-1.5 rounded-lg border border-emerald-700/60 hover:bg-emerald-950/40 text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            <Play className="w-3 h-3 text-emerald-400" /> Simulate PR
+                          </button>
+                          <button
+                            onClick={() => handleApprove(patch.id, false)}
+                            disabled={isActionLoading}
+                            className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950 disabled:opacity-50"
+                          >
+                            {isActionLoading ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Dispatching PR...
+                              </>
+                            ) : (
+                              <>
+                                <Check className="w-3.5 h-3.5" /> Approve & Open PR
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -622,15 +676,27 @@ export function AutoFixPanel() {
                 </p>
                 <textarea
                   value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
+                  onChange={(e) => {
+                    setRejectionReason(e.target.value);
+                    if (rejectError) setRejectError(null);
+                  }}
                   placeholder="e.g. Approach introduces breaking API change; requires manual refactor."
                   className="w-full h-24 bg-black/60 border border-zinc-700 rounded-lg p-3 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-red-500 font-mono"
                 />
+                {rejectError && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-red-500/40 bg-red-950/50 px-3 py-2 text-xs text-red-300"
+                  >
+                    {rejectError}
+                  </div>
+                )}
                 <div className="flex items-center justify-end gap-2">
                   <button
                     onClick={() => {
                       setRejectionModalId(null);
                       setRejectionReason("");
+                      setRejectError(null);
                     }}
                     className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700"
                   >

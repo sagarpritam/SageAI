@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–30 • Current",
-    range: "Capabilities 101–112 + Option B",
+    wave: "Waves 27–31 • Current",
+    range: "Capabilities 101–115 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Amplituhedron Scattering Optimizer, Penrose Twistor Holonomy, Causal Set Poset Lattice, M-Theory G2 & Schwinger Vacuum Harvester.",
+    detail: "Chern-Simons TQFT Shield, Takayanagi QES Islands, Geometric Langlands S-Duality, Amplituhedron Matrix & Alcubierre-Lentz Soliton Warp.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 30 Amplituhedron, Twistor & Causal Set orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 31 Chern-Simons TQFT, QES Islands &amp; Langlands S-Duality orchestration.
           </p>
         </div>
 
