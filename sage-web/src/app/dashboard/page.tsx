@@ -220,6 +220,10 @@ import ChernSimonsTQFTStudio from "@/components/ChernSimonsTQFTStudio";
 import QuantumExtremalIslandStudio from "@/components/QuantumExtremalIslandStudio";
 import GeometricLanglandsStudio from "@/components/GeometricLanglandsStudio";
 import AlcubierreLentzWarpStudio from "@/components/AlcubierreLentzWarpStudio";
+import CelestialHolographyStudio from "@/components/CelestialHolographyStudio";
+import NonInvertibleSymTFTStudio from "@/components/NonInvertibleSymTFTStudio";
+import ConformalBootstrapStudio from "@/components/ConformalBootstrapStudio";
+import AxionHaloscopeStudio from "@/components/AxionHaloscopeStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -228,6 +232,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "celestial-holography", label: "Celestial w1+inf (Cap 116)", icon: Orbit },
+  { id: "non-invertible-symtft", label: "SymTFT Defects (Cap 117)", icon: Layers },
+  { id: "conformal-bootstrap", label: "Bootstrap SDP (Cap 118)", icon: Scale },
+  { id: "axion-haloscope-power", label: "Axion Haloscope (Option B)", icon: Atom },
   { id: "chern-simons-tqft", label: "Chern-Simons TQFT (Cap 113)", icon: Layers },
   { id: "quantum-extremal-island", label: "QES Island Page Curve (Cap 114)", icon: Atom },
   { id: "geometric-langlands", label: "Langlands S-Duality (Cap 115)", icon: Network },
@@ -595,6 +603,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "celestial-holography" && <CelestialHolographyStudio />}
+          {activeTab === "non-invertible-symtft" && <NonInvertibleSymTFTStudio />}
+          {activeTab === "conformal-bootstrap" && <ConformalBootstrapStudio />}
+          {activeTab === "axion-haloscope-power" && <AxionHaloscopeStudio />}
           {activeTab === "chern-simons-tqft" && <ChernSimonsTQFTStudio />}
           {activeTab === "quantum-extremal-island" && <QuantumExtremalIslandStudio />}
           {activeTab === "geometric-langlands" && <GeometricLanglandsStudio />}

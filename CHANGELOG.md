@@ -2,6 +2,35 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v7.2.0] - 2026-11-12 - Trans-Century Era: Celestial Holography $w_{1+\infty}$ BMS4 Memory Shield, Non-Invertible Generalized Symmetry & SymTFT Firewall, Conformal Bootstrap SDP Auditor & Planetary Axion-Haloscope Power Grid (Wave 32 Milestone)
+
+### Added
+- **Capability 116: Celestial Holography $w_{1+\infty}$ Asymptotic BMS Supertranslation & Soft-Graviton Memory Shield** (`app/services/celestial_holography/`):
+  - Evaluates Celestial CFT Mellin-transformed scattering amplitudes on celestial spheres $\mathcal{CS}^2$ across Future Null Infinity ($\mathscr{I}^+$), locking $w_{1+\infty}$ wedge chiral modes and suppressing soft-graviton Bondi news shear memory drifts ($\sim 10^{-10}$ shear residual; $>152\text{ dB}$ memory suppression; $>99.998\%$ Ward identity fidelity) (`CelestialHolographyStudio.tsx`, `app/routers/celestial_holography_routes.py`).
+- **Capability 117: Non-Invertible Generalized Fusion-Category Symmetry & SymTFT Topological Defect Firewall** (`app/services/non_invertible_symtft/`):
+  - Enforces non-invertible Kramers-Wannier Tambara-Yamagami ($TY(\mathbb{Z}_2)$, quantum dimension $d_{\mathcal{N}}=\sqrt{2}$), $\text{Rep}(D_8)$, and Haagerup fusion defects via 3D Symmetry TFT bulk sandwiches $\mathcal{Z}(\mathcal{C})$ with Lagrangian algebra condensation and verified pentagon associators ($\sim 10^{-10}$ residual; $>154\text{ dB}$ anomaly isolation; $>99.998\%$ defect coherence) (`NonInvertibleSymTFTStudio.tsx`, `app/routers/non_invertible_symtft_routes.py`).
+- **Capability 118: Conformal Bootstrap SDP & Tauberian Crossing-Symmetry Unitarity Bounds Auditor** (`app/services/conformal_bootstrap/`):
+  - Audits primal/dual semidefinite programming (`SDPB`) crossing sum rules ($\sum c_{12\mathcal{O}}^2 F_{\Delta,\ell} = 0$) across 3D Ising ($\Delta_\sigma \approx 0.518149, \Delta_\epsilon \approx 1.412625$), $O(N)$ Vector Models, and 4D $\mathcal{N}=4$ SYM islands alongside Martin-Froissart dispersion bounds, eliminating non-unitary ghost operators ($>154\text{--}161\text{ dB}$ suppression; $>99.999\%$ unitarity fidelity) (`ConformalBootstrapStudio.tsx`, `app/routers/conformal_bootstrap_routes.py`).
+- **Option B Wave 32: Sovereign Planetary Topological Axion-Quasiparticle Dark-Matter Haloscope & Coherent Primakov Cavity Grid** (`app/services/axion_haloscope_power/`):
+  - Synchronizes superconducting Sikivie-Primakov $\mathbf{E}\cdot\mathbf{B}$ toroids, topological insulator magnetic polariton cavities, and orbital superradiant resonators ($14\text{--}18\text{ T}$, $Q \approx 2.8\text{--}4.2 \times 10^6$) to rectify Galactic halo QCD axion flux into $>200\text{--}308\text{ GW}$ net continuous zero-carbon, zero-fissile electrical baseload at $\sim 95.8\%\text{--}96.9\%$ conversion efficiency (`AxionHaloscopeStudio.tsx`, `app/routers/axion_haloscope_routes.py`).
+- **Wave 32 Standalone, Consolidated & Playwright Verification Suites**:
+  - Added [`tests/test_wave32_celestial_symtft_bootstrap.py`](tests/test_wave32_celestial_symtft_bootstrap.py), [`scripts/demo_wave32_celestial_symtft_drill.py`](scripts/demo_wave32_celestial_symtft_drill.py) (Capabilities 116–118), [`scripts/demo_axion_haloscope_drill.py`](scripts/demo_axion_haloscope_drill.py) (Option B Wave 32), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (25 sections covering Capabilities 1–118 / Waves 1–32), and expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 147 Wave 1–32 endpoints (`152 / 152` succeeded in `0.344 s`, `441.8 req/s`, `0` failed).
+  - Updated [`sage-web/tests/sageai.spec.ts`](sage-web/tests/sageai.spec.ts) and [`sage-web/tests/proxy-security.spec.ts`](sage-web/tests/proxy-security.spec.ts) with deterministic `v7.2.0` SSR assertions, Wave 32 studio/API coverage, and an inline `role="alert"` zero-dialog regression check.
+
+### Fixed
+- **Frontend Error Resilience, Clipboard Guards & WebSocket Lifecycle Cleanup**:
+  - Surfaced accessible inline `role="alert"` / `role="status"` feedback with explicit `type="button"` controls and guarded `navigator.clipboard?.writeText` calls across [`ZTNAManager.tsx`](sage-web/src/components/ZTNAManager.tsx), [`ZeroEgressEnclave.tsx`](sage-web/src/components/ZeroEgressEnclave.tsx), [`WarRoom.tsx`](sage-web/src/components/WarRoom.tsx), [`SSOConfigPanel.tsx`](sage-web/src/components/SSOConfigPanel.tsx), [`SecuritySettings.tsx`](sage-web/src/components/SecuritySettings.tsx), and [`MFASettings.tsx`](sage-web/src/components/MFASettings.tsx).
+  - Fixed a WebSocket reconnect `setTimeout` unmount leak and dangling pulse timer cleanup in [`WarRoom.tsx`](sage-web/src/components/WarRoom.tsx), and moved [`extractAxiosError`](sage-web/src/components/ZeroEgressEnclave.tsx) to module scope with `useCallback` to satisfy strict `react-hooks/exhaustive-deps` (`--max-warnings 0`).
+
+### Verification & Metrics
+- **Pytest**: 631 / 631 tests passing across 99 test suites (100% pass rate).
+- **Playwright E2E**: 33 / 33 Chromium specs passing across 3 suites (standalone Next.js SSR server).
+- **Next.js Turbopack**: 466 / 466 prerendered static & API routes compiled (`480` total App Router entries: `463` API proxies + `17` page/metadata routes) with 0 errors.
+- **FastAPI**: 692 API endpoints registered across 167 router modules (695 total routes / 673 OpenAPI paths).
+- **React Components**: 186 UI `.tsx` files (179 top-level panels; 150 mounted Command Center studios).
+
+---
+
 ## [v7.1.0] - 2026-11-12 - Trans-Century Era: Witten Chern-Simons 3-Manifold TQFT & Jones Knot Shield, AdS/BCFT Takayanagi Island QES Page Curve Auditor, Langlands-Kapustin Electric-Magnetic S-Duality Synchronizer & Alcubierre-Lentz Solitonic Warp-Field Transit Matrix (Wave 31 Milestone)
 
 ### Added

@@ -14,6 +14,7 @@ import {
 
 export function ZTNAManager() {
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [context, setContext] = useState({
     is_managed: true,
     disk_encrypted: true,
@@ -38,6 +39,7 @@ export function ZTNAManager() {
 
   const evaluateTrust = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ztna/evaluate", {
         method: "POST",
@@ -61,12 +63,17 @@ export function ZTNAManager() {
           },
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setZtnaResult(data);
+      const data = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+      if (!res.ok) {
+        throw new Error(
+          data.error || data.detail || `Trust evaluation failed (HTTP ${res.status})`
+        );
       }
-    } catch (e) {
-      console.error(e);
+      setZtnaResult(data);
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Failed to evaluate Zero-Trust session posture."
+      );
     } finally {
       setLoading(false);
     }
@@ -94,6 +101,7 @@ export function ZTNAManager() {
           </div>
 
           <button
+            type="button"
             onClick={evaluateTrust}
             disabled={loading}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-2"
@@ -102,6 +110,25 @@ export function ZTNAManager() {
             Evaluate Trust Score
           </button>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 bg-rose-950/40 border border-rose-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-rose-300 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-rose-400 hover:text-rose-200 underline text-[11px]"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Score & Tier Banner */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">

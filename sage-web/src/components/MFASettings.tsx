@@ -77,7 +77,7 @@ export function MFASettings() {
           <p className="text-sm text-zinc-400">
             Secure your account with 2FA. You will need an authenticator app (e.g., Google Authenticator, Authy).
           </p>
-          <button onClick={handleSetup} disabled={loading}
+          <button type="button" onClick={handleSetup} disabled={loading}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg transition-colors text-sm flex items-center gap-2">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />} Enable MFA
           </button>
@@ -103,7 +103,7 @@ export function MFASettings() {
           <div className="flex gap-3 max-w-sm">
             <input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="000000"
               className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm tracking-widest placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors" />
-            <button onClick={handleVerify} disabled={loading || code.length < 6}
+            <button type="button" onClick={handleVerify} disabled={loading || code.length < 6}
               className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg transition-colors text-sm">
               {loading ? "Verifying..." : "Verify"}
             </button>
@@ -121,7 +121,7 @@ export function MFASettings() {
           <div className="flex gap-3 max-w-sm">
             <input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="000000"
               className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm tracking-widest placeholder:text-zinc-600 focus:outline-none focus:border-red-500 transition-colors" />
-            <button onClick={handleDisable} disabled={loading || code.length < 6}
+            <button type="button" onClick={handleDisable} disabled={loading || code.length < 6}
               className="bg-red-600/80 hover:bg-red-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg transition-colors text-sm">
               {loading ? "Disabling..." : "Disable"}
             </button>
@@ -129,8 +129,8 @@ export function MFASettings() {
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400 mt-4">{error}</p>}
-      {message && <p className="text-sm text-emerald-400 mt-4">{message}</p>}
+      {error && <p role="alert" className="text-sm text-red-400 mt-4">{error}</p>}
+      {message && <p role="status" className="text-sm text-emerald-400 mt-4">{message}</p>}
     </div>
   );
 }

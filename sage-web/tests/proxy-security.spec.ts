@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.1.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.2.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.1.0");
-    expect(healthJson.version).toBe("7.1.0");
+    expect(healthJson.platform_version).toBe("7.2.0");
+    expect(healthJson.version).toBe("7.2.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -564,6 +564,72 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(warpBody.status).toBe("LENTZ_SOLITON_TRANSIT_OPTIMAL");
     expect(warpBody.positive_energy_only_t00_ge_0).toBe(true);
     expect(Number(warpBody.regenerative_bus_output_gw)).toBeGreaterThan(160.0);
+
+    // Wave 32 studios (Caps 116-118 & Option B) return 200 deterministically offline
+    const celList = await request.get("/api/celestial-holography/boundaries");
+    expect(celList.status()).toBe(200);
+    const celSim = await request.post("/api/celestial-holography/seal-ward", {
+      data: {
+        boundary_id: "CS2-CELESTIAL-BMS-01",
+        mellin_boost_delta: 1.5,
+        soft_theorem_order: 2,
+        w_infinity_mode_cutoff: 20,
+      },
+    });
+    expect(celSim.status()).toBe(200);
+    expect(((await celSim.json()) as { status?: string }).status).toBe(
+      "CELESTIAL_W1INF_LOCKED"
+    );
+
+    const symList = await request.get("/api/non-invertible-symtft/sandwiches");
+    expect(symList.status()).toBe(200);
+    const symSim = await request.post("/api/non-invertible-symtft/seal-defect", {
+      data: {
+        sandwich_id: "SYMTFT-KW-ISING-01",
+        higher_form_p: 1,
+        anyon_count: 6,
+        pentagon_associator_gain: 1.4,
+      },
+    });
+    expect(symSim.status()).toBe(200);
+    expect(((await symSim.json()) as { status?: string }).status).toBe(
+      "SYMTFT_DEFECT_SEALED"
+    );
+
+    const bootList = await request.get("/api/conformal-bootstrap/functionals");
+    expect(bootList.status()).toBe(200);
+    const bootSim = await request.post("/api/conformal-bootstrap/audit-crossing", {
+      data: {
+        functional_id: "SDP-ISING-3D-KINK-01",
+        derivative_order_lambda: 27,
+        max_spin_ell: 26,
+        sdp_precision_gain: 1.45,
+      },
+    });
+    expect(bootSim.status()).toBe(200);
+    expect(((await bootSim.json()) as { status?: string }).status).toBe(
+      "BOOTSTRAP_UNITARITY_SEALED"
+    );
+
+    const axList = await request.get("/api/axion-haloscope-power/arrays");
+    expect(axList.status()).toBe(200);
+    const axSim = await request.post("/api/axion-haloscope-power/resonate-haloscope", {
+      data: {
+        array_id: "AXION-ADMX-TOROID-01",
+        magnetic_field_tesla: 14.0,
+        cavity_quality_q_million: 2.8,
+        axion_mass_uev: 42.0,
+      },
+    });
+    expect(axSim.status()).toBe(200);
+    const axBody = (await axSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_clean_baseload_gw?: number;
+    };
+    expect(axBody.status).toBe("AXION_PRIMAKOV_GRID_OPTIMAL");
+    expect(axBody.zero_fossil_carbon).toBe(true);
+    expect(Number(axBody.net_clean_baseload_gw)).toBeGreaterThan(150.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

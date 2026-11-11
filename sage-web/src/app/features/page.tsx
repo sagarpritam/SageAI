@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Amplituhedron Matrix (Cap 110), Chern-Simons TQFT (Cap 113), Takayanagi QES Islands (Cap 114), and Langlands S-Duality (Cap 115).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Chern-Simons TQFT (Cap 113), Celestial Holography w1+∞ (Cap 116), Non-Invertible SymTFT (Cap 117), and Conformal Bootstrap SDP (Cap 118).",
     },
   ];
 

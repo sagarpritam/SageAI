@@ -69,18 +69,18 @@ export function SecuritySettings() {
           </div>
 
           <div className="flex items-center justify-between">
-            <button onClick={() => setShowPw(!showPw)} className="text-zinc-500 hover:text-zinc-300 text-xs flex items-center gap-1 transition-colors">
+            <button type="button" onClick={() => setShowPw(!showPw)} className="text-zinc-500 hover:text-zinc-300 text-xs flex items-center gap-1 transition-colors">
               {showPw ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
               {showPw ? "Hide" : "Show"}
             </button>
-            <button onClick={handleChange} disabled={saving || !currentPw || !newPw || !confirmPw}
+            <button type="button" onClick={handleChange} disabled={saving || !currentPw || !newPw || !confirmPw}
               className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg transition-colors text-sm flex items-center gap-2">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Updating...</> : "Update Password"}
             </button>
           </div>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          {message && <p className="text-sm text-emerald-400">{message}</p>}
+          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+          {message && <p role="status" className="text-sm text-emerald-400">{message}</p>}
         </div>
 
         <MFASettings />

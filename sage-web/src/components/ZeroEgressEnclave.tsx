@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Shield,
   ShieldCheck,
@@ -85,6 +85,14 @@ interface SovereigntyDrillResult {
   executive_summary: string;
 }
 
+function extractAxiosError(err: unknown, fallback: string) {
+  if (axios.isAxiosError(err)) {
+    const data = err.response?.data as { error?: string; detail?: string } | undefined;
+    return data?.error || data?.detail || err.message || fallback;
+  }
+  return err instanceof Error ? err.message : fallback;
+}
+
 export function ZeroEgressEnclave() {
   const [regions, setRegions] = useState<EnclaveRegion[]>([]);
   const [loadingRegions, setLoadingRegions] = useState(true);
@@ -106,28 +114,30 @@ export function ZeroEgressEnclave() {
   const [runningDrill, setRunningDrill] = useState(false);
   const [drillResult, setDrillResult] = useState<SovereigntyDrillResult | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchRegions = async () => {
+  const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
     try {
       const res = await axios.get("/api/enclave/regions");
       if (res.data?.enclaves) {
         setRegions(res.data.enclaves);
       }
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Failed to load sovereign enclave regions."));
     } finally {
       setLoadingRegions(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRegions();
-  }, []);
+  }, [fetchRegions]);
 
   const handleEncrypt = async () => {
     setEncrypting(true);
     setEnvelopeResult(null);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/enclave/encrypt", {
         plaintext: plaintextInput,
@@ -136,9 +146,11 @@ export function ZeroEgressEnclave() {
       });
       if (res.data?.envelope) {
         setEnvelopeResult(res.data.envelope);
+      } else {
+        setErrorMsg("Enclave encryption response did not return an envelope.");
       }
-    } catch (err) {
-      console.error("Encryption error", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Envelope encryption failed inside enclave."));
     } finally {
       setEncrypting(false);
     }
@@ -146,13 +158,14 @@ export function ZeroEgressEnclave() {
 
   const handleScrub = async () => {
     setScrubbing(true);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/enclave/sanitize", {
         text: rawTextToScrub,
       });
       setScrubResult(res.data);
-    } catch (err) {
-      console.error("Scrub error", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Zero-egress sanitization request failed."));
     } finally {
       setScrubbing(false);
     }
@@ -161,22 +174,33 @@ export function ZeroEgressEnclave() {
   const handleRunSovereigntyDrill = async () => {
     setRunningDrill(true);
     setDrillResult(null);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/enclave/verify");
       if (res.data?.status === "PASS") {
         setDrillResult(res.data);
+      } else {
+        setErrorMsg("Sovereignty verification drill did not pass.");
       }
-    } catch (err) {
-      console.error("Drill error", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Regional sovereignty verification drill failed."));
     } finally {
       setRunningDrill(false);
     }
   };
 
-  const handleCopyHash = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedHash(true);
-    setTimeout(() => setCopiedHash(false), 2000);
+  const handleCopyHash = async (text: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedHash(true);
+        setTimeout(() => setCopiedHash(false), 2000);
+      } else {
+        setErrorMsg("Clipboard write API unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Unable to copy envelope data to clipboard.");
+    }
   };
 
   return (
@@ -210,6 +234,7 @@ export function ZeroEgressEnclave() {
 
           <div>
             <button
+              type="button"
               onClick={handleRunSovereigntyDrill}
               disabled={runningDrill}
               className="px-5 py-2.5 rounded-xl text-sm font-bold text-black bg-teal-400 hover:bg-teal-300 transition shadow-xl shadow-teal-500/20 hover:scale-[1.02] flex items-center gap-2"
@@ -229,6 +254,25 @@ export function ZeroEgressEnclave() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-400 hover:text-red-200 underline text-[11px]"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Drill Results Modal/Banner */}
       {drillResult && (
@@ -262,6 +306,7 @@ export function ZeroEgressEnclave() {
                   {drillResult.merkle_seal.record_hash}
                 </code>
                 <button
+                  type="button"
                   onClick={() => handleCopyHash(drillResult.merkle_seal.record_hash)}
                   className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs transition"
                   title="Copy Hash"
@@ -416,6 +461,7 @@ export function ZeroEgressEnclave() {
             </div>
 
             <button
+              type="button"
               onClick={handleEncrypt}
               disabled={encrypting || !plaintextInput || !enclavePassphrase}
               className="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-2"
@@ -430,6 +476,7 @@ export function ZeroEgressEnclave() {
               <div className="flex items-center justify-between text-zinc-400">
                 <span className="text-teal-400 font-bold">Encrypted Envelope Output</span>
                 <button
+                  type="button"
                   onClick={() => handleCopyHash(JSON.stringify(envelopeResult, null, 2))}
                   className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] flex items-center gap-1"
                 >
@@ -473,6 +520,7 @@ export function ZeroEgressEnclave() {
             </div>
 
             <button
+              type="button"
               onClick={handleScrub}
               disabled={scrubbing || !rawTextToScrub}
               className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-2"

@@ -86,7 +86,10 @@ export function WarRoom() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [healingEvents, setHealingEvents] = useState<Record<string, 'running' | 'success' | 'error'>>({});
   const [simulating, setSimulating] = useState(false);
+  const [pulseError, setPulseError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pulseTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
   const handleHealNow = async (event: WarRoomEvent) => {
     if (!event.target) return;
@@ -114,14 +117,17 @@ export function WarRoom() {
         id: Math.random().toString(36).substring(7)
       };
       setPulses(prev => [...prev, newPulse]);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        pulseTimersRef.current.delete(timer);
         setPulses(prev => prev.filter(p => p.id !== newPulse.id));
       }, 5000);
+      pulseTimersRef.current.add(timer);
     }
   };
 
   const handleSimulatePulse = async () => {
     setSimulating(true);
+    setPulseError(null);
     try {
       await axios.post("/api/warroom", {
         type: "exploit.attempt",
@@ -139,8 +145,15 @@ export function WarRoom() {
         setEvents(list.slice(0, 50));
         handleNewEvent(list[0]);
       }
-    } catch {
-      // Ignore
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data as { error?: string; detail?: string } | undefined)?.error ||
+          (err.response?.data as { error?: string; detail?: string } | undefined)?.detail ||
+          err.message
+        : err instanceof Error
+        ? err.message
+        : "Failed to dispatch simulated telemetry pulse.";
+      setPulseError(msg || "Failed to dispatch simulated telemetry pulse.");
     } finally {
       setSimulating(false);
     }
@@ -149,10 +162,13 @@ export function WarRoom() {
   // Hybrid WebSocket + HTTP Polling Connection
   useEffect(() => {
     let pollInterval: NodeJS.Timeout | null = null;
+    let unmounted = false;
+    const pulseTimers = pulseTimersRef.current;
 
     const fetchHttpEvents = async () => {
       try {
         const res = await axios.get("/api/warroom");
+        if (unmounted) return;
         const list = res.data?.events || [];
         if (Array.isArray(list) && list.length > 0) {
           setEvents(list.slice(0, 50));
@@ -166,6 +182,7 @@ export function WarRoom() {
     fetchHttpEvents();
 
     const connectWs = () => {
+      if (unmounted) return;
       try {
         const wsHost = process.env.NEXT_PUBLIC_WS_URL || 
           `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/warroom`;
@@ -173,11 +190,19 @@ export function WarRoom() {
         wsRef.current = ws;
 
         ws.onopen = () => {
+          if (unmounted) {
+            ws.close();
+            return;
+          }
           setIsConnected(true);
-          if (pollInterval) clearInterval(pollInterval);
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+          }
         };
 
         ws.onmessage = (e) => {
+          if (unmounted) return;
           try {
             const data = JSON.parse(e.data);
             if (data.type === "rehydration") {
@@ -189,19 +214,24 @@ export function WarRoom() {
         };
 
         ws.onclose = () => {
+          if (unmounted) return;
           if (!pollInterval) {
             pollInterval = setInterval(fetchHttpEvents, 4000);
           }
-          setTimeout(connectWs, 8000);
+          if (reconnectTimerRef.current) {
+            clearTimeout(reconnectTimerRef.current);
+          }
+          reconnectTimerRef.current = setTimeout(connectWs, 8000);
         };
 
         ws.onerror = () => {
+          if (unmounted) return;
           if (!pollInterval) {
             pollInterval = setInterval(fetchHttpEvents, 4000);
           }
         };
       } catch {
-        if (!pollInterval) {
+        if (!unmounted && !pollInterval) {
           pollInterval = setInterval(fetchHttpEvents, 4000);
         }
       }
@@ -210,8 +240,24 @@ export function WarRoom() {
     connectWs();
 
     return () => {
-      wsRef.current?.close();
-      if (pollInterval) clearInterval(pollInterval);
+      unmounted = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+      pulseTimers.forEach((timer) => clearTimeout(timer));
+      pulseTimers.clear();
+      if (wsRef.current) {
+        wsRef.current.onopen = null;
+        wsRef.current.onmessage = null;
+        wsRef.current.onclose = null;
+        wsRef.current.onerror = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
   }, []);
 
@@ -248,6 +294,7 @@ export function WarRoom() {
           </div>
 
           <button
+            type="button"
             onClick={handleSimulatePulse}
             disabled={simulating}
             className="px-3 py-1.5 rounded-lg text-xs font-bold font-mono bg-red-950/70 hover:bg-red-900/70 text-red-300 border border-red-700/60 transition-all flex items-center gap-1.5 shadow-sm"
@@ -257,13 +304,34 @@ export function WarRoom() {
           </button>
 
           <button 
+            type="button"
             onClick={() => setIsFullScreen(!isFullScreen)}
             className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 transition-colors"
+            aria-label={isFullScreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
+
+      {pulseError && (
+        <div
+          role="alert"
+          className="px-6 py-2.5 bg-red-950/40 border-b border-red-800/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <XCircle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{pulseError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPulseError(null)}
+            className="text-red-400 hover:text-red-200 underline text-[11px]"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
@@ -389,6 +457,7 @@ export function WarRoom() {
                                 </p>
                                 {event.type === "finding.discovered" && (
                                   <button
+                                    type="button"
                                     onClick={() => handleHealNow(event)}
                                     disabled={healingEvents[event.id] === 'running' || healingEvents[event.id] === 'success'}
                                     className={`text-[9px] px-2 py-1 rounded uppercase font-bold tracking-widest transition-colors flex items-center gap-1

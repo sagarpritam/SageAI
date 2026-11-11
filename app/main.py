@@ -44,6 +44,7 @@ from app.routers import (
     atomic_redteam_routes,
     auth_routes,
     autofix_routes,
+    axion_haloscope_routes,
     billing_routes,
     binary_deobfuscator_routes,
     bloodhound_routes,
@@ -54,6 +55,7 @@ from app.routers import (
     casimir_vacuum_routes,
     cauchy_chronology_routes,
     causal_set_lattice_routes,
+    celestial_holography_routes,
     centesimal_quantum_gravity_routes,
     chern_simons_tqft_routes,
     ci_routes,
@@ -61,6 +63,7 @@ from app.routers import (
     cloud_forensics_routes,
     cluster_federation_routes,
     cognitive_ew_routes,
+    conformal_bootstrap_routes,
     consensus_routes,
     copilot_routes,
     cosmic_censorship_routes,
@@ -130,6 +133,7 @@ from app.routers import (
     neural_bci_routes,
     neuromorphic_snn_routes,
     neutrino_array_routes,
+    non_invertible_symtft_routes,
     noncommutative_spacetime_routes,
     notification_routes,
     novikov_geodesic_routes,
@@ -460,6 +464,10 @@ app.include_router(chern_simons_tqft_routes.router)
 app.include_router(quantum_extremal_island_routes.router)
 app.include_router(geometric_langlands_routes.router)
 app.include_router(alcubierre_lentz_warp_routes.router)
+app.include_router(celestial_holography_routes.router)
+app.include_router(non_invertible_symtft_routes.router)
+app.include_router(conformal_bootstrap_routes.router)
+app.include_router(axion_haloscope_routes.router)
 
 
 # ---------------------

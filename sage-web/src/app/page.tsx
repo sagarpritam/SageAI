@@ -566,7 +566,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Chern-Simons TQFT (Cap 113), Takayanagi QES Islands (Cap 114), Langlands S-Duality (Cap 115), and Lentz Soliton Warp.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Celestial Holography (Cap 116), SymTFT Defects (Cap 117), Conformal Bootstrap (Cap 118), Chern-Simons TQFT (Cap 113) & Axion Haloscope Power Grid.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -737,7 +737,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 31 Chern-Simons & QES Live', time: '2m ago' },
+    { title: 'Wave 32 Celestial & SymTFT Live', time: '2m ago' },
     { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];
@@ -1070,7 +1070,7 @@ const DashboardPreview = () => {
           <div className="md:col-span-3 space-y-6">
             <div className="space-y-2">
               <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Active Studios</div>
-              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 31 Chern-Simons'].map((item, i) => (
+              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 32 Celestial w1+∞'].map((item, i) => (
                 <div key={item} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>
                   {item}
                 </div>
@@ -1873,7 +1873,7 @@ const LandingPage = () => {
         <BentoGrid />
       </section>
 
-      {/* Sovereign Defense Grid & Waves 1-31 Showcase */}
+      {/* Sovereign Defense Grid & Waves 1-32 Showcase */}
       <SovereignArchitectureShowcase />
 
       {/* System Anatomy Section */}

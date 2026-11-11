@@ -51,16 +51,19 @@ export function SSOConfigPanel() {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [statusNote, setStatusNote] = useState<string | null>(null);
 
   const fetchConfig = async () => {
     setLoading(true);
+    setStatusNote(null);
     try {
       const res = await axios.get("/api/auth/sso/config");
       if (res.data?.sso) {
         setConfig((prev) => ({ ...prev, ...res.data.sso }));
       }
     } catch {
-      // Use fallback defaults
+      setStatusNote("Loaded local default SAML/OIDC preview while live SSO service is offline.");
     } finally {
       setLoading(false);
     }
@@ -70,21 +73,31 @@ export function SSOConfigPanel() {
     fetchConfig();
   }, []);
 
-  const handleCopy = (field: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
+  const handleCopy = async (field: string, text: string) => {
+    setErrorMsg(null);
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 2000);
+      } else {
+        setErrorMsg("Clipboard write API unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Unable to copy SP metadata to clipboard.");
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
     setSavedSuccess(false);
+    setErrorMsg(null);
     try {
       await new Promise((r) => setTimeout(r, 600));
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);
-    } catch (err) {
-      console.error("Failed to save SSO config", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to save SSO configuration.");
     } finally {
       setSaving(false);
     }
@@ -128,6 +141,7 @@ export function SSOConfigPanel() {
                   <span className="text-emerald-300 truncate block">{config.acs_url}</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleCopy("acs", config.acs_url)}
                   className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 ml-2"
                   title="Copy ACS URL"
@@ -142,6 +156,7 @@ export function SSOConfigPanel() {
                   <span className="text-emerald-300 truncate block">{config.sp_entity_id}</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleCopy("sp", config.sp_entity_id)}
                   className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 ml-2"
                   title="Copy Entity ID"
@@ -215,6 +230,7 @@ export function SSOConfigPanel() {
             </label>
 
             <button
+              type="button"
               onClick={handleSave}
               disabled={saving}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition text-xs flex items-center gap-2 shadow"
@@ -223,6 +239,17 @@ export function SSOConfigPanel() {
               {savedSuccess ? "Saved Successfully!" : "Save SSO Settings"}
             </button>
           </div>
+
+          {errorMsg && (
+            <p role="alert" className="text-xs font-mono text-red-400">
+              {errorMsg}
+            </p>
+          )}
+          {(savedSuccess || statusNote) && (
+            <p role="status" className="text-xs font-mono text-emerald-400/90">
+              {savedSuccess ? "SSO configuration updated." : statusNote}
+            </p>
+          )}
         </div>
       )}
     </div>

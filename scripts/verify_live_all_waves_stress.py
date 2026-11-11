@@ -827,6 +827,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 31 (Opt B): Alcubierre-Lentz Soliton Engage",
         ),
+        # Wave 32: Celestial Holography, Non-Invertible SymTFT, Conformal Bootstrap, Axion Haloscope (Caps 116-118 + Opt B)
+        (
+            "GET",
+            "/api/celestial-holography/boundaries",
+            None,
+            "Wave 32 (Cap 116): Celestial Holography Boundary List",
+        ),
+        (
+            "POST",
+            "/api/celestial-holography/seal-ward",
+            {
+                "boundary_id": "CS2-CELESTIAL-BMS-01",
+                "mellin_boost_delta": 1.5,
+                "soft_theorem_order": 2,
+                "w_infinity_mode_cutoff": 20,
+                "bms_damping_gain": 1.35,
+            },
+            "Wave 32 (Cap 116): Celestial BMS4 Ward Seal",
+        ),
+        (
+            "GET",
+            "/api/non-invertible-symtft/sandwiches",
+            None,
+            "Wave 32 (Cap 117): Non-Invertible SymTFT Sandwich List",
+        ),
+        (
+            "POST",
+            "/api/non-invertible-symtft/seal-defect",
+            {
+                "sandwich_id": "SYMTFT-KW-ISING-01",
+                "higher_form_p": 1,
+                "anyon_count": 6,
+                "pentagon_associator_gain": 1.4,
+            },
+            "Wave 32 (Cap 117): SymTFT Defect Seal",
+        ),
+        (
+            "GET",
+            "/api/conformal-bootstrap/functionals",
+            None,
+            "Wave 32 (Cap 118): Conformal Bootstrap Functional List",
+        ),
+        (
+            "POST",
+            "/api/conformal-bootstrap/audit-crossing",
+            {
+                "functional_id": "SDP-ISING-3D-KINK-01",
+                "derivative_order_lambda": 27,
+                "max_spin_ell": 26,
+                "sdp_precision_gain": 1.45,
+            },
+            "Wave 32 (Cap 118): Conformal Bootstrap SDP Audit",
+        ),
+        (
+            "GET",
+            "/api/axion-haloscope-power/arrays",
+            None,
+            "Wave 32 (Opt B): Axion Haloscope Array List",
+        ),
+        (
+            "POST",
+            "/api/axion-haloscope-power/resonate-haloscope",
+            {
+                "array_id": "AXION-ADMX-TOROID-01",
+                "magnetic_field_tesla": 14.0,
+                "cavity_quality_q_million": 2.8,
+                "axion_mass_uev": 42.0,
+                "primakov_coupling_gain": 1.25,
+            },
+            "Wave 32 (Opt B): Axion Haloscope Resonate",
+        ),
     ]
 
 
@@ -856,7 +927,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-31, CAPS 1-115) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-32, CAPS 1-118) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -871,7 +942,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-31 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-32 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -928,7 +999,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-31){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-32){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -944,7 +1015,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-31 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-32 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -956,7 +1027,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 144)
+        total_requests if total_requests is not None else max(endpoints_count, 152)
     )
 
     if in_process:
@@ -992,7 +1063,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-31, Capabilities 1-115) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-32, Capabilities 1-118) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",
