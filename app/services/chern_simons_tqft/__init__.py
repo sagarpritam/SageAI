@@ -6,4 +6,3 @@ from app.services.chern_simons_tqft.chern_simons_tqft import (
 )
 
 __all__ = ["ChernSimonsTQFTShield", "get_chern_simons_tqft_shield"]
-

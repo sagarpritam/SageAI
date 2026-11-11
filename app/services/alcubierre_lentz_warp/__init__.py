@@ -6,4 +6,3 @@ from app.services.alcubierre_lentz_warp.alcubierre_lentz_warp import (
 )
 
 __all__ = ["AlcubierreLentzWarpMatrix", "get_alcubierre_lentz_warp_matrix"]
-

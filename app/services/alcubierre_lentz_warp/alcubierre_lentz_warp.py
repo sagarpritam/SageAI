@@ -137,4 +137,3 @@ _alcubierre_lentz_warp_matrix = AlcubierreLentzWarpMatrix()
 def get_alcubierre_lentz_warp_matrix() -> AlcubierreLentzWarpMatrix:
     """Return the global AlcubierreLentzWarpMatrix singleton instance."""
     return _alcubierre_lentz_warp_matrix
-

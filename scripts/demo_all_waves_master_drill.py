@@ -81,7 +81,6 @@ from app.services.fibonacci_anyon_compiler import get_fibonacci_anyon_compiler
 from app.services.firmware_attestation.firmware_integrity_guard import (
     firmware_integrity_guard,
 )
-from app.services.geometric_langlands import get_geometric_langlands_synchronizer
 from app.services.geomagnetic_shield.geomagnetic_solar_shield import (
     geomagnetic_solar_shield,
 )

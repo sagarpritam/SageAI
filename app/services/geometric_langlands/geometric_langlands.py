@@ -137,4 +137,3 @@ _geometric_langlands_synchronizer = GeometricLanglandsSynchronizer()
 def get_geometric_langlands_synchronizer() -> GeometricLanglandsSynchronizer:
     """Return the global GeometricLanglandsSynchronizer singleton instance."""
     return _geometric_langlands_synchronizer
-

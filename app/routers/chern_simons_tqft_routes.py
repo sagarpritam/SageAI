@@ -73,4 +73,3 @@ async def get_tqft_metrics():
     """Retrieve aggregate Chern-Simons TQFT invariant metrics."""
     shield = get_chern_simons_tqft_shield()
     return shield.get_tqft_metrics()
-

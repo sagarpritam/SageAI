@@ -73,4 +73,3 @@ async def get_qes_metrics():
     """Retrieve aggregate Quantum Extremal Island Page Curve metrics."""
     auditor = get_quantum_extremal_island_auditor()
     return auditor.get_qes_metrics()
-

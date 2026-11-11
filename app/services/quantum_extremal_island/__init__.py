@@ -9,4 +9,3 @@ __all__ = [
     "QuantumExtremalIslandAuditor",
     "get_quantum_extremal_island_auditor",
 ]
-

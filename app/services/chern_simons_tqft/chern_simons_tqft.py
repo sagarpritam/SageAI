@@ -145,4 +145,3 @@ _chern_simons_tqft_shield = ChernSimonsTQFTShield()
 def get_chern_simons_tqft_shield() -> ChernSimonsTQFTShield:
     """Return the global ChernSimonsTQFTShield singleton instance."""
     return _chern_simons_tqft_shield
-

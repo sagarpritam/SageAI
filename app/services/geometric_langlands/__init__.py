@@ -9,4 +9,3 @@ __all__ = [
     "GeometricLanglandsSynchronizer",
     "get_geometric_langlands_synchronizer",
 ]
-

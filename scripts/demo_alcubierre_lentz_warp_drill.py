@@ -57,4 +57,3 @@ def run_lentz_warp_drill() -> None:
 
 if __name__ == "__main__":
     run_lentz_warp_drill()
-

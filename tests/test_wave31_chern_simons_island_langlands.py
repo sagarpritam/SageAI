@@ -276,4 +276,3 @@ def test_alcubierre_lentz_warp_api(client):
     metrics_res = client.get("/api/alcubierre-lentz-warp/metrics")
     assert metrics_res.status_code == 200
     assert metrics_res.json()["positive_energy_wec_enforced"] is True
-

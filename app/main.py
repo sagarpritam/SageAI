@@ -93,7 +93,6 @@ from app.routers import (
     firmware_attestation_routes,
     forensics_routes,
     gdpr_routes,
-    geometric_langlands_routes,
     geomagnetic_shield_routes,
     geometric_langlands_routes,
     gravitational_seismic_routes,

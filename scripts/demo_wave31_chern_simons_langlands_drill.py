@@ -91,4 +91,3 @@ def run_wave31_drill() -> None:
 
 if __name__ == "__main__":
     run_wave31_drill()
-

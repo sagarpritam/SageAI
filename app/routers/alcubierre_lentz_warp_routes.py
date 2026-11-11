@@ -66,4 +66,3 @@ async def get_warp_metrics():
     """Retrieve aggregate Alcubierre-Lentz Solitonic Warp-Field metrics."""
     matrix = get_alcubierre_lentz_warp_matrix()
     return matrix.get_warp_metrics()
-
