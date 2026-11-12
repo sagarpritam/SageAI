@@ -36,6 +36,7 @@ export function ThreatFeed() {
   const [ruleBundles, setRuleBundles] = useState<Record<string, any>>({});
   const [activeRuleTabs, setActiveRuleTabs] = useState<Record<string, "yara" | "sigma" | "nuclei" | "waf">>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const toggleForgeRules = async (item: ThreatItem) => {
     if (expandedThreatId === item.id) {
@@ -47,6 +48,7 @@ export function ThreatFeed() {
     if (ruleBundles[item.id]) return;
 
     setSynthesizingId(item.id);
+    setErrorMsg(null);
     try {
       const res = await axios.get(`/api/rules/cve/${encodeURIComponent(item.id)}`).catch(() => null);
       if (res?.data?.bundle) {
@@ -63,22 +65,31 @@ export function ThreatFeed() {
       }
     } catch (e) {
       console.error("Rule synthesis error:", e);
+      setErrorMsg(`Failed to synthesize detection rules for ${item.id}.`);
     } finally {
       setSynthesizingId(null);
     }
   };
 
-  const copyRuleCode = (key: string, code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
+  const copyRuleCode = async (key: string, code: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+        setCopiedKey(key);
+        setTimeout(() => setCopiedKey(null), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy rule payload to clipboard.");
+    }
   };
 
   useEffect(() => {
     axios
       .get("/api/threat-feed")
       .then((r) => setItems(Array.isArray(r.data) ? r.data : []))
-      .catch(() => {})
+      .catch(() => setErrorMsg("Unable to load live threat intelligence feed."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -103,6 +114,7 @@ export function ThreatFeed() {
         <div className="flex gap-1.5">
           {["all", "critical", "high", "medium"].map((f) => (
             <button
+              type="button"
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1 rounded-full text-xs font-bold capitalize transition-all ${
@@ -116,6 +128,22 @@ export function ThreatFeed() {
           ))}
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-8 text-center">
@@ -146,6 +174,7 @@ export function ThreatFeed() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
+                    type="button"
                     onClick={() => toggleForgeRules(item)}
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-emerald-400 border border-zinc-700/60 transition-all"
                   >
@@ -184,6 +213,7 @@ export function ThreatFeed() {
                       <div className="flex gap-1">
                         {(["yara", "sigma", "nuclei", "waf"] as const).map((rTab) => (
                           <button
+                            type="button"
                             key={rTab}
                             onClick={() =>
                               setActiveRuleTabs((prev) => ({ ...prev, [item.id]: rTab }))
@@ -233,7 +263,9 @@ export function ThreatFeed() {
                             <div className="flex items-center justify-between mb-1.5">
                               <span className="text-[11px] text-zinc-400 font-mono">{title}</span>
                               <button
+                                type="button"
                                 onClick={() => copyRuleCode(cKey, code)}
+                                aria-live="polite"
                                 className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-emerald-400 transition-colors"
                               >
                                 {copiedKey === cKey ? (

@@ -25,6 +25,7 @@ export function CTIHub() {
   const [loading, setLoading] = useState(false);
   const [stixBundle, setStixBundle] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const actors = [
     { name: "APT28 (Fancy Bear / Strontium)", origin: "Russian Federation (GRU)", motivation: "ESPIONAGE", tools: ["X-Agent", "Zebrocy", "Mimikatz"] },
@@ -41,6 +42,7 @@ export function CTIHub() {
 
   const generateStix = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const parsedIndicators = indicatorsText
         .split("\n")
@@ -63,19 +65,31 @@ export function CTIHub() {
       if (res.ok) {
         const data = await res.json();
         setStixBundle(data);
+      } else {
+        setErrorMsg(`Failed to generate STIX 2.1 bundle (HTTP ${res.status}).`);
       }
     } catch (e) {
       console.error("STIX generate failed", e);
+      setErrorMsg("Unable to generate STIX 2.1 bundle. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copyBundle = () => {
+  const copyBundle = async () => {
     if (!stixBundle?.stix_bundle) return;
-    navigator.clipboard.writeText(JSON.stringify(stixBundle.stix_bundle, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const payload = JSON.stringify(stixBundle.stix_bundle, null, 2);
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(payload);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy STIX 2.1 bundle to clipboard.");
+    }
   };
 
   return (
@@ -101,6 +115,7 @@ export function CTIHub() {
           </div>
 
           <button
+            type="button"
             onClick={generateStix}
             disabled={loading}
             className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-blue-950/40"
@@ -114,6 +129,7 @@ export function CTIHub() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6">
           {actors.map((act, idx) => (
             <button
+              type="button"
               key={idx}
               onClick={() => setSelectedActor(act.name)}
               className={`p-3 rounded-lg border text-left transition-all ${
@@ -129,6 +145,25 @@ export function CTIHub() {
           ))}
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Input Controls */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
@@ -193,7 +228,9 @@ export function CTIHub() {
             </div>
 
             <button
+              type="button"
               onClick={copyBundle}
+              aria-live="polite"
               className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs rounded border border-zinc-800 flex items-center gap-1.5"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}

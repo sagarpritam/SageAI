@@ -24,6 +24,7 @@ export function DSPMHub() {
   const [dspmReport, setDspmReport] = useState<any>(null);
   const [remediationPlan, setRemediationPlan] = useState<any>(null);
   const [copiedHcl, setCopiedHcl] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const sampleRecords = [
     "TRANSACTION_ID=TX-901 customer_email=alice@corp.com ssn=123-45-6789 card=4111222233334444",
@@ -34,6 +35,7 @@ export function DSPMHub() {
 
   const scanStore = async () => {
     setLoading(true);
+    setErrorMsg(null);
     setRemediationPlan(null);
     try {
       const res = await fetch("/api/dspm/scan", {
@@ -52,9 +54,12 @@ export function DSPMHub() {
       if (res.ok) {
         const data = await res.json();
         setDspmReport(data.dspm_report);
+      } else {
+        setErrorMsg(`DSPM scan failed (HTTP ${res.status}).`);
       }
     } catch (e) {
       console.error("DSPM scan failed", e);
+      setErrorMsg("Unable to complete DSPM store scan. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,6 +68,7 @@ export function DSPMHub() {
   const generateRemediation = async () => {
     if (!dspmReport) return;
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/dspm/remediation", {
         method: "POST",
@@ -72,18 +78,29 @@ export function DSPMHub() {
       if (res.ok) {
         const data = await res.json();
         setRemediationPlan(data.remediation_plan);
+      } else {
+        setErrorMsg(`Failed to generate Terraform remediation policy (HTTP ${res.status}).`);
       }
     } catch (e) {
       console.error("Remediation failed", e);
+      setErrorMsg("Unable to generate Terraform remediation policy.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copyCode = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedHcl(true);
-    setTimeout(() => setCopiedHcl(false), 2000);
+  const copyCode = async (text: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedHcl(true);
+        setTimeout(() => setCopiedHcl(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy Terraform HCL to clipboard.");
+    }
   };
 
   return (
@@ -109,6 +126,7 @@ export function DSPMHub() {
           </div>
 
           <button
+            type="button"
             onClick={scanStore}
             disabled={loading}
             className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-emerald-950/40"
@@ -144,6 +162,7 @@ export function DSPMHub() {
           <div>
             <label className="text-zinc-400 text-[10px] block mb-1">INGRESS ACCESS</label>
             <button
+              type="button"
               onClick={() => setIsPublic(!isPublic)}
               className={`w-full p-2 rounded-lg border text-xs font-bold transition-all ${
                 isPublic ? "bg-rose-950 text-rose-300 border-rose-800" : "bg-zinc-900 text-zinc-300 border-zinc-700"
@@ -155,6 +174,7 @@ export function DSPMHub() {
           <div>
             <label className="text-zinc-400 text-[10px] block mb-1">ENCRYPTION AT REST</label>
             <button
+              type="button"
               onClick={() => setEncryptionEnabled(!encryptionEnabled)}
               className={`w-full p-2 rounded-lg border text-xs font-bold transition-all ${
                 encryptionEnabled ? "bg-emerald-950 text-emerald-300 border-emerald-800" : "bg-amber-950 text-amber-300 border-amber-800"
@@ -165,6 +185,25 @@ export function DSPMHub() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* DSPM Scan Results */}
       {dspmReport && (
@@ -208,6 +247,7 @@ export function DSPMHub() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={generateRemediation}
                 disabled={loading}
                 className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all text-xs flex items-center justify-center gap-2"
@@ -257,7 +297,9 @@ export function DSPMHub() {
                   Automated Least-Privilege Terraform HCL Remediation
                 </h4>
                 <button
+                  type="button"
                   onClick={() => copyCode(remediationPlan.terraform_hcl)}
+                  aria-live="polite"
                   className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-[11px] rounded border border-zinc-800 flex items-center gap-1.5"
                 >
                   {copiedHcl ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}

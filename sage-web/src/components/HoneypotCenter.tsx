@@ -63,9 +63,11 @@ export function HoneypotCenter() {
   const [tokenLabel, setTokenLabel] = useState("Production Database Credential");
   const [createdToken, setCreatedToken] = useState<CanaryToken | null>(null);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [deceptionRes, tokensRes] = await Promise.all([
         axios.get("/api/deception"),
@@ -75,6 +77,7 @@ export function HoneypotCenter() {
       setAlerts(deceptionRes.data.alerts || []);
       setTokens(tokensRes.data.tokens || []);
     } catch {
+      setErrorMsg("Live deception feed unreachable; displaying local decoy baselines.");
       // Fallback
       setDecoys([
         { path: "/wp-login.php", type: "WordPress Admin Decoy", lure: "CMS Login", category: "web" },
@@ -93,6 +96,7 @@ export function HoneypotCenter() {
 
   const handleGenerateCanary = async () => {
     setGenerating(true);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/deception/canary", {
         token_type: tokenType,
@@ -104,6 +108,7 @@ export function HoneypotCenter() {
       }
     } catch (err) {
       console.error(err);
+      setErrorMsg("Failed to forge tripwire canary token.");
     } finally {
       setGenerating(false);
     }
@@ -111,6 +116,7 @@ export function HoneypotCenter() {
 
   const handleSimulateJourney = async () => {
     setSimulating(true);
+    setErrorMsg(null);
     setSimulationResult(null);
     try {
       const res = await axios.post("/api/deception/simulate-attack", {
@@ -123,15 +129,24 @@ export function HoneypotCenter() {
       }
     } catch (err) {
       console.error(err);
+      setErrorMsg("Failed to simulate deception mesh intrusion journey.");
     } finally {
       setSimulating(false);
     }
   };
 
-  const copyToClipboard = (val: string) => {
-    navigator.clipboard.writeText(val);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async (val: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(val);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy canary value to clipboard.");
+    }
   };
 
   return (
@@ -151,6 +166,7 @@ export function HoneypotCenter() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={handleSimulateJourney}
             disabled={simulating}
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 disabled:opacity-50 text-xs font-bold text-white transition shadow-lg shadow-red-950/30 font-mono"
@@ -159,6 +175,7 @@ export function HoneypotCenter() {
             Test Deception Mesh
           </button>
           <button
+            type="button"
             onClick={fetchData}
             disabled={loading}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white hover:border-zinc-700 transition"
@@ -168,6 +185,22 @@ export function HoneypotCenter() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Simulation Result Callout */}
       {simulationResult && (
@@ -235,6 +268,7 @@ export function HoneypotCenter() {
               </div>
 
               <button
+                type="button"
                 onClick={handleGenerateCanary}
                 disabled={generating}
                 className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-bold text-xs uppercase tracking-wider transition font-mono"
@@ -252,7 +286,9 @@ export function HoneypotCenter() {
                 <div className="flex items-center justify-between gap-2">
                   <code className="text-xs font-mono text-zinc-200 truncate">{createdToken.canary_value}</code>
                   <button
+                    type="button"
                     onClick={() => copyToClipboard(createdToken.canary_value)}
+                    aria-label="Copy canary value"
                     className="p-1 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}

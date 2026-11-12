@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.3.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.4.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.3.0");
-    expect(healthJson.version).toBe("7.3.0");
+    expect(healthJson.platform_version).toBe("7.4.0");
+    expect(healthJson.version).toBe("7.4.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -695,6 +695,69 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(ergBody.status).toBe("ERGOSPHERE_BZ_OPTIMAL");
     expect(ergBody.zero_fossil_carbon).toBe(true);
     expect(Number(ergBody.net_grid_output_gw)).toBeGreaterThan(200.0);
+
+    // Wave 34 studios (Caps 122-124 & Option B) return 200 deterministically offline
+    const cmpList = await request.get("/api/complexity-holography/bounds");
+    expect(cmpList.status()).toBe(200);
+    const cmpSim = await request.post("/api/complexity-holography/audit-complexity", {
+      data: {
+        bound_id: "CMP-WDW-ACTION-01",
+        central_charge: 240.0,
+        lloyd_ratio: 0.96,
+        switchback_shocks: 6,
+      },
+    });
+    expect(cmpSim.status()).toBe(200);
+    expect(((await cmpSim.json()) as { status?: string }).status).toBe(
+      "COMPLEXITY_WDW_SEALED"
+    );
+
+    const carList = await request.get("/api/carrollian-holography/manifolds");
+    expect(carList.status()).toBe(200);
+    const carSim = await request.post("/api/carrollian-holography/seal-carrollian", {
+      data: {
+        manifold_id: "CAR-NULL-SCRI-01",
+        carroll_coupling: 0.95,
+        dipole_charge: 6.0,
+      },
+    });
+    expect(carSim.status()).toBe(200);
+    expect(((await carSim.json()) as { status?: string }).status).toBe(
+      "CARROLLIAN_NULL_SEALED"
+    );
+
+    const modList = await request.get("/api/modular-bootstrap/genera");
+    expect(modList.status()).toBe(200);
+    const modSim = await request.post("/api/modular-bootstrap/audit-modular", {
+      data: {
+        genus_id: "MOD-SL2Z-TORUS-01",
+        central_charge: 48.0,
+        spin_cutoff: 24,
+      },
+    });
+    expect(modSim.status()).toBe(200);
+    expect(((await modSim.json()) as { status?: string }).status).toBe(
+      "MODULAR_BOOTSTRAP_SEALED"
+    );
+
+    const sagList = await request.get("/api/casimir-sagnac-power/arrays");
+    expect(sagList.status()).toBe(200);
+    const sagSim = await request.post("/api/casimir-sagnac-power/harvest-sagnac", {
+      data: {
+        array_id: "CAS-SAGNAC-ORBIT-01",
+        pump_frequency_mhz: 520.0,
+        squeeze_gain: 1.6,
+      },
+    });
+    expect(sagSim.status()).toBe(200);
+    const sagBody = (await sagSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(sagBody.status).toBe("CASIMIR_SAGNAC_OPTIMAL");
+    expect(sagBody.zero_fossil_carbon).toBe(true);
+    expect(Number(sagBody.net_grid_output_gw)).toBeGreaterThan(220.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

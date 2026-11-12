@@ -30,13 +30,14 @@ const typeColors: Record<string, string> = {
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     axios
       .get("/api/notifications")
       .then((r) => setNotifications(Array.isArray(r.data) ? r.data : []))
-      .catch(() => {});
+      .catch(() => setErrorMsg("Unable to sync notifications."));
   }, []);
 
   // Close on outside click
@@ -51,25 +52,33 @@ export function NotificationBell() {
   const unread = notifications.filter((n) => !n.is_read).length;
 
   const markRead = async (id: number) => {
+    setErrorMsg(null);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
     try {
       await axios.post(`/api/notifications?action=read&id=${id}`);
-    } catch {}
+    } catch {
+      setErrorMsg("Failed to mark notification as read.");
+    }
   };
 
   const markAllRead = async () => {
+    setErrorMsg(null);
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     try {
       await axios.post("/api/notifications?action=read-all");
-    } catch {}
+    } catch {
+      setErrorMsg("Failed to mark all notifications as read.");
+    }
   };
 
   return (
     <div className="relative" ref={ref}>
       <button
+        type="button"
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
         className="relative p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
         aria-label="Notifications"
       >
@@ -88,17 +97,27 @@ export function NotificationBell() {
             <div className="flex items-center gap-2">
               {unread > 0 && (
                 <button
+                  type="button"
                   onClick={markAllRead}
                   className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   Mark all read
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300" aria-label="Close notifications">
+              <button type="button" onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300" aria-label="Close notifications">
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
+
+          {errorMsg && (
+            <div role="alert" className="px-4 py-2 text-[11px] font-mono text-amber-300 bg-amber-950/40 border-b border-amber-500/30 flex items-center justify-between gap-2">
+              <span>{errorMsg}</span>
+              <button type="button" onClick={() => setErrorMsg(null)} className="text-amber-300/80 hover:text-amber-200 font-semibold shrink-0">
+                Dismiss
+              </button>
+            </div>
+          )}
 
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (

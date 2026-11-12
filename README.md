@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-639%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Next.js](https://img.shields.io/badge/Next.js-478%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-704%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-7.3.0%20Swampland%20WGC%2C%20SYK%20Chaos%20%26%20TMF-gold?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-644%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Next.js](https://img.shields.io/badge/Next.js-490%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-716%20Endpoints-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-7.4.0%20Complexity%2C%20Carrollian%20%26%20Modular-gold?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -888,13 +888,17 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database engine, JWT, rate limiting, telemetry
 │   ├── models/            # 17 SQLAlchemy models (Scan, Finding, Asset, RemediationPatch...)
-│   ├── routers/           # 171 API router modules (Core, Waves 1-33 Trans-Century Defense & Sovereignty)
+│   ├── routers/           # 175 API router modules (Core, Waves 1-34 Trans-Century Defense & Sovereignty)
 │   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
-│   │   ├── swampland_wgc/               # 🆕 Wave 33: Swampland Distance & WGC EFT cutoff firewall (Cap 119)
-│   │   ├── syk_chaos_guard/             # 🆕 Wave 33: SYK maximal chaos & Schwarzian scrambling guard (Cap 120)
-│   │   ├── tmf_cohomology/              # 🆕 Wave 33: Topological Modular Forms & elliptic cohomology shield (Cap 121)
-│   │   ├── ergosphere_spin_power/       # 🆕 Wave 33 (Opt B): Penrose-BZ micro-ergosphere power matrix
+│   │   ├── complexity_holography/       # 🆕 Wave 34: Holographic Quantum Complexity (CA/CV) firewall (Cap 122)
+│   │   ├── carrollian_holography/       # 🆕 Wave 34: Non-Lorentzian Carrollian null-boundary shield (Cap 123)
+│   │   ├── modular_bootstrap/           # 🆕 Wave 34: Modular Bootstrap & Rademacher Regge guard (Cap 124)
+│   │   ├── casimir_sagnac_power/        # 🆕 Wave 34 (Opt B): Dynamical Casimir-Sagnac cavity power grid
+│   │   ├── swampland_wgc/               # Wave 33: Swampland Distance & WGC EFT cutoff firewall (Cap 119)
+│   │   ├── syk_chaos_guard/             # Wave 33: SYK maximal chaos & Schwarzian scrambling guard (Cap 120)
+│   │   ├── tmf_cohomology/              # Wave 33: Topological Modular Forms & elliptic cohomology shield (Cap 121)
+│   │   ├── ergosphere_spin_power/       # Wave 33 (Opt B): Penrose-BZ micro-ergosphere power matrix
 │   │   ├── celestial_holography/        # Wave 32: Celestial w_{1+infinity} & BMS4 memory shield (Cap 116)
 │   │   ├── non_invertible_symtft/       # Wave 32: Non-invertible fusion-category SymTFT firewall (Cap 117)
 │   │   ├── conformal_bootstrap/         # Wave 32: Conformal Bootstrap SDP & unitarity bounds auditor (Cap 118)
@@ -1010,11 +1014,15 @@ SageAI/
 │   │   └── warroom_service.py       # Distributed event streaming & War Room manager
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
-│   ├── app/               # 14 App Router pages (v7.3.0 Landing, Features, Pricing, Command Center...)
-│   ├── app/api/           # 475 API routes and proxy endpoints
-│   ├── lib/platform.ts    # Centralized v7.3.0 metrics, milestone metadata & SITE_URL
-│   └── components/        # 190 Tailwind & Lucide React UI Components (183 top-level panels; 154 mounted Command Center studios)
-│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.3.0 10-Pillar, PQC & Waves 1-33 Grid Showcase
+│   ├── app/               # 14 App Router pages (v7.4.0 Landing, Features, Pricing, Command Center...)
+│   ├── app/api/           # 487 API routes and proxy endpoints
+│   ├── lib/platform.ts    # Centralized v7.4.0 metrics, milestone metadata & SITE_URL
+│   └── components/        # 194 Tailwind & Lucide React UI Components (187 top-level panels; 158 mounted Command Center studios)
+│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.4.0 10-Pillar, PQC & Waves 1-34 Grid Showcase
+│       ├── ComplexityHolographyStudio.tsx        # ⚛️ Holographic Quantum Complexity (CA/CV) Firewall
+│       ├── CarrollianHolographyStudio.tsx        # 🧭 Non-Lorentzian Carrollian Null-Boundary Shield
+│       ├── ModularBootstrapStudio.tsx            # 📐 Modular Bootstrap & Rademacher Regge Guard
+│       ├── CasimirSagnacStudio.tsx               # ⚡ Planetary Dynamical Casimir-Sagnac Power Grid
 │       ├── SwamplandWGCStudio.tsx              # 🏔️ Swampland Distance & Weak Gravity EFT Firewall
 │       ├── SYKChaosStudio.tsx                  # 🔥 SYK Maximal Chaos & Schwarzian Scrambling Guard
 │       ├── TMFCohomologyStudio.tsx             # 🧩 Topological Modular Forms & Elliptic Cohomology Shield
@@ -1114,7 +1122,7 @@ SageAI/
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
 ├── sage-web/tests/        # 33 Playwright E2E specs across 3 suites (standalone Next.js server)
-├── tests/                 # 639 pytest tests across 100 test suites (100% passing)
+├── tests/                 # 644 pytest tests across 101 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

@@ -89,15 +89,18 @@ export function ComplianceCenter() {
   const [loadingDebrief, setLoadingDebrief] = useState<boolean>(false);
   const [debrief, setDebrief] = useState<MultilingualDebrief | null>(null);
   const [copiedHash, setCopiedHash] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const generateReport = async (frameworkId: string) => {
     setSelectedFw(frameworkId);
     setLoadingFw(true);
     setReport(null);
+    setErrorMsg(null);
     try {
       const { data } = await axios.get(`/api/compliance?framework=${frameworkId}`);
       setReport(data);
     } catch {
+      setErrorMsg(`Unable to fetch live compliance posture for ${frameworkId.toUpperCase()}. Showing offline assessment fallback.`);
       setReport({
         framework: frameworkId,
         score: 0,
@@ -155,6 +158,7 @@ export function ComplianceCenter() {
 
   const handleGenerateDebrief = async () => {
     setLoadingDebrief(true);
+    setErrorMsg(null);
     try {
       const { data } = await axios.post("/api/reports/debrief", {
         target: targetAsset,
@@ -170,8 +174,23 @@ export function ComplianceCenter() {
       setDebrief(data);
     } catch (err) {
       console.error("Failed to generate debrief", err);
+      setErrorMsg("Failed to synthesize localized CISO boardroom debrief. Please try again.");
     } finally {
       setLoadingDebrief(false);
+    }
+  };
+
+  const handleCopySealHash = async (hash: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(hash);
+        setCopiedHash(true);
+        setTimeout(() => setCopiedHash(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy SHA-256 Merkle seal to clipboard.");
     }
   };
 
@@ -187,6 +206,7 @@ export function ComplianceCenter() {
       <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setActiveTab("frameworks")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition ${
               activeTab === "frameworks"
@@ -198,6 +218,7 @@ export function ComplianceCenter() {
             Compliance Framework Audits
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("multilingual")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition ${
               activeTab === "multilingual"
@@ -214,12 +235,29 @@ export function ComplianceCenter() {
         </span>
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Tab 1: Framework Audits */}
       {activeTab === "frameworks" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {frameworks.map((fw) => (
               <button
+                type="button"
                 key={fw.id}
                 onClick={() => generateReport(fw.id)}
                 className={`text-left p-4 rounded-xl border transition-all ${
@@ -291,6 +329,7 @@ export function ComplianceCenter() {
               )}
 
               <button
+                type="button"
                 onClick={handleExportFramework}
                 disabled={exportingFw}
                 className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-colors text-sm disabled:opacity-50"
@@ -322,6 +361,7 @@ export function ComplianceCenter() {
               <div className="flex flex-wrap gap-2">
                 {languages.map((l) => (
                   <button
+                    type="button"
                     key={l.code}
                     onClick={() => setSelectedLang(l.code)}
                     className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
@@ -367,6 +407,7 @@ export function ComplianceCenter() {
 
             <div className="pt-2">
               <button
+                type="button"
                 onClick={handleGenerateDebrief}
                 disabled={loadingDebrief}
                 className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/10"
@@ -490,17 +531,16 @@ export function ComplianceCenter() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(debrief.compliance_assurance.block_hash);
-                      setCopiedHash(true);
-                      setTimeout(() => setCopiedHash(false), 2000);
-                    }}
+                    type="button"
+                    onClick={() => handleCopySealHash(debrief.compliance_assurance.block_hash)}
+                    aria-live="polite"
                     className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-300 flex items-center gap-1.5 transition"
                   >
                     {copiedHash ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    Copy SHA-256 Seal
+                    {copiedHash ? "Copied SHA-256 Seal" : "Copy SHA-256 Seal"}
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       const markdown = `# ${debrief.metadata.title}\n\n**Target**: \`${debrief.metadata.target}\`\n**Language**: ${debrief.language.name}\n**Risk Score**: ${debrief.posture.risk_score}/100\n\n## ${debrief.executive_summary.section_label}\n${debrief.executive_summary.content}\n\n## ${debrief.strategic_recommendations.section_label}\n${debrief.strategic_recommendations.items.map((it) => `- ${it}`).join("\n")}\n\n## ${debrief.compliance_assurance.section_label}\n- **Merkle Block**: #${debrief.compliance_assurance.block_index}\n- **Block Hash**: \`${debrief.compliance_assurance.block_hash}\`\n`;
                       const blob = new Blob([markdown], { type: "text/markdown" });

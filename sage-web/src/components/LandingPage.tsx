@@ -20,7 +20,7 @@ const features = [
   { icon: GitBranch, title: "SagePatch AST Self-Healing Code", desc: "SAST + AST sandbox validation -> GitHub PR with human-in-the-loop approval gates", color: "text-amber-400" },
   { icon: Activity, title: "eBPF Kernel SIEM & ASM", desc: "<0.2% CPU syscall telemetry, continuous attack surface monitoring & live War Room alerts", color: "text-cyan-400" },
   { icon: Clock, title: "Post-Quantum Zero-Egress Enclaves", desc: "NIST FIPS 203 ML-KEM-768, FIPS 204 ML-DSA-65 & AES-256-GCM regional isolation (US/EU/APAC)", color: "text-indigo-400" },
-  { icon: Lock, title: `Trans-Century Frontier (${PLATFORM_WAVES_RANGE})`, desc: "Swampland WGC (Cap 119), SYK Maximal Chaos (Cap 120) & Topological Modular Forms (Cap 121)", color: "text-pink-400" },
+  { icon: Lock, title: `Trans-Century Frontier (${PLATFORM_WAVES_RANGE})`, desc: "Complexity CA/CV (Cap 122), Carrollian Null Shield (Cap 123) & Modular Bootstrap (Cap 124)", color: "text-pink-400" },
 ];
 
 const stats = [

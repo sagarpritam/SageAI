@@ -228,6 +228,10 @@ import SwamplandWGCStudio from "@/components/SwamplandWGCStudio";
 import SYKChaosStudio from "@/components/SYKChaosStudio";
 import TMFCohomologyStudio from "@/components/TMFCohomologyStudio";
 import ErgosphereSpinStudio from "@/components/ErgosphereSpinStudio";
+import ComplexityHolographyStudio from "@/components/ComplexityHolographyStudio";
+import CarrollianHolographyStudio from "@/components/CarrollianHolographyStudio";
+import ModularBootstrapStudio from "@/components/ModularBootstrapStudio";
+import CasimirSagnacStudio from "@/components/CasimirSagnacStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -236,6 +240,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "complexity-holography", label: "Complexity CA/CV (Cap 122)", icon: Layers },
+  { id: "carrollian-holography", label: "Carrollian Shield (Cap 123)", icon: Compass },
+  { id: "modular-bootstrap", label: "Modular Bootstrap (Cap 124)", icon: Scale },
+  { id: "casimir-sagnac-power", label: "Casimir-Sagnac Grid (Option B)", icon: Radio },
   { id: "swampland-wgc", label: "Swampland WGC (Cap 119)", icon: Compass },
   { id: "syk-chaos-guard", label: "SYK Chaos Guard (Cap 120)", icon: Activity },
   { id: "tmf-cohomology", label: "TMF Cohomology (Cap 121)", icon: Layers },
@@ -611,6 +619,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "complexity-holography" && <ComplexityHolographyStudio />}
+          {activeTab === "carrollian-holography" && <CarrollianHolographyStudio />}
+          {activeTab === "modular-bootstrap" && <ModularBootstrapStudio />}
+          {activeTab === "casimir-sagnac-power" && <CasimirSagnacStudio />}
           {activeTab === "swampland-wgc" && <SwamplandWGCStudio />}
           {activeTab === "syk-chaos-guard" && <SYKChaosStudio />}
           {activeTab === "tmf-cohomology" && <TMFCohomologyStudio />}

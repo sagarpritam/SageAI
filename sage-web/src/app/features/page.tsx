@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Celestial Holography w1+∞ (Cap 116), Swampland Distance & WGC (Cap 119), SYK Maximal Chaos (Cap 120), and Topological Modular Forms (Cap 121).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Swampland WGC (Cap 119), Complexity CA/CV Holography (Cap 122), Non-Lorentzian Carrollian Shield (Cap 123), and Modular Bootstrap Rademacher Guard (Cap 124).",
     },
   ];
 

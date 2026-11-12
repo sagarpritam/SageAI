@@ -262,19 +262,29 @@ function TrendSparkline({ data }: { data: TrendPoint[] }) {
 
 function CodeSnippet({ language, code }: { language: string; code: string }) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
-  const copy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copy = async () => {
+    setCopyError(false);
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        setCopyError(true);
+      }
+    } catch {
+      setCopyError(true);
+    }
   };
 
   return (
     <div className="mt-2 rounded-lg border border-zinc-800 overflow-hidden">
       <div className="flex items-center justify-between bg-zinc-900 px-3 py-1.5 border-b border-zinc-800">
         <span className="text-xs text-zinc-500 font-mono uppercase">{language}</span>
-        <button onClick={copy} className="text-xs text-zinc-400 hover:text-emerald-400 transition-colors">
-          {copied ? "✓ Copied" : "Copy"}
+        <button type="button" onClick={copy} aria-live="polite" className="text-xs text-zinc-400 hover:text-emerald-400 transition-colors">
+          {copied ? "✓ Copied" : copyError ? "Copy unavailable" : "Copy"}
         </button>
       </div>
       <pre className="p-3 bg-zinc-950 text-xs text-zinc-300 font-mono overflow-x-auto whitespace-pre leading-relaxed max-h-48 overflow-y-auto">
@@ -298,10 +308,12 @@ export function SecurityPosture() {
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [copiedDebrief, setCopiedDebrief] = useState(false);
   const [expandedRem, setExpandedRem] = useState<number | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      setErrorMsg(null);
       try {
         const [postureRes, trendsRes, complianceRes] = await Promise.allSettled([
           axios.get("/api/posture/score"),
@@ -319,14 +331,18 @@ export function SecurityPosture() {
                 `/api/posture/remediation/${postureRes.value.data.scan_id}`
               );
               setRemediations(remRes.data.remediations || []);
-            } catch { /* no-op */ }
+            } catch {
+              setErrorMsg("Unable to load automated remediation playbooks for this scan.");
+            }
           }
+        } else {
+          setErrorMsg("Unable to load security posture score.");
         }
 
         if (trendsRes.status === "fulfilled") setTrends(trendsRes.value.data.trends || []);
         if (complianceRes.status === "fulfilled") setCompliance(complianceRes.value.data);
       } catch {
-        /* no-op */
+        setErrorMsg("Unable to load security posture metrics.");
       } finally {
         setLoading(false);
       }
@@ -338,6 +354,7 @@ export function SecurityPosture() {
     if (activeTab !== "debrief") return;
     const fetchDebrief = async () => {
       setDebriefLoading(true);
+      setErrorMsg(null);
       try {
         if (posture?.scan_id) {
           const res = await axios.get(`/api/reports/${posture.scan_id}/debrief?lang=${selectedLang}`);
@@ -353,6 +370,7 @@ export function SecurityPosture() {
         }
       } catch (err) {
         console.error("Failed to load debrief:", err);
+        setErrorMsg("Unable to synthesize localized CISO debrief.");
       } finally {
         setDebriefLoading(false);
       }
@@ -360,18 +378,27 @@ export function SecurityPosture() {
     fetchDebrief();
   }, [activeTab, selectedLang, posture?.scan_id, posture?.target, posture?.posture_score]);
 
-  const copyDebriefText = () => {
+  const copyDebriefText = async () => {
     if (!debrief) return;
     const text = `${debrief.metadata.title}\nTarget: ${debrief.metadata.target}\nRisk Score: ${debrief.posture.risk_score}/100 (${debrief.posture.risk_level})\n\n${debrief.executive_summary.section_label}:\n${debrief.executive_summary.content}\n\n${debrief.strategic_recommendations.section_label}:\n` +
       debrief.strategic_recommendations.items.map((it, idx) => `${idx + 1}. ${it}`).join("\n") +
       `\n\n${debrief.compliance_assurance.section_label}:\n${debrief.compliance_assurance.tamper_proof_statement} (Block #${debrief.compliance_assurance.block_index}, Hash: ${debrief.compliance_assurance.block_hash})`;
-    navigator.clipboard.writeText(text);
-    setCopiedDebrief(true);
-    setTimeout(() => setCopiedDebrief(false), 2000);
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedDebrief(true);
+        setTimeout(() => setCopiedDebrief(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy executive debrief to clipboard.");
+    }
   };
 
   const downloadSarif = async () => {
     if (!posture?.scan_id) return;
+    setErrorMsg(null);
     try {
       const res = await axios.get(`/api/reports/${posture.scan_id}/sarif`, {
         responseType: "blob",
@@ -384,7 +411,9 @@ export function SecurityPosture() {
       a.click();
       a.remove();
       setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-    } catch { /* no-op */ }
+    } catch {
+      setErrorMsg("Failed to export SARIF compliance report.");
+    }
   };
 
   if (loading) {
@@ -427,6 +456,7 @@ export function SecurityPosture() {
           )}
         </div>
         <button
+          type="button"
           onClick={downloadSarif}
           className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-lg transition-colors border border-zinc-700"
         >
@@ -435,10 +465,27 @@ export function SecurityPosture() {
         </button>
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex gap-1 bg-zinc-900/60 p-1 rounded-xl border border-zinc-800">
         {tabs.map((tab) => (
           <button
+            type="button"
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
@@ -649,6 +696,7 @@ export function SecurityPosture() {
               >
                 {/* Header */}
                 <button
+                  type="button"
                   onClick={() => setExpandedRem(expandedRem === rem.rank ? null : rem.rank)}
                   className="w-full text-left p-4 flex items-center gap-3"
                 >

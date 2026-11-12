@@ -58,13 +58,15 @@ export function IntegrationManager() {
   const [testingProvider, setTestingProvider] = useState<string | null>(null);
   const [savingProvider, setSavingProvider] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ [key: string]: { type: "success" | "error"; text: string } }>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   const fetchStatus = async () => {
+    setStatusError(null);
     try {
       const { data } = await axios.get("/api/integrations/status");
       setStatus(data);
     } catch {
-      // Fallback if backend /status is initializing
+      setStatusError("Unable to reach integration status service; displaying cached settings.");
     } finally {
       setLoading(false);
     }
@@ -196,6 +198,22 @@ export function IntegrationManager() {
         </p>
       </div>
 
+      {statusError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-amber-500/40 bg-amber-950/40 px-4 py-3 text-xs font-mono text-amber-300"
+        >
+          <span>{statusError}</span>
+          <button
+            type="button"
+            onClick={() => setStatusError(null)}
+            className="text-amber-300/80 hover:text-amber-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* ── 1. NVIDIA Build / NIM ── */}
       <div className="bg-zinc-900/60 border border-emerald-900/30 rounded-xl p-6">
         <div className="flex items-center justify-between mb-3">
@@ -235,6 +253,7 @@ export function IntegrationManager() {
             className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-xs placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
           />
           <button
+            type="button"
             onClick={() => handleVerify("nvidia", nvidiaKey)}
             disabled={testingProvider === "nvidia" || !nvidiaKey}
             className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 border border-zinc-700 transition-colors"
@@ -242,6 +261,7 @@ export function IntegrationManager() {
             {testingProvider === "nvidia" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Test Connection"}
           </button>
           <button
+            type="button"
             onClick={() => handleSave("nvidia", nvidiaKey)}
             disabled={savingProvider === "nvidia" || !nvidiaKey}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors"
@@ -252,7 +272,10 @@ export function IntegrationManager() {
         </div>
 
         {feedback.nvidia && (
-          <p className={`text-xs mt-3 ${feedback.nvidia.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+          <p
+            role={feedback.nvidia.type === "error" ? "alert" : "status"}
+            className={`text-xs mt-3 ${feedback.nvidia.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+          >
             {feedback.nvidia.text}
           </p>
         )}
@@ -307,6 +330,7 @@ export function IntegrationManager() {
 
         <div className="flex justify-end gap-2">
           <button
+            type="button"
             onClick={() => handleVerify("censys", censysId, censysSecret)}
             disabled={testingProvider === "censys" || !censysId || !censysSecret}
             className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 border border-zinc-700 transition-colors"
@@ -314,6 +338,7 @@ export function IntegrationManager() {
             {testingProvider === "censys" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Test Credentials"}
           </button>
           <button
+            type="button"
             onClick={() => handleSave("censys", censysId, censysSecret)}
             disabled={savingProvider === "censys" || !censysId || !censysSecret}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
@@ -324,7 +349,10 @@ export function IntegrationManager() {
         </div>
 
         {feedback.censys && (
-          <p className={`text-xs mt-3 ${feedback.censys.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+          <p
+            role={feedback.censys.type === "error" ? "alert" : "status"}
+            className={`text-xs mt-3 ${feedback.censys.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+          >
             {feedback.censys.text}
           </p>
         )}
@@ -361,6 +389,7 @@ export function IntegrationManager() {
             className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-xs placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
           />
           <button
+            type="button"
             onClick={() => handleVerify("shodan", shodanKey)}
             disabled={testingProvider === "shodan" || !shodanKey}
             className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 border border-zinc-700 transition-colors"
@@ -368,6 +397,7 @@ export function IntegrationManager() {
             {testingProvider === "shodan" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Test Key"}
           </button>
           <button
+            type="button"
             onClick={() => handleSave("shodan", shodanKey)}
             disabled={savingProvider === "shodan" || !shodanKey}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors"
@@ -378,7 +408,10 @@ export function IntegrationManager() {
         </div>
 
         {feedback.shodan && (
-          <p className={`text-xs mt-3 ${feedback.shodan.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+          <p
+            role={feedback.shodan.type === "error" ? "alert" : "status"}
+            className={`text-xs mt-3 ${feedback.shodan.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+          >
             {feedback.shodan.text}
           </p>
         )}
@@ -416,6 +449,7 @@ export function IntegrationManager() {
               className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-xs placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
             />
             <button
+              type="button"
               onClick={handleConnectGitHub}
               disabled={savingProvider === "github" || !pat}
               className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-bold px-5 py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors"
@@ -427,6 +461,7 @@ export function IntegrationManager() {
         ) : (
           <div>
             <button
+              type="button"
               onClick={handleDisconnectGitHub}
               disabled={savingProvider === "github"}
               className="bg-red-600/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-xs font-bold transition-colors"
@@ -437,7 +472,10 @@ export function IntegrationManager() {
         )}
 
         {feedback.github && (
-          <p className={`text-xs mt-3 ${feedback.github.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+          <p
+            role={feedback.github.type === "error" ? "alert" : "status"}
+            className={`text-xs mt-3 ${feedback.github.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+          >
             {feedback.github.text}
           </p>
         )}

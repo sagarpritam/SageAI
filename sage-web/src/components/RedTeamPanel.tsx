@@ -155,6 +155,7 @@ export function RedTeamPanel() {
       }
     } catch {
       setTargets([]);
+      setError("Unable to load LLM audit target fleet.");
     } finally {
       setLoadingTargets(false);
     }
@@ -244,10 +245,18 @@ export function RedTeamPanel() {
     }
   };
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedColang(id);
-    setTimeout(() => setCopiedColang(null), 2000);
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedColang(id);
+        setTimeout(() => setCopiedColang(null), 2000);
+      } else {
+        setError("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setError("Failed to copy Colang rule to clipboard.");
+    }
   };
 
   const downloadAuditReport = () => {
@@ -428,9 +437,18 @@ export function RedTeamPanel() {
           </div>
 
           {error && (
-            <div className="bg-red-950/50 border border-red-700 rounded-xl p-4 flex items-center gap-3 text-red-300 text-xs font-mono">
-              <AlertTriangle className="w-5 h-5 shrink-0 text-red-400" />
-              <span>{error}</span>
+            <div role="alert" className="bg-red-950/50 border border-red-700 rounded-xl p-4 flex items-center justify-between gap-3 text-red-300 text-xs font-mono">
+              <span className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 shrink-0 text-red-400" />
+                <span>{error}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setError("")}
+                className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+              >
+                Dismiss
+              </button>
             </div>
           )}
 
@@ -598,6 +616,7 @@ export function RedTeamPanel() {
                               Auto-Synthesized NeMo Guardrails Policy (Colang 2.x)
                             </span>
                             <button
+                              type="button"
                               onClick={() => copyToClipboard(probe.remediation_colang!, probe.probe_id)}
                               className="text-zinc-400 hover:text-white text-[10px] flex items-center gap-1"
                             >

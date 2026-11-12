@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 33 Waves (Capabilities 1 to 121).
+Live Multi-Domain Stress Test & Verification across All 34 Waves (Capabilities 1 to 124).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -970,6 +970,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 33 (Opt B): Penrose-BZ Ergosphere Extract Torque",
         ),
+        # Wave 34: Complexity Holography, Carrollian Null-Boundary, Modular Bootstrap & Casimir-Sagnac Grid (Caps 122-124 + Opt B)
+        (
+            "GET",
+            "/api/complexity-holography/bounds",
+            None,
+            "Wave 34 (Cap 122): Complexity Holography Bounds List",
+        ),
+        (
+            "POST",
+            "/api/complexity-holography/audit-complexity",
+            {
+                "bound_id": "CMP-WDW-ACTION-01",
+                "central_charge": 240.0,
+                "lloyd_ratio": 0.96,
+                "switchback_shocks": 6,
+                "wdw_anchor_gain": 1.6,
+            },
+            "Wave 34 (Cap 122): Complexity Holography Audit WDW",
+        ),
+        (
+            "GET",
+            "/api/carrollian-holography/manifolds",
+            None,
+            "Wave 34 (Cap 123): Carrollian Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/carrollian-holography/seal-carrollian",
+            {
+                "manifold_id": "CAR-NULL-SCRI-01",
+                "carroll_coupling": 0.95,
+                "dipole_charge": 6.0,
+                "null_clamp_gain": 1.65,
+            },
+            "Wave 34 (Cap 123): Carrollian Null-Boundary Seal",
+        ),
+        (
+            "GET",
+            "/api/modular-bootstrap/genera",
+            None,
+            "Wave 34 (Cap 124): Modular Bootstrap Genera List",
+        ),
+        (
+            "POST",
+            "/api/modular-bootstrap/audit-modular",
+            {
+                "genus_id": "MOD-SL2Z-TORUS-01",
+                "central_charge": 48.0,
+                "spin_cutoff": 24,
+                "functional_depth": 1.7,
+            },
+            "Wave 34 (Cap 124): Modular Bootstrap Audit",
+        ),
+        (
+            "GET",
+            "/api/casimir-sagnac-power/arrays",
+            None,
+            "Wave 34 (Opt B): Casimir-Sagnac Arrays List",
+        ),
+        (
+            "POST",
+            "/api/casimir-sagnac-power/harvest-sagnac",
+            {
+                "array_id": "CAS-SAGNAC-ORBIT-01",
+                "pump_frequency_mhz": 520.0,
+                "squeeze_gain": 1.65,
+            },
+            "Wave 34 (Opt B): Casimir-Sagnac Harvest Baseload",
+        ),
     ]
 
 
@@ -999,7 +1068,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-33, CAPS 1-121) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-34, CAPS 1-124) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1014,7 +1083,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-33 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-34 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1071,7 +1140,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-33){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-34){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1087,7 +1156,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-33 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-34 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1099,7 +1168,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 160)
+        total_requests if total_requests is not None else max(endpoints_count, 168)
     )
 
     if in_process:
@@ -1135,7 +1204,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-33, Capabilities 1-121) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-34, Capabilities 1-124) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

@@ -50,8 +50,10 @@ from app.routers import (
     bloodhound_routes,
     calabi_yau_routes,
     canary_fabric_routes,
+    carrollian_holography_routes,
     cart_routes,
     cas_redteam_swarm_routes,
+    casimir_sagnac_routes,
     casimir_vacuum_routes,
     cauchy_chronology_routes,
     causal_set_lattice_routes,
@@ -63,6 +65,7 @@ from app.routers import (
     cloud_forensics_routes,
     cluster_federation_routes,
     cognitive_ew_routes,
+    complexity_holography_routes,
     conformal_bootstrap_routes,
     consensus_routes,
     copilot_routes,
@@ -129,6 +132,7 @@ from app.routers import (
     mhd_plasma_stealth_routes,
     micro_hotpatch_routes,
     mirror_symmetry_routes,
+    modular_bootstrap_routes,
     monopole_battery_routes,
     muon_tomography_routes,
     neural_bci_routes,
@@ -476,6 +480,10 @@ app.include_router(swampland_wgc_routes.router)
 app.include_router(syk_chaos_routes.router)
 app.include_router(tmf_cohomology_routes.router)
 app.include_router(ergosphere_spin_routes.router)
+app.include_router(complexity_holography_routes.router)
+app.include_router(carrollian_holography_routes.router)
+app.include_router(modular_bootstrap_routes.router)
+app.include_router(casimir_sagnac_routes.router)
 
 
 # ---------------------

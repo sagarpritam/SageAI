@@ -83,9 +83,11 @@ export function EnterpriseSecurityHub() {
   const [showReportModal, setShowReportModal] = useState<boolean>(false);
   const [reportMarkdown, setReportMarkdown] = useState<string>("");
   const [copiedHash, setCopiedHash] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchCapabilities = async () => {
     setLoadingCaps(true);
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/security/enterprise-capabilities");
       if (res.data?.capabilities) {
@@ -93,6 +95,7 @@ export function EnterpriseSecurityHub() {
       }
     } catch (err) {
       console.error("Failed to load enterprise capabilities", err);
+      setErrorMsg("Unable to load enterprise capabilities telemetry.");
     } finally {
       setLoadingCaps(false);
     }
@@ -105,11 +108,13 @@ export function EnterpriseSecurityHub() {
   const handleRunFullDrill = async () => {
     setRunningDrill(true);
     setDrillResult(null);
+    setErrorMsg(null);
     setActiveStage(0);
 
+    let stageInterval: ReturnType<typeof setInterval> | null = null;
     try {
       // Simulate live stage progression animation
-      const stageInterval = setInterval(() => {
+      stageInterval = setInterval(() => {
         setActiveStage((prev) => (prev < 10 ? prev + 1 : prev));
       }, 350);
 
@@ -119,6 +124,7 @@ export function EnterpriseSecurityHub() {
       });
 
       clearInterval(stageInterval);
+      stageInterval = null;
       setActiveStage(10);
 
       if (res.data?.status === "SUCCESS") {
@@ -126,12 +132,15 @@ export function EnterpriseSecurityHub() {
       }
     } catch (err) {
       console.error("Failed to execute enterprise security drill", err);
+      setErrorMsg("Failed to execute 10-stage enterprise security drill.");
     } finally {
+      if (stageInterval) clearInterval(stageInterval);
       setRunningDrill(false);
     }
   };
 
   const handleFetchReport = async () => {
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/security/enterprise-report");
       if (res.data?.markdown_report) {
@@ -140,13 +149,22 @@ export function EnterpriseSecurityHub() {
       }
     } catch (err) {
       console.error("Failed to fetch compliance report", err);
+      setErrorMsg("Unable to fetch executive compliance & audit report.");
     }
   };
 
-  const handleCopyMerkleHash = (hash: string) => {
-    navigator.clipboard.writeText(hash);
-    setCopiedHash(true);
-    setTimeout(() => setCopiedHash(false), 2000);
+  const handleCopyMerkleHash = async (hash: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(hash);
+        setCopiedHash(true);
+        setTimeout(() => setCopiedHash(false), 2000);
+      } else {
+        setErrorMsg("Clipboard access is unavailable in this browser context.");
+      }
+    } catch {
+      setErrorMsg("Failed to copy SHA-256 Merkle seal hash.");
+    }
   };
 
   const getCapabilityIcon = (key: string) => {
@@ -207,6 +225,7 @@ export function EnterpriseSecurityHub() {
 
           <div className="flex flex-wrap items-center gap-3">
             <button
+              type="button"
               onClick={handleFetchReport}
               className="px-4 py-2.5 rounded-xl text-sm font-semibold text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 flex items-center gap-2 transition shadow-lg"
             >
@@ -214,6 +233,7 @@ export function EnterpriseSecurityHub() {
               Compliance Report
             </button>
             <button
+              type="button"
               onClick={handleRunFullDrill}
               disabled={runningDrill}
               className={`px-5 py-2.5 rounded-xl text-sm font-bold text-black flex items-center gap-2 transition shadow-xl ${
@@ -257,6 +277,22 @@ export function EnterpriseSecurityHub() {
         )}
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs font-mono text-red-300"
+        >
+          <span>{errorMsg}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300/80 hover:text-red-200 font-semibold shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Drill Results Section */}
       {drillResult && (
         <div className="rounded-2xl border border-emerald-500/40 bg-zinc-950 p-6 shadow-2xl space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -289,7 +325,9 @@ export function EnterpriseSecurityHub() {
                   {drillResult.merkle_seal.record_hash}
                 </code>
                 <button
+                  type="button"
                   onClick={() => handleCopyMerkleHash(drillResult.merkle_seal.record_hash)}
+                  aria-label="Copy SHA-256 Hash"
                   className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs transition"
                   title="Copy SHA-256 Hash"
                 >
@@ -370,6 +408,7 @@ export function EnterpriseSecurityHub() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchCapabilities}
             disabled={loadingCaps}
             className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition"
@@ -451,6 +490,7 @@ export function EnterpriseSecurityHub() {
               </div>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     const blob = new Blob([reportMarkdown], { type: "text/markdown" });
                     const url = URL.createObjectURL(blob);
@@ -465,6 +505,7 @@ export function EnterpriseSecurityHub() {
                   Download .md
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowReportModal(false)}
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition"
                 >
