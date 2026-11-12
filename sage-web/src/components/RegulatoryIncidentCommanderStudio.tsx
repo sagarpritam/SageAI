@@ -48,6 +48,7 @@ export function RegulatoryIncidentCommanderStudio() {
   const [filingResult, setFilingResult] = useState<FilingResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [registrantName, setRegistrantName] = useState("SageAI Sovereign Enterprise Corp");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedRef = useRef(false);
 
   // New incident modal state
@@ -60,6 +61,7 @@ export function RegulatoryIncidentCommanderStudio() {
 
   const requestFiling = useCallback(async (incidentId: string, name: string) => {
     setGenerating(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/regulatory-commander/generate-sec-8k", {
         method: "POST",
@@ -69,10 +71,16 @@ export function RegulatoryIncidentCommanderStudio() {
           registrant_name: name,
         }),
       });
+      if (!res.ok) {
+        setErrorMsg(`Failed to generate SEC 8-K filing (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.filing) {
         setFilingResult(data.filing);
       }
+    } catch {
+      setErrorMsg("Unable to reach SEC 8-K generation backend.");
     } finally {
       setGenerating(false);
     }
@@ -80,8 +88,13 @@ export function RegulatoryIncidentCommanderStudio() {
 
   const fetchIncidents = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/regulatory-commander/incidents");
+      if (!res.ok) {
+        setErrorMsg(`Failed to load incidents (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.incidents) {
         setIncidents(data.incidents);
@@ -91,6 +104,8 @@ export function RegulatoryIncidentCommanderStudio() {
           requestFiling(data.incidents[0].incident_id, "SageAI Sovereign Enterprise Corp");
         }
       }
+    } catch {
+      setErrorMsg("Unable to reach Regulatory Incident Commander backend.");
     } finally {
       setLoading(false);
     }
@@ -114,6 +129,7 @@ export function RegulatoryIncidentCommanderStudio() {
     e.preventDefault();
     if (!newTitle) return;
     setDeclaring(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/regulatory-commander/incidents", {
         method: "POST",
@@ -125,6 +141,10 @@ export function RegulatoryIncidentCommanderStudio() {
           records_compromised: Number(newRecords),
         }),
       });
+      if (!res.ok) {
+        setErrorMsg(`Failed to declare incident (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.incident) {
         hasInitializedRef.current = true;
@@ -134,16 +154,27 @@ export function RegulatoryIncidentCommanderStudio() {
         setShowDeclareModal(false);
         setNewTitle("");
       }
+    } catch {
+      setErrorMsg("Failed to declare security incident.");
     } finally {
       setDeclaring(false);
     }
   }
 
-  function handleCopyFiling() {
+  async function handleCopyFiling() {
     if (!filingResult) return;
-    navigator.clipboard.writeText(filingResult.filing_body);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(filingResult.filing_body);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   }
 
   return (
@@ -174,6 +205,7 @@ export function RegulatoryIncidentCommanderStudio() {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowDeclareModal(true)}
             className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white shadow-lg shadow-rose-500/20 transition"
           >
@@ -181,6 +213,7 @@ export function RegulatoryIncidentCommanderStudio() {
             Declare Incident
           </button>
           <button
+            type="button"
             onClick={fetchIncidents}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
@@ -190,6 +223,15 @@ export function RegulatoryIncidentCommanderStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-rose-950/40 border border-rose-700/50 text-xs font-mono text-rose-300"
+        >
+          {errorMsg}
+        </div>
+      )}
 
       {/* KPI Metric Badges */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -311,6 +353,7 @@ export function RegulatoryIncidentCommanderStudio() {
             </h2>
             {filingResult && (
               <button
+                type="button"
                 onClick={handleCopyFiling}
                 className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
               >
@@ -331,6 +374,7 @@ export function RegulatoryIncidentCommanderStudio() {
                   className="bg-zinc-800 px-2 py-1 rounded text-white font-medium border border-zinc-700 text-xs w-64"
                 />
                 <button
+                  type="button"
                   onClick={() => selectedIncident && generateFiling(selectedIncident.incident_id)}
                   className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold"
                 >
@@ -388,6 +432,7 @@ export function RegulatoryIncidentCommanderStudio() {
                 <ShieldAlert className="w-5 h-5 text-rose-500" /> Declare Material Incident
               </h3>
               <button
+                type="button"
                 onClick={() => setShowDeclareModal(false)}
                 className="text-zinc-400 hover:text-white text-sm"
               >

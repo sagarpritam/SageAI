@@ -24,9 +24,11 @@ export function SymbolicDeobfuscatorStudio() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<any>(null);
   const [copiedYara, setCopiedYara] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const runDeobfuscation = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/binary-deobfuscator/analyze", {
         method: "POST",
@@ -36,19 +38,30 @@ export function SymbolicDeobfuscatorStudio() {
       if (res.ok) {
         const data = await res.json();
         setReport(data);
+      } else {
+        setErrorMsg(`Symbolic de-obfuscation failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Unable to reach binary de-obfuscation endpoint.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copyYara = () => {
+  const copyYara = async () => {
     if (!report?.yara_l_rule) return;
-    navigator.clipboard.writeText(report.yara_l_rule);
-    setCopiedYara(true);
-    setTimeout(() => setCopiedYara(false), 2000);
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(report.yara_l_rule);
+      setCopiedYara(true);
+      setTimeout(() => setCopiedYara(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   };
 
   return (
@@ -83,6 +96,7 @@ export function SymbolicDeobfuscatorStudio() {
             <option value="CobaltStrike_Staged_Shellcode.bin">CobaltStrike (ROR13 API Hashing)</option>
           </select>
           <button
+            type="button"
             onClick={runDeobfuscation}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium text-sm transition shadow-lg shadow-teal-600/20 disabled:opacity-50"
@@ -92,6 +106,15 @@ export function SymbolicDeobfuscatorStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300"
+        >
+          {errorMsg}
+        </div>
+      )}
 
       {report ? (
         <div className="space-y-6">
@@ -207,6 +230,7 @@ export function SymbolicDeobfuscatorStudio() {
                   Auto-Generated YARA-L v2 Detection Rule
                 </span>
                 <button
+                  type="button"
                   onClick={copyYara}
                   className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition"
                 >

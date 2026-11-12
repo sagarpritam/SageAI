@@ -34,8 +34,18 @@ export function EmailReportSettings() {
   useEffect(() => {
     axios
       .get("/api/email-reports")
-      .then((r) => setConfig((prev) => ({ ...prev, ...r.data })))
-      .catch(() => {})
+      .then((r) => {
+        setConfig((prev) => ({ ...prev, ...r.data }));
+        setErrorMsg(null);
+      })
+      .catch((err: unknown) => {
+        const msg = axios.isAxiosError(err)
+          ? err.response?.data?.error ||
+            err.response?.data?.detail ||
+            "Failed to load email report configuration."
+          : "Failed to load email report configuration.";
+        setErrorMsg(String(msg));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -90,6 +100,7 @@ export function EmailReportSettings() {
           <h3 className="text-sm font-bold text-white">Scheduled Email Reports</h3>
         </div>
         <button
+          type="button"
           onClick={() => setConfig({ ...config, enabled: !config.enabled })}
           className={`relative w-11 h-6 rounded-full transition-colors ${
             config.enabled ? "bg-emerald-600" : "bg-zinc-700"
@@ -124,6 +135,7 @@ export function EmailReportSettings() {
             <div className="grid grid-cols-2 gap-2">
               {frequencies.map((f) => (
                 <button
+                  type="button"
                   key={f.value}
                   onClick={() => setConfig({ ...config, frequency: f.value })}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-bold transition-all ${
@@ -147,6 +159,7 @@ export function EmailReportSettings() {
             <div className="flex gap-2">
               {["pdf", "csv", "json"].map((fmt) => (
                 <button
+                  type="button"
                   key={fmt}
                   onClick={() => setConfig({ ...config, format: fmt })}
                   className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
@@ -176,6 +189,7 @@ export function EmailReportSettings() {
                 className="flex-1 bg-black/50 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
               />
               <button
+                type="button"
                 onClick={addRecipient}
                 className="px-3 py-2 bg-emerald-900/30 text-emerald-400 rounded-lg hover:bg-emerald-900/50 transition-colors"
                 aria-label="Add recipient"
@@ -194,6 +208,7 @@ export function EmailReportSettings() {
                   >
                     {email}
                     <button
+                      type="button"
                       onClick={() => removeRecipient(email)}
                       className="text-zinc-500 hover:text-red-400 transition-colors"
                       aria-label={`Remove ${email}`}
@@ -208,6 +223,7 @@ export function EmailReportSettings() {
 
           {/* Save Button */}
           <button
+            type="button"
             onClick={saveConfig}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold rounded-lg transition-colors text-sm w-full justify-center"

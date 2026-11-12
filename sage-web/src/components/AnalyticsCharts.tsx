@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TrendingUp, PieChart, Loader2 } from "lucide-react";
+import { TrendingUp, PieChart, Loader2, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface TrendPoint {
@@ -26,12 +26,21 @@ const sevColors: Record<string, string> = {
 export function AnalyticsCharts() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     axios
       .get("/api/analytics")
-      .then((r) => setData(r.data))
-      .catch(() => {})
+      .then((r) => {
+        setData(r.data);
+        setErrorMsg(null);
+      })
+      .catch((err: unknown) => {
+        const msg = axios.isAxiosError(err)
+          ? err.response?.data?.error || err.response?.data?.detail || "Failed to load analytics telemetry"
+          : "Failed to load analytics telemetry";
+        setErrorMsg(String(msg));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -39,6 +48,18 @@ export function AnalyticsCharts() {
     return (
       <div className="flex justify-center py-12">
         <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div
+        role="alert"
+        className="bg-red-950/40 border border-red-700/50 rounded-xl px-4 py-3 text-xs font-mono text-red-300 flex items-center gap-2"
+      >
+        <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+        <span>{errorMsg}</span>
       </div>
     );
   }

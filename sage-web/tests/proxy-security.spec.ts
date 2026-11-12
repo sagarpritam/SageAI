@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.4.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.5.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.4.0");
-    expect(healthJson.version).toBe("7.4.0");
+    expect(healthJson.platform_version).toBe("7.5.0");
+    expect(healthJson.version).toBe("7.5.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -758,6 +758,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(sagBody.status).toBe("CASIMIR_SAGNAC_OPTIMAL");
     expect(sagBody.zero_fossil_carbon).toBe(true);
     expect(Number(sagBody.net_grid_output_gw)).toBeGreaterThan(220.0);
+
+    // Wave 35 studios (Caps 125-127 & Option B) return 200 deterministically offline
+    const jtList = await request.get("/api/jt-wormhole-matrix/topologies");
+    expect(jtList.status()).toBe(200);
+    const jtSim = await request.post("/api/jt-wormhole-matrix/seal-wormhole", {
+      data: {
+        topology_id: "JT-SSS-TRUMPET-01",
+        genus_g: 2,
+        s0_entropy: 8.4,
+        schwarzian_temp: 1.25,
+      },
+    });
+    expect(jtSim.status()).toBe(200);
+    expect(((await jtSim.json()) as { status?: string }).status).toBe(
+      "JT_WORMHOLE_SEALED"
+    );
+
+    const dsList = await request.get("/api/ds-static-patch/patches");
+    expect(dsList.status()).toBe(200);
+    const dsSim = await request.post("/api/ds-static-patch/lock-patch", {
+      data: {
+        patch_id: "DS-STATIC-GIBBONS-01",
+        hubble_scale: 1.0,
+        york_time: 0.95,
+        timelike_interval: 1.6,
+      },
+    });
+    expect(dsSim.status()).toBe(200);
+    expect(((await dsSim.json()) as { status?: string }).status).toBe(
+      "DS_STATIC_PATCH_LOCKED"
+    );
+
+    const tgList = await request.get("/api/higher-form-twogroup/defects");
+    expect(tgList.status()).toBe(200);
+    const tgSim = await request.post("/api/higher-form-twogroup/audit-twogroup", {
+      data: {
+        defect_id: "TWOGROUP-POSTNIKOV-H3-01",
+        postnikov_order: 4,
+        walker_wang_rank: 8,
+        inflow_coupling: 1.25,
+      },
+    });
+    expect(tgSim.status()).toBe(200);
+    expect(((await tgSim.json()) as { status?: string }).status).toBe(
+      "TWOGROUP_INFLOW_SEALED"
+    );
+
+    const unruhList = await request.get("/api/unruh-rindler-power/arrays");
+    expect(unruhList.status()).toBe(200);
+    const unruhSim = await request.post("/api/unruh-rindler-power/harvest-unruh", {
+      data: {
+        array_id: "UNRUH-RINDLER-LEO-01",
+        cavity_frequency_ghz: 42.0,
+        rectifier_gain: 1.6,
+      },
+    });
+    expect(unruhSim.status()).toBe(200);
+    const unruhBody = (await unruhSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(unruhBody.status).toBe("UNRUH_RINDLER_OPTIMAL");
+    expect(unruhBody.zero_fossil_carbon).toBe(true);
+    expect(Number(unruhBody.net_grid_output_gw)).toBeGreaterThan(240.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

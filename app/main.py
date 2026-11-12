@@ -84,6 +84,7 @@ from app.routers import (
     deep_space_laser_routes,
     desitter_repulsion_routes,
     drone_swarm_shield_routes,
+    ds_static_patch_routes,
     dspm_routes,
     easm_routes,
     ebpf_routes,
@@ -105,6 +106,7 @@ from app.routers import (
     gravitational_seismic_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
+    higher_form_twogroup_routes,
     horava_lifshitz_routes,
     hypersonic_defense_routes,
     hyperspectral_interceptor_routes,
@@ -117,6 +119,7 @@ from app.routers import (
     intergrid_failover_routes,
     intrusion_routes,
     itdr_routes,
+    jt_wormhole_routes,
     kms_hsm_routes,
     ktheory_dbrane_routes,
     kugelblitz_hawking_routes,
@@ -188,6 +191,7 @@ from app.routers import (
     threat_modeling_routes,
     tmf_cohomology_routes,
     twistor_holonomy_routes,
+    unruh_rindler_routes,
     web3_security_routes,
     webhook_routes,
     workload_identity_routes,
@@ -484,6 +488,10 @@ app.include_router(complexity_holography_routes.router)
 app.include_router(carrollian_holography_routes.router)
 app.include_router(modular_bootstrap_routes.router)
 app.include_router(casimir_sagnac_routes.router)
+app.include_router(jt_wormhole_routes.router)
+app.include_router(ds_static_patch_routes.router)
+app.include_router(higher_form_twogroup_routes.router)
+app.include_router(unruh_rindler_routes.router)
 
 
 # ---------------------

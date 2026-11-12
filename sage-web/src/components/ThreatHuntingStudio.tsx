@@ -23,6 +23,7 @@ export function ThreatHuntingStudio() {
   const [activeQueryTab, setActiveQueryTab] = useState<"sigma" | "sentinel" | "splunk" | "elastic">("sigma");
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [huntResults, setHuntResults] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [queries, setQueries] = useState<any>({
     sigma_yaml: `title: SageAI Autonomous Threat Hunt - Powershell
 id: sigma-8f12a03c
@@ -70,6 +71,7 @@ tags:
 
   const forgeQueries = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/threat-hunting/forge-query", {
         method: "POST",
@@ -79,9 +81,11 @@ tags:
       if (res.ok) {
         const data = await res.json();
         setQueries(data.queries);
+      } else {
+        setErrorMsg(`Failed to forge SIEM queries (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error("Forge failed", e);
+    } catch {
+      setErrorMsg("Failed to reach threat hunting query forge.");
     } finally {
       setLoading(false);
     }
@@ -89,6 +93,7 @@ tags:
 
   const runHunt = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const mockEvents = [
         { id: "EVT-01", process: "powershell.exe", command_line: "powershell.exe -nop -enc aW52b2tlLW1pbWlrYXR6", user: "SYSTEM", host: "fin-db-01" },
@@ -104,18 +109,30 @@ tags:
       if (res.ok) {
         const data = await res.json();
         setHuntResults(data.hunt_results);
+      } else {
+        setErrorMsg(`Retrospective threat hunt failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error("Hunt failed", e);
+    } catch {
+      setErrorMsg("Retrospective threat hunt request failed.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copyToClipboard = (text: string, tab: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedTab(tab);
-    setTimeout(() => setCopiedTab(null), 2000);
+  const copyToClipboard = async (text: string, tab: string) => {
+    if (!text) return;
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedTab(tab);
+      setTimeout(() => setCopiedTab(null), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   };
 
   return (
@@ -142,6 +159,7 @@ tags:
 
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={forgeQueries}
               disabled={loading || !hypothesis}
               className="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -150,6 +168,7 @@ tags:
               Forge SIEM Queries
             </button>
             <button
+              type="button"
               onClick={runHunt}
               disabled={loading || !hypothesis}
               className="px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-amber-950/40"
@@ -164,6 +183,7 @@ tags:
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mt-6">
           {templates.map((tpl, idx) => (
             <button
+              type="button"
               key={idx}
               onClick={() => setHypothesis(tpl.text)}
               className="p-2.5 bg-black/40 hover:bg-black/70 border border-zinc-800 rounded-lg text-left transition-all"
@@ -174,6 +194,16 @@ tags:
           ))}
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Hypothesis Input */}
       <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-3">
@@ -194,6 +224,7 @@ tags:
         <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setActiveQueryTab("sigma")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                 activeQueryTab === "sigma" ? "bg-amber-950 text-amber-300 border border-amber-700/60" : "text-zinc-500 hover:text-zinc-300"
@@ -202,6 +233,7 @@ tags:
               Sigma YAML Rule
             </button>
             <button
+              type="button"
               onClick={() => setActiveQueryTab("sentinel")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                 activeQueryTab === "sentinel" ? "bg-amber-950 text-amber-300 border border-amber-700/60" : "text-zinc-500 hover:text-zinc-300"
@@ -210,6 +242,7 @@ tags:
               Microsoft Sentinel (KQL)
             </button>
             <button
+              type="button"
               onClick={() => setActiveQueryTab("splunk")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                 activeQueryTab === "splunk" ? "bg-amber-950 text-amber-300 border border-amber-700/60" : "text-zinc-500 hover:text-zinc-300"
@@ -218,6 +251,7 @@ tags:
               Splunk (SPL)
             </button>
             <button
+              type="button"
               onClick={() => setActiveQueryTab("elastic")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                 activeQueryTab === "elastic" ? "bg-amber-950 text-amber-300 border border-amber-700/60" : "text-zinc-500 hover:text-zinc-300"
@@ -228,6 +262,7 @@ tags:
           </div>
 
           <button
+            type="button"
             onClick={() => {
               const currentContent =
                 activeQueryTab === "sigma"

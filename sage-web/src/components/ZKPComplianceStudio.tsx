@@ -23,17 +23,21 @@ export function ZKPComplianceStudio() {
   const [proofData, setProofData] = useState<any>(null);
   const [verifyResult, setVerifyResult] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchExistingProof = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/zkp/proof");
       if (res.ok) {
         const data = await res.json();
         setProofData(data.proof);
+      } else {
+        setErrorMsg(`Failed to load ZKP compliance proof (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Unable to reach ZKP compliance proof backend.");
     } finally {
       setLoading(false);
     }
@@ -46,6 +50,7 @@ export function ZKPComplianceStudio() {
   const generateNewProof = async () => {
     setLoading(true);
     setVerifyResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/zkp/proof", {
         method: "POST",
@@ -55,9 +60,11 @@ export function ZKPComplianceStudio() {
       if (res.ok) {
         const data = await res.json();
         setProofData(data.proof);
+      } else {
+        setErrorMsg(`ZK proof synthesis failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("ZK proof synthesis request failed.");
     } finally {
       setLoading(false);
     }
@@ -66,6 +73,7 @@ export function ZKPComplianceStudio() {
   const verifyProof = async () => {
     if (!proofData) return;
     setVerifying(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/zkp/verify", {
         method: "POST",
@@ -80,19 +88,30 @@ export function ZKPComplianceStudio() {
       if (res.ok) {
         const data = await res.json();
         setVerifyResult(data.verification);
+      } else {
+        setErrorMsg(`Groth16 pairing verification failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Groth16 pairing verification request failed.");
     } finally {
       setVerifying(false);
     }
   };
 
-  const copyProofJson = () => {
+  const copyProofJson = async () => {
     if (!proofData) return;
-    navigator.clipboard.writeText(JSON.stringify(proofData, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(proofData, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   };
 
   return (
@@ -128,6 +147,7 @@ export function ZKPComplianceStudio() {
             <option>HIPAA Security Rule</option>
           </select>
           <button
+            type="button"
             onClick={generateNewProof}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition shadow-lg shadow-emerald-600/20 disabled:opacity-50"
@@ -137,6 +157,15 @@ export function ZKPComplianceStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300"
+        >
+          {errorMsg}
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -208,6 +237,7 @@ export function ZKPComplianceStudio() {
               </div>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={copyProofJson}
                   className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition"
                 >
@@ -215,6 +245,7 @@ export function ZKPComplianceStudio() {
                   {copied ? "Copied" : "Copy Proof JSON"}
                 </button>
                 <button
+                  type="button"
                   onClick={verifyProof}
                   disabled={verifying || !proofData}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition disabled:opacity-50"

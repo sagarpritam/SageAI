@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 34 Waves (Capabilities 1 to 124).
+Live Multi-Domain Stress Test & Verification across All 35 Waves (Capabilities 1 to 127).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -1039,6 +1039,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 34 (Opt B): Casimir-Sagnac Harvest Baseload",
         ),
+        # Wave 35: JT Wormhole Matrix, dS Static-Patch, 2-Group Higher-Form & Unruh-Rindler Grid (Caps 125-127 + Opt B)
+        (
+            "GET",
+            "/api/jt-wormhole-matrix/topologies",
+            None,
+            "Wave 35 (Cap 125): JT Wormhole Topologies List",
+        ),
+        (
+            "POST",
+            "/api/jt-wormhole-matrix/seal-wormhole",
+            {
+                "topology_id": "JT-SSS-TRUMPET-01",
+                "genus_g": 2,
+                "s0_entropy": 8.4,
+                "schwarzian_temp": 1.25,
+                "trumpet_clamp_gain": 1.6,
+            },
+            "Wave 35 (Cap 125): JT Wormhole Seal",
+        ),
+        (
+            "GET",
+            "/api/ds-static-patch/patches",
+            None,
+            "Wave 35 (Cap 126): dS Static-Patch List",
+        ),
+        (
+            "POST",
+            "/api/ds-static-patch/lock-patch",
+            {
+                "patch_id": "DS-STATIC-GIBBONS-01",
+                "hubble_scale": 1.0,
+                "york_time": 0.95,
+                "timelike_interval": 1.6,
+                "observer_clamp_gain": 1.6,
+            },
+            "Wave 35 (Cap 126): dS Static-Patch Lock",
+        ),
+        (
+            "GET",
+            "/api/higher-form-twogroup/defects",
+            None,
+            "Wave 35 (Cap 127): 2-Group Higher-Form Defects List",
+        ),
+        (
+            "POST",
+            "/api/higher-form-twogroup/audit-twogroup",
+            {
+                "defect_id": "TWOGROUP-POSTNIKOV-H3-01",
+                "postnikov_order": 4,
+                "walker_wang_rank": 8,
+                "inflow_coupling": 1.25,
+                "green_schwarz_gain": 1.65,
+            },
+            "Wave 35 (Cap 127): 2-Group Higher-Form Audit",
+        ),
+        (
+            "GET",
+            "/api/unruh-rindler-power/arrays",
+            None,
+            "Wave 35 (Opt B): Unruh-Rindler Arrays List",
+        ),
+        (
+            "POST",
+            "/api/unruh-rindler-power/harvest-unruh",
+            {
+                "array_id": "UNRUH-RINDLER-LEO-01",
+                "cavity_frequency_ghz": 42.0,
+                "rectifier_gain": 1.6,
+            },
+            "Wave 35 (Opt B): Unruh-Rindler Harvest Baseload",
+        ),
     ]
 
 
@@ -1068,7 +1139,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-34, CAPS 1-124) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-35, CAPS 1-127) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1083,7 +1154,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-34 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-35 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1140,7 +1211,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-34){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-35){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1156,7 +1227,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-34 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-35 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1168,7 +1239,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 168)
+        total_requests if total_requests is not None else max(endpoints_count, 176)
     )
 
     if in_process:
@@ -1204,7 +1275,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-34, Capabilities 1-124) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-35, Capabilities 1-127) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

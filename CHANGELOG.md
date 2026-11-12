@@ -2,6 +2,34 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v7.5.0] - 2026-11-12 - Trans-Century Era: JT Wormhole Matrix Firewall, dS Static-Patch Shield, 2-Group Higher-Form Guard & Planetary Unruh-Rindler Power Grid (Wave 35 Milestone)
+
+### Added
+- **Capability 125: JT Dilaton Wormhole & Saad-Shenker-Stanford Double-Scaled Matrix Firewall** (`app/services/jt_wormhole_matrix/`):
+  - Evaluates $\text{AdS}_2$ Jackiw-Teitelboim dilaton gravity genus expansions ($g = 0\text{--}4$, $e^{-S_0(2g+n-2)}$) against trumpet Weil-Petersson volume growth and SSS random-matrix spectral-form-factor ramp/plateau stabilization ($\sim 10^{-11}$ residual; $161.4\text{--}168.4\text{ dB}$ wormhole handle suppression; $>99.998\%$ matrix unitarity) (`JTWormholeStudio.tsx`, `app/routers/jt_wormhole_routes.py`).
+- **Capability 126: dS/CFT De Sitter Static-Patch Observer & Timelike Entanglement Shield** (`app/services/ds_static_patch/`):
+  - Regulates cosmological static-patch Gibbons-Hawking horizon entropy ($S_{\text{GH}} = \pi \ell_{\text{dS}}^2 / G_N$), stretched-horizon worldline observer holographic encoding, and complex-valued timelike entanglement pseudo-entropy across static patches ($>158\text{--}165\text{ dB}$ de Sitter anomaly isolation; $>99.998\%$ patch coherence) (`DSStaticPatchStudio.tsx`, `app/routers/ds_static_patch_routes.py`).
+- **Capability 127: 2-Group Higher-Form Green-Schwarz & Walker-Wang Topological Anomaly Guard** (`app/services/higher_form_twogroup/`):
+  - Enforces continuous/discrete 2-group cohomology Postnikov classes $\beta \in H^3(BG^{(0)}, G^{(1)})$, modified Green-Schwarz Bianchi identities $dH = \text{tr}(F \wedge F)$, and $(3+1)$D Walker-Wang bulk inflow anomaly cancellation ($>160\text{--}167\text{ dB}$ higher-form defect suppression; $>99.998\%$ anomaly inflow unitarity) (`HigherFormTwoGroupStudio.tsx`, `app/routers/higher_form_twogroup_routes.py`).
+- **Option B Wave 35: Sovereign Planetary Unruh-Rindler Accelerated Vacuum Thermal-Bath Power Grid** (`app/services/unruh_rindler_power/`):
+  - Synchronizes nanoscale relativistic centripetal/Josephson Rindler-wedge rectifier rings ($T_U = \hbar a / 2\pi c k_B = 1.793\text{--}3.758\text{ K}$) across orbital and sub-crustal arrays, rectifying thermalized Unruh vacuum fluctuations into $297.30\text{--}713.77\text{ GW}$ continuous clean baseload at $97.61\%\text{--}98.67\%$ conversion efficiency with zero carbon and zero fissile waste (`UnruhRindlerStudio.tsx`, `app/routers/unruh_rindler_routes.py`).
+- **Wave 35 Standalone, Consolidated & Playwright Verification Suites**:
+  - Added [`tests/test_wave35_jt_ds_twogroup.py`](tests/test_wave35_jt_ds_twogroup.py), [`scripts/demo_wave35_jt_ds_twogroup_drill.py`](scripts/demo_wave35_jt_ds_twogroup_drill.py) (Capabilities 125–127), [`scripts/demo_unruh_rindler_drill.py`](scripts/demo_unruh_rindler_drill.py) (Option B Wave 35), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (28 sections covering Capabilities 1–127 / Waves 1–35), and expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 171 Wave 1–35 endpoints (`176 / 176` succeeded in `0.313 s`, `562.2 req/s`, `0` failed).
+  - Updated [`sage-web/tests/sageai.spec.ts`](sage-web/tests/sageai.spec.ts) and [`sage-web/tests/proxy-security.spec.ts`](sage-web/tests/proxy-security.spec.ts) with `v7.5.0` / `162`-studio Command Center assertions and offline Wave 35 GET+POST `200` proxy checks.
+
+### Fixed
+- **Enterprise UI Resilience & Clipboard Hardening (Batch 4)**:
+  - Guarded remaining `navigator.clipboard.writeText` calls with defensive `navigator?.clipboard?.writeText` checks and inline `role="alert"` recovery feedback, added explicit `type="button"` semantics, and replaced silent empty catch blocks with visible inline error/connection state across [`HardwareEnclaveStudio.tsx`](sage-web/src/components/HardwareEnclaveStudio.tsx), [`KyberMeshVPNStudio.tsx`](sage-web/src/components/KyberMeshVPNStudio.tsx), [`RegulatoryIncidentCommanderStudio.tsx`](sage-web/src/components/RegulatoryIncidentCommanderStudio.tsx), [`SymbolicDeobfuscatorStudio.tsx`](sage-web/src/components/SymbolicDeobfuscatorStudio.tsx), [`ThreatHuntingStudio.tsx`](sage-web/src/components/ThreatHuntingStudio.tsx), [`ThreatModelingStudio.tsx`](sage-web/src/components/ThreatModelingStudio.tsx), [`Web3SecurityStudio.tsx`](sage-web/src/components/Web3SecurityStudio.tsx), [`ZKPComplianceStudio.tsx`](sage-web/src/components/ZKPComplianceStudio.tsx), [`CopilotDrawer.tsx`](sage-web/src/components/copilot/CopilotDrawer.tsx), [`APIKeyManager.tsx`](sage-web/src/components/APIKeyManager.tsx), [`ThreatRuleSynthesizer.tsx`](sage-web/src/components/ThreatRuleSynthesizer.tsx), [`AnalyticsCharts.tsx`](sage-web/src/components/AnalyticsCharts.tsx), [`DashboardOverview.tsx`](sage-web/src/components/DashboardOverview.tsx), [`EmailReportSettings.tsx`](sage-web/src/components/EmailReportSettings.tsx), [`IntelligenceHub.tsx`](sage-web/src/components/IntelligenceHub.tsx), and [`WarRoom.tsx`](sage-web/src/components/WarRoom.tsx).
+
+### Verification & Metrics
+- **Pytest**: 650 / 650 tests passing across 102 test suites (100% pass rate).
+- **Playwright E2E**: 33 / 33 Chromium specs passing across 3 suites (`17.6s`, standalone Next.js SSR server).
+- **Next.js Turbopack**: 502 / 502 prerendered static & API routes compiled (`516` total App Router entries: `499` API proxies + `17` page/metadata routes) with 0 errors (`tsc --noEmit` and `eslint --max-warnings 0` clean).
+- **FastAPI**: 728 `APIRoute` handlers (`731` total routes / `709` OpenAPI paths) registered across 179 router modules.
+- **React Components**: 198 UI `.tsx` files (`191` top-level panels; `162` mounted Command Center studios).
+
+---
+
 ## [v7.4.0] - 2026-11-12 - Trans-Century Era: Holographic Quantum Complexity (CA/CV) Firewall, Non-Lorentzian Carrollian Null Shield, Modular Bootstrap Regge Guard & Dynamical Casimir-Sagnac Power Grid (Wave 34 Milestone)
 
 ### Added

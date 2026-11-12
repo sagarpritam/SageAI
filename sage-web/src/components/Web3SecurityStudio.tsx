@@ -54,10 +54,12 @@ export function Web3SecurityStudio() {
   const [pocResult, setPocResult] = useState<any>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [activeTab, setActiveTab] = useState<"audit" | "poc">("audit");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const runAudit = async () => {
     setLoading(true);
     setPocResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/web3-security/audit", {
         method: "POST",
@@ -71,9 +73,11 @@ export function Web3SecurityStudio() {
       if (res.ok) {
         const data = await res.json();
         setAuditResult(data.audit_report);
+      } else {
+        setErrorMsg(`Smart contract audit failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Unable to reach Web3 smart contract audit backend.");
     } finally {
       setLoading(false);
     }
@@ -82,6 +86,7 @@ export function Web3SecurityStudio() {
   const generatePoC = async (vulnType: string = "REENTRANCY_DRAIN") => {
     setPocLoading(true);
     setActiveTab("poc");
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/web3-security/poc", {
         method: "POST",
@@ -95,19 +100,30 @@ export function Web3SecurityStudio() {
       if (res.ok) {
         const data = await res.json();
         setPocResult(data.foundry_poc);
+      } else {
+        setErrorMsg(`Foundry PoC synthesis failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Foundry PoC synthesis request failed.");
     } finally {
       setPocLoading(false);
     }
   };
 
-  const copyPoCToClipboard = () => {
+  const copyPoCToClipboard = async () => {
     if (!pocResult?.foundry_code) return;
-    navigator.clipboard.writeText(pocResult.foundry_code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(pocResult.foundry_code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   };
 
   return (
@@ -133,6 +149,7 @@ export function Web3SecurityStudio() {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => {
               setSourceCode(SAMPLE_VULNERABLE_CONTRACT);
               setContractName("EtherVault.sol");
@@ -142,6 +159,7 @@ export function Web3SecurityStudio() {
             Load Vulnerable Sample
           </button>
           <button
+            type="button"
             onClick={runAudit}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium text-sm transition shadow-lg shadow-amber-600/20 disabled:opacity-50"
@@ -151,6 +169,16 @@ export function Web3SecurityStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -208,6 +236,7 @@ export function Web3SecurityStudio() {
           {/* Tabs */}
           <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
             <button
+              type="button"
               onClick={() => setActiveTab("audit")}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                 activeTab === "audit"
@@ -219,6 +248,7 @@ export function Web3SecurityStudio() {
               Audit Findings ({auditResult?.vulnerabilities_detected ?? 0})
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("poc")}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                 activeTab === "poc"
@@ -285,6 +315,7 @@ export function Web3SecurityStudio() {
                         </div>
                         <div className="flex justify-end pt-1">
                           <button
+                            type="button"
                             onClick={() => generatePoC(f.name || "REENTRANCY_DRAIN")}
                             className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-mono transition"
                           >
@@ -322,6 +353,7 @@ export function Web3SecurityStudio() {
                       </span>
                     </div>
                     <button
+                      type="button"
                       onClick={copyPoCToClipboard}
                       className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition"
                     >

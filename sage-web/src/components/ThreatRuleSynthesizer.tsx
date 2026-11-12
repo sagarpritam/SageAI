@@ -190,6 +190,7 @@ export function ThreatRuleSynthesizer() {
               const isSelected = selectedCve === tpl.cve_id;
               return (
                 <button
+                  type="button"
                   key={tpl.cve_id}
                   onClick={() => handleSelectTemplate(tpl.cve_id)}
                   className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
@@ -269,6 +270,7 @@ export function ThreatRuleSynthesizer() {
                 <span>{copied ? "Copied!" : "Copy Code"}</span>
               </button>
               <button
+                type="button"
                 onClick={handleDownload}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-900/50 bg-blue-950/40 text-blue-400 text-xs hover:bg-blue-900/50 transition font-bold"
               >
@@ -281,6 +283,7 @@ export function ThreatRuleSynthesizer() {
           {/* Format Tabs */}
           <div className="flex gap-2 border-b border-zinc-800">
             <button
+              type="button"
               onClick={() => setActiveTab("yara")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition border-b-2 ${
                 activeTab === "yara"
@@ -292,6 +295,7 @@ export function ThreatRuleSynthesizer() {
               <span>YARA Signature (.yar)</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("sigma")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition border-b-2 ${
                 activeTab === "sigma"
@@ -303,6 +307,7 @@ export function ThreatRuleSynthesizer() {
               <span>Sigma SIEM Rule (.yml)</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("nuclei")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition border-b-2 ${
                 activeTab === "nuclei"
@@ -314,6 +319,7 @@ export function ThreatRuleSynthesizer() {
               <span>Nuclei DAST Template (.yml)</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("waf")}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition border-b-2 ${
                 activeTab === "waf"

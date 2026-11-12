@@ -29,6 +29,7 @@ export function HardwareEnclaveStudio() {
   const [selectedSecret, setSelectedSecret] = useState("sovereign-vault-master-key");
   const [copiedKey, setCopiedKey] = useState(false);
   const [goldenMeasurements, setGoldenMeasurements] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchMeasurements = async () => {
     try {
@@ -36,9 +37,12 @@ export function HardwareEnclaveStudio() {
       if (res.ok) {
         const data = await res.json();
         setGoldenMeasurements(data.golden_measurements);
+        setErrorMsg(null);
+      } else {
+        setErrorMsg(`Failed to load enclave measurements (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Unable to reach enclave measurements endpoint.");
     }
   };
 
@@ -49,6 +53,7 @@ export function HardwareEnclaveStudio() {
   const runVerification = async () => {
     setLoading(true);
     setUnsealResult(null);
+    setErrorMsg(null);
     try {
       const body: Record<string, any> = { platform };
       if (platform === "AWS_NITRO") {
@@ -82,9 +87,11 @@ export function HardwareEnclaveStudio() {
       if (res.ok) {
         const data = await res.json();
         setVerifyResult(data);
+      } else {
+        setErrorMsg(`Remote attestation failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Remote attestation request failed.");
     } finally {
       setLoading(false);
     }
@@ -92,6 +99,7 @@ export function HardwareEnclaveStudio() {
 
   const unsealSecret = async () => {
     setUnsealLoading(true);
+    setErrorMsg(null);
     try {
       const body: Record<string, any> = {
         platform,
@@ -123,18 +131,30 @@ export function HardwareEnclaveStudio() {
       if (res.ok) {
         const data = await res.json();
         setUnsealResult(data);
+      } else {
+        setErrorMsg(`Secret unsealing request failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setErrorMsg("Secret unsealing request failed.");
     } finally {
       setUnsealLoading(false);
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(true);
-    setTimeout(() => setCopiedKey(false), 2000);
+  const copyToClipboard = async (text: string) => {
+    if (!text) return;
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   };
 
   return (
@@ -162,6 +182,7 @@ export function HardwareEnclaveStudio() {
           <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono">
             <span className="text-slate-400">Simulate Tampering:</span>
             <button
+              type="button"
               onClick={() => setSimulateTampering(!simulateTampering)}
               className={`px-2 py-0.5 rounded font-bold transition ${
                 simulateTampering
@@ -173,6 +194,7 @@ export function HardwareEnclaveStudio() {
             </button>
           </div>
           <button
+            type="button"
             onClick={runVerification}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium text-sm transition shadow-lg shadow-teal-600/20 disabled:opacity-50"
@@ -182,6 +204,16 @@ export function HardwareEnclaveStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -202,6 +234,7 @@ export function HardwareEnclaveStudio() {
                 { id: "INTEL_SGX", label: "Intel SGX / TDX", desc: "DCAP Quote / PCS" },
               ].map((p) => (
                 <button
+                  type="button"
                   key={p.id}
                   onClick={() => setPlatform(p.id as any)}
                   className={`p-3 rounded-lg text-left transition border ${
@@ -344,6 +377,7 @@ export function HardwareEnclaveStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={unsealSecret}
                 disabled={unsealLoading}
                 className="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs transition shadow-lg shadow-teal-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
@@ -373,7 +407,9 @@ export function HardwareEnclaveStudio() {
                         {unsealResult.secret_value}
                       </span>
                       <button
+                        type="button"
                         onClick={() => copyToClipboard(unsealResult.secret_value)}
+                        aria-label="Copy unsealed secret"
                         className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition ml-2"
                       >
                         {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}

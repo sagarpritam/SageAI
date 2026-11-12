@@ -17,12 +17,22 @@ interface ScanSummary {
 export function DashboardOverview() {
   const [recentScans, setRecentScans] = useState<ScanSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     axios
       .get("/api/scans")
-      .then((r) => setRecentScans(r.data.slice(0, 5)))
-      .catch(() => {})
+      .then((r) => {
+        setRecentScans(Array.isArray(r.data) ? r.data.slice(0, 5) : []);
+        setErrorMsg(null);
+      })
+      .catch((err: unknown) => {
+        const msg = axios.isAxiosError(err)
+          ? err.response?.data?.error || err.response?.data?.detail || "Failed to load scan history"
+          : "Failed to load scan history";
+        setErrorMsg(String(msg));
+        setRecentScans([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -40,6 +50,16 @@ export function DashboardOverview() {
 
   return (
     <div className="space-y-8">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-700/50 rounded-xl px-4 py-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {cards.map((c) => (

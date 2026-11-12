@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–34 • Current",
-    range: "Capabilities 101–124 + Option B",
+    wave: "Waves 27–35 • Current",
+    range: "Capabilities 101–127 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Holographic Complexity CA/CV Firewall, Non-Lorentzian Carrollian Shield, Modular Bootstrap Rademacher Guard, Swampland WGC & Casimir-Sagnac Power Grid.",
+    detail: "JT Dilaton Wormhole Matrix Firewall, dS4 Static-Patch Timelike Entanglement Shield, 2-Group Higher-Form Green-Schwarz Guard, Complexity CA/CV & Unruh-Rindler Power Grid.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 34 Complexity Holography, Carrollian Null Shield &amp; Modular Bootstrap orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 35 JT Wormhole Matrix, dS Static-Patch &amp; 2-Group Higher-Form orchestration.
           </p>
         </div>
 

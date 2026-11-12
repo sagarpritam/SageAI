@@ -42,6 +42,7 @@ export function KyberMeshVPNStudio() {
   const [handshaking, setHandshaking] = useState(false);
   const [wireguardConf, setWireguardConf] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // New peer state
   const [nodeName, setNodeName] = useState("Orbital Relay DeepSpace-1");
@@ -51,8 +52,13 @@ export function KyberMeshVPNStudio() {
 
   const fetchPeers = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/kyber-mesh-vpn/peers");
+      if (!res.ok) {
+        setErrorMsg(`Failed to load PQC mesh peers (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.peers) {
         setPeers(data.peers);
@@ -60,6 +66,8 @@ export function KyberMeshVPNStudio() {
           setSelectedPeer((prev) => prev || data.peers[0]);
         }
       }
+    } catch {
+      setErrorMsg("Unable to reach PQC mesh VPN backend.");
     } finally {
       setLoading(false);
     }
@@ -72,6 +80,7 @@ export function KyberMeshVPNStudio() {
   async function handleRegisterPeer(e: React.FormEvent) {
     e.preventDefault();
     setRegistering(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/kyber-mesh-vpn/peers", {
         method: "POST",
@@ -82,11 +91,17 @@ export function KyberMeshVPNStudio() {
           overlay_ip: overlayIp,
         }),
       });
+      if (!res.ok) {
+        setErrorMsg(`Failed to register PQC peer (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.peer) {
         setPeers((prev) => [data.peer, ...prev]);
         setSelectedPeer(data.peer);
       }
+    } catch {
+      setErrorMsg("Failed to register PQC peer.");
     } finally {
       setRegistering(false);
     }
@@ -94,12 +109,17 @@ export function KyberMeshVPNStudio() {
 
   async function handleHandshake(peerId: string) {
     setHandshaking(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/kyber-mesh-vpn/handshake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ peer_id: peerId }),
       });
+      if (!res.ok) {
+        setErrorMsg(`ML-KEM handshake failed (HTTP ${res.status}).`);
+        return;
+      }
       const data = await res.json();
       if (data.handshake) {
         setPeers((prev) =>
@@ -108,6 +128,8 @@ export function KyberMeshVPNStudio() {
           )
         );
       }
+    } catch {
+      setErrorMsg("ML-KEM handshake request failed.");
     } finally {
       setHandshaking(false);
     }
@@ -134,10 +156,23 @@ PersistentKeepalive = 25
     setWireguardConf(conf);
   }
 
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  async function copyToClipboard(text: string) {
+    setErrorMsg(null);
+    if (!text) {
+      setErrorMsg("Select a peer first to generate wg0-pqc.conf before copying.");
+      return;
+    }
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser.");
+    }
   }
 
   return (
@@ -160,12 +195,23 @@ PersistentKeepalive = 25
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchPeers}
+          aria-label="Refresh mesh peers"
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl bg-red-950/40 border border-red-700/50 text-xs font-mono text-red-300"
+        >
+          {errorMsg}
+        </div>
+      )}
 
       {/* Quantum Metric Counters */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -291,6 +337,7 @@ PersistentKeepalive = 25
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleHandshake(selectedPeer.peer_id)}
                     disabled={handshaking}
                     className="px-3.5 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-violet-950/30"
@@ -325,6 +372,7 @@ PersistentKeepalive = 25
                     Generated wg0-pqc.conf with Kyber PSK
                   </span>
                   <button
+                    type="button"
                     onClick={() => copyToClipboard(wireguardConf || "")}
                     className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition"
                   >

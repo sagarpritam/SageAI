@@ -26,10 +26,17 @@ export function APIKeyManager() {
 
   const fetchKeys = () => {
     setLoading(true);
+    setErrorMsg(null);
     axios
       .get("/api/api-keys")
       .then((r) => setKeys(Array.isArray(r.data) ? r.data : []))
-      .catch(() => setKeys([]))
+      .catch((err: unknown) => {
+        const msg = axios.isAxiosError(err)
+          ? err.response?.data?.error || err.response?.data?.detail || "Failed to load API keys"
+          : "Failed to load API keys";
+        setErrorMsg(String(msg));
+        setKeys([]);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -191,6 +198,7 @@ export function APIKeyManager() {
                     </div>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => setConfirmRevokeId(k.id)}
                       className="text-zinc-600 hover:text-red-400 transition-colors"
                       aria-label={`Revoke key ${k.name}`}

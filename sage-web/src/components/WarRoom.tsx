@@ -175,7 +175,9 @@ export function WarRoom() {
           setIsConnected(true);
         }
       } catch {
-        // Fallback polling error
+        if (!unmounted) {
+          setIsConnected(false);
+        }
       }
     };
 
@@ -210,7 +212,9 @@ export function WarRoom() {
             } else {
               handleNewEvent(data);
             }
-          } catch {}
+              } catch {
+                setPulseError("Received malformed WebSocket telemetry payload.");
+              }
         };
 
         ws.onclose = () => {

@@ -21,12 +21,21 @@ export function IntelligenceHub() {
   const [sweeping, setSweeping] = useState(false);
   const [sweepResults, setSweepResults] = useState<Record<string, unknown> | null>(null);
   const [sweepError, setSweepError] = useState("");
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     axios
       .get("/api/intel")
-      .then((r) => setModules(r.data.modules || []))
-      .catch(() => {})
+      .then((r) => {
+        setModules(r.data.modules || []);
+        setLoadError(null);
+      })
+      .catch((e: unknown) => {
+        const msg = axios.isAxiosError(e)
+          ? e.response?.data?.error || e.response?.data?.detail || "Failed to load intelligence modules"
+          : "Failed to load intelligence modules";
+        setLoadError(String(msg));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -83,6 +92,7 @@ export function IntelligenceHub() {
             <option value="phone">Phone</option>
           </select>
           <button
+            type="button"
             onClick={runSweep}
             disabled={sweeping || !sweepTarget.trim()}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-6 py-2 rounded-lg transition-colors text-sm flex items-center gap-2"
@@ -90,8 +100,17 @@ export function IntelligenceHub() {
             {sweeping ? <><Loader2 className="w-4 h-4 animate-spin" /> Sweeping...</> : <><Play className="w-4 h-4" /> Run Sweep</>}
           </button>
         </div>
-        {sweepError && <p className="text-sm text-red-400">{sweepError}</p>}
+        {sweepError && <p role="alert" className="text-sm text-red-400">{sweepError}</p>}
       </div>
+
+      {loadError && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-700/50 rounded-xl px-4 py-3 text-xs font-mono text-red-300"
+        >
+          {loadError}
+        </div>
+      )}
 
       {/* Module Grid */}
       <div>

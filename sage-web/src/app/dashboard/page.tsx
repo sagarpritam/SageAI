@@ -232,6 +232,10 @@ import ComplexityHolographyStudio from "@/components/ComplexityHolographyStudio"
 import CarrollianHolographyStudio from "@/components/CarrollianHolographyStudio";
 import ModularBootstrapStudio from "@/components/ModularBootstrapStudio";
 import CasimirSagnacStudio from "@/components/CasimirSagnacStudio";
+import JTWormholeStudio from "@/components/JTWormholeStudio";
+import DSStaticPatchStudio from "@/components/DSStaticPatchStudio";
+import HigherFormTwoGroupStudio from "@/components/HigherFormTwoGroupStudio";
+import UnruhRindlerStudio from "@/components/UnruhRindlerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -240,6 +244,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "jt-wormhole-matrix", label: "JT Wormhole Matrix (Cap 125)", icon: Orbit },
+  { id: "ds-static-patch", label: "dS Static Patch (Cap 126)", icon: Compass },
+  { id: "higher-form-twogroup", label: "2-Group Higher-Form (Cap 127)", icon: Network },
+  { id: "unruh-rindler-power", label: "Unruh-Rindler Grid (Option B)", icon: Flame },
   { id: "complexity-holography", label: "Complexity CA/CV (Cap 122)", icon: Layers },
   { id: "carrollian-holography", label: "Carrollian Shield (Cap 123)", icon: Compass },
   { id: "modular-bootstrap", label: "Modular Bootstrap (Cap 124)", icon: Scale },
@@ -619,6 +627,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "jt-wormhole-matrix" && <JTWormholeStudio />}
+          {activeTab === "ds-static-patch" && <DSStaticPatchStudio />}
+          {activeTab === "higher-form-twogroup" && <HigherFormTwoGroupStudio />}
+          {activeTab === "unruh-rindler-power" && <UnruhRindlerStudio />}
           {activeTab === "complexity-holography" && <ComplexityHolographyStudio />}
           {activeTab === "carrollian-holography" && <CarrollianHolographyStudio />}
           {activeTab === "modular-bootstrap" && <ModularBootstrapStudio />}

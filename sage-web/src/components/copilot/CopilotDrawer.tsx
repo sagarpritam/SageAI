@@ -71,6 +71,7 @@ export function CopilotDrawer({
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [clipboardError, setClipboardError] = useState<string | null>(null);
 
   // Active investigation context
   const [activeScanId, setActiveScanId] = useState<string | undefined>(initialScanId);
@@ -108,10 +109,19 @@ export function CopilotDrawer({
     }
   }, [isOpen]);
 
-  const handleCopyCode = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCode = async (text: string, id: string) => {
+    setClipboardError(null);
+    if (!navigator?.clipboard?.writeText) {
+      setClipboardError("Clipboard write unavailable in this browser context.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setClipboardError("Clipboard write blocked by browser.");
+    }
   };
 
   const handleClearHistory = () => {
@@ -244,6 +254,7 @@ export function CopilotDrawer({
     <>
       {/* ── Floating Activator Pill ── */}
       <button
+        type="button"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-emerald-950 via-zinc-900 to-zinc-950 text-white border border-emerald-500/40 rounded-full shadow-2xl hover:shadow-emerald-900/40 hover:border-emerald-400 transition-all group backdrop-blur-md"
         title="Open SageAI Copilot (Cmd+K)"
@@ -294,6 +305,7 @@ export function CopilotDrawer({
 
           <div className="flex items-center gap-1.5">
             <button
+              type="button"
               onClick={handleClearHistory}
               className="p-1.5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 rounded-md transition-colors"
               title="Clear conversation"
@@ -301,6 +313,7 @@ export function CopilotDrawer({
               <RotateCcw className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={() => setIsOpen(false)}
               className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-md transition-colors"
               title="Close Copilot (Esc)"
@@ -309,6 +322,22 @@ export function CopilotDrawer({
             </button>
           </div>
         </div>
+
+        {clipboardError && (
+          <div
+            role="alert"
+            className="mx-5 mt-3 px-3 py-2 rounded-lg bg-red-950/50 border border-red-700/50 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+          >
+            <span>{clipboardError}</span>
+            <button
+              type="button"
+              onClick={() => setClipboardError(null)}
+              className="text-red-300 hover:text-white underline text-[11px]"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Investigation Context Pill (if attached) */}
         {(activeScanId || activeTarget) && (
@@ -321,6 +350,7 @@ export function CopilotDrawer({
               </span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setActiveScanId(undefined);
                 setActiveTarget(undefined);
@@ -377,8 +407,19 @@ export function CopilotDrawer({
                   </div>
                 )}
 
-                <div className="mt-1 text-[10px] text-zinc-500 text-right font-mono">
-                  {m.timestamp}
+                <div className="mt-1 flex items-center justify-end gap-2 text-[10px] text-zinc-500 font-mono">
+                  {m.role === "assistant" && m.content && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(m.content, m.id)}
+                      className="inline-flex items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors"
+                      aria-label="Copy assistant response"
+                    >
+                      {copiedId === m.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedId === m.id ? "Copied" : "Copy"}
+                    </button>
+                  )}
+                  <span>{m.timestamp}</span>
                 </div>
               </div>
 
@@ -401,24 +442,28 @@ export function CopilotDrawer({
         {/* Quick Suggestion Chips */}
         <div className="px-5 py-2.5 bg-zinc-900/30 border-t border-zinc-800/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           <button
+            type="button"
             onClick={() => executeSend("Explain CVE-2024-21887 and check CISA KEV exploitation")}
             className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
           >
             🚨 CISA KEV Exploits
           </button>
           <button
+            type="button"
             onClick={() => executeSend("Generate safe non-destructive curl command to check for missing security headers")}
             className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
           >
             🛡️ Safe PoC Curl
           </button>
           <button
+            type="button"
             onClick={() => executeSend("Summarize the latest scan results and high severity findings")}
             className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
           >
             🔍 Scan Summary
           </button>
           <button
+            type="button"
             onClick={() => executeSend("How do I fix Server-Side Request Forgery (SSRF) in Python FastAPI?")}
             className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
           >
@@ -444,6 +489,7 @@ export function CopilotDrawer({
               className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-500 outline-none resize-none px-2 py-1 max-h-32"
             />
             <button
+              type="button"
               onClick={() => executeSend(input)}
               disabled={!input.trim() || isStreaming}
               className="p-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white transition-all shrink-0"
