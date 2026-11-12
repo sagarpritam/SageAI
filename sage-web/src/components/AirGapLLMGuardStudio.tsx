@@ -42,6 +42,7 @@ export function AirGapLLMGuardStudio() {
   const [loading, setLoading] = useState(false);
   const [sealing, setSealing] = useState(false);
   const [sealResult, setSealResult] = useState<any | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // New model artifact scan state
   const [modelName, setModelName] = useState("Llama-3.3-70B-Instruct-Sovereign");
@@ -52,8 +53,12 @@ export function AirGapLLMGuardStudio() {
 
   const fetchModels = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/airgap-llm-guard/models");
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} loading air-gap models`);
+      }
       const data = await res.json();
       if (data.models) {
         setModels(data.models);
@@ -61,6 +66,8 @@ export function AirGapLLMGuardStudio() {
           setSelectedModel((prev) => prev || data.models[0]);
         }
       }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load air-gapped models");
     } finally {
       setLoading(false);
     }
@@ -73,6 +80,7 @@ export function AirGapLLMGuardStudio() {
   async function handleScanModel(e: React.FormEvent) {
     e.preventDefault();
     setScanning(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/airgap-llm-guard/scan-artifact", {
         method: "POST",
@@ -84,11 +92,16 @@ export function AirGapLLMGuardStudio() {
           parameters_billions: Number(paramSize),
         }),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} scanning model weights`);
+      }
       const data = await res.json();
       if (data.model) {
         setModels((prev) => [data.model, ...prev]);
         setSelectedModel(data.model);
       }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to scan model artifact");
     } finally {
       setScanning(false);
     }
@@ -96,12 +109,17 @@ export function AirGapLLMGuardStudio() {
 
   async function handleSealEnclave(modelId: string) {
     setSealing(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/airgap-llm-guard/scan-artifact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ model_id: modelId }),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} sealing model enclave`);
+      }
+      await res.json();
       // Emulate sealing
       setSealResult({
         cert_serial: `0x${Math.random().toString(16).slice(2, 14).toUpperCase()}`,
@@ -114,6 +132,8 @@ export function AirGapLLMGuardStudio() {
           m.model_id === modelId ? { ...m, safety_status: "SEALED_AIRGAP_AUTHORIZED" } : m
         )
       );
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to seal model enclave");
     } finally {
       setSealing(false);
     }
@@ -139,12 +159,29 @@ export function AirGapLLMGuardStudio() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchModels}
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-rose-300 hover:text-white px-2 py-0.5 rounded bg-rose-900/50"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Model Inventory & Safety Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -276,6 +313,7 @@ export function AirGapLLMGuardStudio() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleSealEnclave(selectedModel.model_id)}
                     disabled={sealing}
                     className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-950/30"

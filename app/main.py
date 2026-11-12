@@ -71,6 +71,7 @@ from app.routers import (
     cluster_federation_routes,
     cognitive_ew_routes,
     complexity_holography_routes,
+    condensed_liquid_routes,
     conformal_bootstrap_routes,
     consensus_routes,
     copilot_routes,
@@ -87,6 +88,7 @@ from app.routers import (
     deep_analysis_routes,
     deep_crustal_mhd_routes,
     deep_space_laser_routes,
+    derived_symplectic_routes,
     desitter_repulsion_routes,
     drone_swarm_shield_routes,
     ds_static_patch_routes,
@@ -102,6 +104,7 @@ from app.routers import (
     ergosphere_spin_routes,
     everett_branch_routes,
     explain_routes,
+    factorization_homology_routes,
     false_vacuum_routes,
     fibonacci_anyon_routes,
     firmware_attestation_routes,
@@ -168,6 +171,7 @@ from app.routers import (
     qkd_space_mesh_routes,
     quantum_extremal_island_routes,
     quantum_gravitational_routes,
+    quantum_thermoelectric_routes,
     randall_sundrum_routes,
     ransomware_routes,
     redteam_cluster_routes,
@@ -524,6 +528,10 @@ app.include_router(topos_grothendieck_routes.router)
 app.include_router(motivic_galois_routes.router)
 app.include_router(resurgence_transseries_routes.router)
 app.include_router(berry_curvature_routes.router)
+app.include_router(factorization_homology_routes.router)
+app.include_router(condensed_liquid_routes.router)
+app.include_router(derived_symplectic_routes.router)
+app.include_router(quantum_thermoelectric_routes.router)
 
 
 # ---------------------

@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Subfactor Jones Planars (Cap 134), Grothendieck Topos (Cap 137), Motivic Galois (Cap 138), and Ecalle Resurgence (Cap 139).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Grothendieck Topos (Cap 137), Factorization Homology (Cap 140), Condensed Mathematics (Cap 141), and Derived Shifted Symplectic (Cap 142).",
     },
   ];
 

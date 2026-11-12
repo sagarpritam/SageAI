@@ -14,6 +14,7 @@ import {
   Globe,
   CheckCircle,
   AlertOctagon,
+  AlertTriangle,
 } from "lucide-react";
 
 interface AtomicClock {
@@ -64,14 +65,22 @@ export function AtomicClockStudio() {
   const [signing, setSigning] = useState(false);
   const [simulateSpoofing, setSimulateSpoofing] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchClocksAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [clkRes, metRes] = await Promise.all([
         fetch("/api/atomic-clock/clocks"),
         fetch("/api/atomic-clock/metrics"),
       ]);
+      if (!clkRes.ok) {
+        throw new Error(`HTTP ${clkRes.status} fetching optical atomic clocks`);
+      }
+      if (!metRes.ok) {
+        throw new Error(`HTTP ${metRes.status} fetching atomic clock metrics`);
+      }
       const clkData = await clkRes.json();
       const metData = await metRes.json();
 
@@ -85,7 +94,7 @@ export function AtomicClockStudio() {
         setMetrics(metData.metrics);
       }
     } catch (e) {
-      console.error("Failed to load atomic clock data", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load atomic clock data");
     } finally {
       setLoading(false);
     }
@@ -97,6 +106,7 @@ export function AtomicClockStudio() {
 
   const handleSyncMesh = async () => {
     setSyncing(true);
+    setErrorMsg(null);
     try {
       const payload = {
         primary_clock_id: selectedClockId || "clock-strontium-boulder-01",
@@ -109,13 +119,16 @@ export function AtomicClockStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} synchronizing optical mesh`);
+      }
       const data = await res.json();
       if (data.sync) {
         setLatestSync(data.sync);
         fetchClocksAndMetrics();
       }
     } catch (e) {
-      console.error("Failed to sync atomic clock mesh", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to sync atomic clock mesh");
     } finally {
       setSyncing(false);
     }
@@ -124,6 +137,7 @@ export function AtomicClockStudio() {
   const handleIssueTimestamp = async () => {
     if (!selectedClockId) return;
     setSigning(true);
+    setErrorMsg(null);
     try {
       const payload = {
         clock_id: selectedClockId,
@@ -136,13 +150,16 @@ export function AtomicClockStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} issuing ML-DSA-87 timestamp`);
+      }
       const data = await res.json();
       if (data.timestamp_record) {
         setLatestTimestamp(data.timestamp_record);
         fetchClocksAndMetrics();
       }
     } catch (e) {
-      console.error("Failed to issue atomic timestamp", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to issue atomic timestamp");
     } finally {
       setSigning(false);
     }
@@ -174,6 +191,7 @@ export function AtomicClockStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchClocksAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -182,6 +200,22 @@ export function AtomicClockStudio() {
             Query Clocks
           </button>
         </div>
+
+        {errorMsg && (
+          <div role="alert" className="mt-4 p-3 rounded-lg bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-rose-300 hover:text-white px-2 py-0.5 rounded bg-rose-900/50"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Metrics Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/60">
@@ -224,6 +258,7 @@ export function AtomicClockStudio() {
             <div className="space-y-2">
               {clocks.map((c) => (
                 <button
+                  type="button"
                   key={c.clock_id}
                   onClick={() => setSelectedClockId(c.clock_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -305,6 +340,7 @@ export function AtomicClockStudio() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={handleSyncMesh}
                   disabled={syncing}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-violet-600/20 disabled:opacity-50"
@@ -313,6 +349,7 @@ export function AtomicClockStudio() {
                   {syncing ? "Syncing Mesh..." : "Synchronize Mesh"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleIssueTimestamp}
                   disabled={signing}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-emerald-600/20 disabled:opacity-50"

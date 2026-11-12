@@ -58,23 +58,31 @@ export function AIModelDePoisonStudio() {
   const [anomalyThreshold, setAnomalyThreshold] = useState<number>(10.0);
   const [scanning, setScanning] = useState(false);
   const [excising, setExcising] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [excisionResult, setExcisionResult] = useState<ExcisionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchAdapters = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ai-depoison/adapters");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        adapters?: LoRAAdapter[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load LoRA adapters");
+      }
       if (data.adapters) {
         setAdapters(data.adapters);
         if (data.adapters.length > 0) {
-          setSelectedAdapter((prev) => prev || data.adapters[0]);
+          setSelectedAdapter((prev) => prev || data.adapters![0]);
         }
       }
-    } catch (err) {
-      console.error("Failed to load LoRA adapters", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load LoRA adapters");
     } finally {
       setLoading(false);
     }
@@ -87,6 +95,7 @@ export function AIModelDePoisonStudio() {
   async function handleScan() {
     if (!selectedAdapter) return;
     setScanning(true);
+    setErrorMsg(null);
     setScanResult(null);
     try {
       const res = await fetch("/api/ai-depoison/scan", {
@@ -97,16 +106,22 @@ export function AIModelDePoisonStudio() {
           anomaly_threshold: anomalyThreshold,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        scan?: ScanResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Trojan backdoor weight scan failed");
+      }
       if (data.scan) {
         setScanResult(data.scan);
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] SCAN: ${selectedAdapter.adapter_id} -> ${data.scan.verdict} (Sparsity: ${data.scan.anomaly_sparsity_pct}%)`,
+          `[${new Date().toLocaleTimeString()}] SCAN: ${selectedAdapter.adapter_id} -> ${data.scan!.verdict} (Sparsity: ${data.scan!.anomaly_sparsity_pct}%)`,
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Scan failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Trojan backdoor weight scan failed");
     } finally {
       setScanning(false);
     }
@@ -115,13 +130,20 @@ export function AIModelDePoisonStudio() {
   async function handleExcision() {
     if (!selectedAdapter) return;
     setExcising(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ai-depoison/excise-backdoor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adapter_id: selectedAdapter.adapter_id }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        excision?: ExcisionResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Surgical rank-1 neuron excision failed");
+      }
       if (data.excision) {
         setExcisionResult(data.excision);
         setAdapters((prev) =>
@@ -147,12 +169,12 @@ export function AIModelDePoisonStudio() {
             : null
         );
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] SURGICAL EXCISION: ${selectedAdapter.adapter_id} -> ${data.excision.ablated_neurons_count} neurons ablated in ${data.excision.excision_latency_ms}ms (Utility: ${data.excision.utility_retention_pct}%)`,
+          `[${new Date().toLocaleTimeString()}] SURGICAL EXCISION: ${selectedAdapter.adapter_id} -> ${data.excision!.ablated_neurons_count} neurons ablated in ${data.excision!.excision_latency_ms}ms (Utility: ${data.excision!.utility_retention_pct}%)`,
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Excision failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Surgical rank-1 neuron excision failed");
     } finally {
       setExcising(false);
     }
@@ -180,6 +202,7 @@ export function AIModelDePoisonStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchAdapters}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -189,6 +212,25 @@ export function AIModelDePoisonStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -334,6 +376,7 @@ export function AIModelDePoisonStudio() {
 
                 <div className="flex flex-wrap gap-3 pt-2">
                   <button
+                    type="button"
                     onClick={handleScan}
                     disabled={scanning}
                     className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-900/30"
@@ -343,6 +386,7 @@ export function AIModelDePoisonStudio() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={handleExcision}
                     disabled={excising || selectedAdapter.status !== "POISON_SUSPECTED"}
                     className={`flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all shadow-lg ${

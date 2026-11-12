@@ -2,6 +2,34 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v8.0.0] - 2026-11-13 - Trans-Century Era: Factorization Homology $E_n$-Disk Firewall, Clausen-Scholze Condensed Liquid Shield, PTVV Derived Shifted-Symplectic Stack & Planetary Non-Hermitian Quantum Ratchet Grid (Wave 40 Milestone)
+
+### Added
+- **Capability 140: Ayala-Francis Factorization Homology & $E_n$-Disk Algebra Manifold Firewall** (`app/services/factorization_homology_tft/`):
+  - Evaluates stratified $E_n$-disk operadic homology ($\int_M A$) across 3-sphere ($E_3$), surface genus-2 ($E_2$), and $E_4$-manifold topologies, verifying dualizable topological defect excision and Koszul duality invariance (`165.56 dB` operadic suppression; `99.99869%` factorization unitarity; `0.9999998` manifold gluing coherence on `FACTORIZATION-E3-S3-01`) (`FactorizationHomologyStudio.tsx`, `app/routers/factorization_homology_routes.py`).
+- **Capability 141: Clausen-Scholze Condensed Mathematics & Liquid Vector Space Shield** (`app/services/condensed_liquid_mathematics/`):
+  - Enforces profinite Stone-space sheaf descent ($*$), $p$-liquid norm completion ($p=0.5\text{--}0.85$), and exact $\mathrm{Ext}^i$-vanishing sequences across topological modules (`2.231191` liquid norm bound; `166.07 dB` condensed suppression; `99.99885%` condensed unitarity on `LIQUID-SCHOLZE-P05-01`) (`CondensedLiquidMathStudio.tsx`, `app/routers/condensed_liquid_routes.py`).
+- **Capability 142: PTVV Derived Shifted-Symplectic Stack & AKSZ Lagrangian Intersection Shield** (`app/services/derived_shifted_symplectic/`):
+  - Audits Pantev-Toën-Vaquié-Vezzosi $n$-shifted symplectic forms ($n=-1,-2,0$), AKSZ sigma-model transgression forms, and derived Lagrangian intersection gluing invariants (`0.9999998` AKSZ transgression index; `166.58 dB` Lagrangian isolation; `99.99898%` derived symplectic fidelity on `PTVV-AKSZ-CY3-01`) (`DerivedShiftedSymplecticStudio.tsx`, `app/routers/derived_symplectic_routes.py`).
+- **Option B Wave 40: Sovereign Planetary Non-Hermitian $\mathcal{PT}$-Symmetric Skin-Effect & Quantum Thermal Ratchet Power Grid** (`app/services/quantum_thermoelectric_ratchet/`):
+  - Synchronizes Hatano-Nelson non-Hermitian skin-effect arrays (`NONHERM-SKIN-ARRAY-01`: `351.91 GW` net baseload at `98.41%` efficiency), exceptional-point $\mathcal{PT}$-symmetric cavities (`PT-SYMMETRIC-CAVITY-02`: `515.12 GW` at `98.91%`), and driven Brownian quantum thermal ratchets (`QUANTUM-RATCHET-L2-03`: `721.28 GW` at `99.35%`) with zero fossil carbon and zero fissile waste (`QuantumThermoelectricPowerStudio.tsx`, `app/routers/quantum_thermoelectric_routes.py`).
+- **Wave 40 Standalone, Consolidated & Playwright Verification Suites**:
+  - Added [`tests/test_wave40_factorization_condensed_symplectic.py`](tests/test_wave40_factorization_condensed_symplectic.py) (6 tests), [`scripts/demo_wave40_factorization_condensed_symplectic_drill.py`](scripts/demo_wave40_factorization_condensed_symplectic_drill.py) (Capabilities 140–142), [`scripts/demo_quantum_thermoelectric_drill.py`](scripts/demo_quantum_thermoelectric_drill.py) (Option B Wave 40), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (`[33/33]` sections covering Capabilities `1–142` / `WAVES 1–40`), and expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 211 Wave 1–40 endpoints (`216 / 216` succeeded in `0.381 s`, `566.5 req/s`, `0` failed, p50 `13.13 ms`, p95 `19.11 ms`, p99 `19.74 ms`).
+  - Updated [`sage-web/tests/sageai.spec.ts`](sage-web/tests/sageai.spec.ts) and [`sage-web/tests/proxy-security.spec.ts`](sage-web/tests/proxy-security.spec.ts) with `v8.0.0` / `182`-studio Command Center assertions and offline Wave 40 GET+POST `200` proxy checks.
+
+### Fixed
+- **Enterprise UI Resilience & Silent-Catch Hardening (Batch 9)**:
+  - Replaced silent empty catches, surfaced explicit `!res.ok` HTTP errors, added inline `role="alert"` error banners with dismiss controls, and enforced `type="button"` semantics across 10 frontier & command studios ([`AdversaryEmulationStudio.tsx`](sage-web/src/components/AdversaryEmulationStudio.tsx), [`AdversaryMatrixViewer.tsx`](sage-web/src/components/AdversaryMatrixViewer.tsx), [`AIImmuneDefenseStudio.tsx`](sage-web/src/components/AIImmuneDefenseStudio.tsx), [`AIModelDePoisonStudio.tsx`](sage-web/src/components/AIModelDePoisonStudio.tsx), [`AirgapExploitStudio.tsx`](sage-web/src/components/AirgapExploitStudio.tsx), [`AirGapLLMGuardStudio.tsx`](sage-web/src/components/AirGapLLMGuardStudio.tsx), [`AISOCCommandCenter.tsx`](sage-web/src/components/AISOCCommandCenter.tsx), [`AISPMCommandCenter.tsx`](sage-web/src/components/AISPMCommandCenter.tsx), [`AntimatterFusionStudio.tsx`](sage-web/src/components/AntimatterFusionStudio.tsx), and [`AtomicClockStudio.tsx`](sage-web/src/components/AtomicClockStudio.tsx)).
+
+### Verification & Metrics
+- **Pytest**: 680 / 680 tests passing across 107 test suites (100% pass rate).
+- **Playwright E2E**: 33 / 33 Chromium specs passing across 3 suites (`18.4s`, standalone Next.js SSR server).
+- **Next.js Turbopack**: 562 / 562 prerendered static & API routes compiled (`576` total App Router entries: `559` API proxies + `17` page/metadata routes) with 0 errors (`tsc --noEmit` and `eslint --max-warnings 0` clean).
+- **FastAPI**: 788 `APIRoute` handlers (`791` total `app.routes` including 3 WebSocket routes / `769` OpenAPI paths) registered across 199 router modules.
+- **React Components**: 218 UI `.tsx` files (`211` top-level panels; `182` mounted Command Center studios).
+
+---
+
 ## [v7.9.0] - 2026-11-13 - Trans-Century Era: Grothendieck Topos Sheaf Firewall, Motivic Galois Cohomology Shield, Écalle Resurgence Transseries & Planetary Berry-Curvature Harvest Grid (Wave 39 Milestone)
 
 ### Added

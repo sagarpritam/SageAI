@@ -10,10 +10,12 @@ import {
   CheckCircle2,
   Crosshair,
   Hash,
+  AlertTriangle,
 } from "lucide-react";
 
 export function AdversaryMatrixViewer() {
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [matrixData, setMatrixData] = useState<any>({
     average_coverage_pct: 95.2,
     tactics: [
@@ -30,18 +32,20 @@ export function AdversaryMatrixViewer() {
 
   const runAptDrill = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/adversary/drill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ actor_id: selectedApt }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setDrillResult(data);
+      const data = (await res.json().catch(() => ({}))) as { error?: string } & Record<string, any>;
+      if (!res.ok) {
+        throw new Error(data.error || "BAS adversary emulation drill failed");
       }
-    } catch (e) {
-      console.error(e);
+      setDrillResult(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "BAS adversary emulation drill failed");
     } finally {
       setLoading(false);
     }
@@ -79,6 +83,7 @@ export function AdversaryMatrixViewer() {
               <option value="VOLT_TYPHOON">Volt Typhoon (Critical Infra)</option>
             </select>
             <button
+              type="button"
               onClick={runAptDrill}
               disabled={loading}
               className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-2"
@@ -88,6 +93,25 @@ export function AdversaryMatrixViewer() {
             </button>
           </div>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-red-300 hover:text-white underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Coverage */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">

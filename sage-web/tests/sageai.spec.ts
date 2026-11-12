@@ -522,13 +522,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v7.9.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v8.0.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v7.9.0 metadata & live stats
-    await expect(page.locator('text=SageAI v7.9.0').first()).toBeVisible();
-    await expect(page.locator('text=139 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v8.0.0 metadata & live stats
+    await expect(page.locator('text=SageAI v8.0.0').first()).toBeVisible();
+    await expect(page.locator('text=142 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -542,9 +542,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-39 Milestone tab
-    await page.locator('button:has-text("Waves 1–39")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Grothendieck Topos, Motivic Galois & Resurgence Shield (v7.9.0)' })).toBeVisible();
+    // Switch to Waves 1-40 Milestone tab
+    await page.locator('button:has-text("Waves 1–40")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Factorization Homology, Condensed Math & Shifted Symplectic (v8.0.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -556,31 +556,31 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 7.9.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 8.0.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v7.9.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v8.0.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v7.9.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v8.0.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 178 Studios (Waves 1–39)').first()).toBeVisible();
+    await expect(page.locator('text=All 182 Studios (Waves 1–40)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v7.9.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.0.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–139)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–142)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v7.9.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.0.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
   });
 
-  test('Authenticated Command Center displays v7.9.0 badge, 178 active studios, and Wave 39 modules', async ({ context, page }) => {
+  test('Authenticated Command Center displays v8.0.0 badge, 182 active studios, and Wave 40 modules', async ({ context, page }) => {
     await mockAuthenticatedSession(context, page);
 
     await page.route('/api/notifications*', async (route) => {
@@ -599,35 +599,35 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     await page.goto('/dashboard');
     await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
-    await expect(page.getByText(/v7\.9\.0\s+•\s+Waves 1–39\s+•\s+139 Capabilities/).first()).toBeVisible();
-    await expect(page.locator('text=178 Active Modules').first()).toBeVisible();
+    await expect(page.getByText(/v8\.0\.0\s+•\s+Waves 1–40\s+•\s+142 Capabilities/).first()).toBeVisible();
+    await expect(page.locator('text=182 Active Modules').first()).toBeVisible();
 
-    const searchInput = page.locator('input[placeholder="Search 178 modules..."]');
+    const searchInput = page.locator('input[placeholder="Search 182 modules..."]');
     await expect(searchInput).toBeVisible();
 
-    await searchInput.fill('Grothendieck Topos');
-    const toposTab = page.locator('button:has-text("Grothendieck Topos (Cap 137)")');
-    await expect(toposTab).toBeVisible();
-    await toposTab.click();
-    await expect(page.locator('text=Capability 137: Grothendieck Topos').first()).toBeVisible();
+    await searchInput.fill('Factorization Homology');
+    const facTab = page.locator('button:has-text("Factorization Homology (Cap 140)")');
+    await expect(facTab).toBeVisible();
+    await facTab.click();
+    await expect(page.locator('text=Capability 140: Ayala-Francis Factorization Homology').first()).toBeVisible();
 
-    await searchInput.fill('Motivic Galois');
-    const motivicTab = page.locator('button:has-text("Motivic Galois (Cap 138)")');
-    await expect(motivicTab).toBeVisible();
-    await motivicTab.click();
-    await expect(page.locator('text=Capability 138: Motivic Galois').first()).toBeVisible();
+    await searchInput.fill('Condensed Mathematics');
+    const condTab = page.locator('button:has-text("Condensed Mathematics (Cap 141)")');
+    await expect(condTab).toBeVisible();
+    await condTab.click();
+    await expect(page.locator('text=Capability 141: Clausen-Scholze Condensed Mathematics').first()).toBeVisible();
 
-    await searchInput.fill('Resurgence Transseries');
-    const resurgTab = page.locator('button:has-text("Resurgence Transseries (Cap 139)")');
-    await expect(resurgTab).toBeVisible();
-    await resurgTab.click();
-    await expect(page.locator('text=Capability 139: Ecalle Alien-Calculus').first()).toBeVisible();
+    await searchInput.fill('Derived Shifted Symplectic');
+    const sympTab = page.locator('button:has-text("Derived Shifted Symplectic (Cap 142)")');
+    await expect(sympTab).toBeVisible();
+    await sympTab.click();
+    await expect(page.locator('text=Capability 142: PTVV Derived Shifted-Symplectic').first()).toBeVisible();
 
-    await searchInput.fill('Berry-Curvature Grid');
-    const berryTab = page.locator('button:has-text("Berry-Curvature Grid (Option B)")');
-    await expect(berryTab).toBeVisible();
-    await berryTab.click();
-    await expect(page.locator('text=Option B Wave 39: Planetary Topological Berry-Curvature').first()).toBeVisible();
+    await searchInput.fill('Quantum Ratchet Grid');
+    const ratchetTab = page.locator('button:has-text("Quantum Ratchet Grid (Option B)")');
+    await expect(ratchetTab).toBeVisible();
+    await ratchetTab.click();
+    await expect(page.locator('text=Option B Wave 40: Planetary Non-Hermitian PT-Symmetric').first()).toBeVisible();
   });
 
   test('ZTNAManager surfaces inline role="alert" without dialog popups on upstream HTTP 500', async ({ context, page }) => {
@@ -661,7 +661,7 @@ test.describe('SageAI Web E2E Test Suite', () => {
     });
 
     await page.goto('/dashboard');
-    const searchInput = page.locator('input[placeholder="Search 178 modules..."]');
+    const searchInput = page.locator('input[placeholder="Search 182 modules..."]');
     await searchInput.fill('Zero-Trust');
     const ztnaTab = page.locator('button:has-text("Zero-Trust")');
     await expect(ztnaTab).toBeVisible();

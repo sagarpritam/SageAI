@@ -1394,6 +1394,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 39 (Opt B): Berry-Curvature Baseload Harvest",
         ),
+        # Wave 40: Factorization Homology, Condensed Mathematics, Derived Shifted-Symplectic & Non-Hermitian Ratchet Grid
+        (
+            "GET",
+            "/api/factorization-homology-tft/manifolds",
+            None,
+            "Wave 40 (Cap 140): Factorization Homology Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/factorization-homology-tft/seal-manifold",
+            {
+                "manifold_id": "FACTORIZATION-E3-S3-01",
+                "operad_dimension": 3,
+                "excision_strata_depth": 12,
+                "koszul_duality_order": 6,
+                "excision_gain": 1.6,
+            },
+            "Wave 40 (Cap 140): Factorization Homology Manifold Seal",
+        ),
+        (
+            "GET",
+            "/api/condensed-liquid-mathematics/modules",
+            None,
+            "Wave 40 (Cap 141): Condensed Liquid Modules List",
+        ),
+        (
+            "POST",
+            "/api/condensed-liquid-mathematics/seal-condensed",
+            {
+                "module_id": "LIQUID-SCHOLZE-P05-01",
+                "liquid_exponent_p": 0.5,
+                "profinite_stone_rank": 16,
+                "ext_vanishing_degree": 6,
+                "condensed_gain": 1.6,
+            },
+            "Wave 40 (Cap 141): Condensed Liquid Solidification Seal",
+        ),
+        (
+            "GET",
+            "/api/derived-shifted-symplectic/stacks",
+            None,
+            "Wave 40 (Cap 142): Derived Shifted-Symplectic Stacks List",
+        ),
+        (
+            "POST",
+            "/api/derived-shifted-symplectic/seal-lagrangian",
+            {
+                "stack_id": "PTVV-AKSZ-CY3-01",
+                "symplectic_shift_n": -1,
+                "lagrangian_intersection_rank": 10,
+                "aksz_transgression_degree": 6,
+                "symplectic_gain": 1.6,
+            },
+            "Wave 40 (Cap 142): PTVV Derived Lagrangian Seal",
+        ),
+        (
+            "GET",
+            "/api/quantum-thermoelectric-power/harvesters",
+            None,
+            "Wave 40 (Opt B): Non-Hermitian Quantum Ratchet Harvesters List",
+        ),
+        (
+            "POST",
+            "/api/quantum-thermoelectric-power/harvest-ratchet",
+            {
+                "harvester_id": "NONHERM-SKIN-ARRAY-01",
+                "bath_gradient_kelvin": 420.0,
+                "nonhermitian_gain": 1.6,
+            },
+            "Wave 40 (Opt B): Non-Hermitian Quantum Ratchet Baseload Harvest",
+        ),
     ]
 
 
@@ -1423,7 +1494,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-39, CAPS 1-139) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-40, CAPS 1-142) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1438,7 +1509,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-39 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-40 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1495,7 +1566,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-39){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-40){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1511,7 +1582,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-39 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-40 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1523,7 +1594,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 208)
+        total_requests if total_requests is not None else max(endpoints_count, 216)
     )
 
     if in_process:
@@ -1559,7 +1630,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-39, Capabilities 1-139) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-40, Capabilities 1-142) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

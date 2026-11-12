@@ -20,6 +20,7 @@ export function AISOCCommandCenter() {
   const [briefingLoading, setBriefingLoading] = useState(false);
   const [triageReport, setTriageReport] = useState<any>(null);
   const [briefing, setBriefing] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const sampleAlerts = [
     { id: "ALT-01", source_ip: "198.51.100.42", target_asset: "prod-api-gateway", type: "sqli_probe", severity: "LOW", category: "waf_probe" },
@@ -37,18 +38,20 @@ export function AISOCCommandCenter() {
   const runTriage = async () => {
     setLoading(true);
     setBriefing(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ai-soc/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ raw_alerts: sampleAlerts }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setTriageReport(data.triage_report);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} running neural alert triage`);
       }
+      const data = await res.json();
+      setTriageReport(data.triage_report);
     } catch (e) {
-      console.error("Triage failed", e);
+      setErrorMsg(e instanceof Error ? e.message : "Neural alert triage failed");
     } finally {
       setLoading(false);
     }
@@ -57,18 +60,20 @@ export function AISOCCommandCenter() {
   const generateBriefing = async () => {
     if (!triageReport) return;
     setBriefingLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ai-soc/briefing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ triage_report: triageReport }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setBriefing(data.executive_briefing);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} generating CISO briefing`);
       }
+      const data = await res.json();
+      setBriefing(data.executive_briefing);
     } catch (e) {
-      console.error("Briefing failed", e);
+      setErrorMsg(e instanceof Error ? e.message : "CISO briefing generation failed");
     } finally {
       setBriefingLoading(false);
     }
@@ -97,6 +102,7 @@ export function AISOCCommandCenter() {
           </div>
 
           <button
+            type="button"
             onClick={runTriage}
             disabled={loading}
             className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-cyan-950/40"
@@ -105,6 +111,22 @@ export function AISOCCommandCenter() {
             Run Neural Alert Triage
           </button>
         </div>
+
+        {errorMsg && (
+          <div role="alert" className="mt-4 p-3 rounded-lg bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-rose-300 hover:text-white px-2 py-0.5 rounded bg-rose-900/50"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Highlight Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6">
@@ -143,6 +165,7 @@ export function AISOCCommandCenter() {
               Correlated Attack Clusters ({triageReport.incidents.length})
             </h3>
             <button
+              type="button"
               onClick={generateBriefing}
               disabled={briefingLoading}
               className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"

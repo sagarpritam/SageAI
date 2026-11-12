@@ -12,12 +12,14 @@ import {
   RefreshCw,
   Cpu,
   Flame,
+  AlertTriangle,
 } from "lucide-react";
 
 export function AdversaryEmulationStudio() {
   const [selectedCampaign, setSelectedCampaign] = useState("APT29_COZY_BEAR");
   const [loading, setLoading] = useState(false);
   const [atomicLoading, setAtomicLoading] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [campaignReport, setCampaignReport] = useState<any>(null);
   const [atomicResult, setAtomicResult] = useState<any>(null);
 
@@ -39,6 +41,7 @@ export function AdversaryEmulationStudio() {
 
   const runCampaign = async () => {
     setLoading(true);
+    setErrorMsg(null);
     setAtomicResult(null);
     try {
       const res = await fetch("/api/atomic-redteam/run", {
@@ -49,12 +52,16 @@ export function AdversaryEmulationStudio() {
           target_network: "prod-vpc-us-east-1",
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setCampaignReport(data.campaign_report);
+      const data = (await res.json().catch(() => ({}))) as {
+        campaign_report?: any;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Adversary campaign simulation failed");
       }
-    } catch (e) {
-      console.error(e);
+      setCampaignReport(data.campaign_report);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Adversary campaign simulation failed");
     } finally {
       setLoading(false);
     }
@@ -62,6 +69,7 @@ export function AdversaryEmulationStudio() {
 
   const runAtomic = async (techId: string) => {
     setAtomicLoading(techId);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/atomic-redteam/run", {
         method: "POST",
@@ -72,12 +80,16 @@ export function AdversaryEmulationStudio() {
           dry_run: true,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setAtomicResult(data.result);
+      const data = (await res.json().catch(() => ({}))) as {
+        result?: any;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || `Atomic technique ${techId} execution failed`);
       }
-    } catch (e) {
-      console.error(e);
+      setAtomicResult(data.result);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : `Atomic technique ${techId} execution failed`);
     } finally {
       setAtomicLoading(null);
     }
@@ -100,6 +112,7 @@ export function AdversaryEmulationStudio() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={runCampaign}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-red-950/40 disabled:opacity-50"
@@ -109,6 +122,25 @@ export function AdversaryEmulationStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Campaign Selector Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -243,6 +275,7 @@ export function AdversaryEmulationStudio() {
                     <p className="text-xs font-medium text-white">{tech.name}</p>
                   </div>
                   <button
+                    type="button"
                     onClick={() => runAtomic(tech.id)}
                     disabled={atomicLoading === tech.id}
                     className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-md text-xs transition-colors disabled:opacity-50"

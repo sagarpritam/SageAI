@@ -252,6 +252,10 @@ import ToposGrothendieckStudio from "@/components/ToposGrothendieckStudio";
 import MotivicGaloisStudio from "@/components/MotivicGaloisStudio";
 import ResurgenceTransseriesStudio from "@/components/ResurgenceTransseriesStudio";
 import BerryCurvaturePowerStudio from "@/components/BerryCurvaturePowerStudio";
+import FactorizationHomologyStudio from "@/components/FactorizationHomologyStudio";
+import CondensedLiquidMathStudio from "@/components/CondensedLiquidMathStudio";
+import DerivedShiftedSymplecticStudio from "@/components/DerivedShiftedSymplecticStudio";
+import QuantumThermoelectricPowerStudio from "@/components/QuantumThermoelectricPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -260,6 +264,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "factorization-homology-tft", label: "Factorization Homology (Cap 140)", icon: Layers },
+  { id: "condensed-liquid-mathematics", label: "Condensed Mathematics (Cap 141)", icon: Shield },
+  { id: "derived-shifted-symplectic", label: "Derived Shifted Symplectic (Cap 142)", icon: Activity },
+  { id: "quantum-thermoelectric-power", label: "Quantum Ratchet Grid (Option B)", icon: Zap },
   { id: "topos-grothendieck-firewall", label: "Grothendieck Topos (Cap 137)", icon: Layers },
   { id: "motivic-galois-cohomology", label: "Motivic Galois (Cap 138)", icon: GitBranch },
   { id: "resurgence-transseries-shield", label: "Resurgence Transseries (Cap 139)", icon: Activity },
@@ -663,6 +671,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "factorization-homology-tft" && <FactorizationHomologyStudio />}
+          {activeTab === "condensed-liquid-mathematics" && <CondensedLiquidMathStudio />}
+          {activeTab === "derived-shifted-symplectic" && <DerivedShiftedSymplecticStudio />}
+          {activeTab === "quantum-thermoelectric-power" && <QuantumThermoelectricPowerStudio />}
           {activeTab === "topos-grothendieck-firewall" && <ToposGrothendieckStudio />}
           {activeTab === "motivic-galois-cohomology" && <MotivicGaloisStudio />}
           {activeTab === "resurgence-transseries-shield" && <ResurgenceTransseriesStudio />}

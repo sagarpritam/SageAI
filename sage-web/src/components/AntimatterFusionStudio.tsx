@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Rocket, RefreshCw, Activity, Shield, Flame, Gauge, Zap } from 'lucide-react';
+import { Rocket, RefreshCw, Activity, Shield, Flame, Gauge, Zap, AlertTriangle } from 'lucide-react';
 
 interface ACFThruster {
   thruster_id: string;
@@ -43,10 +43,15 @@ export default function AntimatterFusionStudio() {
   const [repRate, setRepRate] = useState<number>(30.0);
   const [loading, setLoading] = useState<boolean>(false);
   const [telemetry, setTelemetry] = useState<PulseResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchThrusters = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/antimatter-fusion/thrusters');
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} loading ACF thrusters`);
+      }
       const data = await res.json();
       if (data.thrusters) {
         setThrusters(data.thrusters);
@@ -55,7 +60,7 @@ export default function AntimatterFusionStudio() {
         }
       }
     } catch (err) {
-      console.error('Failed to load ACF thrusters', err);
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load ACF thrusters');
     }
   }, []);
 
@@ -65,6 +70,7 @@ export default function AntimatterFusionStudio() {
 
   const handleIgnite = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/antimatter-fusion/ignite-pulse', {
         method: 'POST',
@@ -76,10 +82,13 @@ export default function AntimatterFusionStudio() {
           rep_rate_hz: repRate,
         }),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} igniting ACF pulse`);
+      }
       const data = await res.json();
       setTelemetry(data);
     } catch (err) {
-      console.error('ACF pulse ignition failed', err);
+      setErrorMsg(err instanceof Error ? err.message : 'ACF pulse ignition failed');
     } finally {
       setLoading(false);
     }
@@ -102,6 +111,7 @@ export default function AntimatterFusionStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchThrusters}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -109,6 +119,22 @@ export default function AntimatterFusionStudio() {
           <span>Refresh Thrusters</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-3 rounded-lg bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-rose-300 hover:text-white px-2 py-0.5 rounded bg-rose-900/50"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {thrusters.map((t) => (
@@ -199,6 +225,7 @@ export default function AntimatterFusionStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleIgnite}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-rose-950/50"

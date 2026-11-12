@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.9.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.0.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.9.0");
-    expect(healthJson.version).toBe("7.9.0");
+    expect(healthJson.platform_version).toBe("8.0.0");
+    expect(healthJson.version).toBe("8.0.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1083,6 +1083,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(berryBody.status).toBe("BERRY_CURVATURE_GRID_OPTIMAL");
     expect(berryBody.zero_fossil_carbon).toBe(true);
     expect(Number(berryBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 40 studios (Caps 140-142 & Option B) return 200 deterministically offline
+    const facList = await request.get("/api/factorization-homology-tft/manifolds");
+    expect(facList.status()).toBe(200);
+    const facSim = await request.post("/api/factorization-homology-tft/seal-manifold", {
+      data: {
+        manifold_id: "FACTORIZATION-E3-S3-01",
+        operad_dimension: 3,
+        excision_strata_depth: 12,
+        koszul_duality_order: 6,
+      },
+    });
+    expect(facSim.status()).toBe(200);
+    expect(((await facSim.json()) as { status?: string }).status).toBe(
+      "FACTORIZATION_MANIFOLD_SEALED"
+    );
+
+    const condList = await request.get("/api/condensed-liquid-mathematics/modules");
+    expect(condList.status()).toBe(200);
+    const condSim = await request.post("/api/condensed-liquid-mathematics/seal-condensed", {
+      data: {
+        module_id: "LIQUID-SCHOLZE-P05-01",
+        liquid_exponent_p: 0.5,
+        profinite_stone_rank: 16,
+        ext_vanishing_degree: 6,
+      },
+    });
+    expect(condSim.status()).toBe(200);
+    expect(((await condSim.json()) as { status?: string }).status).toBe(
+      "CONDENSED_LIQUID_SEALED"
+    );
+
+    const sympList = await request.get("/api/derived-shifted-symplectic/stacks");
+    expect(sympList.status()).toBe(200);
+    const sympSim = await request.post("/api/derived-shifted-symplectic/seal-lagrangian", {
+      data: {
+        stack_id: "PTVV-AKSZ-CY3-01",
+        symplectic_shift_n: -1,
+        lagrangian_intersection_rank: 10,
+        aksz_transgression_degree: 6,
+      },
+    });
+    expect(sympSim.status()).toBe(200);
+    expect(((await sympSim.json()) as { status?: string }).status).toBe(
+      "DERIVED_LAGRANGIAN_SEALED"
+    );
+
+    const ratchetList = await request.get("/api/quantum-thermoelectric-power/harvesters");
+    expect(ratchetList.status()).toBe(200);
+    const ratchetSim = await request.post("/api/quantum-thermoelectric-power/harvest-ratchet", {
+      data: {
+        harvester_id: "NONHERM-SKIN-ARRAY-01",
+        bath_gradient_kelvin: 420.0,
+        nonhermitian_gain: 1.6,
+      },
+    });
+    expect(ratchetSim.status()).toBe(200);
+    const ratchetBody = (await ratchetSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(ratchetBody.status).toBe("THERMOELECTRIC_RATCHET_OPTIMAL");
+    expect(ratchetBody.zero_fossil_carbon).toBe(true);
+    expect(Number(ratchetBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });
