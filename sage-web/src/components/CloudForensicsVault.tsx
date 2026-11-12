@@ -53,11 +53,17 @@ export function CloudForensicsVault() {
   const [resourceId, setResourceId] = useState("vol-0a8912cf882b (prod-db-volume)");
   const [incidentId, setIncidentId] = useState("INC-2026-9481");
   const [creating, setCreating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSnapshots = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cloud-forensics/snapshots");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Failed to load snapshots (${res.status})`);
+      }
       const data = await res.json();
       if (data.snapshots) {
         setSnapshots(data.snapshots);
@@ -65,6 +71,8 @@ export function CloudForensicsVault() {
           setSelectedSnapshot((prev) => prev || data.snapshots[0]);
         }
       }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load forensic snapshots");
     } finally {
       setLoading(false);
     }
@@ -77,6 +85,7 @@ export function CloudForensicsVault() {
   async function handleCreateSnapshot(e: React.FormEvent) {
     e.preventDefault();
     setCreating(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cloud-forensics/snapshots", {
         method: "POST",
@@ -89,11 +98,17 @@ export function CloudForensicsVault() {
           memory_capture: true,
         }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Snapshot capture failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.snapshot) {
         setSnapshots((prev) => [data.snapshot, ...prev]);
         setSelectedSnapshot(data.snapshot);
       }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to capture cloud forensic snapshot");
     } finally {
       setCreating(false);
     }
@@ -101,16 +116,23 @@ export function CloudForensicsVault() {
 
   async function handleVerify(snapshotId: string) {
     setVerifying(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cloud-forensics/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ snapshot_id: snapshotId }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Hash verification failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.verification) {
         setVerificationResult(data.verification);
       }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to verify forensic snapshot hashes");
     } finally {
       setVerifying(false);
     }
@@ -118,6 +140,25 @@ export function CloudForensicsVault() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-800/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -136,6 +177,7 @@ export function CloudForensicsVault() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchSnapshots}
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >
@@ -244,6 +286,7 @@ export function CloudForensicsVault() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleVerify(selectedSnapshot.snapshot_id)}
                     disabled={verifying}
                     className="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 text-xs font-medium border border-emerald-500/30 transition flex items-center gap-1.5"
@@ -252,6 +295,7 @@ export function CloudForensicsVault() {
                     Verify Hashes
                   </button>
                   <button
+                    type="button"
                     onClick={() => setShowManifestModal(true)}
                     className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition flex items-center gap-1.5"
                   >
@@ -331,6 +375,7 @@ export function CloudForensicsVault() {
                 Federal Rules of Evidence FRE 902(13/14) Certificate
               </h3>
               <button
+                type="button"
                 onClick={() => setShowManifestModal(false)}
                 className="text-xs text-slate-400 hover:text-white"
               >
@@ -351,6 +396,7 @@ export function CloudForensicsVault() {
             </div>
             <div className="flex justify-end">
               <button
+                type="button"
                 onClick={() => setShowManifestModal(false)}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium"
               >

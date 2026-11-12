@@ -35,6 +35,7 @@ export function CanaryFabricCenter() {
   const [deploying, setDeploying] = useState(false);
   const [tripwireLoading, setTripwireLoading] = useState(false);
   const [latestBreachEvent, setLatestBreachEvent] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // New Canary Form state
   const [newType, setNewType] = useState("CLOUD_IAM");
@@ -43,14 +44,17 @@ export function CanaryFabricCenter() {
 
   const fetchCanaries = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/canary-fabric/tokens");
-      if (res.ok) {
-        const data = await res.json();
-        setCanaries(data.canaries || []);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Failed to load canary tokens (${res.status})`);
       }
+      const data = await res.json();
+      setCanaries(data.canaries || []);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load canary fabric tokens");
     } finally {
       setLoading(false);
     }
@@ -62,6 +66,7 @@ export function CanaryFabricCenter() {
 
   const deployToken = async () => {
     setDeploying(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/canary-fabric/deploy", {
         method: "POST",
@@ -72,12 +77,14 @@ export function CanaryFabricCenter() {
           memo: newMemo,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setCanaries((prev) => [data.canary, ...prev]);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Canary deployment failed (${res.status})`);
       }
+      const data = await res.json();
+      setCanaries((prev) => [data.canary, ...prev]);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to plant synthetic honeytoken");
     } finally {
       setDeploying(false);
     }
@@ -86,6 +93,7 @@ export function CanaryFabricCenter() {
   const simulateTripwire = async (canaryId: string) => {
     setTripwireLoading(true);
     setLatestBreachEvent(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/canary-fabric/tripwire", {
         method: "POST",
@@ -98,19 +106,21 @@ export function CanaryFabricCenter() {
           auto_isolate_host: true,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLatestBreachEvent(data.event);
-        setCanaries((prev) =>
-          prev.map((c) =>
-            c.canary_id === canaryId
-              ? { ...c, status: "TRIPWIRE_TRIGGERED_ACTIVE_ALERT", tripwire_count: c.tripwire_count + 1 }
-              : c
-          )
-        );
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Tripwire simulation failed (${res.status})`);
       }
+      const data = await res.json();
+      setLatestBreachEvent(data.event);
+      setCanaries((prev) =>
+        prev.map((c) =>
+          c.canary_id === canaryId
+            ? { ...c, status: "TRIPWIRE_TRIGGERED_ACTIVE_ALERT", tripwire_count: c.tripwire_count + 1 }
+            : c
+        )
+      );
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to simulate canary tripwire");
     } finally {
       setTripwireLoading(false);
     }
@@ -118,6 +128,25 @@ export function CanaryFabricCenter() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-red-950/30 to-slate-900 border border-amber-500/20 backdrop-blur-sm">
         <div className="flex items-center gap-3">
@@ -138,6 +167,7 @@ export function CanaryFabricCenter() {
         </div>
 
         <button
+          type="button"
           onClick={fetchCanaries}
           disabled={loading}
           className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition"
@@ -220,6 +250,7 @@ export function CanaryFabricCenter() {
               </div>
 
               <button
+                type="button"
                 onClick={deployToken}
                 disabled={deploying}
                 className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs transition shadow-lg shadow-amber-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
@@ -281,6 +312,7 @@ export function CanaryFabricCenter() {
                       Tripwire Trips: {c.tripwire_count}
                     </span>
                     <button
+                      type="button"
                       onClick={() => simulateTripwire(c.canary_id)}
                       disabled={tripwireLoading}
                       className="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-mono text-[11px] transition flex items-center gap-1.5"

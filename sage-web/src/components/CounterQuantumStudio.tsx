@@ -13,6 +13,7 @@ import {
   Flame,
   Binary,
   AlertOctagon,
+  AlertTriangle,
 } from "lucide-react";
 
 interface QuantumInterceptor {
@@ -62,14 +63,21 @@ export function CounterQuantumStudio() {
   const [injecting, setInjecting] = useState(false);
   const [trippingDecoherence, setTrippingDecoherence] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchInterceptorsAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [itRes, metRes] = await Promise.all([
         fetch("/api/counter-quantum/interceptors"),
         fetch("/api/counter-quantum/metrics"),
       ]);
+      if (!itRes.ok || !metRes.ok) {
+        const failedRes = !itRes.ok ? itRes : metRes;
+        const errData = await failedRes.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Counter-quantum telemetry failed (${failedRes.status})`);
+      }
       const itData = await itRes.json();
       const metData = await metRes.json();
 
@@ -83,7 +91,7 @@ export function CounterQuantumStudio() {
         setMetrics(metData.metrics);
       }
     } catch (e) {
-      console.error("Failed to load counter-quantum data", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load counter-quantum telemetry");
     } finally {
       setLoading(false);
     }
@@ -96,6 +104,7 @@ export function CounterQuantumStudio() {
   const handleInjectChaff = async () => {
     if (!selectedItId) return;
     setInjecting(true);
+    setErrorMsg(null);
     try {
       const payload = {
         interceptor_id: selectedItId,
@@ -109,13 +118,17 @@ export function CounterQuantumStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Honey-chaff injection failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.injection) {
         setLatestInjection(data.injection);
         fetchInterceptorsAndMetrics();
       }
     } catch (e) {
-      console.error("Failed to inject quantum honey-chaff", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to inject quantum honey-chaff");
     } finally {
       setInjecting(false);
     }
@@ -124,6 +137,7 @@ export function CounterQuantumStudio() {
   const handleTriggerDecoherence = async () => {
     if (!selectedItId) return;
     setTrippingDecoherence(true);
+    setErrorMsg(null);
     try {
       const payload = {
         interceptor_id: selectedItId,
@@ -135,13 +149,17 @@ export function CounterQuantumStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Decoherence trigger failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.decoherence) {
         setLatestDecoherence(data.decoherence);
         fetchInterceptorsAndMetrics();
       }
     } catch (e) {
-      console.error("Failed to trigger quantum decoherence", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to trigger quantum decoherence");
     } finally {
       setTrippingDecoherence(false);
     }
@@ -151,6 +169,25 @@ export function CounterQuantumStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div className="relative overflow-hidden rounded-xl border border-fuchsia-800/50 bg-gradient-to-r from-slate-950 via-fuchsia-950/20 to-slate-950 p-6 shadow-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -173,6 +210,7 @@ export function CounterQuantumStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchInterceptorsAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -223,6 +261,7 @@ export function CounterQuantumStudio() {
             <div className="space-y-2">
               {interceptors.map((it) => (
                 <button
+                  type="button"
                   key={it.interceptor_id}
                   onClick={() => setSelectedItId(it.interceptor_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -303,6 +342,7 @@ export function CounterQuantumStudio() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={handleInjectChaff}
                   disabled={injecting}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-fuchsia-600/20 disabled:opacity-50"
@@ -311,6 +351,7 @@ export function CounterQuantumStudio() {
                   {injecting ? "Injecting..." : "Inject Honey Chaff"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleTriggerDecoherence}
                   disabled={trippingDecoherence}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-rose-600/20 disabled:opacity-50"

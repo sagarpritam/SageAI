@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Cpu,
   AlertCircle,
+  AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
 
@@ -39,6 +40,7 @@ export function APTAttributionCenter() {
   const [actors, setActors] = useState<ActorProfile[]>([]);
   const [selectedActor, setSelectedActor] = useState<ActorProfile | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // IOC Analysis state
   const [indicatorInput, setIndicatorInput] = useState("194.26.29.112");
@@ -48,8 +50,13 @@ export function APTAttributionCenter() {
 
   const fetchActors = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/apt-attribution/actors");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Failed to load APT actors (${res.status})`);
+      }
       const data = await res.json();
       if (data.actors) {
         setActors(data.actors);
@@ -57,6 +64,8 @@ export function APTAttributionCenter() {
           setSelectedActor((prev) => prev || data.actors[0]);
         }
       }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load APT actor profiles");
     } finally {
       setLoading(false);
     }
@@ -69,6 +78,7 @@ export function APTAttributionCenter() {
   async function handleAnalyzeIOC(e: React.FormEvent) {
     e.preventDefault();
     setAnalyzing(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/apt-attribution/analyze-ioc", {
         method: "POST",
@@ -78,10 +88,16 @@ export function APTAttributionCenter() {
           ja4_fingerprint: ja4Input || undefined,
         }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `IOC attribution failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.attribution) {
         setAnalysisResult(data.attribution);
       }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to execute IOC attribution query");
     } finally {
       setAnalyzing(false);
     }
@@ -89,6 +105,25 @@ export function APTAttributionCenter() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-950 border border-amber-800/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -107,6 +142,7 @@ export function APTAttributionCenter() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchActors}
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >

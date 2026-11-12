@@ -14,6 +14,7 @@ import {
   Sliders,
   Wifi,
   Cpu,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Emitter {
@@ -72,14 +73,21 @@ export function CognitiveEWStudio() {
   const [synthesizing, setSynthesizing] = useState(false);
   const [engaging, setEngaging] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchEmittersAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [emitRes, metRes] = await Promise.all([
         fetch("/api/cognitive-ew/emitters"),
         fetch("/api/cognitive-ew/metrics"),
       ]);
+      if (!emitRes.ok || !metRes.ok) {
+        const failedRes = !emitRes.ok ? emitRes : metRes;
+        const errData = await failedRes.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Cognitive EW telemetry failed (${failedRes.status})`);
+      }
       const emitData = await emitRes.json();
       const metData = await metRes.json();
 
@@ -93,7 +101,7 @@ export function CognitiveEWStudio() {
         setMetrics(metData.metrics);
       }
     } catch (e) {
-      console.error("Failed to load cognitive EW data", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load cognitive EW telemetry");
     } finally {
       setLoading(false);
     }
@@ -106,6 +114,7 @@ export function CognitiveEWStudio() {
   const handleSynthesize = async () => {
     if (!selectedEmitterId) return;
     setSynthesizing(true);
+    setErrorMsg(null);
     try {
       const em = emitters.find((e) => e.emitter_id === selectedEmitterId);
       const payload = {
@@ -121,12 +130,16 @@ export function CognitiveEWStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `DRFM synthesis failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.waveform) {
         setLatestWaveform(data.waveform);
       }
     } catch (e) {
-      console.error("Failed to synthesize DRFM waveform", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to synthesize DRFM waveform");
     } finally {
       setSynthesizing(false);
     }
@@ -135,6 +148,7 @@ export function CognitiveEWStudio() {
   const handleEngage = async () => {
     if (!selectedEmitterId) return;
     setEngaging(true);
+    setErrorMsg(null);
     try {
       const payload = {
         emitter_id: selectedEmitterId,
@@ -147,13 +161,17 @@ export function CognitiveEWStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `EW countermeasure engagement failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.engagement) {
         setLatestEngagement(data.engagement);
         fetchEmittersAndMetrics();
       }
     } catch (e) {
-      console.error("Failed to engage cognitive countermeasure", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to engage cognitive countermeasure");
     } finally {
       setEngaging(false);
     }
@@ -163,6 +181,25 @@ export function CognitiveEWStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div className="relative overflow-hidden rounded-xl border border-amber-800/50 bg-gradient-to-r from-slate-950 via-amber-950/20 to-slate-950 p-6 shadow-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -185,6 +222,7 @@ export function CognitiveEWStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchEmittersAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -235,6 +273,7 @@ export function CognitiveEWStudio() {
             <div className="space-y-2">
               {emitters.map((e) => (
                 <button
+                  type="button"
                   key={e.emitter_id}
                   onClick={() => setSelectedEmitterId(e.emitter_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -331,6 +370,7 @@ export function CognitiveEWStudio() {
 
               <div className="flex items-end gap-3">
                 <button
+                  type="button"
                   onClick={handleSynthesize}
                   disabled={synthesizing}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all shadow-md shadow-amber-600/20 disabled:opacity-50"
@@ -339,6 +379,7 @@ export function CognitiveEWStudio() {
                   {synthesizing ? "Synthesizing..." : "Synthesize DRFM"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleEngage}
                   disabled={engaging}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all shadow-md shadow-rose-600/20 disabled:opacity-50"

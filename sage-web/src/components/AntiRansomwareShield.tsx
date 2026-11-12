@@ -14,12 +14,14 @@ import {
   CheckCircle2,
   Cpu,
   Layers,
+  AlertTriangle,
 } from "lucide-react";
 
 export function AntiRansomwareShield() {
   const [loading, setLoading] = useState(false);
   const [canariesDeployed, setCanariesDeployed] = useState(true);
   const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const canaries = [
     { name: "passwords_vault_2026.docx", path: "/shared/finance/passwords_vault_2026.docx", status: "ARMED", trips: 0 },
@@ -30,14 +32,17 @@ export function AntiRansomwareShield() {
 
   const runSimulation = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ransomware/simulate", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setSimulationResult(data.simulation_result);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Simulation failed (${res.status})`);
       }
+      const data = await res.json();
+      setSimulationResult(data.simulation_result);
     } catch (e) {
-      console.error("Simulation failed", e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to run ransomware detonation simulation");
     } finally {
       setLoading(false);
     }
@@ -45,6 +50,25 @@ export function AntiRansomwareShield() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-red-950/40 via-zinc-950 to-zinc-900 border border-red-900/40 rounded-xl p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -66,6 +90,7 @@ export function AntiRansomwareShield() {
           </div>
 
           <button
+            type="button"
             onClick={runSimulation}
             disabled={loading}
             className="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-red-950/40"

@@ -256,6 +256,10 @@ import FactorizationHomologyStudio from "@/components/FactorizationHomologyStudi
 import CondensedLiquidMathStudio from "@/components/CondensedLiquidMathStudio";
 import DerivedShiftedSymplecticStudio from "@/components/DerivedShiftedSymplecticStudio";
 import QuantumThermoelectricPowerStudio from "@/components/QuantumThermoelectricPowerStudio";
+import HitchinModuliStudio from "@/components/HitchinModuliStudio";
+import GeometricSatakeStudio from "@/components/GeometricSatakeStudio";
+import HomotopyUnivalenceStudio from "@/components/HomotopyUnivalenceStudio";
+import TwistedSupergridPowerStudio from "@/components/TwistedSupergridPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -264,6 +268,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "hitchin-moduli-hyperkahler", label: "Hitchin Moduli (Cap 143)", icon: Compass },
+  { id: "geometric-satake-kashiwara", label: "Geometric Satake (Cap 144)", icon: Layers },
+  { id: "homotopy-type-univalence", label: "HoTT Univalence (Cap 145)", icon: Box },
+  { id: "twisted-bilayer-supergrid", label: "Andreev Supergrid (Option B)", icon: Zap },
   { id: "factorization-homology-tft", label: "Factorization Homology (Cap 140)", icon: Layers },
   { id: "condensed-liquid-mathematics", label: "Condensed Mathematics (Cap 141)", icon: Shield },
   { id: "derived-shifted-symplectic", label: "Derived Shifted Symplectic (Cap 142)", icon: Activity },
@@ -671,6 +679,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "hitchin-moduli-hyperkahler" && <HitchinModuliStudio />}
+          {activeTab === "geometric-satake-kashiwara" && <GeometricSatakeStudio />}
+          {activeTab === "homotopy-type-univalence" && <HomotopyUnivalenceStudio />}
+          {activeTab === "twisted-bilayer-supergrid" && <TwistedSupergridPowerStudio />}
           {activeTab === "factorization-homology-tft" && <FactorizationHomologyStudio />}
           {activeTab === "condensed-liquid-mathematics" && <CondensedLiquidMathStudio />}
           {activeTab === "derived-shifted-symplectic" && <DerivedShiftedSymplecticStudio />}

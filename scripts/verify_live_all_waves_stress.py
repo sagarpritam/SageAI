@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 35 Waves (Capabilities 1 to 127).
+Live Multi-Domain Stress Test & Verification across All 41 Waves (Capabilities 1 to 145).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -1465,6 +1465,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 40 (Opt B): Non-Hermitian Quantum Ratchet Baseload Harvest",
         ),
+        # Wave 41: Hitchin Moduli, Geometric Satake, HoTT Univalence & Twisted-Trilayer Andreev Supergrid
+        (
+            "GET",
+            "/api/hitchin-moduli-hyperkahler/bundles",
+            None,
+            "Wave 41 (Cap 143): Hitchin Moduli Bundles List",
+        ),
+        (
+            "POST",
+            "/api/hitchin-moduli-hyperkahler/seal-hitchin",
+            {
+                "bundle_id": "HITCHIN-SL2C-SIGMA3-01",
+                "riemann_genus": 3,
+                "spectral_network_nodes": 12,
+                "twistor_rotation_deg": 18,
+                "hyperkahler_gain": 1.6,
+            },
+            "Wave 41 (Cap 143): Hitchin Moduli & Hyperkahler Seal",
+        ),
+        (
+            "GET",
+            "/api/geometric-satake-kashiwara/sheaves",
+            None,
+            "Wave 41 (Cap 144): Geometric Satake Sheaves List",
+        ),
+        (
+            "POST",
+            "/api/geometric-satake-kashiwara/seal-crystal",
+            {
+                "sheaf_id": "SATAKE-MV-SL4-01",
+                "dual_group_rank": 4,
+                "crystal_operator_depth": 14,
+                "mv_polytope_vertices": 12,
+                "satake_gain": 1.6,
+            },
+            "Wave 41 (Cap 144): Geometric Satake & Crystal Seal",
+        ),
+        (
+            "GET",
+            "/api/homotopy-type-univalence/universes",
+            None,
+            "Wave 41 (Cap 145): HoTT Univalent Universes List",
+        ),
+        (
+            "POST",
+            "/api/homotopy-type-univalence/seal-univalence",
+            {
+                "universe_id": "HOTT-UNIVALENCE-U0-01",
+                "h_truncation_level": 2,
+                "cubical_dimension": 8,
+                "hit_constructors": 10,
+                "univalence_gain": 1.6,
+            },
+            "Wave 41 (Cap 145): HoTT Univalence Cubical Path Seal",
+        ),
+        (
+            "GET",
+            "/api/twisted-bilayer-supergrid/arrays",
+            None,
+            "Wave 41 (Opt B): Twisted-Trilayer Andreev Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/twisted-bilayer-supergrid/harvest-andreev",
+            {
+                "array_id": "MATTG-ANDREEV-ARRAY-01",
+                "twist_angle_millideg": 1560.0,
+                "quantum_metric_gain": 1.6,
+            },
+            "Wave 41 (Opt B): Andreev Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1494,7 +1565,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-40, CAPS 1-142) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-41, CAPS 1-145) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1509,7 +1580,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-40 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-41 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1566,7 +1637,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-40){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-41){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1582,7 +1653,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-40 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-41 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1594,7 +1665,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 216)
+        total_requests if total_requests is not None else max(endpoints_count, 224)
     )
 
     if in_process:
@@ -1630,7 +1701,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-40, Capabilities 1-142) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-41, Capabilities 1-145) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

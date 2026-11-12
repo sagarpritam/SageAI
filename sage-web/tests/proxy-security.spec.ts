@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.0.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.1.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.0.0");
-    expect(healthJson.version).toBe("8.0.0");
+    expect(healthJson.platform_version).toBe("8.1.0");
+    expect(healthJson.version).toBe("8.1.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1148,6 +1148,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(ratchetBody.status).toBe("THERMOELECTRIC_RATCHET_OPTIMAL");
     expect(ratchetBody.zero_fossil_carbon).toBe(true);
     expect(Number(ratchetBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 41 studios (Caps 143-145 & Option B) return 200 deterministically offline
+    const hitchinList = await request.get("/api/hitchin-moduli-hyperkahler/bundles");
+    expect(hitchinList.status()).toBe(200);
+    const hitchinSim = await request.post("/api/hitchin-moduli-hyperkahler/seal-hitchin", {
+      data: {
+        bundle_id: "HITCHIN-SU2-SPECTRUM-01",
+        higgs_genus_g: 4,
+        hyperkahler_twistor_zeta: 1.5,
+        spectral_sheet_rank: 6,
+      },
+    });
+    expect(hitchinSim.status()).toBe(200);
+    expect(((await hitchinSim.json()) as { status?: string }).status).toBe(
+      "HITCHIN_MODULI_SEALED"
+    );
+
+    const satakeList = await request.get("/api/geometric-satake-kashiwara/sheaves");
+    expect(satakeList.status()).toBe(200);
+    const satakeSim = await request.post("/api/geometric-satake-kashiwara/seal-crystal", {
+      data: {
+        sheaf_id: "SATAKE-AFFINE-GR-E6-01",
+        crystal_highest_weight: 8,
+        perverse_stratum_rank: 12,
+        affine_loop_grade: 6,
+      },
+    });
+    expect(satakeSim.status()).toBe(200);
+    expect(((await satakeSim.json()) as { status?: string }).status).toBe(
+      "SATAKE_CRYSTAL_SEALED"
+    );
+
+    const hottList = await request.get("/api/homotopy-type-univalence/universes");
+    expect(hottList.status()).toBe(200);
+    const hottSim = await request.post("/api/homotopy-type-univalence/seal-univalence", {
+      data: {
+        universe_id: "HOTT-CUBICAL-KAN-01",
+        truncation_level_n: 4,
+        cubical_face_dim: 12,
+        hit_cell_count: 8,
+      },
+    });
+    expect(hottSim.status()).toBe(200);
+    expect(((await hottSim.json()) as { status?: string }).status).toBe(
+      "HOTT_UNIVALENCE_SEALED"
+    );
+
+    const superList = await request.get("/api/twisted-bilayer-supergrid/arrays");
+    expect(superList.status()).toBe(200);
+    const superSim = await request.post("/api/twisted-bilayer-supergrid/harvest-andreev", {
+      data: {
+        array_id: "MATTG-ANDREEV-CORE-01",
+        twist_angle_deg: 1.56,
+        josephson_pump_ghz: 48.0,
+      },
+    });
+    expect(superSim.status()).toBe(200);
+    const superBody = (await superSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(superBody.status).toBe("ANDREEV_SUPERGRID_OPTIMAL");
+    expect(superBody.zero_fossil_carbon).toBe(true);
+    expect(Number(superBody.net_grid_output_gw)).toBeGreaterThan(320.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

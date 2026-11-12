@@ -567,7 +567,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Factorization Homology (Cap 140), Condensed Math (Cap 141), Shifted Symplectic (Cap 142), Grothendieck Topos (Cap 137) & Quantum Ratchet Grid.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Hitchin Moduli (Cap 143), Geometric Satake (Cap 144), HoTT Univalence (Cap 145), Factorization Homology (Cap 140) & Andreev Supergrid.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -740,7 +740,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 40 Factorization Homology & Shifted Symplectic Live', time: '2m ago' },
+    { title: 'Wave 41 Hitchin Moduli, Satake & HoTT Univalence Live', time: '2m ago' },
     { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];

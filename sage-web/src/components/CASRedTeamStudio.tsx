@@ -54,11 +54,17 @@ export function CASRedTeamStudio() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(false);
   const [runningRound, setRunningRound] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchCampaigns = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cas-redteam/campaigns");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Failed to load CAS campaigns (${res.status})`);
+      }
       const data = await res.json();
       if (data.campaigns) {
         setCampaigns(data.campaigns);
@@ -67,7 +73,7 @@ export function CASRedTeamStudio() {
         }
       }
     } catch (err) {
-      console.error("Failed to fetch campaigns", err);
+      setErrorMsg(err instanceof Error ? err.message : "Failed to fetch red-team campaigns");
     } finally {
       setLoading(false);
     }
@@ -80,12 +86,17 @@ export function CASRedTeamStudio() {
   async function handleRunRound() {
     if (!selectedCampaign) return;
     setRunningRound(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cas-redteam/execute-round", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ campaign_id: selectedCampaign.campaign_id }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Swarm round execution failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.result?.finding) {
         setSelectedCampaign((prev) => {
@@ -99,6 +110,8 @@ export function CASRedTeamStudio() {
           };
         });
       }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to execute red-team swarm round");
     } finally {
       setRunningRound(false);
     }
@@ -106,6 +119,25 @@ export function CASRedTeamStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-950 border border-rose-800/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -125,6 +157,7 @@ export function CASRedTeamStudio() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={handleRunRound}
             disabled={runningRound || !selectedCampaign}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs shadow-lg shadow-rose-950/40 transition"
@@ -133,6 +166,7 @@ export function CASRedTeamStudio() {
             Run Swarm Round
           </button>
           <button
+            type="button"
             onClick={fetchCampaigns}
             className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
           >

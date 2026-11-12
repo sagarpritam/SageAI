@@ -112,10 +112,13 @@ from app.routers import (
     gdpr_routes,
     geomagnetic_shield_routes,
     geometric_langlands_routes,
+    geometric_satake_routes,
     gravitational_seismic_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
     higher_form_twogroup_routes,
+    hitchin_moduli_routes,
+    homotopy_univalence_routes,
     horava_lifshitz_routes,
     hypersonic_defense_routes,
     hyperspectral_interceptor_routes,
@@ -210,6 +213,7 @@ from app.routers import (
     time_crystal_routes,
     tmf_cohomology_routes,
     topos_grothendieck_routes,
+    twisted_supergrid_routes,
     twistor_holonomy_routes,
     unruh_rindler_routes,
     web3_security_routes,
@@ -532,6 +536,10 @@ app.include_router(factorization_homology_routes.router)
 app.include_router(condensed_liquid_routes.router)
 app.include_router(derived_symplectic_routes.router)
 app.include_router(quantum_thermoelectric_routes.router)
+app.include_router(hitchin_moduli_routes.router)
+app.include_router(geometric_satake_routes.router)
+app.include_router(homotopy_univalence_routes.router)
+app.include_router(twisted_supergrid_routes.router)
 
 
 # ---------------------

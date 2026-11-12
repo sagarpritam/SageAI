@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–40 • Current",
-    range: "Capabilities 101–142 + Option B",
+    wave: "Waves 27–41 • Current",
+    range: "Capabilities 101–145 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Factorization Homology E_n-Disk Firewall, Clausen-Scholze Condensed Liquid Shield, PTVV Derived Shifted-Symplectic Stack, Grothendieck Topos & Non-Hermitian Quantum Ratchet Grid.",
+    detail: "Hitchin Moduli Hyperkähler Twistor Firewall, Geometric Satake Crystal-Basis Shield, HoTT Voevodsky Univalence Cubical Guard, Factorization Homology & Andreev Bilayer Supergrid.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 40 Factorization Homology, Condensed Math &amp; Derived Shifted-Symplectic orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 41 Hitchin Moduli, Geometric Satake &amp; HoTT Univalence orchestration.
           </p>
         </div>
 

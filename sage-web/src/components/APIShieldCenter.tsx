@@ -11,6 +11,7 @@ import {
   Layers,
   Code2,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 
 export function APIShieldCenter() {
@@ -18,18 +19,22 @@ export function APIShieldCenter() {
   const [regoLoading, setRegoLoading] = useState(false);
   const [auditReport, setAuditReport] = useState<any>(null);
   const [opaPolicy, setOpaPolicy] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const auditAPIs = async () => {
     setLoading(true);
     setOpaPolicy(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/api-shield/audit");
-      if (res.ok) {
-        const data = await res.json();
-        setAuditReport(data.api_audit_report);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `API audit failed (${res.status})`);
       }
+      const data = await res.json();
+      setAuditReport(data.api_audit_report);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to audit microservices APIs");
     } finally {
       setLoading(false);
     }
@@ -37,14 +42,17 @@ export function APIShieldCenter() {
 
   const generateRego = async () => {
     setRegoLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/api-shield/rego");
-      if (res.ok) {
-        const data = await res.json();
-        setOpaPolicy(data.opa_policy);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Rego generation failed (${res.status})`);
       }
+      const data = await res.json();
+      setOpaPolicy(data.opa_policy);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to generate OPA Rego policy");
     } finally {
       setRegoLoading(false);
     }
@@ -52,6 +60,25 @@ export function APIShieldCenter() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
         <div>
@@ -67,6 +94,7 @@ export function APIShieldCenter() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={auditAPIs}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-500 hover:to-blue-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-indigo-950/40 disabled:opacity-50"
@@ -106,6 +134,7 @@ export function APIShieldCenter() {
               <p className="text-[11px] text-zinc-400">Synthesize an Open Policy Agent (OPA) Rego policy to enforce tenant boundaries in Envoy / Istio.</p>
             </div>
             <button
+              type="button"
               onClick={generateRego}
               disabled={regoLoading}
               className="flex items-center gap-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-all disabled:opacity-50"

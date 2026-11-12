@@ -19,18 +19,22 @@ export function CARTHub() {
   const [severLoading, setSeverLoading] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const [severanceResult, setSeveranceResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const discoverPaths = async () => {
     setLoading(true);
     setSeveranceResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cart/paths");
-      if (res.ok) {
-        const data = await res.json();
-        setAnalysis(data.analysis);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Attack graph scan failed (${res.status})`);
       }
+      const data = await res.json();
+      setAnalysis(data.analysis);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to analyze enterprise attack graph");
     } finally {
       setLoading(false);
     }
@@ -38,18 +42,21 @@ export function CARTHub() {
 
   const severChokePoint = async (nodeId: string) => {
     setSeverLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cart/sever", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ node_id: nodeId }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setSeveranceResult(data.severance_result);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Choke-point severance failed (${res.status})`);
       }
+      const data = await res.json();
+      setSeveranceResult(data.severance_result);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to sever attack graph choke point");
     } finally {
       setSeverLoading(false);
     }
@@ -57,6 +64,25 @@ export function CARTHub() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
         <div>
@@ -72,6 +98,7 @@ export function CARTHub() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={discoverPaths}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-amber-950/40 disabled:opacity-50"
@@ -125,6 +152,7 @@ export function CARTHub() {
                 Paths traversing: {analysis.choke_point.paths_traversing} / {analysis.total_attack_paths_found}
               </span>
               <button
+                type="button"
                 onClick={() => severChokePoint(analysis.choke_point.node_id)}
                 disabled={severLoading}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white text-xs font-semibold rounded-lg transition-all shadow-md disabled:opacity-50"

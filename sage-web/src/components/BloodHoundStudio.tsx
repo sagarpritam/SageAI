@@ -11,6 +11,7 @@ import {
   Key,
   Users,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 
 export function BloodHoundStudio() {
@@ -18,18 +19,22 @@ export function BloodHoundStudio() {
   const [scriptLoading, setScriptLoading] = useState(false);
   const [adReport, setAdReport] = useState<any>(null);
   const [lockdownScript, setLockdownScript] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const scanAD = async () => {
     setLoading(true);
     setLockdownScript(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/bloodhound/scan");
-      if (res.ok) {
-        const data = await res.json();
-        setAdReport(data.ad_report);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Active Directory scan failed (${res.status})`);
       }
+      const data = await res.json();
+      setAdReport(data.ad_report);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to scan Active Directory attack paths");
     } finally {
       setLoading(false);
     }
@@ -37,18 +42,21 @@ export function BloodHoundStudio() {
 
   const generateLockdown = async () => {
     setScriptLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/bloodhound/lockdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLockdownScript(data.lockdown_script);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.detail || `Lockdown generation failed (${res.status})`);
       }
+      const data = await res.json();
+      setLockdownScript(data.lockdown_script);
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to generate Active Directory hardening script");
     } finally {
       setScriptLoading(false);
     }
@@ -56,6 +64,25 @@ export function BloodHoundStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs text-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            {errorMsg}
+          </span>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
         <div>
@@ -71,6 +98,7 @@ export function BloodHoundStudio() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={scanAD}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-red-950/40 disabled:opacity-50"
@@ -141,6 +169,7 @@ export function BloodHoundStudio() {
               <p className="text-[11px] text-zinc-400">Generate a hardened PowerShell script to revoke DCSync rights and enforce AES-256 SPNs.</p>
             </div>
             <button
+              type="button"
               onClick={generateLockdown}
               disabled={scriptLoading}
               className="flex items-center gap-2 px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-all disabled:opacity-50"
