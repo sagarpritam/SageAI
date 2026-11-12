@@ -45,18 +45,25 @@ export function CrossPlaneMeshStudio() {
   const [intentDesc, setIntentDesc] = useState("Allow mTLS only from checkout pods to billing vault on port 8443; deny internet.");
   const [targetPort, setTargetPort] = useState(8443);
   const [translating, setTranslating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchPolicies = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/crossplane-mesh/policies");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load cross-plane mesh policies");
+      }
       if (data.policies) {
         setPolicies(data.policies);
         if (data.policies.length > 0) {
           setSelectedPolicy((prev) => prev || data.policies[0]);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load cross-plane mesh policies");
     } finally {
       setLoading(false);
     }
@@ -65,12 +72,15 @@ export function CrossPlaneMeshStudio() {
   const fetchHealth = useCallback(async () => {
     try {
       const res = await fetch("/api/crossplane-mesh/health");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load cross-plane mesh health telemetry");
+      }
       if (data.health) {
         setHealthData(data.health);
       }
-    } catch (err) {
-      console.error("Failed to load health", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load cross-plane mesh health telemetry");
     }
   }, []);
 
@@ -82,6 +92,7 @@ export function CrossPlaneMeshStudio() {
   async function handleTranslatePolicy(e: React.FormEvent) {
     e.preventDefault();
     setTranslating(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/crossplane-mesh/policies", {
         method: "POST",
@@ -93,11 +104,16 @@ export function CrossPlaneMeshStudio() {
           target_clouds: ["AWS", "AZURE", "GCP", "CILIUM_K8S"],
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to translate cross-plane security policy");
+      }
       if (data.policy) {
         setPolicies((prev) => [data.policy, ...prev]);
         setSelectedPolicy(data.policy);
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to translate cross-plane security policy");
     } finally {
       setTranslating(false);
     }
@@ -123,6 +139,7 @@ export function CrossPlaneMeshStudio() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             fetchPolicies();
             fetchHealth();
@@ -132,6 +149,21 @@ export function CrossPlaneMeshStudio() {
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Cross-Cloud Mesh Telemetry Matrix */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

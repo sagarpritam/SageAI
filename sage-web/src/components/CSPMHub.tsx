@@ -60,9 +60,11 @@ export function CSPMHub() {
   });
 
   const [activeRemediation, setActiveRemediation] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const runCSPMAudit = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cspm/audit", {
         method: "POST",
@@ -76,12 +78,13 @@ export function CSPMHub() {
           ],
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setCspmData(data);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to run CIS benchmark CSPM audit");
       }
-    } catch (e) {
-      console.error(e);
+      setCspmData(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to run CIS benchmark CSPM audit");
     } finally {
       setLoading(false);
     }
@@ -89,18 +92,20 @@ export function CSPMHub() {
 
   const fetchRemediation = async (findingId: string, ruleId: string) => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cspm/remediation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ finding_id: findingId, rule_id: ruleId }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setActiveRemediation(data.remediation);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch automated remediation fix");
       }
-    } catch (e) {
-      console.error(e);
+      setActiveRemediation(data.remediation);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to fetch automated remediation fix");
     } finally {
       setLoading(false);
     }
@@ -130,6 +135,7 @@ export function CSPMHub() {
 
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={runCSPMAudit}
               disabled={loading}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -139,6 +145,21 @@ export function CSPMHub() {
             </button>
           </div>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 p-3 rounded-lg bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Metrics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
@@ -172,6 +193,7 @@ export function CSPMHub() {
       {/* Tabs */}
       <div className="flex gap-2 border-b border-zinc-800 pb-2">
         <button
+          type="button"
           onClick={() => setActiveTab("toxic")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
             activeTab === "toxic"
@@ -182,6 +204,7 @@ export function CSPMHub() {
           Toxic Risk Combinations ({cspmData.toxic_combinations?.length || 0})
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("findings")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
             activeTab === "findings"
@@ -235,6 +258,7 @@ export function CSPMHub() {
               </div>
 
               <button
+                type="button"
                 onClick={() => fetchRemediation(f.finding_id, f.rule_id)}
                 className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded font-bold transition-all flex items-center gap-1.5 self-start md:self-center"
               >
@@ -251,7 +275,7 @@ export function CSPMHub() {
         <div className="p-4 bg-black border border-zinc-800 rounded-xl space-y-3 font-mono text-xs">
           <div className="flex items-center justify-between text-zinc-300 font-bold">
             <span>Automated Remediation Script ({activeRemediation.type})</span>
-            <button onClick={() => setActiveRemediation(null)} className="text-zinc-500 hover:text-white">✕</button>
+            <button type="button" onClick={() => setActiveRemediation(null)} className="text-zinc-500 hover:text-white">✕</button>
           </div>
           <div>
             <div className="text-[10px] text-zinc-500 mb-1">Terraform HCL Fix:</div>

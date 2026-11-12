@@ -15,6 +15,7 @@ import {
   Share2,
   Navigation,
   Satellite,
+  AlertTriangle,
 } from "lucide-react";
 
 interface DSOCTerminal {
@@ -67,13 +68,18 @@ export function DeepSpaceLaserStudio() {
   const [acquisition, setAcquisition] = useState<BeamAcquisition | null>(null);
   const [transmission, setTransmission] = useState<TransmissionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedSelectionRef = useRef(false);
 
   const fetchTerminals = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/deep-space-laser/terminals");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load DSOC terminals");
+      }
       if (data.terminals) {
         setTerminals(data.terminals);
         if (!hasInitializedSelectionRef.current && data.terminals.length > 0) {
@@ -82,8 +88,8 @@ export function DeepSpaceLaserStudio() {
           setPointAheadAngle(data.terminals[0].point_ahead_angle_urad);
         }
       }
-    } catch (err) {
-      console.error("Failed to load DSOC terminals", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load DSOC terminals");
     } finally {
       setLoading(false);
     }
@@ -97,6 +103,7 @@ export function DeepSpaceLaserStudio() {
     if (!selectedTerminal) return;
     setAcquiring(true);
     setAcquisition(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/deep-space-laser/acquire-beam", {
         method: "POST",
@@ -108,7 +115,10 @@ export function DeepSpaceLaserStudio() {
           photon_snr_db: photonSnr,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "DSOC beam acquisition failed");
+      }
       if (data.acquisition) {
         setAcquisition(data.acquisition);
         setLogs((prev) => [
@@ -116,8 +126,8 @@ export function DeepSpaceLaserStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Acquisition failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "DSOC beam acquisition failed");
     } finally {
       setAcquiring(false);
     }
@@ -126,6 +136,7 @@ export function DeepSpaceLaserStudio() {
   async function handleTransmit() {
     if (!selectedTerminal) return;
     setTransmitting(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/deep-space-laser/transmit-frame", {
         method: "POST",
@@ -136,7 +147,10 @@ export function DeepSpaceLaserStudio() {
           pqc_cipher: "ML-KEM-1024_LDPC",
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "DSOC frame transmission failed");
+      }
       if (data.transmission) {
         setTransmission(data.transmission);
         setLogs((prev) => [
@@ -144,8 +158,8 @@ export function DeepSpaceLaserStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Transmission failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "DSOC frame transmission failed");
     } finally {
       setTransmitting(false);
     }
@@ -173,6 +187,7 @@ export function DeepSpaceLaserStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchTerminals}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -182,6 +197,21 @@ export function DeepSpaceLaserStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -379,6 +409,7 @@ export function DeepSpaceLaserStudio() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={handleAcquire}
                   disabled={acquiring}
                   className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-900/30"
@@ -388,6 +419,7 @@ export function DeepSpaceLaserStudio() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleTransmit}
                   disabled={transmitting}
                   className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-900/30"

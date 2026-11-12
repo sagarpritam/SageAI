@@ -94,6 +94,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json(data, { status: backendRes.status });
   } catch {
-    return offlineBackendResponse("Failed to connect to scan engine service");
+    return offlineBackendResponse("Failed to connect to scan engine service (configure BACKEND_URL)");
   }
 }

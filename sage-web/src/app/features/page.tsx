@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Factorization Homology (Cap 140), Hitchin Moduli Hyperkähler (Cap 143), Geometric Satake (Cap 144), and HoTT Voevodsky Univalence (Cap 145).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Hitchin Moduli (Cap 143), Chromatic Morava E-Theory (Cap 146), Fukaya Floer (Cap 147), and Koszul Operadic Bar-Cobar (Cap 148).",
     },
   ];
 

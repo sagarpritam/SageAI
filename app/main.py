@@ -65,6 +65,7 @@ from app.routers import (
     centesimal_quantum_gravity_routes,
     cft_defect_bcft_routes,
     chern_simons_tqft_routes,
+    chromatic_morava_routes,
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
@@ -109,6 +110,7 @@ from app.routers import (
     fibonacci_anyon_routes,
     firmware_attestation_routes,
     forensics_routes,
+    fukaya_floer_routes,
     gdpr_routes,
     geomagnetic_shield_routes,
     geometric_langlands_routes,
@@ -132,6 +134,7 @@ from app.routers import (
     intrusion_routes,
     itdr_routes,
     jt_wormhole_routes,
+    kagome_supergrid_routes,
     kms_hsm_routes,
     ktheory_dbrane_routes,
     kugelblitz_hawking_routes,
@@ -160,6 +163,7 @@ from app.routers import (
     noncommutative_spacetime_routes,
     notification_routes,
     novikov_geodesic_routes,
+    operadic_bar_cobar_routes,
     orbital_debris_routes,
     orbital_hpm_routes,
     orbital_laser_routes,
@@ -540,6 +544,10 @@ app.include_router(hitchin_moduli_routes.router)
 app.include_router(geometric_satake_routes.router)
 app.include_router(homotopy_univalence_routes.router)
 app.include_router(twisted_supergrid_routes.router)
+app.include_router(chromatic_morava_routes.router)
+app.include_router(fukaya_floer_routes.router)
+app.include_router(operadic_bar_cobar_routes.router)
+app.include_router(kagome_supergrid_routes.router)
 
 
 # ---------------------

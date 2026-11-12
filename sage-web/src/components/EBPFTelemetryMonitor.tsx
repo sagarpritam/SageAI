@@ -37,25 +37,27 @@ export function EBPFTelemetryMonitor() {
   const [severityFilter, setSeverityFilter] = useState<string>("ALL");
   const [quarantineTargetPid, setQuarantineTargetPid] = useState<string>("");
   const [quarantineResult, setQuarantineResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchTelemetry = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
-      // 1. Fetch probes status
       const statusRes = await fetch("/api/ebpf/status");
-      if (statusRes.ok) {
-        const data = await statusRes.json();
-        setAgentStatus(data.agent);
+      const statusData = await statusRes.json().catch(() => ({}));
+      if (!statusRes.ok) {
+        throw new Error(statusData.error || "Failed to fetch eBPF agent status");
       }
+      setAgentStatus(statusData.agent);
 
-      // 2. Fetch events
       const eventsRes = await fetch(`/api/ebpf/events?limit=25&severity=${severityFilter === "ALL" ? "" : severityFilter}`);
-      if (eventsRes.ok) {
-        const data = await eventsRes.json();
-        setEvents(data.events || []);
+      const eventsData = await eventsRes.json().catch(() => ({}));
+      if (!eventsRes.ok) {
+        throw new Error(eventsData.error || "Failed to fetch eBPF kernel ring buffer events");
       }
-    } catch (e) {
-      console.error("eBPF fetch failed", e);
+      setEvents(eventsData.events || []);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to fetch eBPF telemetry");
     } finally {
       setLoading(false);
     }
@@ -67,20 +69,21 @@ export function EBPFTelemetryMonitor() {
 
   const handleQuarantine = async (pidToQuarantine: number) => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ebpf/quarantine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pid: pidToQuarantine, reason: "Host kernel security policy violation" }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setQuarantineResult(data.quarantine);
-        // Refresh events to show updated quarantine flag
-        fetchTelemetry();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Kernel process quarantine action failed");
       }
-    } catch (e) {
-      console.error("Quarantine failed", e);
+      setQuarantineResult(data.quarantine);
+      fetchTelemetry();
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Kernel process quarantine action failed");
     } finally {
       setLoading(false);
     }
@@ -110,6 +113,7 @@ export function EBPFTelemetryMonitor() {
 
           <div className="flex items-center gap-3 font-mono text-xs">
             <button
+              type="button"
               onClick={fetchTelemetry}
               disabled={loading}
               className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50"
@@ -119,6 +123,21 @@ export function EBPFTelemetryMonitor() {
             </button>
           </div>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 p-3 rounded-lg bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Operational Metrics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
@@ -186,6 +205,7 @@ export function EBPFTelemetryMonitor() {
           <div className="flex items-center gap-2 text-xs">
             {["ALL", "CRITICAL", "HIGH", "INFO"].map((sev) => (
               <button
+                type="button"
                 key={sev}
                 onClick={() => setSeverityFilter(sev)}
                 className={`px-3 py-1 font-mono rounded-md font-bold transition-all ${
@@ -244,6 +264,7 @@ export function EBPFTelemetryMonitor() {
                     </span>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => handleQuarantine(ev.pid)}
                       className="px-2 py-0.5 bg-rose-950 hover:bg-rose-900 text-rose-300 rounded border border-rose-700 font-bold"
                     >

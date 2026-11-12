@@ -15,6 +15,7 @@ import {
   Lock,
   ArrowRight,
   Target,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Countermeasure {
@@ -30,17 +31,20 @@ export function D3FENDMatrixViewer() {
   const [attackTech, setAttackTech] = useState("T1059.001");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryResult, setQueryResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchMatrix = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/d3fend/matrix");
-      if (res.ok) {
-        const data = await res.json();
-        setMatrixData(data.matrix);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load MITRE D3FEND countermeasure matrix");
       }
-    } catch (e) {
-      console.error(e);
+      setMatrixData(data.matrix);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load MITRE D3FEND countermeasure matrix");
     } finally {
       setLoading(false);
     }
@@ -53,18 +57,20 @@ export function D3FENDMatrixViewer() {
   const runAttackQuery = async (tech?: string) => {
     const targetTech = tech || attackTech;
     setQueryLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/d3fend/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ attack_technique: targetTech }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setQueryResult(data.query_result);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to query D3FEND countermeasures");
       }
-    } catch (e) {
-      console.error(e);
+      setQueryResult(data.query_result);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to query D3FEND countermeasures");
     } finally {
       setQueryLoading(false);
     }
@@ -99,6 +105,7 @@ export function D3FENDMatrixViewer() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchMatrix}
             disabled={loading}
             className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition"
@@ -107,6 +114,21 @@ export function D3FENDMatrixViewer() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* ATT&CK Query Bar */}
       <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
@@ -130,6 +152,7 @@ export function D3FENDMatrixViewer() {
             />
           </div>
           <button
+            type="button"
             onClick={() => runAttackQuery()}
             disabled={queryLoading}
             className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition flex items-center justify-center gap-2 disabled:opacity-50"
@@ -148,6 +171,7 @@ export function D3FENDMatrixViewer() {
             { id: "T1078", label: "Valid Accounts (T1078)" },
           ].map((quick) => (
             <button
+              type="button"
               key={quick.id}
               onClick={() => {
                 setAttackTech(quick.id);

@@ -72,6 +72,8 @@ import {
   FlipHorizontal,
   BatteryCharging,
   GitCommitHorizontal,
+  GitMerge,
+  Infinity as InfinityIcon,
   X,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
@@ -260,6 +262,10 @@ import HitchinModuliStudio from "@/components/HitchinModuliStudio";
 import GeometricSatakeStudio from "@/components/GeometricSatakeStudio";
 import HomotopyUnivalenceStudio from "@/components/HomotopyUnivalenceStudio";
 import TwistedSupergridPowerStudio from "@/components/TwistedSupergridPowerStudio";
+import ChromaticMoravaStudio from "@/components/ChromaticMoravaStudio";
+import FukayaFloerStudio from "@/components/FukayaFloerStudio";
+import OperadicBarCobarStudio from "@/components/OperadicBarCobarStudio";
+import KagomeSupergridPowerStudio from "@/components/KagomeSupergridPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -268,6 +274,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "chromatic-homotopy-morava", label: "Chromatic Morava (Cap 146)", icon: Layers },
+  { id: "symplectic-fukaya-floer", label: "Fukaya Floer (Cap 147)", icon: InfinityIcon },
+  { id: "operadic-bv-bar-cobar", label: "Operadic Koszul (Cap 148)", icon: GitMerge },
+  { id: "kagome-chern-supergrid", label: "Kagome Supergrid (Option B)", icon: Zap },
   { id: "hitchin-moduli-hyperkahler", label: "Hitchin Moduli (Cap 143)", icon: Compass },
   { id: "geometric-satake-kashiwara", label: "Geometric Satake (Cap 144)", icon: Layers },
   { id: "homotopy-type-univalence", label: "HoTT Univalence (Cap 145)", icon: Box },
@@ -679,6 +689,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "chromatic-homotopy-morava" && <ChromaticMoravaStudio />}
+          {activeTab === "symplectic-fukaya-floer" && <FukayaFloerStudio />}
+          {activeTab === "operadic-bv-bar-cobar" && <OperadicBarCobarStudio />}
+          {activeTab === "kagome-chern-supergrid" && <KagomeSupergridPowerStudio />}
           {activeTab === "hitchin-moduli-hyperkahler" && <HitchinModuliStudio />}
           {activeTab === "geometric-satake-kashiwara" && <GeometricSatakeStudio />}
           {activeTab === "homotopy-type-univalence" && <HomotopyUnivalenceStudio />}

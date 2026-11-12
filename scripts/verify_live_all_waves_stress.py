@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 41 Waves (Capabilities 1 to 145).
+Live Multi-Domain Stress Test & Verification across All 42 Waves (Capabilities 1 to 148).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -1536,6 +1536,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 41 (Opt B): Andreev Supergrid Baseload Harvest",
         ),
+        # Wave 42: Chromatic Morava, Fukaya Floer, Koszul Operadic & Kagome Polariton Supergrid (Caps 146-148 + Opt B)
+        (
+            "GET",
+            "/api/chromatic-homotopy-morava/spectra",
+            None,
+            "Wave 42 (Cap 146): Chromatic Morava Spectra List",
+        ),
+        (
+            "POST",
+            "/api/chromatic-homotopy-morava/seal-chromatic",
+            {
+                "spectrum_id": "CHR-MORAVA-K4-01",
+                "morava_height": 4,
+                "formal_group_rank": 8,
+                "stabilizer_orbifold_nodes": 16,
+                "chromatic_gain": 1.6,
+            },
+            "Wave 42 (Cap 146): Chromatic Morava E-Theory Seal",
+        ),
+        (
+            "GET",
+            "/api/symplectic-fukaya-floer/branes",
+            None,
+            "Wave 42 (Cap 147): Fukaya A_infinity Branes List",
+        ),
+        (
+            "POST",
+            "/api/symplectic-fukaya-floer/seal-floer",
+            {
+                "brane_id": "FUKAYA-AINF-CY3-01",
+                "ainf_order": 5,
+                "holomorphic_disks": 14,
+                "novikov_valuation_depth": 12,
+                "symplectic_gain": 1.6,
+            },
+            "Wave 42 (Cap 147): Fukaya Floer Homology Seal",
+        ),
+        (
+            "GET",
+            "/api/operadic-bv-bar-cobar/operads",
+            None,
+            "Wave 42 (Cap 148): Koszul Operadic Complexes List",
+        ),
+        (
+            "POST",
+            "/api/operadic-bv-bar-cobar/seal-operad",
+            {
+                "operad_id": "OPERAD-KOSZUL-LINF-01",
+                "operad_arity": 4,
+                "graph_complex_loops": 12,
+                "homotopy_transfer_order": 10,
+                "operadic_gain": 1.6,
+            },
+            "Wave 42 (Cap 148): Koszul Bar-Cobar Formality Seal",
+        ),
+        (
+            "GET",
+            "/api/kagome-chern-supergrid/arrays",
+            None,
+            "Wave 42 (Opt B): Kagome Chern Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/kagome-chern-supergrid/harvest-kagome",
+            {
+                "array_id": "KAGOME-CHERN-ARRAY-01",
+                "chern_gap_mev": 420.0,
+                "polariton_coherence_gain": 1.6,
+            },
+            "Wave 42 (Opt B): Kagome Chern Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1565,7 +1636,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-41, CAPS 1-145) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-42, CAPS 1-148) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1580,7 +1651,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-41 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-42 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1637,7 +1708,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-41){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-42){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1653,7 +1724,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-41 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-42 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1665,7 +1736,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 224)
+        total_requests if total_requests is not None else max(endpoints_count, 232)
     )
 
     if in_process:
@@ -1701,7 +1772,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-41, Capabilities 1-145) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-42, Capabilities 1-148) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

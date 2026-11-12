@@ -37,28 +37,31 @@ export function DarkWebRadarCenter() {
     revocationsExecuted: 12,
   });
   const [revocationSuccess, setRevocationSuccess] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const scanDomain = useCallback(async (targetDomain: string = "enterprise.io") => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/darkweb-radar/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domain: targetDomain }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setHits(data.compromised_records || []);
-        if (data.radar_report) {
-          setStats({
-            totalFlagged: data.radar_report.compromised_credentials_flagged || 4,
-            highRiskTokens: data.radar_report.active_session_tokens_intercepted || 3,
-            revocationsExecuted: 12,
-          });
-        }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to scan darkweb infostealer telemetry");
       }
-    } catch (e) {
-      console.error(e);
+      setHits(data.compromised_records || []);
+      if (data.radar_report) {
+        setStats({
+          totalFlagged: data.radar_report.compromised_credentials_flagged || 4,
+          highRiskTokens: data.radar_report.active_session_tokens_intercepted || 3,
+          revocationsExecuted: 12,
+        });
+      }
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to scan darkweb infostealer telemetry");
     } finally {
       setLoading(false);
     }
@@ -71,6 +74,7 @@ export function DarkWebRadarCenter() {
   const revokeSession = async (userEmail: string, tokenHash: string) => {
     setRevoking(tokenHash);
     setRevocationSuccess(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/darkweb-radar/revoke", {
         method: "POST",
@@ -80,23 +84,25 @@ export function DarkWebRadarCenter() {
           token_hash: tokenHash,
         }),
       });
-      if (res.ok) {
-        setRevocationSuccess(`Session tokens for ${userEmail} revoked across Okta, Google Workspace, and Azure AD.`);
-        setHits((prev) =>
-          prev.map((h) =>
-            h.compromised_token_hash === tokenHash
-              ? { ...h, has_active_session_cookie: false, threat_severity: "REVOKED_NEUTRALIZED" }
-              : h
-          )
-        );
-        setStats((prev) => ({
-          ...prev,
-          highRiskTokens: Math.max(0, prev.highRiskTokens - 1),
-          revocationsExecuted: prev.revocationsExecuted + 1,
-        }));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to revoke IdP session tokens");
       }
-    } catch (e) {
-      console.error(e);
+      setRevocationSuccess(`Session tokens for ${userEmail} revoked across Okta, Google Workspace, and Azure AD.`);
+      setHits((prev) =>
+        prev.map((h) =>
+          h.compromised_token_hash === tokenHash
+            ? { ...h, has_active_session_cookie: false, threat_severity: "REVOKED_NEUTRALIZED" }
+            : h
+        )
+      );
+      setStats((prev) => ({
+        ...prev,
+        highRiskTokens: Math.max(0, prev.highRiskTokens - 1),
+        revocationsExecuted: prev.revocationsExecuted + 1,
+      }));
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to revoke IdP session tokens");
     } finally {
       setRevoking(null);
     }
@@ -132,6 +138,7 @@ export function DarkWebRadarCenter() {
             placeholder="Domain (e.g. enterprise.io)"
           />
           <button
+            type="button"
             onClick={() => scanDomain(domain)}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium text-sm transition shadow-lg shadow-red-600/20 disabled:opacity-50"
@@ -141,6 +148,21 @@ export function DarkWebRadarCenter() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -224,6 +246,7 @@ export function DarkWebRadarCenter() {
                   <td className="py-3 px-3 text-right">
                     {hit.has_active_session_cookie ? (
                       <button
+                        type="button"
                         onClick={() => revokeSession(hit.user_identity, hit.compromised_token_hash)}
                         disabled={revoking === hit.compromised_token_hash}
                         className="px-3 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-medium text-[11px] transition disabled:opacity-50 inline-flex items-center gap-1.5"

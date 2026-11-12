@@ -37,18 +37,25 @@ export function FirmwareAttestationStudio() {
   const [loading, setLoading] = useState(false);
   const [attesting, setAttesting] = useState(false);
   const [attestResult, setAttestResult] = useState<any | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchDevices = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/firmware-attestation/devices");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load UEFI firmware attestation devices");
+      }
       if (data.devices) {
         setDevices(data.devices);
         if (data.devices.length > 0) {
           setSelectedDevice((prev) => prev || data.devices[0]);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load UEFI firmware attestation devices");
     } finally {
       setLoading(false);
     }
@@ -60,6 +67,7 @@ export function FirmwareAttestationStudio() {
 
   async function handleAttest(dev: DeviceRecord) {
     setAttesting(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/firmware-attestation/attest", {
         method: "POST",
@@ -72,10 +80,15 @@ export function FirmwareAttestationStudio() {
           secure_boot_enabled: dev.secure_boot_enabled,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "TPM 2.0 / SPI flash hardware attestation failed");
+      }
       if (data.attestation) {
         setAttestResult(data.attestation);
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "TPM 2.0 / SPI flash hardware attestation failed");
     } finally {
       setAttesting(false);
     }
@@ -117,12 +130,28 @@ export function FirmwareAttestationStudio() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchDevices}
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Firmware Fleet Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -211,6 +240,7 @@ export function FirmwareAttestationStudio() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleAttest(selectedDevice)}
                     disabled={attesting}
                     className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-cyan-950/30"
@@ -219,6 +249,7 @@ export function FirmwareAttestationStudio() {
                     Attest TPM & SPI
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleQuarantine(selectedDevice.device_id)}
                     className="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 text-xs font-medium border border-rose-500/30 transition flex items-center gap-1.5"
                   >

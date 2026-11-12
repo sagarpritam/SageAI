@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Network, RefreshCw, Activity, Shield, Sparkles, Binary } from 'lucide-react';
+import { Network, RefreshCw, Shield, Sparkles, Binary, AlertTriangle } from 'lucide-react';
 
 interface FibonacciBraid {
   braid_id: string;
@@ -37,20 +37,25 @@ export default function FibonacciAnyonStudio() {
   const [lengthSteps, setLengthSteps] = useState<number>(32);
   const [gain, setGain] = useState<number>(1.1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<CompileResult | null>(null);
 
   const fetchBraids = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/fibonacci-anyon/braids');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to load Fibonacci anyon braids');
+      }
       if (data.braids) {
         setBraids(data.braids);
         if (data.braids.length > 0) {
           setSelectedBraid((prev) => prev || data.braids[0].braid_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load Fibonacci anyon braids', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load Fibonacci anyon braids');
     }
   }, []);
 
@@ -60,6 +65,7 @@ export default function FibonacciAnyonStudio() {
 
   const handleCompile = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/fibonacci-anyon/compile-braid', {
         method: 'POST',
@@ -71,10 +77,13 @@ export default function FibonacciAnyonStudio() {
           damping_gain: gain,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Fibonacci braid compilation failed');
+      }
       setTelemetry(data);
-    } catch (err) {
-      console.error('Fibonacci braid compilation failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Fibonacci braid compilation failed');
     } finally {
       setLoading(false);
     }
@@ -97,6 +106,7 @@ export default function FibonacciAnyonStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchBraids}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -104,6 +114,21 @@ export default function FibonacciAnyonStudio() {
           <span>Refresh Channels</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {braids.map((b) => (
@@ -193,6 +218,7 @@ export default function FibonacciAnyonStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleCompile}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-fuchsia-950/50"

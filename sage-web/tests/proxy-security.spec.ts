@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.1.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.2.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.1.0");
-    expect(healthJson.version).toBe("8.1.0");
+    expect(healthJson.platform_version).toBe("8.2.0");
+    expect(healthJson.version).toBe("8.2.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1213,6 +1213,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(superBody.status).toBe("ANDREEV_SUPERGRID_OPTIMAL");
     expect(superBody.zero_fossil_carbon).toBe(true);
     expect(Number(superBody.net_grid_output_gw)).toBeGreaterThan(320.0);
+
+    // Wave 42 studios (Caps 146-148 & Option B) return 200 deterministically offline
+    const chrList = await request.get("/api/chromatic-homotopy-morava/spectra");
+    expect(chrList.status()).toBe(200);
+    const chrSim = await request.post("/api/chromatic-homotopy-morava/seal-chromatic", {
+      data: {
+        spectrum_id: "CHR-MORAVA-K4-01",
+        morava_height: 4,
+        formal_group_rank: 8,
+        stabilizer_orbifold_nodes: 16,
+      },
+    });
+    expect(chrSim.status()).toBe(200);
+    expect(((await chrSim.json()) as { status?: string }).status).toBe(
+      "CHROMATIC_MORAVA_SEALED"
+    );
+
+    const flList = await request.get("/api/symplectic-fukaya-floer/branes");
+    expect(flList.status()).toBe(200);
+    const flSim = await request.post("/api/symplectic-fukaya-floer/seal-floer", {
+      data: {
+        brane_id: "FUKAYA-AINF-CY3-01",
+        ainf_order: 5,
+        holomorphic_disks: 14,
+        novikov_valuation_depth: 12,
+      },
+    });
+    expect(flSim.status()).toBe(200);
+    expect(((await flSim.json()) as { status?: string }).status).toBe(
+      "FUKAYA_FLOER_SEALED"
+    );
+
+    const opList = await request.get("/api/operadic-bv-bar-cobar/operads");
+    expect(opList.status()).toBe(200);
+    const opSim = await request.post("/api/operadic-bv-bar-cobar/seal-operad", {
+      data: {
+        operad_id: "OPERAD-KOSZUL-LINF-01",
+        operad_arity: 4,
+        graph_complex_loops: 12,
+        homotopy_transfer_order: 10,
+      },
+    });
+    expect(opSim.status()).toBe(200);
+    expect(((await opSim.json()) as { status?: string }).status).toBe(
+      "OPERADIC_KOSZUL_SEALED"
+    );
+
+    const kagList = await request.get("/api/kagome-chern-supergrid/arrays");
+    expect(kagList.status()).toBe(200);
+    const kagSim = await request.post("/api/kagome-chern-supergrid/harvest-kagome", {
+      data: {
+        array_id: "KAGOME-CHERN-ARRAY-01",
+        chern_gap_mev: 420.0,
+        polariton_coherence_gain: 1.6,
+      },
+    });
+    expect(kagSim.status()).toBe(200);
+    const kagBody = (await kagSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(kagBody.status).toBe("KAGOME_SUPERGRID_OPTIMAL");
+    expect(kagBody.zero_fossil_carbon).toBe(true);
+    expect(Number(kagBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

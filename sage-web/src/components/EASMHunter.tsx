@@ -14,6 +14,7 @@ import {
 export function EASMHunter() {
   const [loading, setLoading] = useState(false);
   const [targetDomain, setTargetDomain] = useState("enterprise.com");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [easmData, setEasmData] = useState<any>({
     perimeter_grade: "F (CRITICAL RISKS DETECTED)",
     total_assets_discovered: 5,
@@ -41,18 +42,20 @@ export function EASMHunter() {
 
   const runEASMScan = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/easm/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target_domain: targetDomain }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setEasmData(data);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to execute EASM perimeter scan");
       }
-    } catch (e) {
-      console.error(e);
+      setEasmData(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to execute EASM perimeter scan");
     } finally {
       setLoading(false);
     }
@@ -87,6 +90,7 @@ export function EASMHunter() {
               className="px-3 py-1.5 bg-black border border-zinc-700 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-500"
             />
             <button
+              type="button"
               onClick={runEASMScan}
               disabled={loading}
               className="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-black font-bold rounded-lg text-xs transition-all flex items-center gap-2"
@@ -96,6 +100,21 @@ export function EASMHunter() {
             </button>
           </div>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 p-3 rounded-lg bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
           <div className="p-3 bg-black/40 border border-zinc-800 rounded-lg font-mono">

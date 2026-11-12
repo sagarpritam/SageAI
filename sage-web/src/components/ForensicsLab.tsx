@@ -6,31 +6,32 @@ import {
   ShieldCheck,
   RefreshCw,
   Cpu,
-  Radio,
-  FileSearch,
-  CheckCircle2,
   Terminal,
+  AlertTriangle,
 } from "lucide-react";
 
 export function ForensicsLab() {
   const [host, setHost] = useState("prod-k8s-node-04");
   const [loading, setLoading] = useState(false);
   const [bundle, setBundle] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const acquireMemory = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/forensics/acquire", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target_host: host }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setBundle(data.forensic_bundle);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to acquire live volatile memory forensics bundle");
       }
-    } catch (e) {
-      console.error(e);
+      setBundle(data.forensic_bundle);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to acquire live volatile memory forensics bundle");
     } finally {
       setLoading(false);
     }
@@ -60,6 +61,7 @@ export function ForensicsLab() {
             placeholder="Host to acquire..."
           />
           <button
+            type="button"
             onClick={acquireMemory}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-500 hover:to-cyan-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-teal-950/40 disabled:opacity-50"
@@ -69,6 +71,21 @@ export function ForensicsLab() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-700/60 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-300 hover:text-white underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {bundle ? (
         <div className="space-y-6">
