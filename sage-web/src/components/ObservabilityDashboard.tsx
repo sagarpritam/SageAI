@@ -90,13 +90,15 @@ export function ObservabilityDashboard() {
   const [runningDast, setRunningDast] = useState(false);
   const [dastResults, setDastResults] = useState<Record<string, unknown> | null>(null);
   const [dastError, setDastError] = useState("");
+  const [telemetryError, setTelemetryError] = useState<string | null>(null);
 
   const fetchMetrics = async () => {
+    setTelemetryError(null);
     try {
       const res = await axios.get("/api/telemetry/metrics");
       setMetrics(res.data);
-    } catch {
-      // Graceful fallback
+    } catch (err: unknown) {
+      setTelemetryError(err instanceof Error ? err.message : "Failed to load operational metrics");
     } finally {
       setLoadingMetrics(false);
     }
@@ -106,8 +108,9 @@ export function ObservabilityDashboard() {
     try {
       const res = await axios.get("/api/telemetry/traces?limit=20");
       setTraces(res.data.traces || []);
-    } catch {
+    } catch (err: unknown) {
       setTraces([]);
+      setTelemetryError(err instanceof Error ? err.message : "Failed to load distributed traces");
     }
   };
 
@@ -118,11 +121,13 @@ export function ObservabilityDashboard() {
 
   const inspectTrace = async (traceId: string) => {
     setLoadingTraceDetail(true);
+    setTelemetryError(null);
     try {
       const res = await axios.get(`/api/telemetry/traces/${traceId}`);
       setSelectedTrace(res.data);
-    } catch {
+    } catch (err: unknown) {
       setSelectedTrace(null);
+      setTelemetryError(err instanceof Error ? err.message : "Failed to load trace waterfall");
     } finally {
       setLoadingTraceDetail(false);
     }
@@ -176,6 +181,16 @@ export function ObservabilityDashboard() {
           <RefreshCw className="w-3.5 h-3.5" /> Refresh Telemetry
         </button>
       </div>
+
+      {telemetryError && (
+        <div
+          role="alert"
+          className="bg-red-950/40 border border-red-800/60 rounded-xl p-3 flex items-center gap-2 text-xs font-mono text-red-300"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{telemetryError}</span>
+        </div>
+      )}
 
       {/* Operational Scorecard Cards */}
       {loadingMetrics ? (

@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Complexity CA/CV (Cap 122), JT Dilaton Wormhole Matrix (Cap 125), dS Static-Patch Shield (Cap 126), and 2-Group Higher-Form Guard (Cap 127).",
+        "Includes Centesimal Quantum Gravity (Cap 100), JT Wormhole Matrix (Cap 125), BFSS Matrix Fuzzball (Cap 128), BCFT g-Theorem Shield (Cap 129), and Entanglement Wedge E_W Guard (Cap 130).",
     },
   ];
 

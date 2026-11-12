@@ -47,6 +47,7 @@ from app.routers import (
     axion_haloscope_routes,
     billing_routes,
     binary_deobfuscator_routes,
+    bloch_schwinger_routes,
     bloodhound_routes,
     calabi_yau_routes,
     canary_fabric_routes,
@@ -59,6 +60,7 @@ from app.routers import (
     causal_set_lattice_routes,
     celestial_holography_routes,
     centesimal_quantum_gravity_routes,
+    cft_defect_bcft_routes,
     chern_simons_tqft_routes,
     ci_routes,
     cislunar_relay_routes,
@@ -91,6 +93,7 @@ from app.routers import (
     email_report_routes,
     enclave_attestation_routes,
     enclave_routes,
+    entanglement_wedge_routes,
     enterprise_routes,
     er_bridge_routes,
     ergosphere_spin_routes,
@@ -131,6 +134,7 @@ from app.routers import (
     malware_routes,
     mantle_geoneutrino_routes,
     marine_sonar_routes,
+    matrix_bfss_routes,
     mfa_routes,
     mhd_plasma_stealth_routes,
     micro_hotpatch_routes,
@@ -492,6 +496,10 @@ app.include_router(jt_wormhole_routes.router)
 app.include_router(ds_static_patch_routes.router)
 app.include_router(higher_form_twogroup_routes.router)
 app.include_router(unruh_rindler_routes.router)
+app.include_router(matrix_bfss_routes.router)
+app.include_router(cft_defect_bcft_routes.router)
+app.include_router(entanglement_wedge_routes.router)
+app.include_router(bloch_schwinger_routes.router)
 
 
 # ---------------------

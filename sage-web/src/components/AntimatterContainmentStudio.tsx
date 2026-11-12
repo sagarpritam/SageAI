@@ -48,17 +48,20 @@ export function AntimatterContainmentStudio() {
   const [acting, setActing] = useState(false);
   const [selectedCell, setSelectedCell] = useState("CELL-ALPHA-PENNING-01");
   const [telemetry, setTelemetry] = useState<PlasmaTelemetry | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchCells = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/antimatter-containment/cells");
-      if (res.ok) {
-        const data = await res.json();
-        setCells(data);
+      if (!res.ok) {
+        throw new Error(`Antimatter cell fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setCells(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Penning-trap cells");
     } finally {
       setLoading(false);
     }
@@ -67,12 +70,13 @@ export function AntimatterContainmentStudio() {
   const fetchTelemetry = async (cellId: string) => {
     try {
       const res = await fetch(`/api/antimatter-containment/telemetry?cell_id=${cellId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setTelemetry(data);
+      if (!res.ok) {
+        throw new Error(`Plasma telemetry fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setTelemetry(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load plasma telemetry");
     }
   };
 
@@ -175,6 +179,7 @@ export function AntimatterContainmentStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={() => {
               fetchCells();
               fetchTelemetry(selectedCell);
@@ -186,6 +191,16 @@ export function AntimatterContainmentStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 p-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="h-4 w-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -269,6 +284,7 @@ export function AntimatterContainmentStudio() {
               </h4>
               <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
+                  type="button"
                   onClick={handleCompressPlasma}
                   disabled={acting}
                   className="flex items-center justify-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"
@@ -277,6 +293,7 @@ export function AntimatterContainmentStudio() {
                   {acting ? "Applying Rotating Wall Quadrupole..." : "Apply Rotating Wall Compression"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleQuenchDivert}
                   disabled={acting}
                   className="flex items-center justify-center gap-2 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"

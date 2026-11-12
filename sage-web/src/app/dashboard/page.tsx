@@ -236,6 +236,10 @@ import JTWormholeStudio from "@/components/JTWormholeStudio";
 import DSStaticPatchStudio from "@/components/DSStaticPatchStudio";
 import HigherFormTwoGroupStudio from "@/components/HigherFormTwoGroupStudio";
 import UnruhRindlerStudio from "@/components/UnruhRindlerStudio";
+import MatrixBFSSFuzzballStudio from "@/components/MatrixBFSSFuzzballStudio";
+import CFTDefectBCFTStudio from "@/components/CFTDefectBCFTStudio";
+import EntanglementWedgeStudio from "@/components/EntanglementWedgeStudio";
+import BlochSchwingerStudio from "@/components/BlochSchwingerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -244,6 +248,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "matrix-bfss-fuzzball", label: "BFSS Matrix Fuzzball (Cap 128)", icon: Layers },
+  { id: "cft-defect-bcft", label: "BCFT g-Theorem (Cap 129)", icon: Shield },
+  { id: "entanglement-wedge-cross", label: "Entanglement Wedge E_W (Cap 130)", icon: GitBranch },
+  { id: "bloch-schwinger-power", label: "Floquet-Bloch Grid (Option B)", icon: Zap },
   { id: "jt-wormhole-matrix", label: "JT Wormhole Matrix (Cap 125)", icon: Orbit },
   { id: "ds-static-patch", label: "dS Static Patch (Cap 126)", icon: Compass },
   { id: "higher-form-twogroup", label: "2-Group Higher-Form (Cap 127)", icon: Network },
@@ -542,6 +550,7 @@ export default function DashboardPage() {
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
                 title="Clear search"
@@ -572,6 +581,7 @@ export default function DashboardPage() {
             const isSelected = selectedCategory === cat.id;
             return (
               <button
+                type="button"
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-3 py-1.5 rounded-full font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
@@ -595,6 +605,7 @@ export default function DashboardPage() {
             const isActive = activeTab === tab.id;
             return (
               <button
+                type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-t-lg text-xs font-bold transition-all whitespace-nowrap ${
@@ -612,6 +623,7 @@ export default function DashboardPage() {
             <div className="py-2.5 px-3 text-xs text-zinc-500 italic flex items-center gap-2">
               No modules match &quot;{searchQuery}&quot;.
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCategory("all");
@@ -627,6 +639,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "matrix-bfss-fuzzball" && <MatrixBFSSFuzzballStudio />}
+          {activeTab === "cft-defect-bcft" && <CFTDefectBCFTStudio />}
+          {activeTab === "entanglement-wedge-cross" && <EntanglementWedgeStudio />}
+          {activeTab === "bloch-schwinger-power" && <BlochSchwingerStudio />}
           {activeTab === "jt-wormhole-matrix" && <JTWormholeStudio />}
           {activeTab === "ds-static-patch" && <DSStaticPatchStudio />}
           {activeTab === "higher-form-twogroup" && <HigherFormTwoGroupStudio />}

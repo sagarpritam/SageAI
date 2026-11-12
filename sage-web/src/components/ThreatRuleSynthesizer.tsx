@@ -64,8 +64,8 @@ export function ThreatRuleSynthesizer() {
       if (res.data?.templates) {
         setTemplates(res.data.templates);
       }
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load CVE rule templates");
     }
   };
 

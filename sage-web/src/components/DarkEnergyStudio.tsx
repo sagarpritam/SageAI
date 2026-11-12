@@ -50,17 +50,20 @@ export function DarkEnergyStudio() {
   const [targetRegion, setTargetRegion] = useState("LOCAL_SOLAR_WARP_SECTOR_4");
   const [couplingFactor, setCouplingFactor] = useState(1.0);
   const [lastEvent, setLastEvent] = useState<DarkEnergyEvent | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchHarvesters = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/dark-energy/harvesters");
-      if (res.ok) {
-        const data = await res.json();
-        setHarvesters(data);
+      if (!res.ok) {
+        throw new Error(`Dark energy harvesters fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setHarvesters(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load dark energy harvesters");
     } finally {
       setLoading(false);
     }
@@ -137,6 +140,7 @@ export function DarkEnergyStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchHarvesters}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-900/40 hover:bg-purple-800/50 border border-purple-700/50 text-purple-200 text-sm font-medium transition-all"
@@ -146,6 +150,16 @@ export function DarkEnergyStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-800/60 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Harvesters Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -222,6 +236,7 @@ export function DarkEnergyStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleStabilize}
               disabled={stabilizing}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"

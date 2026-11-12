@@ -396,6 +396,7 @@ const ScrollToTop = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.button
+          type="button"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
@@ -566,7 +567,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including JT Wormhole Matrix (Cap 125), dS Static-Patch (Cap 126), 2-Group Guard (Cap 127), Complexity CA/CV (Cap 122) & Unruh-Rindler Power Grid.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including BFSS Matrix Fuzzball (Cap 128), BCFT g-Theorem (Cap 129), Entanglement Wedge E_W (Cap 130), JT Wormhole Matrix (Cap 125) & Floquet-Bloch Power Grid.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -676,6 +677,7 @@ const SecurityScore = () => {
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-4">
                 <button 
+                  type="button"
                   onClick={() => setScore(prev => Math.min(100, prev + item.weight))}
                   className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all"
                 >
@@ -686,6 +688,7 @@ const SecurityScore = () => {
             ))}
           </div>
           <button 
+            type="button"
             onClick={() => setScore(45)}
             className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest hover:text-white transition-colors"
           >
@@ -737,7 +740,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 35 JT Wormhole & 2-Group Live', time: '2m ago' },
+    { title: 'Wave 36 BFSS Fuzzball & BCFT E_W Live', time: '2m ago' },
     { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];

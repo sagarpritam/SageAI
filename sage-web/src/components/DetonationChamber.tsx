@@ -76,8 +76,8 @@ export function DetonationChamber() {
       if (res.data?.samples) {
         setSamples(res.data.samples);
       }
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load malware benchmark samples");
     }
   };
 
@@ -276,6 +276,7 @@ export function DetonationChamber() {
           {/* Tab Navigation: Dynamic Detonation vs Static Analysis */}
           <div className="flex gap-2 border-b border-zinc-800">
             <button
+              type="button"
               onClick={() => setActiveView("dynamic")}
               className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition border-b-2 ${
                 activeView === "dynamic"
@@ -287,6 +288,7 @@ export function DetonationChamber() {
               <span>Behavioral Detonation Telemetry</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveView("static")}
               className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition border-b-2 ${
                 activeView === "static"

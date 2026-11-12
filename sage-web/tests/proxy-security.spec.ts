@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.5.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.6.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.5.0");
-    expect(healthJson.version).toBe("7.5.0");
+    expect(healthJson.platform_version).toBe("7.6.0");
+    expect(healthJson.version).toBe("7.6.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -823,6 +823,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(unruhBody.status).toBe("UNRUH_RINDLER_OPTIMAL");
     expect(unruhBody.zero_fossil_carbon).toBe(true);
     expect(Number(unruhBody.net_grid_output_gw)).toBeGreaterThan(240.0);
+
+    // Wave 36 studios (Caps 128-130 & Option B) return 200 deterministically offline
+    const bfssList = await request.get("/api/matrix-bfss-fuzzball/configurations");
+    expect(bfssList.status()).toBe(200);
+    const bfssSim = await request.post("/api/matrix-bfss-fuzzball/lock-fuzzball", {
+      data: {
+        config_id: "BFSS-BMN-MATRIX-01",
+        matrix_rank_n: 64,
+        thooft_coupling: 4.2,
+        mu_mass_gap: 1.65,
+      },
+    });
+    expect(bfssSim.status()).toBe(200);
+    expect(((await bfssSim.json()) as { status?: string }).status).toBe(
+      "MATRIX_FUZZBALL_SEALED"
+    );
+
+    const bcftList = await request.get("/api/cft-defect-bcft/interfaces");
+    expect(bcftList.status()).toBe(200);
+    const bcftSim = await request.post("/api/cft-defect-bcft/seal-interface", {
+      data: {
+        interface_id: "BCFT-CARDY-ISING-01",
+        g_uv: 2.0,
+        g_ir: 1.414,
+        transmission_coeff: 0.94,
+      },
+    });
+    expect(bcftSim.status()).toBe(200);
+    expect(((await bcftSim.json()) as { status?: string }).status).toBe(
+      "BCFT_DEFECT_SEALED"
+    );
+
+    const ewList = await request.get("/api/entanglement-wedge-cross/wedges");
+    expect(ewList.status()).toBe(200);
+    const ewSim = await request.post("/api/entanglement-wedge-cross/audit-wedge", {
+      data: {
+        wedge_id: "EW-ADS3-DOUBLE-WEDGE-01",
+        ew_area: 3.4,
+        mutual_information: 4.9,
+        cross_section_boundaries: 2,
+      },
+    });
+    expect(ewSim.status()).toBe(200);
+    expect(((await ewSim.json()) as { status?: string }).status).toBe(
+      "EW_CROSS_SECTION_AUDITED"
+    );
+
+    const floquetList = await request.get("/api/bloch-schwinger-power/cavities");
+    expect(floquetList.status()).toBe(200);
+    const floquetSim = await request.post("/api/bloch-schwinger-power/harvest-floquet", {
+      data: {
+        cavity_id: "FLOQUET-BLOCH-ORBIT-01",
+        floquet_drive_thz: 22.0,
+        edge_rectifier_gain: 1.6,
+      },
+    });
+    expect(floquetSim.status()).toBe(200);
+    const floquetBody = (await floquetSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(floquetBody.status).toBe("FLOQUET_BLOCH_OPTIMAL");
+    expect(floquetBody.zero_fossil_carbon).toBe(true);
+    expect(Number(floquetBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

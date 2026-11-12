@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-650%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Next.js](https://img.shields.io/badge/Next.js-502%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-731%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-7.5.0%20JT%20Wormhole%2C%20dS%20Patch%20%26%202--Group-gold?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-656%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Next.js](https://img.shields.io/badge/Next.js-514%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-743%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-7.6.0%20BFSS%20Fuzzball%2C%20BCFT%20%26%20Wedge%20E__W-gold?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -597,7 +597,7 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │ REST API + WebSockets
 ┌───────────────────────────────────▼────────────────────────────────────┐
-│                  FastAPI Backend (704 Endpoints / 171 Routers)         │
+│                  FastAPI Backend (740 Endpoints / 183 Routers)         │
 │  Enterprise Orchestrator │ WAF │ NIDS │ UEBA │ SOAR │ Audit Chain      │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
 │  │  10-Pillar Sovereign Defense & Offense Grid                     │  │
@@ -888,13 +888,17 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database engine, JWT, rate limiting, telemetry
 │   ├── models/            # 17 SQLAlchemy models (Scan, Finding, Asset, RemediationPatch...)
-│   ├── routers/           # 179 API router modules (Core, Waves 1-35 Trans-Century Defense & Sovereignty)
+│   ├── routers/           # 183 API router modules (Core, Waves 1-36 Trans-Century Defense & Sovereignty)
 │   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
-│   │   ├── jt_wormhole_matrix/          # 🆕 Wave 35: JT Dilaton Wormhole & SSS Matrix firewall (Cap 125)
-│   │   ├── ds_static_patch/             # 🆕 Wave 35: dS/CFT Static-Patch & Timelike Entanglement shield (Cap 126)
-│   │   ├── higher_form_twogroup/        # 🆕 Wave 35: 2-Group Higher-Form Green-Schwarz & Walker-Wang guard (Cap 127)
-│   │   ├── unruh_rindler_power/         # 🆕 Wave 35 (Opt B): Planetary Unruh-Rindler thermal bath power grid
+│   │   ├── matrix_bfss_fuzzball/        # 🆕 Wave 36: BFSS / IKKT Matrix Model & Fuzzball firewall (Cap 128)
+│   │   ├── cft_defect_bcft/             # 🆕 Wave 36: Cardy BCFT Defect Line & g-Theorem RG shield (Cap 129)
+│   │   ├── entanglement_wedge_cross/    # 🆕 Wave 36: Reflected Entropy S_R & Wedge E_W guard (Cap 130)
+│   │   ├── bloch_schwinger_power/       # 🆕 Wave 36 (Opt B): Planetary Floquet-Bloch photonic power grid
+│   │   ├── jt_wormhole_matrix/          # Wave 35: JT Dilaton Wormhole & SSS Matrix firewall (Cap 125)
+│   │   ├── ds_static_patch/             # Wave 35: dS/CFT Static-Patch & Timelike Entanglement shield (Cap 126)
+│   │   ├── higher_form_twogroup/        # Wave 35: 2-Group Higher-Form Green-Schwarz & Walker-Wang guard (Cap 127)
+│   │   ├── unruh_rindler_power/         # Wave 35 (Opt B): Planetary Unruh-Rindler thermal bath power grid
 │   │   ├── complexity_holography/       # Wave 34: Holographic Quantum Complexity (CA/CV) firewall (Cap 122)
 │   │   ├── carrollian_holography/       # Wave 34: Non-Lorentzian Carrollian null-boundary shield (Cap 123)
 │   │   ├── modular_bootstrap/           # Wave 34: Modular Bootstrap & Rademacher Regge guard (Cap 124)
@@ -1018,11 +1022,15 @@ SageAI/
 │   │   └── warroom_service.py       # Distributed event streaming & War Room manager
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
-│   ├── app/               # 17 App Router page/metadata routes (v7.5.0 Landing, Features, Pricing, Command Center...)
-│   ├── app/api/           # 499 API routes and proxy endpoints
-│   ├── lib/platform.ts    # Centralized v7.5.0 metrics, milestone metadata & SITE_URL
-│   └── components/        # 198 Tailwind & Lucide React UI Components (191 top-level panels; 162 mounted Command Center studios)
-│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.5.0 10-Pillar, PQC & Waves 1-35 Grid Showcase
+│   ├── app/               # 17 App Router page/metadata routes (v7.6.0 Landing, Features, Pricing, Command Center...)
+│   ├── app/api/           # 511 API routes and proxy endpoints
+│   ├── lib/platform.ts    # Centralized v7.6.0 metrics, milestone metadata & SITE_URL
+│   └── components/        # 202 Tailwind & Lucide React UI Components (195 top-level panels; 166 mounted Command Center studios)
+│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.6.0 10-Pillar, PQC & Waves 1-36 Grid Showcase
+│       ├── MatrixBFSSFuzzballStudio.tsx          # 🧩 BFSS / IKKT Matrix Model & Fuzzball Microstate Firewall
+│       ├── CFTDefectBCFTStudio.tsx               # 🛡️ Boundary CFT Defect Line & g-Theorem RG Interface Shield
+│       ├── EntanglementWedgeStudio.tsx           # 🔀 Reflected Entropy S_R & Entanglement Wedge E_W Guard
+│       ├── BlochSchwingerStudio.tsx              # ⚡ Planetary Topological Floquet-Bloch Photonic Power Grid
 │       ├── JTWormholeStudio.tsx                  # 🕳️ JT Dilaton Wormhole & SSS Matrix Firewall
 │       ├── DSStaticPatchStudio.tsx               # 🧭 dS/CFT Static-Patch & Timelike Entanglement Shield
 │       ├── HigherFormTwoGroupStudio.tsx          # 🕸️ 2-Group Higher-Form Green-Schwarz & Walker-Wang Guard
@@ -1130,7 +1138,7 @@ SageAI/
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
 ├── sage-web/tests/        # 33 Playwright E2E specs across 3 suites (standalone Next.js server)
-├── tests/                 # 650 pytest tests across 102 test suites (100% passing)
+├── tests/                 # 656 pytest tests across 103 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

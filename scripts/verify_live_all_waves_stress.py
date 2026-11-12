@@ -1110,6 +1110,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 35 (Opt B): Unruh-Rindler Harvest Baseload",
         ),
+        # Wave 36: BFSS Matrix Fuzzball, BCFT Defect & g-Theorem, Entanglement Wedge E_W & Floquet-Bloch Grid
+        (
+            "GET",
+            "/api/matrix-bfss-fuzzball/configurations",
+            None,
+            "Wave 36 (Cap 128): BFSS Matrix Fuzzball Configurations List",
+        ),
+        (
+            "POST",
+            "/api/matrix-bfss-fuzzball/lock-fuzzball",
+            {
+                "config_id": "BFSS-BMN-MATRIX-01",
+                "matrix_rank_n": 64,
+                "thooft_coupling": 4.2,
+                "mu_mass_gap": 1.65,
+                "commutator_clamp_gain": 1.6,
+            },
+            "Wave 36 (Cap 128): BFSS Matrix Fuzzball Lock",
+        ),
+        (
+            "GET",
+            "/api/cft-defect-bcft/interfaces",
+            None,
+            "Wave 36 (Cap 129): BCFT Defect Interfaces List",
+        ),
+        (
+            "POST",
+            "/api/cft-defect-bcft/seal-interface",
+            {
+                "interface_id": "BCFT-CARDY-ISING-01",
+                "g_uv": 2.0,
+                "g_ir": 1.414,
+                "transmission_coeff": 0.94,
+                "cardy_clamp_gain": 1.6,
+            },
+            "Wave 36 (Cap 129): BCFT Defect Seal",
+        ),
+        (
+            "GET",
+            "/api/entanglement-wedge-cross/wedges",
+            None,
+            "Wave 36 (Cap 130): Entanglement Wedge E_W List",
+        ),
+        (
+            "POST",
+            "/api/entanglement-wedge-cross/audit-wedge",
+            {
+                "wedge_id": "EW-ADS3-DOUBLE-WEDGE-01",
+                "ew_area": 3.4,
+                "mutual_information": 4.9,
+                "cross_section_boundaries": 2,
+                "purification_gain": 1.6,
+            },
+            "Wave 36 (Cap 130): Entanglement Wedge E_W Audit",
+        ),
+        (
+            "GET",
+            "/api/bloch-schwinger-power/cavities",
+            None,
+            "Wave 36 (Opt B): Floquet-Bloch Photonic Cavities List",
+        ),
+        (
+            "POST",
+            "/api/bloch-schwinger-power/harvest-floquet",
+            {
+                "cavity_id": "FLOQUET-BLOCH-ORBIT-01",
+                "floquet_drive_thz": 22.0,
+                "edge_rectifier_gain": 1.6,
+            },
+            "Wave 36 (Opt B): Floquet-Bloch Harvest Baseload",
+        ),
     ]
 
 
@@ -1139,7 +1210,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-35, CAPS 1-127) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-36, CAPS 1-130) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1154,7 +1225,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-35 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-36 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1211,7 +1282,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-35){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-36){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1227,7 +1298,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-35 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-36 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1239,7 +1310,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 176)
+        total_requests if total_requests is not None else max(endpoints_count, 184)
     )
 
     if in_process:
@@ -1275,7 +1346,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-35, Capabilities 1-127) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-36, Capabilities 1-130) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

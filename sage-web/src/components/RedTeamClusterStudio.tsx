@@ -69,17 +69,20 @@ export function RedTeamClusterStudio() {
   const [lastCampaign, setLastCampaign] = useState<CampaignResult | null>(null);
   const [daemonActive, setDaemonActive] = useState(false);
   const [daemonTicks, setDaemonTicks] = useState<DaemonTick[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchAgents = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/redteam-cluster/agents");
-      if (res.ok) {
-        const data = await res.json();
-        setAgents(data);
+      if (!res.ok) {
+        throw new Error(`Red-team agents fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setAgents(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load red-team agents");
     } finally {
       setLoading(false);
     }
@@ -95,8 +98,8 @@ export function RedTeamClusterStudio() {
           setDaemonTicks(data.recent_ticks);
         }
       }
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to poll daemon telemetry");
     }
   };
 
@@ -108,33 +111,36 @@ export function RedTeamClusterStudio() {
   }, []);
 
   const handleToggleDaemon = async () => {
+    setErrorMsg(null);
     try {
       if (daemonActive) {
         const res = await fetch("/api/redteam-cluster/daemon/stop", { method: "POST" });
-        if (res.ok) {
-          setDaemonActive(false);
-          setLogs((prev) => [
-            `[${new Date().toLocaleTimeString()}] Autonomous Red-Team background daemon halted.`,
-            ...prev,
-          ]);
+        if (!res.ok) {
+          throw new Error(`Failed to stop daemon (HTTP ${res.status})`);
         }
+        setDaemonActive(false);
+        setLogs((prev) => [
+          `[${new Date().toLocaleTimeString()}] Autonomous Red-Team background daemon halted.`,
+          ...prev,
+        ]);
       } else {
         const res = await fetch("/api/redteam-cluster/daemon/start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ cycle_interval_seconds: 10.0 }),
         });
-        if (res.ok) {
-          setDaemonActive(true);
-          setLogs((prev) => [
-            `[${new Date().toLocaleTimeString()}] Autonomous Red-Team continuous daemon started (Cycle: 10s).`,
-            ...prev,
-          ]);
+        if (!res.ok) {
+          throw new Error(`Failed to start daemon (HTTP ${res.status})`);
         }
+        setDaemonActive(true);
+        setLogs((prev) => [
+          `[${new Date().toLocaleTimeString()}] Autonomous Red-Team continuous daemon started (Cycle: 10s).`,
+          ...prev,
+        ]);
       }
       fetchDaemonStatus();
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Daemon toggle failed");
     }
   };
 
@@ -206,6 +212,7 @@ export function RedTeamClusterStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={handleToggleDaemon}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 daemonActive
@@ -217,6 +224,7 @@ export function RedTeamClusterStudio() {
               {daemonActive ? "Daemon: Running (Click to Stop)" : "Start Background Swarm Daemon"}
             </button>
             <button
+              type="button"
               onClick={() => {
                 fetchAgents();
                 fetchDaemonStatus();
@@ -228,6 +236,16 @@ export function RedTeamClusterStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl bg-red-950/40 border border-red-800/60 p-3 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertOctagon className="h-4 w-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -341,6 +359,7 @@ export function RedTeamClusterStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleLaunchCampaign}
                 disabled={campaignRunning}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"

@@ -79,17 +79,19 @@ export function DefenseGridMonitor() {
   const [auditVerification, setAuditVerification] = useState<ChainVerification | null>(null);
   const [ledger, setLedger] = useState<AuditBlock[]>([]);
   const [chainLoading, setChainLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchAuditChain = async () => {
     setChainLoading(true);
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/intrusion/audit-chain");
       if (res.data) {
         setAuditVerification(res.data.verification);
         setLedger(res.data.recent_ledger || []);
       }
-    } catch (err) {
-      console.error("Failed to load audit chain", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load audit chain");
     } finally {
       setChainLoading(false);
     }
@@ -101,6 +103,7 @@ export function DefenseGridMonitor() {
 
   const handleWafInspect = async () => {
     setWafLoading(true);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/intrusion/analyze-request", {
         path: wafPath,
@@ -113,8 +116,8 @@ export function DefenseGridMonitor() {
       if (res.data?.action === "BLOCK") {
         fetchAuditChain();
       }
-    } catch (err) {
-      console.error("WAF inspection error", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "WAF inspection request failed");
     } finally {
       setWafLoading(false);
     }
@@ -123,6 +126,7 @@ export function DefenseGridMonitor() {
   const handleNidsProbe = async (portToProbe?: number) => {
     const p = portToProbe ?? probePort;
     setNidsProbing(true);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/intrusion/nids-probe", {
         source_ip: probeIp,
@@ -135,8 +139,8 @@ export function DefenseGridMonitor() {
       } else {
         setNidsAlert(null);
       }
-    } catch (err) {
-      console.error("NIDS probe error", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "NIDS probe request failed");
     } finally {
       setNidsProbing(false);
     }
@@ -144,6 +148,7 @@ export function DefenseGridMonitor() {
 
   const handleSimulatePortScan = async () => {
     setNidsProbing(true);
+    setErrorMsg(null);
     const scanPorts = [21, 22, 23, 80, 443, 3389];
     setRecentPorts([]);
     for (const p of scanPorts) {
@@ -157,8 +162,8 @@ export function DefenseGridMonitor() {
           setNidsAlert(res.data.alert);
           fetchAuditChain();
         }
-      } catch (e) {
-        // continue scan
+      } catch (err: unknown) {
+        setErrorMsg(err instanceof Error ? err.message : `Port scan probe failed on :${p}`);
       }
     }
     setNidsProbing(false);
@@ -166,6 +171,7 @@ export function DefenseGridMonitor() {
 
   const handleCheckAnomaly = async () => {
     setUebaLoading(true);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/intrusion/anomaly-check", {
         client_ip: clientIp,
@@ -173,8 +179,8 @@ export function DefenseGridMonitor() {
         payload_bytes: Number(payloadSize),
       });
       setAnomalies(res.data?.anomalies_detected || []);
-    } catch (err) {
-      console.error("UEBA check error", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "UEBA behavioral check failed");
     } finally {
       setUebaLoading(false);
     }
@@ -227,6 +233,16 @@ export function DefenseGridMonitor() {
         </div>
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-800/60 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
       {/* Grid: 2 Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Module 1: Ingress WAF Inspector */}
@@ -250,6 +266,7 @@ export function DefenseGridMonitor() {
             {/* Quick Presets */}
             <div className="mb-4 flex flex-wrap gap-1.5">
               <button
+                type="button"
                 onClick={() => {
                   setWafPath("/api/v1/search");
                   setWafQuery("1' UNION SELECT username, password FROM users --");
@@ -260,6 +277,7 @@ export function DefenseGridMonitor() {
                 SQLi Payload
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setWafPath("/api/v1/comments");
                   setWafQuery("");
@@ -270,6 +288,7 @@ export function DefenseGridMonitor() {
                 XSS Vector
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setWafPath("/api/v1/ping");
                   setWafQuery("; whoami && cat /etc/passwd");
@@ -280,6 +299,7 @@ export function DefenseGridMonitor() {
                 Command Injection
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setWafPath("/api/v1/fetch");
                   setWafQuery("url=http://169.254.169.254/latest/meta-data/");
@@ -326,6 +346,7 @@ export function DefenseGridMonitor() {
 
           <div className="mt-5 space-y-4">
             <button
+              type="button"
               onClick={handleWafInspect}
               disabled={wafLoading}
               className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-blue-900/20"
@@ -413,6 +434,7 @@ export function DefenseGridMonitor() {
                     className="w-32 bg-zinc-900/80 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono focus:border-purple-500/50 outline-none"
                   />
                   <button
+                    type="button"
                     onClick={() => handleNidsProbe()}
                     disabled={nidsProbing}
                     className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold rounded-lg text-xs transition-colors flex items-center gap-1.5"
@@ -442,6 +464,7 @@ export function DefenseGridMonitor() {
 
           <div className="mt-5 space-y-4">
             <button
+              type="button"
               onClick={handleSimulatePortScan}
               disabled={nidsProbing}
               className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-purple-900/20"
@@ -526,6 +549,7 @@ export function DefenseGridMonitor() {
 
           <div className="mt-5 space-y-4">
             <button
+              type="button"
               onClick={handleCheckAnomaly}
               disabled={uebaLoading}
               className="w-full py-2.5 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-amber-900/20"
@@ -569,6 +593,7 @@ export function DefenseGridMonitor() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={fetchAuditChain}
                 disabled={chainLoading}
                 className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"

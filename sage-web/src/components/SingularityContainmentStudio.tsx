@@ -48,17 +48,20 @@ export function SingularityContainmentStudio() {
   const [selectedCell, setSelectedCell] = useState("SINGULARITY-VAULT-GENEVA-01");
   const [deltaFeed, setDeltaFeed] = useState(0.05);
   const [lastTelemetry, setLastTelemetry] = useState<SingularityTelemetry | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchCells = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/singularity-containment/cells");
-      if (res.ok) {
-        const data = await res.json();
-        setCells(data);
+      if (!res.ok) {
+        throw new Error(`Singularity cell fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setCells(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load singularity containment cells");
     } finally {
       setLoading(false);
     }
@@ -163,6 +166,7 @@ export function SingularityContainmentStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchCells}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-900/40 hover:bg-amber-800/50 border border-amber-700/50 text-amber-200 text-sm font-medium transition-all"
@@ -172,6 +176,16 @@ export function SingularityContainmentStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-800/60 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Cells Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -237,6 +251,7 @@ export function SingularityContainmentStudio() {
 
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
+                type="button"
                 onClick={handleAdjustFeed}
                 disabled={adjusting}
                 className="py-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-semibold text-xs transition-all shadow-lg shadow-orange-900/30 flex items-center justify-center gap-2"
@@ -246,6 +261,7 @@ export function SingularityContainmentStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleSampleTelemetry}
                 disabled={sampling}
                 className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs transition-all flex items-center justify-center gap-2"

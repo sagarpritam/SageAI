@@ -60,17 +60,20 @@ export function ClusterFederationStudio() {
   const [targetCluster, setTargetCluster] = useState("CLUSTER-EU-CENTRAL-02");
   const [lastSync, setLastSync] = useState<SyncEvent | null>(null);
   const [lastFailover, setLastFailover] = useState<FailoverEvent | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchClusters = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cluster-federation/clusters");
-      if (res.ok) {
-        const data = await res.json();
-        setClusters(data);
+      if (!res.ok) {
+        throw new Error(`Cluster fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setClusters(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load federation clusters");
     } finally {
       setLoading(false);
     }
@@ -186,6 +189,7 @@ export function ClusterFederationStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchClusters}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-900/40 hover:bg-sky-800/50 border border-sky-700/50 text-sky-200 text-sm font-medium transition-all"
@@ -195,6 +199,16 @@ export function ClusterFederationStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-red-950/40 border border-red-800/60 text-xs font-mono text-red-300 flex items-center gap-2"
+        >
+          <AlertOctagon className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Clusters List */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -277,6 +291,7 @@ export function ClusterFederationStudio() {
 
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
+                type="button"
                 onClick={handleSync}
                 disabled={syncing}
                 className="py-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-semibold text-xs transition-all shadow-lg shadow-sky-900/30 flex items-center justify-center gap-2"
@@ -286,6 +301,7 @@ export function ClusterFederationStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleFailover}
                 disabled={failingOver}
                 className="py-3 rounded-xl bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-semibold text-xs transition-all shadow-lg shadow-rose-900/30 flex items-center justify-center gap-2"
