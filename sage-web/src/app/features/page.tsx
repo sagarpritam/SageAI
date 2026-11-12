@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Hitchin Moduli (Cap 143), Chromatic Morava E-Theory (Cap 146), Fukaya Floer (Cap 147), and Koszul Operadic Bar-Cobar (Cap 148).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Chromatic Morava (Cap 146), Cluster Associahedron (Cap 149), Quantum Yangian (Cap 150), and Lurie Infinity Cobordism (Cap 151).",
     },
   ];
 

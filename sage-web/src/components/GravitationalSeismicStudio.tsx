@@ -67,28 +67,43 @@ export function GravitationalSeismicStudio() {
   const [triangulating, setTriangulating] = useState(false);
   const [simulateNuclearShock, setSimulateNuclearShock] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchObservatoriesAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [obsRes, metRes] = await Promise.all([
         fetch("/api/gravitational-seismic/observatories"),
         fetch("/api/gravitational-seismic/metrics"),
       ]);
-      const obsData = await obsRes.json();
-      const metData = await metRes.json();
+      const obsData = (await obsRes.json().catch(() => ({}))) as {
+        observatories?: GWObservatory[];
+        error?: string;
+      };
+      const metData = (await metRes.json().catch(() => ({}))) as {
+        metrics?: unknown;
+        error?: string;
+      };
+      if (!obsRes.ok || !metRes.ok) {
+        throw new Error(
+          obsData.error || metData.error || "Failed to load gravitational seismic telemetry"
+        );
+      }
 
       if (obsData.observatories) {
         setObservatories(obsData.observatories);
         if (obsData.observatories.length > 0) {
-          setSelectedObsId((prev) => prev || obsData.observatories[0].observatory_id);
+          setSelectedObsId((prev) => prev || obsData.observatories![0].observatory_id);
         }
       }
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
-      console.error("Failed to load gravitational seismic data", e);
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Failed to load gravitational seismic data"
+      );
     } finally {
       setLoading(false);
     }
@@ -101,6 +116,7 @@ export function GravitationalSeismicStudio() {
   const handleAnalyzeStrain = async () => {
     if (!selectedObsId) return;
     setAnalyzing(true);
+    setErrorMsg(null);
     try {
       const payload = {
         observatory_id: selectedObsId,
@@ -115,13 +131,19 @@ export function GravitationalSeismicStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        analysis?: StrainAnalysis;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to analyze strain tensor");
+      }
       if (data.analysis) {
         setLatestAnalysis(data.analysis);
         fetchObservatoriesAndMetrics();
       }
-    } catch (e) {
-      console.error("Failed to analyze strain tensor", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to analyze strain tensor");
     } finally {
       setAnalyzing(false);
     }
@@ -129,6 +151,7 @@ export function GravitationalSeismicStudio() {
 
   const handleTriangulate = async () => {
     setTriangulating(true);
+    setErrorMsg(null);
     try {
       const payload = {
         event_label: "SUBCRUSTAL_SEISMIC_TAMPER_TDOA",
@@ -145,12 +168,20 @@ export function GravitationalSeismicStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        triangulation?: TriangulationResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to triangulate sub-crustal tamper");
+      }
       if (data.triangulation) {
         setLatestTriangulation(data.triangulation);
       }
-    } catch (e) {
-      console.error("Failed to triangulate sub-crustal tamper", e);
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Failed to triangulate sub-crustal tamper"
+      );
     } finally {
       setTriangulating(false);
     }
@@ -160,6 +191,24 @@ export function GravitationalSeismicStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Top Banner */}
       <div className="relative overflow-hidden rounded-xl border border-teal-800/50 bg-gradient-to-r from-slate-950 via-teal-950/25 to-slate-950 p-6 shadow-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -182,6 +231,7 @@ export function GravitationalSeismicStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchObservatoriesAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -232,6 +282,7 @@ export function GravitationalSeismicStudio() {
             <div className="space-y-2">
               {observatories.map((o) => (
                 <button
+                  type="button"
                   key={o.observatory_id}
                   onClick={() => setSelectedObsId(o.observatory_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -307,6 +358,7 @@ export function GravitationalSeismicStudio() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={handleAnalyzeStrain}
                   disabled={analyzing}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-teal-600/20 disabled:opacity-50"
@@ -315,6 +367,7 @@ export function GravitationalSeismicStudio() {
                   {analyzing ? "Analyzing Strain..." : "Analyze Strain"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleTriangulate}
                   disabled={triangulating}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50"

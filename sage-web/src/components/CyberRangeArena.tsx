@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Swords,
   ShieldCheck,
@@ -68,26 +68,38 @@ export function CyberRangeArena() {
   const [running, setRunning] = useState(false);
   const [drillResult, setDrillResult] = useState<DrillResult | null>(null);
   const [activeStageIndex, setActiveStageIndex] = useState<number>(0);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchScenarios = async () => {
+  const extractAxiosError = useCallback((err: unknown, fallback: string) => {
+    const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+    return (
+      ax?.response?.data?.detail ||
+      ax?.response?.data?.error ||
+      (err instanceof Error ? err.message : fallback)
+    );
+  }, []);
+
+  const fetchScenarios = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/simulation/scenarios");
       if (res.data?.scenarios) {
         setScenarios(res.data.scenarios);
       }
-    } catch (err) {
-      console.error("Failed to load scenarios", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Failed to load cyber range scenarios."));
     }
-  };
+  }, [extractAxiosError]);
 
   useEffect(() => {
     fetchScenarios();
-  }, []);
+  }, [fetchScenarios]);
 
   const handleRunDrill = async () => {
     setRunning(true);
     setDrillResult(null);
     setActiveStageIndex(0);
+    setErrorMsg(null);
 
     try {
       const res = await axios.post("/api/simulation/run-drill", {
@@ -102,9 +114,11 @@ export function CyberRangeArena() {
           await new Promise((r) => setTimeout(r, 350));
           setActiveStageIndex(i + 1);
         }
+      } else {
+        setErrorMsg("Drill execution did not return success status.");
       }
-    } catch (err) {
-      console.error("Drill simulation error", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Failed to run autonomous cyber range drill."));
     } finally {
       setRunning(false);
     }
@@ -131,6 +145,24 @@ export function CyberRangeArena() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Top Banner */}
       <div className="p-6 bg-gradient-to-r from-red-950/30 via-zinc-900 to-black border border-red-500/20 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -191,6 +223,7 @@ export function CyberRangeArena() {
 
         <div>
           <button
+            type="button"
             onClick={handleRunDrill}
             disabled={running}
             className="w-full py-2.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-red-900/30"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { AlertCircle, ShieldAlert, CheckCircle, FileCode, Upload, RefreshCw, Lock, Terminal, Activity, GitBranch, ExternalLink } from "lucide-react";
+import { AlertCircle, ShieldAlert, CheckCircle, FileCode, Upload, RefreshCw, Lock, Terminal, Activity, GitBranch, ExternalLink, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface IncidentAction {
@@ -56,9 +56,20 @@ export function IncidentCenter() {
   const [reLoading, setReLoading] = useState(false);
   const [reResult, setReResult] = useState<ReverseEngResult | null>(null);
   const [ingesting, setIngesting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const extractAxiosError = (err: unknown, fallback: string) => {
+    const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+    return (
+      ax?.response?.data?.detail ||
+      ax?.response?.data?.error ||
+      (err instanceof Error ? err.message : fallback)
+    );
+  };
 
   const fetchIncidents = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/incidents");
       const list = res.data?.incidents || [];
@@ -66,8 +77,8 @@ export function IncidentCenter() {
       if (list.length > 0) {
         setSelectedIncident((prev) => prev || list[0]);
       }
-    } catch {
-      // Mock fallback
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Failed to load SOAR incidents."));
       setIncidents([]);
     } finally {
       setLoading(false);
@@ -81,6 +92,7 @@ export function IncidentCenter() {
   const handleIngestSimulatedAlert = async () => {
     setIngesting(true);
     setMessage(null);
+    setErrorMsg(null);
     try {
       const res = await axios.post("/api/incidents", {
         title: "Autonomous NIDS Alert: Lateral SMB Credential Access Attempt",
@@ -98,8 +110,9 @@ export function IncidentCenter() {
         await fetchIncidents();
         setSelectedIncident(res.data.incident);
       }
-    } catch (err: any) {
-      const detail = err.response?.data?.detail || err.message;
+    } catch (err: unknown) {
+      const detail = extractAxiosError(err, "Ingestion failed");
+      setErrorMsg(`Ingestion failed: ${detail}`);
       setMessage(`Ingestion failed: ${detail}`);
     } finally {
       setIngesting(false);
@@ -110,6 +123,7 @@ export function IncidentCenter() {
     if (!selectedIncident || actionLoading) return;
     setActionLoading(true);
     setMessage(null);
+    setErrorMsg(null);
 
     try {
       const res = await axios.post("/api/incidents/action", {
@@ -123,8 +137,9 @@ export function IncidentCenter() {
       } else {
         setMessage(res.data?.message || "Action completed.");
       }
-    } catch (err: any) {
-      const detail = err.response?.data?.detail || err.message;
+    } catch (err: unknown) {
+      const detail = extractAxiosError(err, "Authorization blocked");
+      setErrorMsg(`Authorization blocked: ${detail}`);
       setMessage(`Authorization blocked: ${detail}`);
     } finally {
       setActionLoading(false);
@@ -135,6 +150,7 @@ export function IncidentCenter() {
     setRemediating(true);
     setPatchResult(null);
     setMessage(null);
+    setErrorMsg(null);
     try {
       const res = await axios.post(`/api/incidents/${incidentId}/remediate`, {
         repository: "demo/security-service",
@@ -146,8 +162,9 @@ export function IncidentCenter() {
       } else {
         setMessage(res.data?.message || "Remediation submitted.");
       }
-    } catch (err: any) {
-      const detail = err.response?.data?.detail || err.message;
+    } catch (err: unknown) {
+      const detail = extractAxiosError(err, "Remediation failed");
+      setErrorMsg(`Remediation error: ${detail}`);
       setMessage(`Remediation error: ${detail}`);
     } finally {
       setRemediating(false);
@@ -157,6 +174,7 @@ export function IncidentCenter() {
   const handleRunReverseEngineering = async () => {
     setReLoading(true);
     setReResult(null);
+    setErrorMsg(null);
     try {
       // Encode sample to base64
       const b64 = btoa(unescape(encodeURIComponent(reSampleText)));
@@ -167,8 +185,8 @@ export function IncidentCenter() {
       if (res.data?.analysis) {
         setReResult(res.data.analysis);
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Reverse engineering analysis failed."));
     } finally {
       setReLoading(false);
     }
@@ -176,6 +194,24 @@ export function IncidentCenter() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="p-5 rounded-xl bg-gradient-to-r from-red-950/40 via-zinc-900/60 to-black border border-red-900/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -189,6 +225,7 @@ export function IncidentCenter() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={handleIngestSimulatedAlert}
             disabled={ingesting}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-800/80 text-xs font-mono text-red-200 hover:text-white hover:bg-red-900/60 transition disabled:opacity-50"
@@ -197,6 +234,7 @@ export function IncidentCenter() {
             {ingesting ? "Ingesting..." : "Ingest Detector Alert"}
           </button>
           <button
+            type="button"
             onClick={fetchIncidents}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white"
           >
@@ -209,7 +247,7 @@ export function IncidentCenter() {
       {message && (
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-200 flex items-center justify-between">
           <span>{message}</span>
-          <button onClick={() => setMessage(null)} className="text-zinc-500 hover:text-white">✕</button>
+          <button type="button" onClick={() => setMessage(null)} className="text-zinc-500 hover:text-white">✕</button>
         </div>
       )}
 
@@ -278,6 +316,7 @@ export function IncidentCenter() {
                 <div className="flex flex-wrap gap-2">
                   {selectedIncident.suggested_actions.map((act, i) => (
                     <button
+                      type="button"
                       key={i}
                       onClick={() => handleExecuteAction(act.action)}
                       disabled={actionLoading}
@@ -293,6 +332,7 @@ export function IncidentCenter() {
                     </button>
                   ))}
                   <button
+                    type="button"
                     onClick={() => handleRemediate(selectedIncident.incident_id)}
                     disabled={remediating}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-blue-900/30 text-blue-300 border border-blue-800/60 hover:bg-blue-900/50 transition"
@@ -414,6 +454,7 @@ export function IncidentCenter() {
               className="w-full bg-black/60 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 font-mono"
             />
             <button
+              type="button"
               onClick={handleRunReverseEngineering}
               disabled={reLoading}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs transition"

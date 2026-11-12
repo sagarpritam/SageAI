@@ -31,6 +31,7 @@ from app.routers import (
     airgap_llm_guard_routes,
     alcubierre_lentz_warp_routes,
     algebraic_qft_routes,
+    altermagnetic_supergrid_routes,
     amplituhedron_scattering_routes,
     antimatter_containment_routes,
     antimatter_fusion_routes,
@@ -69,6 +70,7 @@ from app.routers import (
     ci_routes,
     cislunar_relay_routes,
     cloud_forensics_routes,
+    cluster_associahedron_routes,
     cluster_federation_routes,
     cognitive_ew_routes,
     complexity_holography_routes,
@@ -127,6 +129,7 @@ from app.routers import (
     iac_drift_routes,
     incident_routes,
     industrial_scada_routes,
+    infinity_cobordism_routes,
     inflaton_reheating_routes,
     integration_routes,
     intelligence_hub_routes,
@@ -179,6 +182,7 @@ from app.routers import (
     quantum_extremal_island_routes,
     quantum_gravitational_routes,
     quantum_thermoelectric_routes,
+    quantum_yangian_routes,
     randall_sundrum_routes,
     ransomware_routes,
     redteam_cluster_routes,
@@ -548,6 +552,10 @@ app.include_router(chromatic_morava_routes.router)
 app.include_router(fukaya_floer_routes.router)
 app.include_router(operadic_bar_cobar_routes.router)
 app.include_router(kagome_supergrid_routes.router)
+app.include_router(cluster_associahedron_routes.router)
+app.include_router(quantum_yangian_routes.router)
+app.include_router(infinity_cobordism_routes.router)
+app.include_router(altermagnetic_supergrid_routes.router)
 
 
 # ---------------------

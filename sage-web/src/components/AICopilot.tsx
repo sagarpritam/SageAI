@@ -38,6 +38,7 @@ export function AICopilot({ scanId }: { scanId?: string }) {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export function AICopilot({ scanId }: { scanId?: string }) {
     if (!customText) setInput("");
     setMessages((prev) => [...prev, { role: "user", content: msg }]);
     setLoading(true);
+    setErrorMsg(null);
 
     try {
       // Connect to Phase 02 Copilot API
@@ -78,7 +80,15 @@ export function AICopilot({ scanId }: { scanId?: string }) {
           ...prev,
           { role: "assistant", content: fallbackRes.data.reply },
         ]);
-      } catch {
+      } catch (err: unknown) {
+        const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+        const msgText =
+          ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error
+            ? err.message
+            : "AI service unavailable. Verify FastAPI backend and session.");
+        setErrorMsg(msgText);
         setMessages((prev) => [
           ...prev,
           {
@@ -116,6 +126,24 @@ export function AICopilot({ scanId }: { scanId?: string }) {
       </div>
 
       {/* Messages */}
+      {errorMsg && (
+        <div
+          role="alert"
+          className="mx-5 mt-3 bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 font-sans">
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-3 ${m.role === "user" ? "justify-end" : ""}`}>
@@ -170,18 +198,21 @@ export function AICopilot({ scanId }: { scanId?: string }) {
       {/* Suggestion Chips */}
       <div className="px-5 py-2 bg-zinc-900/40 border-t border-zinc-800/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <button
+          type="button"
           onClick={() => handleSend("Explain CVE-2024-21887 and check CISA KEV exploitation")}
           className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
         >
           🚨 CISA KEV Exploits
         </button>
         <button
+          type="button"
           onClick={() => handleSend("Generate safe non-destructive curl command to check for missing security headers")}
           className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
         >
           🛡️ Safe PoC Curl
         </button>
         <button
+          type="button"
           onClick={() => handleSend("Summarize the latest scan results and high severity findings")}
           className="px-2.5 py-1 rounded-full text-[11px] bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500/50 hover:text-white shrink-0 transition-colors"
         >
@@ -200,6 +231,7 @@ export function AICopilot({ scanId }: { scanId?: string }) {
             className="flex-1 bg-black/60 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
           />
           <button
+            type="button"
             onClick={() => handleSend()}
             disabled={loading || !input.trim()}
             aria-label="Send message"

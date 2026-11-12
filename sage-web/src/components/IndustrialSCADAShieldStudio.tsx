@@ -50,6 +50,7 @@ export function IndustrialSCADAShieldStudio() {
   const [inspecting, setInspecting] = useState(false);
   const [inspectionResult, setInspectionResult] = useState<InspectionResult | null>(null);
   const [inspectionLogs, setInspectionLogs] = useState<InspectionResult[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedSelectionRef = useRef(false);
 
   const setDefaultValueForPlc = useCallback((plc: PLCRecord) => {
@@ -64,9 +65,16 @@ export function IndustrialSCADAShieldStudio() {
 
   const fetchPLCs = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/industrial-scada/plcs");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        plcs?: PLCRecord[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load industrial PLCs");
+      }
       if (data.plcs) {
         setPlcs(data.plcs);
         if (!hasInitializedSelectionRef.current && data.plcs.length > 0) {
@@ -75,6 +83,8 @@ export function IndustrialSCADAShieldStudio() {
           setDefaultValueForPlc(data.plcs[0]);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load industrial PLCs");
     } finally {
       setLoading(false);
     }
@@ -94,6 +104,7 @@ export function IndustrialSCADAShieldStudio() {
   async function handleTransmitPacket() {
     if (!selectedPlc) return;
     setInspecting(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/industrial-scada/inspect-packet", {
         method: "POST",
@@ -106,7 +117,13 @@ export function IndustrialSCADAShieldStudio() {
           requested_value: Number(testValue),
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        inspection?: InspectionResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to transmit SCADA packet");
+      }
       if (data.inspection) {
         const item: InspectionResult = {
           ...data.inspection,
@@ -129,6 +146,8 @@ export function IndustrialSCADAShieldStudio() {
           );
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to transmit SCADA packet");
     } finally {
       setInspecting(false);
     }
@@ -138,6 +157,24 @@ export function IndustrialSCADAShieldStudio() {
 
   return (
     <div className="space-y-6 text-zinc-100">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-xl backdrop-blur-md">
         <div className="flex items-center gap-4">
@@ -163,6 +200,7 @@ export function IndustrialSCADAShieldStudio() {
         </div>
 
         <button
+          type="button"
           onClick={fetchPLCs}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
@@ -313,6 +351,7 @@ export function IndustrialSCADAShieldStudio() {
                   />
 
                   <button
+                    type="button"
                     onClick={handleTransmitPacket}
                     disabled={inspecting}
                     className="whitespace-nowrap px-6 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 shadow-lg shadow-amber-500/20 transition disabled:opacity-50 flex items-center gap-2"
@@ -331,18 +370,21 @@ export function IndustrialSCADAShieldStudio() {
                   {selectedPlc.enforced_envelope.includes("RPM") && (
                     <>
                       <button
+                        type="button"
                         onClick={() => setTestValue(3000)}
                         className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono"
                       >
                         Safe (3000 RPM)
                       </button>
                       <button
+                        type="button"
                         onClick={() => setTestValue(3800)}
                         className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-mono"
                       >
                         Overspeed Attack (3800 RPM)
                       </button>
                       <button
+                        type="button"
                         onClick={() => setTestValue(5200)}
                         className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-mono"
                       >
@@ -353,12 +395,14 @@ export function IndustrialSCADAShieldStudio() {
                   {selectedPlc.enforced_envelope.includes("PH") && (
                     <>
                       <button
+                        type="button"
                         onClick={() => setTestValue(7.2)}
                         className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono"
                       >
                         Neutral Safe (7.2 pH)
                       </button>
                       <button
+                        type="button"
                         onClick={() => setTestValue(13.8)}
                         className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-mono"
                       >
@@ -369,12 +413,14 @@ export function IndustrialSCADAShieldStudio() {
                   {selectedPlc.enforced_envelope.includes("FREQUENCY") && (
                     <>
                       <button
+                        type="button"
                         onClick={() => setTestValue(60.0)}
                         className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono"
                       >
                         Standard Grid (60.0 Hz)
                       </button>
                       <button
+                        type="button"
                         onClick={() => setTestValue(68.5)}
                         className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-mono"
                       >

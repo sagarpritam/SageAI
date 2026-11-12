@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.2.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.3.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.2.0");
-    expect(healthJson.version).toBe("8.2.0");
+    expect(healthJson.platform_version).toBe("8.3.0");
+    expect(healthJson.version).toBe("8.3.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1278,6 +1278,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(kagBody.status).toBe("KAGOME_SUPERGRID_OPTIMAL");
     expect(kagBody.zero_fossil_carbon).toBe(true);
     expect(Number(kagBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 43 studios (Caps 149-151 & Option B) return 200 deterministically offline
+    const clList = await request.get("/api/cluster-algebra-associahedron/clusters");
+    expect(clList.status()).toBe(200);
+    const clSim = await request.post("/api/cluster-algebra-associahedron/seal-cluster", {
+      data: {
+        cluster_id: "CLUSTER-A4-STASHEFF-01",
+        cluster_rank: 4,
+        stasheff_vertices: 14,
+        quiver_mutation_depth: 12,
+      },
+    });
+    expect(clSim.status()).toBe(200);
+    expect(((await clSim.json()) as { status?: string }).status).toBe(
+      "CLUSTER_ASSOCIAHEDRON_SEALED"
+    );
+
+    const ynList = await request.get("/api/kashiwara-quantum-affine-yangian/yangians");
+    expect(ynList.status()).toBe(200);
+    const ynSim = await request.post("/api/kashiwara-quantum-affine-yangian/seal-yangian", {
+      data: {
+        yangian_id: "YANGIAN-SL4-RMATRIX-01",
+        yangian_rank: 4,
+        bethe_roots_count: 16,
+        baxter_q_depth: 12,
+      },
+    });
+    expect(ynSim.status()).toBe(200);
+    expect(((await ynSim.json()) as { status?: string }).status).toBe(
+      "QUANTUM_YANGIAN_SEALED"
+    );
+
+    const cbList = await request.get("/api/infinity-topos-lurie-cobordism/cobordisms");
+    expect(cbList.status()).toBe(200);
+    const cbSim = await request.post("/api/infinity-topos-lurie-cobordism/seal-cobordism", {
+      data: {
+        cobordism_id: "BORDISM-INF3-FRAMED-01",
+        category_dimension_n: 3,
+        dualizable_cells: 18,
+        stratified_seams: 14,
+      },
+    });
+    expect(cbSim.status()).toBe(200);
+    expect(((await cbSim.json()) as { status?: string }).status).toBe(
+      "INFINITY_COBORDISM_SEALED"
+    );
+
+    const altList = await request.get("/api/altermagnetic-magnon-supergrid/arrays");
+    expect(altList.status()).toBe(200);
+    const altSim = await request.post("/api/altermagnetic-magnon-supergrid/harvest-altermagnet", {
+      data: {
+        array_id: "ALTERMAG-RUO2-ARRAY-01",
+        spin_splitting_mev: 480.0,
+        magnon_coherence_gain: 1.6,
+      },
+    });
+    expect(altSim.status()).toBe(200);
+    const altBody = (await altSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(altBody.status).toBe("ALTERMAGNETIC_SUPERGRID_OPTIMAL");
+    expect(altBody.zero_fossil_carbon).toBe(true);
+    expect(Number(altBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–42 • Current",
-    range: "Capabilities 101–148 + Option B",
+    wave: "Waves 27–43 • Current",
+    range: "Capabilities 101–151 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Chromatic Morava E-Theory Firewall, Fukaya A_infinity Floer Homology Shield, Koszul Operadic Bar-Cobar Formality Guard, Hitchin Moduli & Kagome Polariton Supergrid.",
+    detail: "Cluster Algebra Associahedron Firewall, Quantum Affine Yangian R-Matrix Shield, Lurie (infinity,n)-Category Bordism Hypothesis, Chromatic Morava & Altermagnetic Magnon Supergrid.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 42 Chromatic Morava, Fukaya Floer &amp; Koszul Operadic orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 43 Cluster Associahedron, Quantum Yangian &amp; Infinity Cobordism orchestration.
           </p>
         </div>
 

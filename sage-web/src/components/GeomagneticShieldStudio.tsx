@@ -14,6 +14,7 @@ import {
   Flame,
   Radio,
   Gauge,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Substation {
@@ -68,6 +69,7 @@ export function GeomagneticShieldStudio() {
   const [evaluation, setEvaluation] = useState<StormEvaluation | null>(null);
   const [blockingEvent, setBlockingEvent] = useState<BlockingEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
@@ -75,18 +77,31 @@ export function GeomagneticShieldStudio() {
 
   const fetchSubstations = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/geomagnetic-shield/substations");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        status?: string;
+        substations?: Substation[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch EHV substations");
+      }
       if (data.status === "success" && data.substations) {
         setSubstations(data.substations);
         if (data.substations.length > 0) {
-          setSelectedSubstation((prev) => prev || data.substations[0]);
+          setSelectedSubstation((prev) => prev || data.substations![0]);
         }
         addLog(`Loaded ${data.substations.length} EHV transmission power grid substations.`);
       }
-    } catch {
-      addLog("Failed to fetch substations; using fallback space weather telemetry.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch substations; using fallback space weather telemetry.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setLoading(false);
     }
@@ -99,6 +114,7 @@ export function GeomagneticShieldStudio() {
   const handleEvaluateStorm = async (simulateCME = false) => {
     if (!selectedSubstation) return;
     setEvaluating(true);
+    setErrorMsg(null);
     const testKp = simulateCME ? 9.0 : kpIndex;
     const testRate = simulateCME ? 1250.0 : dbDt;
     const testGic = simulateCME ? 148.0 : gicAmps;
@@ -115,7 +131,13 @@ export function GeomagneticShieldStudio() {
           measured_gic_amps: testGic,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        evaluation?: StormEvaluation;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Geomagnetic space weather evaluation failed.");
+      }
       if (data.evaluation) {
         setEvaluation(data.evaluation);
         if (data.evaluation.threat_detected) {
@@ -124,8 +146,11 @@ export function GeomagneticShieldStudio() {
           addLog(`✓ Magnetosphere field nominal: ${data.evaluation.action_recommended}`);
         }
       }
-    } catch {
-      addLog("Geomagnetic space weather evaluation failed.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Geomagnetic space weather evaluation failed.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setEvaluating(false);
     }
@@ -134,6 +159,7 @@ export function GeomagneticShieldStudio() {
   const handleTriggerBlocking = async () => {
     if (!selectedSubstation) return;
     setTripping(true);
+    setErrorMsg(null);
     try {
       addLog(`Tripping sub-12ms series blocking capacitor & NGR on ${selectedSubstation.substation_id}...`);
       const res = await fetch("/api/geomagnetic-shield/trigger-blocking", {
@@ -145,13 +171,22 @@ export function GeomagneticShieldStudio() {
           tripping_latency_ms: 9.4,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        blocking_event?: BlockingEvent;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to trip series capacitor shield.");
+      }
       if (data.blocking_event) {
         setBlockingEvent(data.blocking_event);
         addLog(`🛡️ GIC Series Capacitor Tripped in ${data.blocking_event.tripping_speed_ms} ms! GIC quenched: ${data.blocking_event.quenched_gic_reduction_pct}%. Residual: ${data.blocking_event.residual_gic_amps} A.`);
       }
-    } catch {
-      addLog("Failed to trip series capacitor shield.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Failed to trip series capacitor shield.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setTripping(false);
     }
@@ -159,6 +194,24 @@ export function GeomagneticShieldStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-orange-900/20 to-neutral-900/60 p-6 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -181,6 +234,7 @@ export function GeomagneticShieldStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchSubstations}
             disabled={loading}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3.5 py-1.5 text-xs font-medium text-neutral-200 transition hover:bg-neutral-700/80"
@@ -281,6 +335,7 @@ export function GeomagneticShieldStudio() {
 
           <div className="flex flex-wrap gap-2 pt-2">
             <button
+              type="button"
               onClick={() => handleEvaluateStorm(false)}
               disabled={evaluating}
               className="flex items-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow hover:bg-amber-500"
@@ -289,6 +344,7 @@ export function GeomagneticShieldStudio() {
               Evaluate Space Weather
             </button>
             <button
+              type="button"
               onClick={() => handleEvaluateStorm(true)}
               disabled={evaluating}
               className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/30 px-3.5 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-900/40"
@@ -297,6 +353,7 @@ export function GeomagneticShieldStudio() {
               Simulate Severe CME Incursion
             </button>
             <button
+              type="button"
               onClick={handleTriggerBlocking}
               disabled={tripping}
               className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/30 px-3.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/40"

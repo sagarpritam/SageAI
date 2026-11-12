@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 42 Waves (Capabilities 1 to 148).
+Live Multi-Domain Stress Test & Verification across All 43 Waves (Capabilities 1 to 151).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -1607,6 +1607,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 42 (Opt B): Kagome Chern Supergrid Baseload Harvest",
         ),
+        # Wave 43 (Caps 149-151 & Option B)
+        (
+            "GET",
+            "/api/cluster-algebra-associahedron/clusters",
+            None,
+            "Wave 43 (Cap 149): Cluster Associahedra List",
+        ),
+        (
+            "POST",
+            "/api/cluster-algebra-associahedron/seal-cluster",
+            {
+                "cluster_id": "CLUSTER-A4-STASHEFF-01",
+                "cluster_rank": 4,
+                "stasheff_vertices": 14,
+                "quiver_mutation_depth": 12,
+                "cluster_gain": 1.6,
+            },
+            "Wave 43 (Cap 149): Cluster Associahedron Mutation Seal",
+        ),
+        (
+            "GET",
+            "/api/kashiwara-quantum-affine-yangian/yangians",
+            None,
+            "Wave 43 (Cap 150): Quantum Affine Yangians List",
+        ),
+        (
+            "POST",
+            "/api/kashiwara-quantum-affine-yangian/seal-yangian",
+            {
+                "yangian_id": "YANGIAN-SL4-RMATRIX-01",
+                "yangian_rank": 4,
+                "bethe_roots_count": 16,
+                "baxter_q_depth": 12,
+                "yangian_gain": 1.6,
+            },
+            "Wave 43 (Cap 150): Quantum Yangian R-Matrix Seal",
+        ),
+        (
+            "GET",
+            "/api/infinity-topos-lurie-cobordism/cobordisms",
+            None,
+            "Wave 43 (Cap 151): Lurie Infinity Cobordisms List",
+        ),
+        (
+            "POST",
+            "/api/infinity-topos-lurie-cobordism/seal-cobordism",
+            {
+                "cobordism_id": "BORDISM-INF3-FRAMED-01",
+                "category_dimension_n": 3,
+                "dualizable_cells": 18,
+                "stratified_seams": 14,
+                "cobordism_gain": 1.6,
+            },
+            "Wave 43 (Cap 151): Lurie Infinity Cobordism Seal",
+        ),
+        (
+            "GET",
+            "/api/altermagnetic-magnon-supergrid/arrays",
+            None,
+            "Wave 43 (Opt B): Altermagnetic Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/altermagnetic-magnon-supergrid/harvest-altermagnet",
+            {
+                "array_id": "ALTERMAG-RUO2-ARRAY-01",
+                "spin_splitting_mev": 480.0,
+                "magnon_coherence_gain": 1.6,
+            },
+            "Wave 43 (Opt B): Altermagnetic Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1636,7 +1707,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-42, CAPS 1-148) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-43, CAPS 1-151) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1651,7 +1722,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-42 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-43 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1708,7 +1779,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-42){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-43){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1724,7 +1795,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-42 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-43 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1736,7 +1807,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 232)
+        total_requests if total_requests is not None else max(endpoints_count, 240)
     )
 
     if in_process:
@@ -1772,7 +1843,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-42, Capabilities 1-148) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-43, Capabilities 1-151) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

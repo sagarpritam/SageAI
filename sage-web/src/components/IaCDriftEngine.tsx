@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   Server,
   Terminal,
+  AlertTriangle,
 } from "lucide-react";
 
 export function IaCDriftEngine() {
@@ -18,21 +19,27 @@ export function IaCDriftEngine() {
   const [prLoading, setPrLoading] = useState(false);
   const [driftReport, setDriftReport] = useState<any>(null);
   const [generatedPR, setGeneratedPR] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const scanDrift = async () => {
     setLoading(true);
     setGeneratedPR(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/iac-drift/scan", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setDriftReport(data.drift_report);
+      const data = (await res.json().catch(() => ({}))) as {
+        drift_report?: unknown;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to scan IaC drift");
       }
-    } catch (e) {
-      console.error(e);
+      setDriftReport(data.drift_report);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to scan IaC drift");
     } finally {
       setLoading(false);
     }
@@ -41,6 +48,7 @@ export function IaCDriftEngine() {
   const generatePR = async () => {
     if (!driftReport) return;
     setPrLoading(true);
+    setErrorMsg(null);
     try {
       const driftIds = driftReport.drifts.map((d: any) => d.drift_id);
       const res = await fetch("/api/iac-drift/pr", {
@@ -48,12 +56,18 @@ export function IaCDriftEngine() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ drift_ids: driftIds }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setGeneratedPR(data.pull_request);
+      const data = (await res.json().catch(() => ({}))) as {
+        pull_request?: unknown;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to generate remediation PR");
       }
-    } catch (e) {
-      console.error(e);
+      setGeneratedPR(data.pull_request);
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Failed to generate remediation PR"
+      );
     } finally {
       setPrLoading(false);
     }
@@ -61,6 +75,24 @@ export function IaCDriftEngine() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
         <div>
@@ -76,6 +108,7 @@ export function IaCDriftEngine() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={scanDrift}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-sky-950/40 disabled:opacity-50"
@@ -118,6 +151,7 @@ export function IaCDriftEngine() {
               </div>
             </div>
             <button
+              type="button"
               onClick={generatePR}
               disabled={prLoading}
               className="flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg transition-all shadow-md disabled:opacity-50"

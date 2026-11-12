@@ -14,6 +14,7 @@ import {
   Wind,
   Radio,
   Scan,
+  AlertTriangle,
 } from "lucide-react";
 
 interface HAPSNode {
@@ -69,6 +70,7 @@ export function HAPSStratosphereStudio() {
   const [flightMonitor, setFlightMonitor] = useState<FlightMonitor | null>(null);
   const [telemetryEvent, setTelemetryEvent] = useState<TelemetryEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
@@ -76,18 +78,31 @@ export function HAPSStratosphereStudio() {
 
   const fetchNodes = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/haps-stratosphere/nodes");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        status?: string;
+        nodes?: HAPSNode[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch HAPS nodes");
+      }
       if (data.status === "success" && data.nodes) {
         setNodes(data.nodes);
         if (data.nodes.length > 0) {
-          setSelectedNode((prev) => prev || data.nodes[0]);
+          setSelectedNode((prev) => prev || data.nodes![0]);
         }
         addLog(`Loaded ${data.nodes.length} stratospheric HAPS surveillance platforms.`);
       }
-    } catch {
-      addLog("Failed to fetch HAPS nodes; using fallback telemetry.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch HAPS nodes; using fallback telemetry.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setLoading(false);
     }
@@ -100,6 +115,7 @@ export function HAPSStratosphereStudio() {
   const handleMonitorFlight = async (simulateShear = false) => {
     if (!selectedNode) return;
     setMonitoring(true);
+    setErrorMsg(null);
     const testWind = simulateShear ? 42.5 : windMps;
     const testJitter = simulateShear ? 4.8 : opticalJitter;
 
@@ -116,7 +132,13 @@ export function HAPSStratosphereStudio() {
           optical_link_jitter_urad: testJitter,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        flight_monitor?: FlightMonitor;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Stratospheric flight monitoring failed.");
+      }
       if (data.flight_monitor) {
         setFlightMonitor(data.flight_monitor);
         if (data.flight_monitor.threat_detected) {
@@ -125,8 +147,11 @@ export function HAPSStratosphereStudio() {
           addLog(`✓ Stratospheric flight nominal: Station-keeping at ${data.flight_monitor.station_keeping_efficiency_pct}%.`);
         }
       }
-    } catch {
-      addLog("Stratospheric flight monitoring failed.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Stratospheric flight monitoring failed.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setMonitoring(false);
     }
@@ -135,6 +160,7 @@ export function HAPSStratosphereStudio() {
   const handleRelaySAR = async () => {
     if (!selectedNode) return;
     setRelaying(true);
+    setErrorMsg(null);
     try {
       addLog(`Downlinking sub-millimeter SAR ground telemetry from ${selectedNode.node_id}...`);
       const res = await fetch("/api/haps-stratosphere/relay-sar", {
@@ -146,13 +172,21 @@ export function HAPSStratosphereStudio() {
           pqc_cipher: "ML-DSA-87_AES256GCM",
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        telemetry_event?: TelemetryEvent;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to downlink SAR telemetry.");
+      }
       if (data.telemetry_event) {
         setTelemetryEvent(data.telemetry_event);
         addLog(`🛰️ SAR Ground Telemetry Downlinked! Resolution: ${data.telemetry_event.sar_resolution_meters}m · Cipher: ${data.telemetry_event.pqc_signature_algorithm} · Targets Correlated: ${data.telemetry_event.target_tracks_correlated}.`);
       }
-    } catch {
-      addLog("Failed to downlink SAR telemetry.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to downlink SAR telemetry.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setRelaying(false);
     }
@@ -160,6 +194,24 @@ export function HAPSStratosphereStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-sky-500/30 bg-gradient-to-br from-sky-950/40 via-blue-900/20 to-neutral-900/60 p-6 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -182,6 +234,7 @@ export function HAPSStratosphereStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchNodes}
             disabled={loading}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3.5 py-1.5 text-xs font-medium text-neutral-200 transition hover:bg-neutral-700/80"
@@ -280,6 +333,7 @@ export function HAPSStratosphereStudio() {
 
           <div className="flex flex-wrap gap-2 pt-2">
             <button
+              type="button"
               onClick={() => handleMonitorFlight(false)}
               disabled={monitoring}
               className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow hover:bg-sky-500"
@@ -288,6 +342,7 @@ export function HAPSStratosphereStudio() {
               Monitor Aero Station-Keeping
             </button>
             <button
+              type="button"
               onClick={() => handleMonitorFlight(true)}
               disabled={monitoring}
               className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/30 px-3.5 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-900/40"
@@ -296,6 +351,7 @@ export function HAPSStratosphereStudio() {
               Simulate Jet Stream Shear
             </button>
             <button
+              type="button"
               onClick={handleRelaySAR}
               disabled={relaying}
               className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/30 px-3.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/40"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Swords, ShieldCheck, Scale, Cpu, Play, CheckCircle2, AlertOctagon, HelpCircle, Activity, ShieldAlert, Sparkles } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Swords, ShieldCheck, Scale, Cpu, Play, CheckCircle2, AlertOctagon, HelpCircle, Activity, Sparkles, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface CouncilModelHealth {
@@ -48,15 +48,27 @@ export function AIConsensusArena() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ConsensusResult | null>(null);
   const [councilModels, setCouncilModels] = useState<CouncilModelHealth[]>([]);
-  const [telemetryLoading, setTelemetryLoading] = useState(true);
+  const [, setTelemetryLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchCouncilHealth = async () => {
+  const extractAxiosError = useCallback((err: unknown, fallback: string) => {
+    const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+    return (
+      ax?.response?.data?.detail ||
+      ax?.response?.data?.error ||
+      (err instanceof Error ? err.message : fallback)
+    );
+  }, []);
+
+  const fetchCouncilHealth = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await axios.get("/api/consensus/council-health");
       if (res.data?.matrix?.models) {
         setCouncilModels(res.data.matrix.models);
       }
-    } catch {
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Council health endpoint unavailable; displaying offline diagnostic matrix."));
       // Diagnostic fallback
       setCouncilModels([
         {
@@ -115,16 +127,17 @@ export function AIConsensusArena() {
     } finally {
       setTelemetryLoading(false);
     }
-  };
+  }, [extractAxiosError]);
 
   useEffect(() => {
     fetchCouncilHealth();
-  }, []);
+  }, [fetchCouncilHealth]);
 
   const handleRunConsensus = async () => {
     if (!title || !target || loading) return;
     setLoading(true);
     setResult(null);
+    setErrorMsg(null);
 
     try {
       const res = await axios.post("/api/consensus", {
@@ -135,9 +148,11 @@ export function AIConsensusArena() {
       if (res.data?.evaluation) {
         setResult(res.data.evaluation);
         fetchCouncilHealth();
+      } else {
+        setErrorMsg("Consensus response returned without evaluation payload.");
       }
-    } catch (err) {
-      console.error("Consensus evaluation error", err);
+    } catch (err: unknown) {
+      setErrorMsg(extractAxiosError(err, "Tri-model consensus evaluation failed."));
     } finally {
       setLoading(false);
     }
@@ -145,6 +160,24 @@ export function AIConsensusArena() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Top Banner */}
       <div className="p-5 rounded-xl bg-gradient-to-r from-purple-950/30 via-zinc-900/60 to-black border border-purple-900/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -228,6 +261,7 @@ export function AIConsensusArena() {
         </div>
 
         <button
+          type="button"
           onClick={handleRunConsensus}
           disabled={loading}
           className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition disabled:opacity-50"

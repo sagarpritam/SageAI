@@ -15,6 +15,7 @@ import {
   Flame,
   Radio,
   Crosshair,
+  AlertTriangle,
 } from "lucide-react";
 
 interface HypersonicThreat {
@@ -72,13 +73,21 @@ export function HypersonicDefenseStudio() {
   const [trackResult, setTrackResult] = useState<GlideTracking | null>(null);
   const [interceptResult, setInterceptResult] = useState<InterceptResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedSelectionRef = useRef(false);
 
   const fetchThreats = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/hypersonic-defense/threats");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        threats?: HypersonicThreat[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load hypersonic threats");
+      }
       if (data.threats) {
         setThreats(data.threats);
         if (!hasInitializedSelectionRef.current && data.threats.length > 0) {
@@ -88,8 +97,8 @@ export function HypersonicDefenseStudio() {
           setAltitude(data.threats[0].altitude_km);
         }
       }
-    } catch (err) {
-      console.error("Failed to load hypersonic threats", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load hypersonic threats");
     } finally {
       setLoading(false);
     }
@@ -103,6 +112,7 @@ export function HypersonicDefenseStudio() {
     if (!selectedThreat) return;
     setTracking(true);
     setTrackResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/hypersonic-defense/track-glide-path", {
         method: "POST",
@@ -115,7 +125,13 @@ export function HypersonicDefenseStudio() {
           plasma_blackout_active: plasmaBlackout,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        tracking?: GlideTracking;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Hypersonic trajectory tracking failed");
+      }
       if (data.tracking) {
         setTrackResult(data.tracking);
         if (data.tracking.threat_detected) {
@@ -128,12 +144,12 @@ export function HypersonicDefenseStudio() {
           );
         }
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] HGV TRACK: ${selectedThreat.threat_id} -> ${data.tracking.threat_type} (Mach ${mach} @ ${altitude} km, Cutoff: ${data.tracking.plasma_cutoff_freq_ghz} GHz)`,
+          `[${new Date().toLocaleTimeString()}] HGV TRACK: ${selectedThreat.threat_id} -> ${data.tracking!.threat_type} (Mach ${mach} @ ${altitude} km, Cutoff: ${data.tracking!.plasma_cutoff_freq_ghz} GHz)`,
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Tracking failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Hypersonic trajectory tracking failed");
     } finally {
       setTracking(false);
     }
@@ -142,6 +158,7 @@ export function HypersonicDefenseStudio() {
   async function handleFire() {
     if (!selectedThreat) return;
     setFiring(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/hypersonic-defense/fire-interceptor", {
         method: "POST",
@@ -152,7 +169,13 @@ export function HypersonicDefenseStudio() {
           fire_control_latency_ms: 2.1,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        interception?: InterceptResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Interceptor launch failed");
+      }
       if (data.interception) {
         setInterceptResult(data.interception);
         setThreats((prev) =>
@@ -170,12 +193,12 @@ export function HypersonicDefenseStudio() {
           prev ? { ...prev, status: "NEUTRALIZED_KINETIC_KILL" } : null
         );
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] HYPERSONIC KILL: Intercepted ${selectedThreat.threat_id} with ${data.interception.interceptor_weapon} in ${data.interception.fire_control_latency_ms} ms (Closing Mach: ${data.interception.relative_closing_mach})`,
+          `[${new Date().toLocaleTimeString()}] HYPERSONIC KILL: Intercepted ${selectedThreat.threat_id} with ${data.interception!.interceptor_weapon} in ${data.interception!.fire_control_latency_ms} ms (Closing Mach: ${data.interception!.relative_closing_mach})`,
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Firing failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Interceptor launch failed");
     } finally {
       setFiring(false);
     }
@@ -183,6 +206,24 @@ export function HypersonicDefenseStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-orange-950/40 via-red-900/20 to-slate-900/50 border border-orange-500/30 backdrop-blur-md shadow-2xl">
         <div className="flex items-center space-x-4">
@@ -203,6 +244,7 @@ export function HypersonicDefenseStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchThreats}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -408,6 +450,7 @@ export function HypersonicDefenseStudio() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={handleTrack}
                   disabled={tracking}
                   className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-semibold text-sm transition-all shadow-lg shadow-orange-900/30"
@@ -417,6 +460,7 @@ export function HypersonicDefenseStudio() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleFire}
                   disabled={firing || selectedThreat.status === "NEUTRALIZED_KINETIC_KILL"}
                   className={`flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all shadow-lg ${

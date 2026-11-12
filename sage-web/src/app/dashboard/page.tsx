@@ -74,6 +74,7 @@ import {
   GitCommitHorizontal,
   GitMerge,
   Infinity as InfinityIcon,
+  Hexagon,
   X,
 } from "lucide-react";
 import { DashboardOverview } from "@/components/DashboardOverview";
@@ -266,6 +267,10 @@ import ChromaticMoravaStudio from "@/components/ChromaticMoravaStudio";
 import FukayaFloerStudio from "@/components/FukayaFloerStudio";
 import OperadicBarCobarStudio from "@/components/OperadicBarCobarStudio";
 import KagomeSupergridPowerStudio from "@/components/KagomeSupergridPowerStudio";
+import ClusterAssociahedronStudio from "@/components/ClusterAssociahedronStudio";
+import QuantumYangianStudio from "@/components/QuantumYangianStudio";
+import InfinityCobordismStudio from "@/components/InfinityCobordismStudio";
+import AltermagneticSupergridPowerStudio from "@/components/AltermagneticSupergridPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -274,6 +279,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "cluster-algebra-associahedron", label: "Cluster Associahedron (Cap 149)", icon: Hexagon },
+  { id: "kashiwara-quantum-affine-yangian", label: "Quantum Yangian (Cap 150)", icon: GitBranch },
+  { id: "infinity-topos-lurie-cobordism", label: "Infinity Cobordism (Cap 151)", icon: InfinityIcon },
+  { id: "altermagnetic-magnon-supergrid", label: "Altermagnetic Supergrid (Option B)", icon: Zap },
   { id: "chromatic-homotopy-morava", label: "Chromatic Morava (Cap 146)", icon: Layers },
   { id: "symplectic-fukaya-floer", label: "Fukaya Floer (Cap 147)", icon: InfinityIcon },
   { id: "operadic-bv-bar-cobar", label: "Operadic Koszul (Cap 148)", icon: GitMerge },
@@ -689,6 +698,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "cluster-algebra-associahedron" && <ClusterAssociahedronStudio />}
+          {activeTab === "kashiwara-quantum-affine-yangian" && <QuantumYangianStudio />}
+          {activeTab === "infinity-topos-lurie-cobordism" && <InfinityCobordismStudio />}
+          {activeTab === "altermagnetic-magnon-supergrid" && <AltermagneticSupergridPowerStudio />}
           {activeTab === "chromatic-homotopy-morava" && <ChromaticMoravaStudio />}
           {activeTab === "symplectic-fukaya-floer" && <FukayaFloerStudio />}
           {activeTab === "operadic-bv-bar-cobar" && <OperadicBarCobarStudio />}
