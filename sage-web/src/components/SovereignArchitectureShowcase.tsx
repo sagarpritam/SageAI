@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–32 • Current",
-    range: "Capabilities 101–118 + Option B",
+    wave: "Waves 27–33 • Current",
+    range: "Capabilities 101–121 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Celestial w1+∞ Holography, Non-Invertible SymTFT Defects, Conformal Bootstrap SDP, Chern-Simons TQFT & Axion Haloscope Power Grid.",
+    detail: "Swampland Distance & WGC EFT Firewall, SYK Maximal Chaos Guard, Topological Modular Forms, Celestial w1+∞ & Superradiant Ergosphere Power Matrix.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 32 Celestial Holography, Non-Invertible SymTFT &amp; Conformal Bootstrap orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 33 Swampland WGC, SYK Maximal Chaos &amp; Topological Modular Forms orchestration.
           </p>
         </div>
 
@@ -277,7 +277,7 @@ export function SovereignArchitectureShowcase() {
           </motion.div>
         )}
 
-        {/* Tab 3: Waves 1-32 Evolution */}
+        {/* Tab 3: Waves 1-33 Evolution */}
         {activeTab === "frontier" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

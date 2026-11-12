@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.2.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.3.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.2.0");
-    expect(healthJson.version).toBe("7.2.0");
+    expect(healthJson.platform_version).toBe("7.3.0");
+    expect(healthJson.version).toBe("7.3.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -630,6 +630,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(axBody.status).toBe("AXION_PRIMAKOV_GRID_OPTIMAL");
     expect(axBody.zero_fossil_carbon).toBe(true);
     expect(Number(axBody.net_clean_baseload_gw)).toBeGreaterThan(150.0);
+
+    // Wave 33 studios (Caps 119-121 & Option B) return 200 deterministically offline
+    const swlList = await request.get("/api/swampland-wgc/bounds");
+    expect(swlList.status()).toBe(200);
+    const swlSim = await request.post("/api/swampland-wgc/audit-eft", {
+      data: {
+        bound_id: "SWL-DISTANCE-TOWER-01",
+        field_excursion_mpl: 2.0,
+        alpha_exponent: 0.707,
+        charge_mass_ratio: 1.25,
+      },
+    });
+    expect(swlSim.status()).toBe(200);
+    expect(((await swlSim.json()) as { status?: string }).status).toBe(
+      "SWAMPLAND_WGC_SEALED"
+    );
+
+    const sykList = await request.get("/api/syk-chaos-guard/ensembles");
+    expect(sykList.status()).toBe(200);
+    const sykSim = await request.post("/api/syk-chaos-guard/bound-scrambling", {
+      data: {
+        ensemble_id: "SYK-MAJORANA-Q4-01",
+        majorana_n: 512,
+        interaction_q: 4,
+        beta_j_coupling: 28.0,
+      },
+    });
+    expect(sykSim.status()).toBe(200);
+    expect(((await sykSim.json()) as { status?: string }).status).toBe(
+      "SYK_CHAOS_BOUND_LOCKED"
+    );
+
+    const tmfList = await request.get("/api/tmf-cohomology/strata");
+    expect(tmfList.status()).toBe(200);
+    const tmfSim = await request.post("/api/tmf-cohomology/seal-torsion", {
+      data: {
+        stratum_id: "TMF-WITTEN-GENUS-01",
+        modular_weight: 12,
+        torsion_order: 24,
+        adams_page: 3,
+      },
+    });
+    expect(tmfSim.status()).toBe(200);
+    expect(((await tmfSim.json()) as { status?: string }).status).toBe(
+      "TMF_TORSION_SEALED"
+    );
+
+    const ergList = await request.get("/api/ergosphere-spin-power/rotors");
+    expect(ergList.status()).toBe(200);
+    const ergSim = await request.post("/api/ergosphere-spin-power/extract-torque", {
+      data: {
+        rotor_id: "ERG-BZ-TOROID-01",
+        spin_a_star: 0.985,
+        magnetic_flux_wb: 5000000.0,
+      },
+    });
+    expect(ergSim.status()).toBe(200);
+    const ergBody = (await ergSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(ergBody.status).toBe("ERGOSPHERE_BZ_OPTIMAL");
+    expect(ergBody.zero_fossil_carbon).toBe(true);
+    expect(Number(ergBody.net_grid_output_gw)).toBeGreaterThan(200.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

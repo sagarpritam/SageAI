@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 31 Waves (Capabilities 1 to 115).
+Live Multi-Domain Stress Test & Verification across All 33 Waves (Capabilities 1 to 121).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -898,6 +898,78 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 32 (Opt B): Axion Haloscope Resonate",
         ),
+        (
+            "GET",
+            "/api/swampland-wgc/bounds",
+            None,
+            "Wave 33 (Cap 119): Swampland WGC Bounds List",
+        ),
+        (
+            "POST",
+            "/api/swampland-wgc/audit-eft",
+            {
+                "bound_id": "SWL-DISTANCE-TOWER-01",
+                "field_excursion_mpl": 2.0,
+                "alpha_exponent": 0.707,
+                "charge_mass_ratio": 1.25,
+                "species_cutoff_gain": 1.4,
+            },
+            "Wave 33 (Cap 119): Swampland WGC Audit EFT",
+        ),
+        (
+            "GET",
+            "/api/syk-chaos-guard/ensembles",
+            None,
+            "Wave 33 (Cap 120): SYK Chaos Ensemble List",
+        ),
+        (
+            "POST",
+            "/api/syk-chaos-guard/bound-scrambling",
+            {
+                "ensemble_id": "SYK-MAJORANA-Q4-01",
+                "majorana_n": 512,
+                "interaction_q": 4,
+                "beta_j_coupling": 28.0,
+                "schwarzian_damping_gain": 1.4,
+            },
+            "Wave 33 (Cap 120): SYK Chaos Bound Scrambling",
+        ),
+        (
+            "GET",
+            "/api/tmf-cohomology/strata",
+            None,
+            "Wave 33 (Cap 121): TMF Cohomology Strata List",
+        ),
+        (
+            "POST",
+            "/api/tmf-cohomology/seal-torsion",
+            {
+                "stratum_id": "TMF-WITTEN-GENUS-01",
+                "modular_weight": 12,
+                "torsion_order": 24,
+                "adams_page": 3,
+                "elliptic_damping_gain": 1.45,
+            },
+            "Wave 33 (Cap 121): TMF Cohomology Seal Torsion",
+        ),
+        (
+            "GET",
+            "/api/ergosphere-spin-power/rotors",
+            None,
+            "Wave 33 (Opt B): Penrose-BZ Ergosphere Rotor List",
+        ),
+        (
+            "POST",
+            "/api/ergosphere-spin-power/extract-torque",
+            {
+                "rotor_id": "ERG-BZ-TOROID-01",
+                "spin_a_star": 0.985,
+                "magnetic_flux_wb": 5000000.0,
+                "flux_coupling_gain": 1.45,
+                "superradiant_mode_m": 2,
+            },
+            "Wave 33 (Opt B): Penrose-BZ Ergosphere Extract Torque",
+        ),
     ]
 
 
@@ -927,7 +999,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-32, CAPS 1-118) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-33, CAPS 1-121) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -942,7 +1014,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-32 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-33 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -999,7 +1071,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-32){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-33){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1015,7 +1087,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-32 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-33 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1027,7 +1099,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 152)
+        total_requests if total_requests is not None else max(endpoints_count, 160)
     )
 
     if in_process:
@@ -1063,7 +1135,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-32, Capabilities 1-118) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-33, Capabilities 1-121) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

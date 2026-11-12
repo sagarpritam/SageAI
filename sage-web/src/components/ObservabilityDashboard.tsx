@@ -166,6 +166,7 @@ export function ObservabilityDashboard() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             fetchMetrics();
             fetchTraces();
@@ -402,6 +403,7 @@ export function ObservabilityDashboard() {
 
         <div className="flex items-center justify-end">
           <button
+            type="button"
             onClick={handleRunDast}
             disabled={runningDast || !dastTarget.trim()}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950"
@@ -419,7 +421,10 @@ export function ObservabilityDashboard() {
         </div>
 
         {dastError && (
-          <div className="bg-red-950/40 border border-red-700/40 rounded-xl p-4 flex items-start gap-3">
+          <div
+            role="alert"
+            className="bg-red-950/40 border border-red-700/40 rounded-xl p-4 flex items-start gap-3"
+          >
             <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <p className="text-xs text-red-300 font-mono">{dastError}</p>
           </div>

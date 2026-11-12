@@ -224,6 +224,10 @@ import CelestialHolographyStudio from "@/components/CelestialHolographyStudio";
 import NonInvertibleSymTFTStudio from "@/components/NonInvertibleSymTFTStudio";
 import ConformalBootstrapStudio from "@/components/ConformalBootstrapStudio";
 import AxionHaloscopeStudio from "@/components/AxionHaloscopeStudio";
+import SwamplandWGCStudio from "@/components/SwamplandWGCStudio";
+import SYKChaosStudio from "@/components/SYKChaosStudio";
+import TMFCohomologyStudio from "@/components/TMFCohomologyStudio";
+import ErgosphereSpinStudio from "@/components/ErgosphereSpinStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -232,6 +236,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "swampland-wgc", label: "Swampland WGC (Cap 119)", icon: Compass },
+  { id: "syk-chaos-guard", label: "SYK Chaos Guard (Cap 120)", icon: Activity },
+  { id: "tmf-cohomology", label: "TMF Cohomology (Cap 121)", icon: Layers },
+  { id: "ergosphere-spin-power", label: "Ergosphere Power (Option B)", icon: Zap },
   { id: "celestial-holography", label: "Celestial w1+inf (Cap 116)", icon: Orbit },
   { id: "non-invertible-symtft", label: "SymTFT Defects (Cap 117)", icon: Layers },
   { id: "conformal-bootstrap", label: "Bootstrap SDP (Cap 118)", icon: Scale },
@@ -603,6 +611,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "swampland-wgc" && <SwamplandWGCStudio />}
+          {activeTab === "syk-chaos-guard" && <SYKChaosStudio />}
+          {activeTab === "tmf-cohomology" && <TMFCohomologyStudio />}
+          {activeTab === "ergosphere-spin-power" && <ErgosphereSpinStudio />}
           {activeTab === "celestial-holography" && <CelestialHolographyStudio />}
           {activeTab === "non-invertible-symtft" && <NonInvertibleSymTFTStudio />}
           {activeTab === "conformal-bootstrap" && <ConformalBootstrapStudio />}

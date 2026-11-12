@@ -260,9 +260,9 @@ const AttackMap = () => {
     <div className="relative w-full aspect-[1/1] md:aspect-[2/1] bg-zinc-950/50 rounded-[2rem] md:rounded-[3rem] border border-white/5 overflow-hidden group">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_70%)]" />
       
-      {/* Mock Map Background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/map/1920/1080')] bg-cover bg-center mix-blend-overlay grayscale" />
+      {/* Deterministic Tactical Grid Map Backdrop (zero external asset blocking) */}
+      <div className="absolute inset-0 opacity-25">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(16,185,129,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.12)_1px,transparent_1px)] bg-[size:36px_36px]" />
       </div>
 
       {/* Central Node */}
@@ -566,7 +566,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Celestial Holography (Cap 116), SymTFT Defects (Cap 117), Conformal Bootstrap (Cap 118), Chern-Simons TQFT (Cap 113) & Axion Haloscope Power Grid.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Swampland WGC (Cap 119), SYK Chaos Guard (Cap 120), TMF Cohomology (Cap 121), Celestial Holography (Cap 116) & Penrose-BZ Ergosphere Power Matrix.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -737,7 +737,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 32 Celestial & SymTFT Live', time: '2m ago' },
+    { title: 'Wave 33 Swampland, SYK & TMF Live', time: '2m ago' },
     { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];
@@ -1070,7 +1070,7 @@ const DashboardPreview = () => {
           <div className="md:col-span-3 space-y-6">
             <div className="space-y-2">
               <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Active Studios</div>
-              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 32 Celestial w1+∞'].map((item, i) => (
+              {['Defense Grid (10/10)', '5-LLM Consensus', 'Quantum Safe PQC', 'SagePatch Auto-Fix', 'Wave 33 Swampland & TMF'].map((item, i) => (
                 <div key={item} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>
                   {item}
                 </div>
@@ -1873,7 +1873,7 @@ const LandingPage = () => {
         <BentoGrid />
       </section>
 
-      {/* Sovereign Defense Grid & Waves 1-32 Showcase */}
+      {/* Sovereign Defense Grid & Waves 1-33 Showcase */}
       <SovereignArchitectureShowcase />
 
       {/* System Anatomy Section */}

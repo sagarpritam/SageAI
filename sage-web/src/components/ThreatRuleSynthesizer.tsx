@@ -121,12 +121,19 @@ export function ThreatRuleSynthesizer() {
     }
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const code = getActiveCode();
-    if (code) {
-      navigator.clipboard.writeText(code);
+    if (!code) return;
+    if (!navigator?.clipboard?.writeText) {
+      setError("Clipboard unavailable in this browser context. Download the rule file instead.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError("Clipboard write blocked by browser. Download the rule file instead.");
     }
   };
 
@@ -228,7 +235,10 @@ export function ThreatRuleSynthesizer() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2">
+        <div
+          role="alert"
+          className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2"
+        >
           <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -251,6 +261,7 @@ export function ThreatRuleSynthesizer() {
 
             <div className="flex items-center gap-2 self-start sm:self-center">
               <button
+                type="button"
                 onClick={handleCopy}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 text-zinc-300 text-xs hover:border-zinc-700 transition"
               >

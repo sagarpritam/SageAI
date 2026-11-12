@@ -63,7 +63,10 @@ export function ScanInput({ onStartScan, isLoading }: ScanInputProps) {
         </Button>
       </form>
       {error && (
-        <div className="text-rose-400 text-xs font-mono px-1 flex items-center gap-1.5 animate-in fade-in duration-200">
+        <div
+          role="alert"
+          className="text-rose-400 text-xs font-mono px-1 flex items-center gap-1.5 animate-in fade-in duration-200"
+        >
           <span>⚠️</span> {error}
         </div>
       )}

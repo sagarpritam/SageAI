@@ -294,6 +294,7 @@ export function DeepAnalysisPanel() {
         )}
 
         <button
+          type="button"
           onClick={runAudit}
           disabled={loading}
           className="w-full py-2.5 rounded-lg bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-red-900/30"
@@ -313,7 +314,10 @@ export function DeepAnalysisPanel() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2">
+        <div
+          role="alert"
+          className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2"
+        >
           <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
           <span>{error}</span>
         </div>

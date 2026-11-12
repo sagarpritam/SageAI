@@ -57,10 +57,20 @@ export function APIKeyManager() {
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(newKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    if (!newKey) return;
+    setErrorMsg(null);
+    if (!navigator?.clipboard?.writeText) {
+      setErrorMsg("Clipboard write unavailable in this browser context. Copy the key manually above.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(newKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setErrorMsg("Clipboard write blocked by browser. Copy the key manually above.");
+    }
   };
 
   const handleRevoke = async (id: string) => {
@@ -105,6 +115,7 @@ export function APIKeyManager() {
             className="flex-1 bg-black/50 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors"
           />
           <button
+            type="button"
             onClick={handleCreate}
             disabled={creating || !newName.trim()}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-5 py-2 rounded-lg transition-colors text-sm"
@@ -125,6 +136,7 @@ export function APIKeyManager() {
               {newKey}
             </code>
             <button
+              type="button"
               onClick={handleCopy}
               className="text-zinc-400 hover:text-emerald-400 transition-colors"
               aria-label="Copy new API key"

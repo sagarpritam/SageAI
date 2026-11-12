@@ -89,6 +89,7 @@ from app.routers import (
     enclave_routes,
     enterprise_routes,
     er_bridge_routes,
+    ergosphere_spin_routes,
     everett_branch_routes,
     explain_routes,
     false_vacuum_routes,
@@ -172,6 +173,8 @@ from app.routers import (
     string_field_theory_routes,
     subsea_cable_routes,
     supply_chain_routes,
+    swampland_wgc_routes,
+    syk_chaos_routes,
     tachyon_horizon_routes,
     telecom_5g_routes,
     telemetry_routes,
@@ -179,6 +182,7 @@ from app.routers import (
     threat_hunting_routes,
     threat_hunting_swarm_routes,
     threat_modeling_routes,
+    tmf_cohomology_routes,
     twistor_holonomy_routes,
     web3_security_routes,
     webhook_routes,
@@ -468,6 +472,10 @@ app.include_router(celestial_holography_routes.router)
 app.include_router(non_invertible_symtft_routes.router)
 app.include_router(conformal_bootstrap_routes.router)
 app.include_router(axion_haloscope_routes.router)
+app.include_router(swampland_wgc_routes.router)
+app.include_router(syk_chaos_routes.router)
+app.include_router(tmf_cohomology_routes.router)
+app.include_router(ergosphere_spin_routes.router)
 
 
 # ---------------------

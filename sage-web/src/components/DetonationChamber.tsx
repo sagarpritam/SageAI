@@ -151,6 +151,7 @@ export function DetonationChamber() {
       <div className="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800 space-y-4">
         <div className="flex gap-2 border-b border-zinc-800 pb-3">
           <button
+            type="button"
             onClick={() => setInputMode("benchmark")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
               inputMode === "benchmark"
@@ -161,6 +162,7 @@ export function DetonationChamber() {
             Threat Benchmark Library
           </button>
           <button
+            type="button"
             onClick={() => setInputMode("custom")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
               inputMode === "custom"
@@ -205,6 +207,7 @@ export function DetonationChamber() {
         )}
 
         <button
+          type="button"
           onClick={runDetonation}
           disabled={loading}
           className="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-purple-900/30"
@@ -224,7 +227,10 @@ export function DetonationChamber() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2">
+        <div
+          role="alert"
+          className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-red-300 text-xs flex items-center gap-2"
+        >
           <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
           <span>{error}</span>
         </div>

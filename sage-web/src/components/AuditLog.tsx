@@ -70,7 +70,10 @@ export function AuditLog() {
       </div>
 
       {error && (
-        <div className="bg-amber-950/30 border border-amber-900/40 rounded-xl p-6 text-center text-amber-400 text-sm">
+        <div
+          role="alert"
+          className="bg-amber-950/30 border border-amber-900/40 rounded-xl p-6 text-center text-amber-400 text-sm"
+        >
           {error}
         </div>
       )}
