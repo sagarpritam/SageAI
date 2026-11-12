@@ -11,6 +11,7 @@ import {
   Sparkles,
   Radio,
   Sliders,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ERBridgeThroatNode {
@@ -46,16 +47,19 @@ export function ERBridgeSiphonStudio() {
   const [incidentPower, setIncidentPower] = useState(650.0);
   const [lastEvent, setLastEvent] = useState<ERSiphonEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchThroats = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/er-bridge/throats");
-      if (res.ok) {
-        const data = await res.json();
-        setThroats(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load ER=EPR wormhole throats");
       }
-    } catch {
-      // Fallback
+      setThroats(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load ER=EPR wormhole throats");
     } finally {
       setLoading(false);
     }
@@ -72,6 +76,7 @@ export function ERBridgeSiphonStudio() {
 
   const handleSiphon = async () => {
     setSiphoning(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Siphoning metric surge at ${selectedThroat} (${incidentPower} GW from ${surgeSource})...`,
       ...prev,
@@ -88,20 +93,24 @@ export function ERBridgeSiphonStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: ERSiphonEvent = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] METRIC SIPHON COMPLETE: ${data.event_id}`,
-          `[${new Date().toLocaleTimeString()}] Power Siphoned: ${data.siphoned_power_gw.toFixed(2)} GW | Shear Damping: ${data.spacetime_shear_damping_pct}%`,
-          `[${new Date().toLocaleTimeString()}] Gao-Jafferis Coupling: ${data.gao_jafferis_coupling_strength.toFixed(3)} | Throat Dilation: ${data.micro_throat_dilation_am.toFixed(1)} am`,
-          `[${new Date().toLocaleTimeString()}] Status: ${data.status}`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Wormhole neck pinch-off or siphon failure");
       }
-    } catch {
+      const event = data as ERSiphonEvent;
+      setLastEvent(event);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] SIPHON ERROR: Wormhole neck pinch-off anomaly.`,
+        `[${new Date().toLocaleTimeString()}] METRIC SIPHON COMPLETE: ${event.event_id}`,
+        `[${new Date().toLocaleTimeString()}] Power Siphoned: ${event.siphoned_power_gw.toFixed(2)} GW | Shear Damping: ${event.spacetime_shear_damping_pct}%`,
+        `[${new Date().toLocaleTimeString()}] Gao-Jafferis Coupling: ${event.gao_jafferis_coupling_strength.toFixed(3)} | Throat Dilation: ${event.micro_throat_dilation_am.toFixed(1)} am`,
+        `[${new Date().toLocaleTimeString()}] Status: ${event.status}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Wormhole neck pinch-off anomaly.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] SIPHON ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -111,6 +120,24 @@ export function ERBridgeSiphonStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-blue-950/40 p-6 backdrop-blur">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -134,6 +161,7 @@ export function ERBridgeSiphonStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchThroats}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 flex items-center gap-1.5 transition-colors"
@@ -255,6 +283,7 @@ export function ERBridgeSiphonStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleSiphon}
               disabled={siphoning}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-cyan-900/30"

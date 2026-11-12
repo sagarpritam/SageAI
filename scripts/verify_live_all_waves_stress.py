@@ -1252,6 +1252,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 37 (Opt B): Time-Crystal Subharmonic Harvest",
         ),
+        # Wave 38: Subfactor Jones Planars, BV-BRST Cohomology, p-Adic Holography & Spin-Caloritronic Grid
+        (
+            "GET",
+            "/api/subfactor-jones-planars/algebras",
+            None,
+            "Wave 38 (Cap 134): Subfactor Jones Planar Algebras List",
+        ),
+        (
+            "POST",
+            "/api/subfactor-jones-planars/compress-tangle",
+            {
+                "algebra_id": "SUBFACTOR-JONES-E8-01",
+                "jones_level_k": 28,
+                "tangle_boxes": 16,
+                "tl_strand_count": 12,
+                "planar_gain": 1.6,
+            },
+            "Wave 38 (Cap 134): Subfactor Planar Tangle Compress",
+        ),
+        (
+            "GET",
+            "/api/bv-brst-cohomology/complexes",
+            None,
+            "Wave 38 (Cap 135): BV-BRST Cohomology Complexes List",
+        ),
+        (
+            "POST",
+            "/api/bv-brst-cohomology/enforce-master",
+            {
+                "complex_id": "BV-MASTER-YANG-MILLS-01",
+                "ghost_number_grading": 2,
+                "antifield_bracket_order": 4,
+                "gauge_fermion_xi": 1.2,
+                "brst_gain": 1.6,
+            },
+            "Wave 38 (Cap 135): BV Quantum Master Equation Enforce",
+        ),
+        (
+            "GET",
+            "/api/adic-p-adic-holography/trees",
+            None,
+            "Wave 38 (Cap 136): p-Adic Bruhat-Tits Trees List",
+        ),
+        (
+            "POST",
+            "/api/adic-p-adic-holography/seal-ultrametric",
+            {
+                "tree_id": "PADIC-BRUHAT-TITS-P3-01",
+                "prime_base_p": 3,
+                "tree_depth_n": 12,
+                "vladimirov_order": 2.0,
+                "ultrametric_gain": 1.6,
+            },
+            "Wave 38 (Cap 136): p-Adic Ultrametric Tree Seal",
+        ),
+        (
+            "GET",
+            "/api/spin-caloritronic-power/arrays",
+            None,
+            "Wave 38 (Opt B): Spin-Caloritronic Magnon Arrays List",
+        ),
+        (
+            "POST",
+            "/api/spin-caloritronic-power/harvest-magnon",
+            {
+                "array_id": "MAGNON-YIG-PT-01",
+                "magnon_freq_ghz": 42.0,
+                "spin_seebeck_gain": 1.6,
+            },
+            "Wave 38 (Opt B): Spin-Caloritronic Magnon Harvest",
+        ),
     ]
 
 
@@ -1281,7 +1352,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-37, CAPS 1-133) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-38, CAPS 1-136) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1353,7 +1424,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-37){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-38){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1369,7 +1440,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-37 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-38 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1381,7 +1452,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 192)
+        total_requests if total_requests is not None else max(endpoints_count, 200)
     )
 
     if in_process:
@@ -1417,7 +1488,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-36, Capabilities 1-130) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-38, Capabilities 1-136) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

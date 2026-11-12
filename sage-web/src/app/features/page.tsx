@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), BFSS Matrix Fuzzball (Cap 128), MERA Tensor RG (Cap 131), AQFT Haag-Kastler Shield (Cap 132), and BPST Instanton Shield (Cap 133).",
+        "Includes Centesimal Quantum Gravity (Cap 100), MERA Tensor RG (Cap 131), Subfactor Jones Planars (Cap 134), BV-BRST Cohomology (Cap 135), and p-Adic Holography (Cap 136).",
     },
   ];
 

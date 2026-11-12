@@ -244,6 +244,10 @@ import MERATensorRenormStudio from "@/components/MERATensorRenormStudio";
 import AlgebraicQFTHaagStudio from "@/components/AlgebraicQFTHaagStudio";
 import SkyrmionInstantonStudio from "@/components/SkyrmionInstantonStudio";
 import TimeCrystalPowerStudio from "@/components/TimeCrystalPowerStudio";
+import SubfactorJonesPlanarStudio from "@/components/SubfactorJonesPlanarStudio";
+import BVBRSTCohomologyStudio from "@/components/BVBRSTCohomologyStudio";
+import PAdicHolographyStudio from "@/components/PAdicHolographyStudio";
+import SpinCaloritronicPowerStudio from "@/components/SpinCaloritronicPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -252,6 +256,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "subfactor-jones-planars", label: "Subfactor Jones (Cap 134)", icon: Layers },
+  { id: "bv-brst-cohomology", label: "BV-BRST Cohomology (Cap 135)", icon: Shield },
+  { id: "adic-p-adic-holography", label: "p-Adic Holography (Cap 136)", icon: GitBranch },
+  { id: "spin-caloritronic-power", label: "Spin-Caloritronic Grid (Option B)", icon: Zap },
   { id: "mera-tensor-renorm", label: "MERA Tensor RG (Cap 131)", icon: Network },
   { id: "algebraic-qft-haag", label: "AQFT Haag-Kastler (Cap 132)", icon: Shield },
   { id: "skyrmion-instanton-qcd", label: "BPST Instanton Shield (Cap 133)", icon: Orbit },
@@ -647,6 +655,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "subfactor-jones-planars" && <SubfactorJonesPlanarStudio />}
+          {activeTab === "bv-brst-cohomology" && <BVBRSTCohomologyStudio />}
+          {activeTab === "adic-p-adic-holography" && <PAdicHolographyStudio />}
+          {activeTab === "spin-caloritronic-power" && <SpinCaloritronicPowerStudio />}
           {activeTab === "mera-tensor-renorm" && <MERATensorRenormStudio />}
           {activeTab === "algebraic-qft-haag" && <AlgebraicQFTHaagStudio />}
           {activeTab === "skyrmion-instanton-qcd" && <SkyrmionInstantonStudio />}

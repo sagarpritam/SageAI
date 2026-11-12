@@ -14,6 +14,7 @@ import {
   Flame,
   CheckCircle,
   VolumeX,
+  AlertTriangle,
 } from "lucide-react";
 
 interface MHDAeroPlatformNode {
@@ -53,16 +54,19 @@ export function MHDPlasmaStealthStudio() {
   const [plasmaFreq, setPlasmaFreq] = useState(24.5);
   const [lastEngagement, setLastEngagement] = useState<MHDStealthEngagementResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchPlatforms = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/mhd-plasma-stealth/platforms");
-      if (res.ok) {
-        const data = await res.json();
-        setPlatforms(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load MHD aero platforms");
       }
-    } catch {
-      // Fallback
+      setPlatforms(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load MHD aero platforms");
     } finally {
       setLoading(false);
     }
@@ -79,6 +83,7 @@ export function MHDPlasmaStealthStudio() {
 
   const handleEngageStealth = async () => {
     setEngaging(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Energizing superconducting Halbach magnets & microwave ionization on " + selectedPlatform + "...",
       ...prev,
@@ -93,18 +98,21 @@ export function MHDPlasmaStealthStudio() {
           plasma_freq_ghz: plasmaFreq,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastEngagement(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Full MHD Plasma Stealth Engaged. Radar RCS Attenuation: " + data.rf_rcs_attenuation_db.toFixed(1) + " dB (Radar Blackout).",
-          "[" + new Date().toLocaleTimeString() + "] Lorentz Bow-Shock Damped: " + data.lorentz_bow_shock_damping_pct.toFixed(2) + "% | Ground Sonic Boom: " + data.sonic_boom_ground_footprint_db.toFixed(1) + " dB | Drag Cut: " + data.drag_reduction_pct.toFixed(1) + "%",
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Plasma stealth engagement failed");
       }
-    } catch {
+      setLastEngagement(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Plasma stealth engagement failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Full MHD Plasma Stealth Engaged. Radar RCS Attenuation: " + data.rf_rcs_attenuation_db.toFixed(1) + " dB (Radar Blackout).",
+        "[" + new Date().toLocaleTimeString() + "] Lorentz Bow-Shock Damped: " + data.lorentz_bow_shock_damping_pct.toFixed(2) + "% | Ground Sonic Boom: " + data.sonic_boom_ground_footprint_db.toFixed(1) + " dB | Drag Cut: " + data.drag_reduction_pct.toFixed(1) + "%",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Plasma stealth engagement failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -114,6 +122,24 @@ export function MHDPlasmaStealthStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-950/40 via-indigo-900/30 to-sky-950/40 border border-blue-500/30 rounded-xl">
         <div className="flex items-center gap-4">
@@ -133,6 +159,7 @@ export function MHDPlasmaStealthStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchPlatforms}
           className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg text-sm text-blue-300 transition-colors self-start md:self-auto"
         >
@@ -247,6 +274,7 @@ export function MHDPlasmaStealthStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleEngageStealth}
             disabled={engaging}
             className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30"

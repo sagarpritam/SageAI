@@ -13,6 +13,7 @@ import {
   Database,
   Layers,
   CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface HoravaDomainNode {
@@ -47,16 +48,19 @@ export function HoravaLifshitzStudio() {
   const [dampingGain, setDampingGain] = useState(1.0);
   const [lastResult, setLastResult] = useState<HoravaScalingResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchDomains = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/horava-lifshitz/domains");
-      if (res.ok) {
-        const data = await res.json();
-        setDomains(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load Horava-Lifshitz foliation domains");
       }
-    } catch {
-      // Fallback
+      setDomains(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Horava-Lifshitz foliation domains");
     } finally {
       setLoading(false);
     }
@@ -73,6 +77,7 @@ export function HoravaLifshitzStudio() {
 
   const handleGovernScaling = async () => {
     setGoverning(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Locking dynamical critical exponent z = " + targetZ.toFixed(2) + " on " + selectedDomain + "...",
       ...prev,
@@ -87,18 +92,22 @@ export function HoravaLifshitzStudio() {
           foliation_damping_gain: dampingGain,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Foliation invariance locked (" + data.foliation_invariance_pct.toFixed(3) + "%). z = " + data.governed_z.toFixed(2) + ".",
-          "[" + new Date().toLocaleTimeString() + "] Ghost-Free Modes: " + data.ghost_free_mode_count + " | High-Derivative Spatial Suppression: " + data.high_derivative_suppression_db.toFixed(1) + " dB",
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Lifshitz scaling adjustment failed");
       }
-    } catch {
+      const result = data as HoravaScalingResult;
+      setLastResult(result);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Lifshitz scaling adjustment failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Foliation invariance locked (" + result.foliation_invariance_pct.toFixed(3) + "%). z = " + result.governed_z.toFixed(2) + ".",
+        "[" + new Date().toLocaleTimeString() + "] Ghost-Free Modes: " + result.ghost_free_mode_count + " | High-Derivative Spatial Suppression: " + result.high_derivative_suppression_db.toFixed(1) + " dB",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Lifshitz scaling adjustment failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -108,6 +117,24 @@ export function HoravaLifshitzStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-gradient-to-r from-sky-950/40 via-cyan-900/30 to-blue-950/40 border border-sky-500/30 rounded-xl">
         <div className="flex items-center gap-4">
@@ -127,6 +154,7 @@ export function HoravaLifshitzStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchDomains}
           className="flex items-center gap-2 px-4 py-2 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 rounded-lg text-sm text-sky-300 transition-colors self-start md:self-auto"
         >
@@ -241,6 +269,7 @@ export function HoravaLifshitzStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleGovernScaling}
             disabled={governing}
             className="w-full py-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-900/30"

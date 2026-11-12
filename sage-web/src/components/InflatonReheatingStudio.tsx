@@ -12,6 +12,7 @@ import {
   Sparkles,
   Layers,
   Thermometer,
+  AlertTriangle,
 } from "lucide-react";
 
 interface InflatonResonanceNode {
@@ -48,16 +49,19 @@ export function InflatonReheatingStudio() {
   const [couplingGain, setCouplingGain] = useState(1.0);
   const [lastCycle, setLastCycle] = useState<ReheatingCycleResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/inflaton-reheating/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load inflaton reheating cavities");
       }
-    } catch {
-      // Fallback
+      setNodes(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load inflaton reheating cavities");
     } finally {
       setLoading(false);
     }
@@ -74,6 +78,7 @@ export function InflatonReheatingStudio() {
 
   const handleTriggerCycle = async () => {
     setReheating(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Igniting inflaton preheating at ${selectedNode} (Amplitude: ${amplitude} M_Pl, Gain: ${couplingGain}x)...`,
       ...prev,
@@ -90,20 +95,24 @@ export function InflatonReheatingStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: ReheatingCycleResult = await res.json();
-        setLastCycle(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] REHEATING CYCLE SUCCESS: ${data.cycle_id}`,
-          `[${new Date().toLocaleTimeString()}] Reheat Temp: ${data.thermalized_reheat_temp_gev.toExponential(2)} GeV | Floquet Growth: mu=${data.parametric_growth_floquet_mu.toFixed(4)}`,
-          `[${new Date().toLocaleTimeString()}] Baryon Density: ${data.synthesized_baryon_density_cm3.toExponential(2)} cm^-3 | Quenched Entropy: ${data.quenched_anomalous_entropy_nats.toFixed(2)} nats`,
-          `[${new Date().toLocaleTimeString()}] Relativistic DOF g*: ${data.plasma_relativistic_dof_g_star} | Status: ${data.status}`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Inflaton potential decoherence");
       }
-    } catch {
+      const cycle = data as ReheatingCycleResult;
+      setLastCycle(cycle);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] REHEATING ERROR: Inflaton potential decoherence.`,
+        `[${new Date().toLocaleTimeString()}] REHEATING CYCLE SUCCESS: ${cycle.cycle_id}`,
+        `[${new Date().toLocaleTimeString()}] Reheat Temp: ${cycle.thermalized_reheat_temp_gev.toExponential(2)} GeV | Floquet Growth: mu=${cycle.parametric_growth_floquet_mu.toFixed(4)}`,
+        `[${new Date().toLocaleTimeString()}] Baryon Density: ${cycle.synthesized_baryon_density_cm3.toExponential(2)} cm^-3 | Quenched Entropy: ${cycle.quenched_anomalous_entropy_nats.toFixed(2)} nats`,
+        `[${new Date().toLocaleTimeString()}] Relativistic DOF g*: ${cycle.plasma_relativistic_dof_g_star} | Status: ${cycle.status}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Inflaton potential decoherence.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] REHEATING ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -113,6 +122,24 @@ export function InflatonReheatingStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-orange-500/30 bg-gradient-to-r from-orange-950/40 via-slate-900 to-red-950/40 p-6 backdrop-blur">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -136,6 +163,7 @@ export function InflatonReheatingStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchNodes}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-orange-500/40 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 flex items-center gap-1.5 transition-colors"
@@ -257,6 +285,7 @@ export function InflatonReheatingStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleTriggerCycle}
               disabled={reheating}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-orange-900/30"

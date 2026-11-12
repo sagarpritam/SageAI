@@ -13,6 +13,7 @@ import {
   Eye,
   Radio,
   Rocket,
+  AlertTriangle,
 } from "lucide-react";
 
 interface SatelliteNode {
@@ -68,16 +69,19 @@ export function HyperspectralInterceptorStudio() {
   const [lastScan, setLastScan] = useState<ScanResult | null>(null);
   const [lastEngagement, setLastEngagement] = useState<EngagementResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSatellites = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/hyperspectral-interceptor/constellation");
-      if (res.ok) {
-        const data = await res.json();
-        setSatellites(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load hyperspectral satellite constellation");
       }
-    } catch {
-      // Fallback
+      setSatellites(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load hyperspectral satellite constellation");
     } finally {
       setLoading(false);
     }
@@ -94,6 +98,7 @@ export function HyperspectralInterceptorStudio() {
 
   const handleScan = async () => {
     setScanning(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Scanning target ${targetCoords} using ${selectedSat} (${classification})...`,
       ...prev,
@@ -110,20 +115,24 @@ export function HyperspectralInterceptorStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: ScanResult = await res.json();
-        setLastScan(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] TARGET IDENTIFIED: ${data.scan_id}`,
-          `[${new Date().toLocaleTimeString()}] Signature: ${data.spectral_absorption_signature}`,
-          `[${new Date().toLocaleTimeString()}] Thermal Delta T: +${data.thermal_delta_t_kelvin} K | Confidence: ${data.confidence_score_pct}%`,
-          `[${new Date().toLocaleTimeString()}] Geohash: ${data.target_geohash} | Sub-Pixel Abundance: ${(data.subpixel_abundance_fraction * 100).toFixed(1)}%`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Hyperspectral target scan failed");
       }
-    } catch {
+      const scan = data as ScanResult;
+      setLastScan(scan);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] SCAN ERROR: Cloud cover or atmospheric scattering interference.`,
+        `[${new Date().toLocaleTimeString()}] TARGET IDENTIFIED: ${scan.scan_id}`,
+        `[${new Date().toLocaleTimeString()}] Signature: ${scan.spectral_absorption_signature}`,
+        `[${new Date().toLocaleTimeString()}] Thermal Delta T: +${scan.thermal_delta_t_kelvin} K | Confidence: ${scan.confidence_score_pct}%`,
+        `[${new Date().toLocaleTimeString()}] Geohash: ${scan.target_geohash} | Sub-Pixel Abundance: ${(scan.subpixel_abundance_fraction * 100).toFixed(1)}%`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Cloud cover or atmospheric scattering interference.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] SCAN ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -134,6 +143,7 @@ export function HyperspectralInterceptorStudio() {
   const handleEngage = async () => {
     if (!lastScan) return;
     setEngaging(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Cross-cueing ${interceptorType} to target coordinates ${lastScan.target_coordinates}...`,
       ...prev,
@@ -149,20 +159,24 @@ export function HyperspectralInterceptorStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: EngagementResult = await res.json();
-        setLastEngagement(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] INTERCEPTOR DISPATCHED: ${data.engagement_id}`,
-          `[${new Date().toLocaleTimeString()}] Cross-Cue Latency: ${data.cross_cue_latency_ms} ms | Kill Prob: ${data.kill_probability_pct}%`,
-          `[${new Date().toLocaleTimeString()}] Trajectory: ${data.intercept_trajectory_solution}`,
-          `[${new Date().toLocaleTimeString()}] Time to Impact: ${data.projected_time_to_impact_sec.toFixed(4)} s`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Interceptor telemetry link timeout");
       }
-    } catch {
+      const engagement = data as EngagementResult;
+      setLastEngagement(engagement);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] ENGAGEMENT FAILED: Interceptor telemetry link timeout.`,
+        `[${new Date().toLocaleTimeString()}] INTERCEPTOR DISPATCHED: ${engagement.engagement_id}`,
+        `[${new Date().toLocaleTimeString()}] Cross-Cue Latency: ${engagement.cross_cue_latency_ms} ms | Kill Prob: ${engagement.kill_probability_pct}%`,
+        `[${new Date().toLocaleTimeString()}] Trajectory: ${engagement.intercept_trajectory_solution}`,
+        `[${new Date().toLocaleTimeString()}] Time to Impact: ${engagement.projected_time_to_impact_sec.toFixed(4)} s`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Interceptor telemetry link timeout.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] ENGAGEMENT FAILED: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -172,6 +186,24 @@ export function HyperspectralInterceptorStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-sky-500/30 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40 p-6 backdrop-blur">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -195,6 +227,7 @@ export function HyperspectralInterceptorStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchSatellites}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs transition"
@@ -306,6 +339,7 @@ export function HyperspectralInterceptorStudio() {
 
             <div className="flex gap-2 pt-2">
               <button
+                type="button"
                 onClick={handleScan}
                 disabled={scanning}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition disabled:opacity-50"
@@ -315,6 +349,7 @@ export function HyperspectralInterceptorStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleEngage}
                 disabled={engaging || !lastScan}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition disabled:opacity-50"

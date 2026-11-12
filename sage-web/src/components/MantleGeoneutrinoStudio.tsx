@@ -61,16 +61,19 @@ export function MantleGeoneutrinoStudio() {
   const [depthTarget, setDepthTarget] = useState(2890.0);
   const [lastInversion, setLastInversion] = useState<MantleInversion | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchObservatories = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/mantle-geoneutrino/observatories");
-      if (res.ok) {
-        const data = await res.json();
-        setObservatories(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to sync geoneutrino observatories");
       }
-    } catch {
-      // Fallback
+      setObservatories(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to sync geoneutrino observatories");
     } finally {
       setLoading(false);
     }
@@ -82,6 +85,7 @@ export function MantleGeoneutrinoStudio() {
 
   const handleReconstructMantle = async () => {
     setInverting(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Measuring inverse beta decay geoneutrino flux (&nu;&#772;ₑ + p &rarr; e⁺ + n) across JUNO, KamLAND & Borexino (Region: ${selectedRegion}, Depth: ${depthTarget}km)...`,
       ...prev,
@@ -98,20 +102,23 @@ export function MantleGeoneutrinoStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setLastInversion(data);
-        const warn = data.days_to_potential_breach
-          ? `Breach Warning: ${data.days_to_potential_breach} days lead time`
-          : "Mantle stable";
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] 3D Mantle Inversion complete: U/Th Ratio ${data.u_th_ratio} | Heat Flux ${data.mantle_heat_flux_tw} TW | ${warn} (Confidence: ${data.early_warning_confidence_pct}%)`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Liquid scintillator signal loss");
       }
-    } catch {
+      setLastInversion(data);
+      const warn = data.days_to_potential_breach
+        ? `Breach Warning: ${data.days_to_potential_breach} days lead time`
+        : "Mantle stable";
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] Inversion error: Liquid scintillator signal loss`,
+        `[${new Date().toLocaleTimeString()}] 3D Mantle Inversion complete: U/Th Ratio ${data.u_th_ratio} | Heat Flux ${data.mantle_heat_flux_tw} TW | ${warn} (Confidence: ${data.early_warning_confidence_pct}%)`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Liquid scintillator signal loss";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Inversion error: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -121,6 +128,24 @@ export function MantleGeoneutrinoStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-orange-500/20 bg-gradient-to-r from-orange-950/40 via-red-900/20 to-neutral-900/40 p-6 backdrop-blur">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -140,6 +165,7 @@ export function MantleGeoneutrinoStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchObservatories}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
           >
@@ -251,6 +277,7 @@ export function MantleGeoneutrinoStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleReconstructMantle}
                 disabled={inverting}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"

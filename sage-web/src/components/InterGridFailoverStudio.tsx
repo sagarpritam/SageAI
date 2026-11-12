@@ -50,14 +50,19 @@ export function InterGridFailoverStudio() {
   const [evaluating, setEvaluating] = useState(false);
   const [stabilityResult, setStabilityResult] = useState<StabilityResult | null>(null);
   const [islandingResult, setIslandingResult] = useState<any | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedSelectionRef = useRef(false);
 
   const fetchGrids = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/intergrid-failover/interconnects");
-      const data = await res.json();
-      if (data.interconnects) {
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load power interconnects");
+      }
+      if (data && Array.isArray(data.interconnects)) {
         setGrids(data.interconnects);
         if (!hasInitializedSelectionRef.current && data.interconnects.length > 0) {
           hasInitializedSelectionRef.current = true;
@@ -65,6 +70,8 @@ export function InterGridFailoverStudio() {
           setFrequencyHz(data.interconnects[0].nominal_frequency_hz);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load power interconnects");
     } finally {
       setLoading(false);
     }
@@ -77,6 +84,7 @@ export function InterGridFailoverStudio() {
   async function handleEvaluateStability() {
     if (!selectedGrid) return;
     setEvaluating(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/intergrid-failover/evaluate-stability", {
         method: "POST",
@@ -88,8 +96,11 @@ export function InterGridFailoverStudio() {
           rocof_hz_s: Number(rocof),
         }),
       });
-      const data = await res.json();
-      if (data.stability_analysis) {
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to evaluate grid stability");
+      }
+      if (data && data.stability_analysis) {
         const item: StabilityResult = {
           ...data.stability_analysis,
           timestamp: new Date().toLocaleTimeString(),
@@ -109,6 +120,8 @@ export function InterGridFailoverStudio() {
           );
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to evaluate grid stability");
     } finally {
       setEvaluating(false);
     }
@@ -116,6 +129,7 @@ export function InterGridFailoverStudio() {
 
   async function handleTriggerIslanding() {
     if (!selectedGrid) return;
+    setErrorMsg(null);
     try {
       setIslandingResult({
         status: "ISLANDED_AUTONOMOUS_OPERATION",
@@ -132,8 +146,8 @@ export function InterGridFailoverStudio() {
       setSelectedGrid((prev) =>
         prev ? { ...prev, islanding_status: "ISLANDED_AUTONOMOUS_OPERATION" } : null
       );
-    } catch {
-      // ignore
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to trigger micro-grid islanding");
     }
   }
 
@@ -142,6 +156,24 @@ export function InterGridFailoverStudio() {
 
   return (
     <div className="space-y-6 text-zinc-100">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-xl backdrop-blur-md">
         <div className="flex items-center gap-4">
@@ -167,6 +199,7 @@ export function InterGridFailoverStudio() {
         </div>
 
         <button
+          type="button"
           onClick={fetchGrids}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
@@ -365,6 +398,7 @@ export function InterGridFailoverStudio() {
                 <div className="text-xs text-zinc-400 flex flex-wrap gap-2">
                   <span className="text-zinc-500">Quick Test Cases:</span>
                   <button
+                    type="button"
                     onClick={() => {
                       setFrequencyHz(selectedGrid.nominal_frequency_hz);
                       setPhaseAngle(5.0);
@@ -375,6 +409,7 @@ export function InterGridFailoverStudio() {
                     Nominal 60.0 Hz
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setFrequencyHz(58.95);
                       setRocof(1.85);
@@ -384,6 +419,7 @@ export function InterGridFailoverStudio() {
                     Frequency Collapse Attack
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setPhaseAngle(52.0);
                     }}
@@ -395,6 +431,7 @@ export function InterGridFailoverStudio() {
 
                 <div className="flex gap-3">
                   <button
+                    type="button"
                     onClick={handleEvaluateStability}
                     disabled={evaluating}
                     className="flex-1 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-zinc-950 shadow-lg shadow-yellow-500/20 transition disabled:opacity-50 flex items-center justify-center gap-2"
@@ -404,6 +441,7 @@ export function InterGridFailoverStudio() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={handleTriggerIslanding}
                     className="px-5 py-2.5 rounded-xl font-semibold text-sm bg-rose-600/80 hover:bg-rose-500 text-white border border-rose-500 transition flex items-center gap-2"
                   >

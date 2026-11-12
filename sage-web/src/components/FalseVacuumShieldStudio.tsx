@@ -11,6 +11,7 @@ import {
   Sparkles,
   Flame,
   Radio,
+  AlertTriangle,
 } from "lucide-react";
 
 interface VacuumChamberNode {
@@ -47,16 +48,19 @@ export function FalseVacuumShieldStudio() {
   const [counterBiasTW, setCounterBiasTW] = useState(48.0);
   const [lastEvent, setLastEvent] = useState<VacuumQuenchEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchChambers = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/false-vacuum/chambers");
-      if (res.ok) {
-        const data = await res.json();
-        setChambers(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load false-vacuum shield chambers");
       }
-    } catch {
-      // Fallback
+      setChambers(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load false-vacuum shield chambers");
     } finally {
       setLoading(false);
     }
@@ -73,6 +77,7 @@ export function FalseVacuumShieldStudio() {
 
   const handleQuench = async () => {
     setQuenching(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Triggering counter-bias quench at ${selectedChamber} (${counterBiasTW} TW against ${perturbation})...`,
       ...prev,
@@ -89,20 +94,24 @@ export function FalseVacuumShieldStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: VacuumQuenchEvent = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] NUCLEATION QUENCH SUCCESS: ${data.event_id}`,
-          `[${new Date().toLocaleTimeString()}] Suppression: 10^${data.nucleation_suppression_orders_of_mag.toFixed(1)} orders of magnitude | Delta B: +${data.effective_bounce_action_boost.toFixed(1)}`,
-          `[${new Date().toLocaleTimeString()}] Bubble Collapse Confirmed: ${data.bubble_collapse_confirmed ? "YES" : "NO"}`,
-          `[${new Date().toLocaleTimeString()}] Residual Nucleation Prob: ${data.nucleation_probability_remaining.toExponential(1)}`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Bounce barrier collapse detected during quench");
       }
-    } catch {
+      const event = data as VacuumQuenchEvent;
+      setLastEvent(event);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] QUENCH ERROR: Bounce barrier collapse detected.`,
+        `[${new Date().toLocaleTimeString()}] NUCLEATION QUENCH SUCCESS: ${event.event_id}`,
+        `[${new Date().toLocaleTimeString()}] Suppression: 10^${event.nucleation_suppression_orders_of_mag.toFixed(1)} orders of magnitude | Delta B: +${event.effective_bounce_action_boost.toFixed(1)}`,
+        `[${new Date().toLocaleTimeString()}] Bubble Collapse Confirmed: ${event.bubble_collapse_confirmed ? "YES" : "NO"}`,
+        `[${new Date().toLocaleTimeString()}] Residual Nucleation Prob: ${event.nucleation_probability_remaining.toExponential(1)}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Bounce barrier collapse detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] QUENCH ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -112,6 +121,24 @@ export function FalseVacuumShieldStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-rose-500/30 bg-gradient-to-r from-rose-950/40 via-slate-900 to-amber-950/40 p-6 backdrop-blur">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -135,6 +162,7 @@ export function FalseVacuumShieldStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchChambers}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 flex items-center gap-1.5 transition-colors"
@@ -256,6 +284,7 @@ export function FalseVacuumShieldStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleQuench}
               disabled={quenching}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-rose-900/30"

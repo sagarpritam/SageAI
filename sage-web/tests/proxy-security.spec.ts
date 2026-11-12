@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.7.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.8.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.7.0");
-    expect(healthJson.version).toBe("7.7.0");
+    expect(healthJson.platform_version).toBe("7.8.0");
+    expect(healthJson.version).toBe("7.8.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -953,6 +953,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(tcBody.status).toBe("TIME_CRYSTAL_GRID_OPTIMAL");
     expect(tcBody.zero_fossil_carbon).toBe(true);
     expect(Number(tcBody.net_grid_output_gw)).toBeGreaterThan(280.0);
+
+    // Wave 38 studios (Caps 134-136 & Option B) return 200 deterministically offline
+    const subList = await request.get("/api/subfactor-jones-planars/algebras");
+    expect(subList.status()).toBe(200);
+    const subSim = await request.post("/api/subfactor-jones-planars/compress-tangle", {
+      data: {
+        algebra_id: "SUBFACTOR-JONES-E8-01",
+        jones_level_k: 28,
+        tangle_boxes: 16,
+        tl_strand_count: 12,
+      },
+    });
+    expect(subSim.status()).toBe(200);
+    expect(((await subSim.json()) as { status?: string }).status).toBe(
+      "SUBFACTOR_TANGLE_SEALED"
+    );
+
+    const bvList = await request.get("/api/bv-brst-cohomology/complexes");
+    expect(bvList.status()).toBe(200);
+    const bvSim = await request.post("/api/bv-brst-cohomology/enforce-master", {
+      data: {
+        complex_id: "BV-MASTER-YANG-MILLS-01",
+        ghost_number_grading: 2,
+        antifield_bracket_order: 4,
+        gauge_fermion_xi: 1.2,
+      },
+    });
+    expect(bvSim.status()).toBe(200);
+    expect(((await bvSim.json()) as { status?: string }).status).toBe(
+      "BV_BRST_MASTER_SEALED"
+    );
+
+    const padicList = await request.get("/api/adic-p-adic-holography/trees");
+    expect(padicList.status()).toBe(200);
+    const padicSim = await request.post("/api/adic-p-adic-holography/seal-ultrametric", {
+      data: {
+        tree_id: "PADIC-BRUHAT-TITS-P3-01",
+        prime_base_p: 3,
+        tree_depth_n: 12,
+        vladimirov_order: 2.0,
+      },
+    });
+    expect(padicSim.status()).toBe(200);
+    expect(((await padicSim.json()) as { status?: string }).status).toBe(
+      "PADIC_ULTRAMETRIC_SEALED"
+    );
+
+    const spinList = await request.get("/api/spin-caloritronic-power/arrays");
+    expect(spinList.status()).toBe(200);
+    const spinSim = await request.post("/api/spin-caloritronic-power/harvest-magnon", {
+      data: {
+        array_id: "MAGNON-YIG-PT-01",
+        magnon_freq_ghz: 42.0,
+        spin_seebeck_gain: 1.6,
+      },
+    });
+    expect(spinSim.status()).toBe(200);
+    const spinBody = (await spinSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(spinBody.status).toBe("SPIN_CALORITRONIC_GRID_OPTIMAL");
+    expect(spinBody.zero_fossil_carbon).toBe(true);
+    expect(Number(spinBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

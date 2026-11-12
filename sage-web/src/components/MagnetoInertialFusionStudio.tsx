@@ -14,6 +14,7 @@ import {
   Rocket,
   Gauge,
   CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface MIFReactorPlatform {
@@ -52,16 +53,19 @@ export function MagnetoInertialFusionStudio() {
   const [compressionGain, setCompressionGain] = useState(1.0);
   const [lastResult, setLastResult] = useState<MIFPulseResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchReactors = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/magneto-inertial-fusion/reactors");
-      if (res.ok) {
-        const data = await res.json();
-        setReactors(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load MIF reactors");
       }
-    } catch {
-      // Fallback
+      setReactors(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load MIF reactors");
     } finally {
       setLoading(false);
     }
@@ -78,6 +82,7 @@ export function MagnetoInertialFusionStudio() {
 
   const handlePulse = async () => {
     setPulsing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Discharging pulsed power banks into " + selectedReactor + " liner...",
       ...prev,
@@ -92,18 +97,21 @@ export function MagnetoInertialFusionStudio() {
           compression_gain: compressionGain,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Thermonuclear Breakeven Exceeded! Gain: Q = " + data.fusion_gain_q.toFixed(2) + " (Yield: " + data.thermal_yield_gw.toFixed(2) + " GW_th).",
-          "[" + new Date().toLocaleTimeString() + "] Direct Electrical Conversion: " + data.direct_electrical_conversion_mw.toFixed(1) + " MW | Magnetic Nozzle Isp: " + data.specific_impulse_isp_s.toFixed(0) + " s",
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "MIF pulse initiation failed");
       }
-    } catch {
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: MIF pulse initiation failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Thermonuclear Breakeven Exceeded! Gain: Q = " + data.fusion_gain_q.toFixed(2) + " (Yield: " + data.thermal_yield_gw.toFixed(2) + " GW_th).",
+        "[" + new Date().toLocaleTimeString() + "] Direct Electrical Conversion: " + data.direct_electrical_conversion_mw.toFixed(1) + " MW | Magnetic Nozzle Isp: " + data.specific_impulse_isp_s.toFixed(0) + " s",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "MIF pulse initiation failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -113,6 +121,24 @@ export function MagnetoInertialFusionStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-gradient-to-r from-purple-950/40 via-fuchsia-900/30 to-amber-950/40 border border-purple-500/30 rounded-xl">
         <div className="flex items-center gap-4">
@@ -132,6 +158,7 @@ export function MagnetoInertialFusionStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchReactors}
           className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg text-sm text-purple-300 transition-colors self-start md:self-auto"
         >
@@ -247,6 +274,7 @@ export function MagnetoInertialFusionStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handlePulse}
             disabled={pulsing}
             className="w-full py-3 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-amber-600 hover:from-purple-500 hover:to-amber-500 disabled:opacity-50 text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-900/30"

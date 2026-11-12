@@ -51,16 +51,19 @@ export function MagnetosphereDynamoStudio() {
   const [simulatedE1, setSimulatedE1] = useState(55.0);
   const [lastResponse, setLastResponse] = useState<DecouplingResponse | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchStations = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/magnetosphere-dynamo/stations");
-      if (res.ok) {
-        const data = await res.json();
-        setStations(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to sync magnetosphere dynamo stations");
       }
-    } catch {
-      // Fallback
+      setStations(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to sync magnetosphere dynamo stations");
     } finally {
       setLoading(false);
     }
@@ -72,6 +75,7 @@ export function MagnetosphereDynamoStudio() {
 
   const handleTriggerDecoupling = async () => {
     setDecoupling(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Injecting ULF Alfv&eacute;n resonance wave & engaging picosecond HEMP diverter at ${selectedStation} (${simulatedE1} kV/m E1 pulse)...`,
       ...prev,
@@ -89,17 +93,20 @@ export function MagnetosphereDynamoStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setLastResponse(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] HEMP Decoupled: E1 clamped to ${data.clamped_e1_voltage_volts} V (${data.attenuation_ratio_db} dB attenuation) | GIC reduced: ${data.substation_gic_reduced_pct}% | Response: ${data.mitigation_latency_ns} ns`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "HTS coil flux pinning breached");
       }
-    } catch {
+      setLastResponse(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] Decoupling error: HTS coil flux pinning breached`,
+        `[${new Date().toLocaleTimeString()}] HEMP Decoupled: E1 clamped to ${data.clamped_e1_voltage_volts} V (${data.attenuation_ratio_db} dB attenuation) | GIC reduced: ${data.substation_gic_reduced_pct}% | Response: ${data.mitigation_latency_ns} ns`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "HTS coil flux pinning breached";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Decoupling error: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -109,6 +116,24 @@ export function MagnetosphereDynamoStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/40 via-indigo-900/20 to-neutral-900/40 p-6 backdrop-blur">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -128,6 +153,7 @@ export function MagnetosphereDynamoStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchStations}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
           >
@@ -253,6 +279,7 @@ export function MagnetosphereDynamoStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleTriggerDecoupling}
                 disabled={decoupling}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"

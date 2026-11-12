@@ -11,6 +11,7 @@ import {
   Shield,
   Sparkles,
   Layers,
+  AlertTriangle,
 } from "lucide-react";
 
 interface QuantumBranchNode {
@@ -46,16 +47,19 @@ export function EverettBranchStudio() {
   const [phaseGain, setPhaseGain] = useState(1.0);
   const [lastEvent, setLastEvent] = useState<EverettResolutionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchBranches = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/everett-branch/branches");
-      if (res.ok) {
-        const data = await res.json();
-        setBranches(data);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Failed to load Everett-Wheeler Hilbert branches");
       }
-    } catch {
-      // Fallback
+      setBranches(Array.isArray(data) ? data : []);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Everett-Wheeler Hilbert branches");
     } finally {
       setLoading(false);
     }
@@ -72,6 +76,7 @@ export function EverettBranchStudio() {
 
   const handleResolve = async () => {
     setResolving(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Aligning inter-branch relative phases for ${selectedBranch} with gain ${phaseGain}x...`,
       ...prev,
@@ -87,20 +92,24 @@ export function EverettBranchStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: EverettResolutionResult = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] ENTROPY RESOLUTION LOCKED: ${data.resolution_id}`,
-          `[${new Date().toLocaleTimeString()}] von Neumann Entropy: ${data.von_neumann_branch_entropy_nats.toFixed(4)} nats | Quench: ${data.decoherence_quench_ratio_db.toFixed(1)} dB`,
-          `[${new Date().toLocaleTimeString()}] Optimal Counterfactual: ${data.optimal_counterfactual_trajectory}`,
-          `[${new Date().toLocaleTimeString()}] Consensus Branch Stability: ${data.consensus_branch_stability_pct}%`,
-          ...prev,
-        ]);
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((data && data.error) || "Pointer state phase mismatch detected");
       }
-    } catch {
+      const event = data as EverettResolutionResult;
+      setLastEvent(event);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] RESOLUTION ERROR: Pointer state phase mismatch detected.`,
+        `[${new Date().toLocaleTimeString()}] ENTROPY RESOLUTION LOCKED: ${event.resolution_id}`,
+        `[${new Date().toLocaleTimeString()}] von Neumann Entropy: ${event.von_neumann_branch_entropy_nats.toFixed(4)} nats | Quench: ${event.decoherence_quench_ratio_db.toFixed(1)} dB`,
+        `[${new Date().toLocaleTimeString()}] Optimal Counterfactual: ${event.optimal_counterfactual_trajectory}`,
+        `[${new Date().toLocaleTimeString()}] Consensus Branch Stability: ${event.consensus_branch_stability_pct}%`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Pointer state phase mismatch detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] RESOLUTION ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -110,6 +119,24 @@ export function EverettBranchStudio() {
 
   return (
     <div className="space-y-6">
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-slate-900 to-indigo-950/40 p-6 backdrop-blur">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -133,6 +160,7 @@ export function EverettBranchStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchBranches}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 flex items-center gap-1.5 transition-colors"
@@ -251,6 +279,7 @@ export function EverettBranchStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleResolve}
               disabled={resolving}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-purple-900/30"

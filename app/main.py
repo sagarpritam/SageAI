@@ -50,6 +50,7 @@ from app.routers import (
     binary_deobfuscator_routes,
     bloch_schwinger_routes,
     bloodhound_routes,
+    bv_brst_routes,
     calabi_yau_routes,
     canary_fabric_routes,
     carrollian_holography_routes,
@@ -155,6 +156,7 @@ from app.routers import (
     orbital_hpm_routes,
     orbital_laser_routes,
     org_routes,
+    p_adic_holography_routes,
     password_routes,
     payment_routes,
     photonic_quantum_routes,
@@ -182,9 +184,11 @@ from app.routers import (
     skyrmion_instanton_routes,
     solar_sail_laser_routes,
     space_ground_qkd_routes,
+    spin_caloritronic_routes,
     spin_foam_routes,
     sso_routes,
     string_field_theory_routes,
+    subfactor_jones_routes,
     subsea_cable_routes,
     supply_chain_routes,
     swampland_wgc_routes,
@@ -508,6 +512,10 @@ app.include_router(mera_tensor_routes.router)
 app.include_router(algebraic_qft_routes.router)
 app.include_router(skyrmion_instanton_routes.router)
 app.include_router(time_crystal_routes.router)
+app.include_router(subfactor_jones_routes.router)
+app.include_router(bv_brst_routes.router)
+app.include_router(p_adic_holography_routes.router)
+app.include_router(spin_caloritronic_routes.router)
 
 
 # ---------------------
