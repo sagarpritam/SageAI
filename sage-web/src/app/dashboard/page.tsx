@@ -240,6 +240,10 @@ import MatrixBFSSFuzzballStudio from "@/components/MatrixBFSSFuzzballStudio";
 import CFTDefectBCFTStudio from "@/components/CFTDefectBCFTStudio";
 import EntanglementWedgeStudio from "@/components/EntanglementWedgeStudio";
 import BlochSchwingerStudio from "@/components/BlochSchwingerStudio";
+import MERATensorRenormStudio from "@/components/MERATensorRenormStudio";
+import AlgebraicQFTHaagStudio from "@/components/AlgebraicQFTHaagStudio";
+import SkyrmionInstantonStudio from "@/components/SkyrmionInstantonStudio";
+import TimeCrystalPowerStudio from "@/components/TimeCrystalPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -248,6 +252,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "mera-tensor-renorm", label: "MERA Tensor RG (Cap 131)", icon: Network },
+  { id: "algebraic-qft-haag", label: "AQFT Haag-Kastler (Cap 132)", icon: Shield },
+  { id: "skyrmion-instanton-qcd", label: "BPST Instanton Shield (Cap 133)", icon: Orbit },
+  { id: "time-crystal-power", label: "Time-Crystal Grid (Option B)", icon: Zap },
   { id: "matrix-bfss-fuzzball", label: "BFSS Matrix Fuzzball (Cap 128)", icon: Layers },
   { id: "cft-defect-bcft", label: "BCFT g-Theorem (Cap 129)", icon: Shield },
   { id: "entanglement-wedge-cross", label: "Entanglement Wedge E_W (Cap 130)", icon: GitBranch },
@@ -639,6 +647,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "mera-tensor-renorm" && <MERATensorRenormStudio />}
+          {activeTab === "algebraic-qft-haag" && <AlgebraicQFTHaagStudio />}
+          {activeTab === "skyrmion-instanton-qcd" && <SkyrmionInstantonStudio />}
+          {activeTab === "time-crystal-power" && <TimeCrystalPowerStudio />}
           {activeTab === "matrix-bfss-fuzzball" && <MatrixBFSSFuzzballStudio />}
           {activeTab === "cft-defect-bcft" && <CFTDefectBCFTStudio />}
           {activeTab === "entanglement-wedge-cross" && <EntanglementWedgeStudio />}

@@ -49,17 +49,20 @@ export function DeepCrustalMHDStudio() {
   const [velocityFactor, setVelocityFactor] = useState(1.0);
   const [loadFactor, setLoadFactor] = useState(0.85);
   const [lastDischarge, setLastDischarge] = useState<MHDPowerDischargeResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchVaults = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/deep-crustal-mhd/vaults");
-      if (res.ok) {
-        const data = await res.json();
-        setVaults(data);
+      if (!res.ok) {
+        throw new Error(`MHD vaults fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setVaults(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load deep-crustal MHD vaults.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ export function DeepCrustalMHDStudio() {
 
   const handleGenerate = async () => {
     setGenerating(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Engaging supercritical brine flow at ${selectedVault} (Velocity: ${velocityFactor}x, Load: ${loadFactor})...`,
       ...prev,
@@ -92,20 +96,23 @@ export function DeepCrustalMHDStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: MHDPowerDischargeResult = await res.json();
-        setLastDischarge(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] DIRECT DC BASELOAD ENGAGED: ${data.discharge_id}`,
-          `[${new Date().toLocaleTimeString()}] Generated Power: ${data.generated_mhd_power_mw.toFixed(1)} MW | Grid Export: ${data.sovereign_grid_export_mw.toFixed(1)} MW`,
-          `[${new Date().toLocaleTimeString()}] Generator Efficiency: ${data.mhd_generator_efficiency_pct}% | Hall Parameter beta: ${data.hall_parameter_beta.toFixed(3)}`,
-          `[${new Date().toLocaleTimeString()}] Subterranean Isolation: ${data.subterranean_isolation_confirmed ? "SECURED (CLASS-V)" : "ATTENUATED"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`MHD power discharge returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: MHDPowerDischargeResult = await res.json();
+      setLastDischarge(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] GENERATION ERROR: Supercritical brine pressure destabilization.`,
+        `[${new Date().toLocaleTimeString()}] DIRECT DC BASELOAD ENGAGED: ${data.discharge_id}`,
+        `[${new Date().toLocaleTimeString()}] Generated Power: ${data.generated_mhd_power_mw.toFixed(1)} MW | Grid Export: ${data.sovereign_grid_export_mw.toFixed(1)} MW`,
+        `[${new Date().toLocaleTimeString()}] Generator Efficiency: ${data.mhd_generator_efficiency_pct}% | Hall Parameter beta: ${data.hall_parameter_beta.toFixed(3)}`,
+        `[${new Date().toLocaleTimeString()}] Subterranean Isolation: ${data.subterranean_isolation_confirmed ? "SECURED (CLASS-V)" : "ATTENUATED"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Supercritical brine pressure destabilization.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] GENERATION ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -138,6 +145,7 @@ export function DeepCrustalMHDStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchVaults}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 flex items-center gap-1.5 transition-colors"
@@ -152,6 +160,18 @@ export function DeepCrustalMHDStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid: Vault Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -262,6 +282,7 @@ export function DeepCrustalMHDStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleGenerate}
               disabled={generating}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-900/30"

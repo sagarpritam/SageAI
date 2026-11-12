@@ -46,17 +46,20 @@ export function CauchyChronologyStudio() {
   const [selectedHorizon, setSelectedHorizon] = useState("CAUCHY-HORIZON-KERR-01");
   const [blueshiftFactor, setBlueshiftFactor] = useState(1.0e12);
   const [lastAction, setLastAction] = useState<ChronoResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchHorizons = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cauchy-chronology/horizons");
-      if (res.ok) {
-        const data = await res.json();
-        setHorizons(data);
+      if (!res.ok) {
+        throw new Error(`Horizons fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setHorizons(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Cauchy spacetime horizons.");
     } finally {
       setLoading(false);
     }
@@ -73,6 +76,7 @@ export function CauchyChronologyStudio() {
 
   const handleClamp = async () => {
     setClamping(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Blue-sheet divergence detected at ${selectedHorizon}. Activating quantum vacuum backreaction clamp...`,
       ...prev,
@@ -88,20 +92,23 @@ export function CauchyChronologyStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: ChronoResult = await res.json();
-        setLastAction(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] CLAMP DISCHARGED: ${data.action_id}`,
-          `[${new Date().toLocaleTimeString()}] Divergence Suppression: ${data.divergence_suppression_ratio_db.toFixed(1)} dB | Counter-Pulse: ${data.quantum_backreaction_counter_pulse_joules.toExponential(3)} J`,
-          `[${new Date().toLocaleTimeString()}] CTC Phase Slip: ${data.ctc_phase_slip_femtoseconds.toFixed(6)} fs | Causality Fidelity: ${data.chronology_preservation_fidelity_pct.toFixed(5)}%`,
-          `[${new Date().toLocaleTimeString()}] Closed Timelike Loop Prevented: ${data.closed_timelike_loop_prevented ? "TRUE" : "FALSE"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Chronology clamp returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: ChronoResult = await res.json();
+      setLastAction(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] CLAMP FAULT: Acausal chronology rupture detected.`,
+        `[${new Date().toLocaleTimeString()}] CLAMP DISCHARGED: ${data.action_id}`,
+        `[${new Date().toLocaleTimeString()}] Divergence Suppression: ${data.divergence_suppression_ratio_db.toFixed(1)} dB | Counter-Pulse: ${data.quantum_backreaction_counter_pulse_joules.toExponential(3)} J`,
+        `[${new Date().toLocaleTimeString()}] CTC Phase Slip: ${data.ctc_phase_slip_femtoseconds.toFixed(6)} fs | Causality Fidelity: ${data.chronology_preservation_fidelity_pct.toFixed(5)}%`,
+        `[${new Date().toLocaleTimeString()}] Closed Timelike Loop Prevented: ${data.closed_timelike_loop_prevented ? "TRUE" : "FALSE"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Acausal chronology rupture detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] CLAMP FAULT: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -134,6 +141,7 @@ export function CauchyChronologyStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchHorizons}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs transition"
@@ -144,6 +152,18 @@ export function CauchyChronologyStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metric Telemetry Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -236,6 +256,7 @@ export function CauchyChronologyStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleClamp}
               disabled={clamping}
               className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-medium text-xs transition disabled:opacity-50"

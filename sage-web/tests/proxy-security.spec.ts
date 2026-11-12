@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.6.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.7.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.6.0");
-    expect(healthJson.version).toBe("7.6.0");
+    expect(healthJson.platform_version).toBe("7.7.0");
+    expect(healthJson.version).toBe("7.7.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -888,6 +888,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(floquetBody.status).toBe("FLOQUET_BLOCH_OPTIMAL");
     expect(floquetBody.zero_fossil_carbon).toBe(true);
     expect(Number(floquetBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 37 studios (Caps 131-133 & Option B) return 200 deterministically offline
+    const meraList = await request.get("/api/mera-tensor-renorm/networks");
+    expect(meraList.status()).toBe(200);
+    const meraSim = await request.post("/api/mera-tensor-renorm/renormalize-cone", {
+      data: {
+        network_id: "MERA-TERNARY-ADS3-01",
+        bond_dim_chi: 32,
+        rg_layers: 14,
+        central_charge: 12.0,
+      },
+    });
+    expect(meraSim.status()).toBe(200);
+    expect(((await meraSim.json()) as { status?: string }).status).toBe(
+      "MERA_CAUSAL_CONE_SEALED"
+    );
+
+    const aqftList = await request.get("/api/algebraic-qft-haag/algebras");
+    expect(aqftList.status()).toBe(200);
+    const aqftSim = await request.post("/api/algebraic-qft-haag/seal-net", {
+      data: {
+        algebra_id: "AQFT-HAAG-DIAMOND-01",
+        diamond_radius: 2.4,
+        split_distance: 0.45,
+        modular_temp: 1.0,
+      },
+    });
+    expect(aqftSim.status()).toBe(200);
+    expect(((await aqftSim.json()) as { status?: string }).status).toBe(
+      "AQFT_HAAG_NET_SEALED"
+    );
+
+    const skyList = await request.get("/api/skyrmion-instanton-qcd/lattices");
+    expect(skyList.status()).toBe(200);
+    const skySim = await request.post("/api/skyrmion-instanton-qcd/clamp-instanton", {
+      data: {
+        lattice_id: "BPST-INSTANTON-SU2-01",
+        winding_q: 2,
+        instanton_size_rho: 0.35,
+        gauge_coupling: 1.25,
+      },
+    });
+    expect(skySim.status()).toBe(200);
+    expect(((await skySim.json()) as { status?: string }).status).toBe(
+      "SKYRMION_TOPOLOGY_SEALED"
+    );
+
+    const tcList = await request.get("/api/time-crystal-power/arrays");
+    expect(tcList.status()).toBe(200);
+    const tcSim = await request.post("/api/time-crystal-power/harvest-subharmonic", {
+      data: {
+        array_id: "TIME-CRYSTAL-ORBIT-01",
+        shapiro_freq_ghz: 34.0,
+        ratchet_gain: 1.6,
+      },
+    });
+    expect(tcSim.status()).toBe(200);
+    const tcBody = (await tcSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(tcBody.status).toBe("TIME_CRYSTAL_GRID_OPTIMAL");
+    expect(tcBody.zero_fossil_carbon).toBe(true);
+    expect(Number(tcBody.net_grid_output_gw)).toBeGreaterThan(280.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

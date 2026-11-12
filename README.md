@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-656%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Next.js](https://img.shields.io/badge/Next.js-514%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-743%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-7.6.0%20BFSS%20Fuzzball%2C%20BCFT%20%26%20Wedge%20E__W-gold?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-662%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Next.js](https://img.shields.io/badge/Next.js-526%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-755%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-7.7.0%20MERA%20RG%2C%20AQFT%20%26%20BPST%20Instanton-gold?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 
@@ -597,7 +597,7 @@ Every OSINT module operates **immediately without mandatory API keys** using res
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │ REST API + WebSockets
 ┌───────────────────────────────────▼────────────────────────────────────┐
-│                  FastAPI Backend (740 Endpoints / 183 Routers)         │
+│                  FastAPI Backend (752 Endpoints / 187 Routers)         │
 │  Enterprise Orchestrator │ WAF │ NIDS │ UEBA │ SOAR │ Audit Chain      │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
 │  │  10-Pillar Sovereign Defense & Offense Grid                     │  │
@@ -888,13 +888,17 @@ SageAI/
 ├── app/
 │   ├── core/              # Config, database engine, JWT, rate limiting, telemetry
 │   ├── models/            # 17 SQLAlchemy models (Scan, Finding, Asset, RemediationPatch...)
-│   ├── routers/           # 183 API router modules (Core, Waves 1-36 Trans-Century Defense & Sovereignty)
+│   ├── routers/           # 187 API router modules (Core, Waves 1-37 Trans-Century Defense & Sovereignty)
 │   ├── schemas/           # Pydantic request & response validators
 │   ├── services/
-│   │   ├── matrix_bfss_fuzzball/        # 🆕 Wave 36: BFSS / IKKT Matrix Model & Fuzzball firewall (Cap 128)
-│   │   ├── cft_defect_bcft/             # 🆕 Wave 36: Cardy BCFT Defect Line & g-Theorem RG shield (Cap 129)
-│   │   ├── entanglement_wedge_cross/    # 🆕 Wave 36: Reflected Entropy S_R & Wedge E_W guard (Cap 130)
-│   │   ├── bloch_schwinger_power/       # 🆕 Wave 36 (Opt B): Planetary Floquet-Bloch photonic power grid
+│   │   ├── mera_tensor_renorm/          # 🆕 Wave 37: MERA & cMERA Tensor RG Circuit firewall (Cap 131)
+│   │   ├── algebraic_qft_haag/          # 🆕 Wave 37: AQFT Haag-Kastler & Tomita-Takesaki shield (Cap 132)
+│   │   ├── skyrmion_instanton_qcd/      # 🆕 Wave 37: Skyrmion-Instanton BPST & Theta-Vacuum shield (Cap 133)
+│   │   ├── time_crystal_power/          # 🆕 Wave 37 (Opt B): Planetary Time-Crystal Josephson harvest grid
+│   │   ├── matrix_bfss_fuzzball/        # Wave 36: BFSS / IKKT Matrix Model & Fuzzball firewall (Cap 128)
+│   │   ├── cft_defect_bcft/             # Wave 36: Cardy BCFT Defect Line & g-Theorem RG shield (Cap 129)
+│   │   ├── entanglement_wedge_cross/    # Wave 36: Reflected Entropy S_R & Wedge E_W guard (Cap 130)
+│   │   ├── bloch_schwinger_power/       # Wave 36 (Opt B): Planetary Floquet-Bloch photonic power grid
 │   │   ├── jt_wormhole_matrix/          # Wave 35: JT Dilaton Wormhole & SSS Matrix firewall (Cap 125)
 │   │   ├── ds_static_patch/             # Wave 35: dS/CFT Static-Patch & Timelike Entanglement shield (Cap 126)
 │   │   ├── higher_form_twogroup/        # Wave 35: 2-Group Higher-Form Green-Schwarz & Walker-Wang guard (Cap 127)
@@ -1022,11 +1026,15 @@ SageAI/
 │   │   └── warroom_service.py       # Distributed event streaming & War Room manager
 │   └── middleware/        # Security headers, SlowAPI rate limiter, audit trail middleware
 ├── sage-web/src/          # Next.js 16.4.4 Production SSR Frontend (Turbopack)
-│   ├── app/               # 17 App Router page/metadata routes (v7.6.0 Landing, Features, Pricing, Command Center...)
-│   ├── app/api/           # 511 API routes and proxy endpoints
-│   ├── lib/platform.ts    # Centralized v7.6.0 metrics, milestone metadata & SITE_URL
-│   └── components/        # 202 Tailwind & Lucide React UI Components (195 top-level panels; 166 mounted Command Center studios)
-│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.6.0 10-Pillar, PQC & Waves 1-36 Grid Showcase
+│   ├── app/               # 17 App Router page/metadata routes (v7.7.0 Landing, Features, Pricing, Command Center...)
+│   ├── app/api/           # 523 API routes and proxy endpoints
+│   ├── lib/platform.ts    # Centralized v7.7.0 metrics, milestone metadata & SITE_URL
+│   └── components/        # 206 Tailwind & Lucide React UI Components (199 top-level panels; 170 mounted Command Center studios)
+│       ├── SovereignArchitectureShowcase.tsx     # Interactive v7.7.0 10-Pillar, PQC & Waves 1-37 Grid Showcase
+│       ├── MERATensorRenormStudio.tsx            # 🧩 MERA & Continuous cMERA Tensor RG Circuit Firewall
+│       ├── AlgebraicQFTHaagStudio.tsx            # 🛡️ AQFT Haag-Kastler Net & Tomita-Takesaki Modular Wedge Shield
+│       ├── SkyrmionInstantonStudio.tsx           # 🌀 Topological Skyrmion-Instanton BPST & Theta-Vacuum Shield
+│       ├── TimeCrystalPowerStudio.tsx            # ⚡ Planetary Floquet Time-Crystal Josephson Harvest Grid
 │       ├── MatrixBFSSFuzzballStudio.tsx          # 🧩 BFSS / IKKT Matrix Model & Fuzzball Microstate Firewall
 │       ├── CFTDefectBCFTStudio.tsx               # 🛡️ Boundary CFT Defect Line & g-Theorem RG Interface Shield
 │       ├── EntanglementWedgeStudio.tsx           # 🔀 Reflected Entropy S_R & Entanglement Wedge E_W Guard
@@ -1138,7 +1146,7 @@ SageAI/
 │       ├── QuantumSafeStudio.tsx                 # NIST Kyber KEM, Dilithium DSA & Zero-Egress Sealer
 │       └── EnterpriseSecurityHub.tsx             # Sovereign Defense Grid Command Center
 ├── sage-web/tests/        # 33 Playwright E2E specs across 3 suites (standalone Next.js server)
-├── tests/                 # 656 pytest tests across 103 test suites (100% passing)
+├── tests/                 # 662 pytest tests across 104 test suites (100% passing)
 ├── alembic/               # Database migrations & revision history
 └── docker/                # Multi-service Docker Compose configurations
 ```

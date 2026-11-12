@@ -49,17 +49,20 @@ export function DeSitterRepulsionStudio() {
   const [targetRegion, setTargetRegion] = useState("LOCAL_INERTIAL_FRAME_SEC_1");
   const [couplingGain, setCouplingGain] = useState(1.0);
   const [lastEvent, setLastEvent] = useState<DeSitterEvent | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/desitter-repulsion/grids");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        throw new Error(`de Sitter grid fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load de Sitter repulsion grids.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ export function DeSitterRepulsionStudio() {
 
   const handleGenerate = async () => {
     setGenerating(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Pumping resonant dipole potential at ${selectedNode} with gain ${couplingGain}x...`,
       ...prev,
@@ -92,20 +96,23 @@ export function DeSitterRepulsionStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: DeSitterEvent = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] REPULSION BARRIER ACTIVE: ${data.event_id}`,
-          `[${new Date().toLocaleTimeString()}] Repulsive Metric Force: ${data.repulsive_metric_force_nn.toFixed(2)} nN | Screening: ${data.curvature_screening_efficiency_pct}%`,
-          `[${new Date().toLocaleTimeString()}] Casimir-Polder Potential: ${data.casimir_polder_potential_ev.toExponential(4)} eV`,
-          `[${new Date().toLocaleTimeString()}] Cosmic Expansion Decoupled: ${data.cosmological_expansion_decoupled ? "CONFIRMED" : "PENDING"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Repulsion generation returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: DeSitterEvent = await res.json();
+      setLastEvent(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] GENERATION ERROR: Metric phase incoherence detected.`,
+        `[${new Date().toLocaleTimeString()}] REPULSION BARRIER ACTIVE: ${data.event_id}`,
+        `[${new Date().toLocaleTimeString()}] Repulsive Metric Force: ${data.repulsive_metric_force_nn.toFixed(2)} nN | Screening: ${data.curvature_screening_efficiency_pct}%`,
+        `[${new Date().toLocaleTimeString()}] Casimir-Polder Potential: ${data.casimir_polder_potential_ev.toExponential(4)} eV`,
+        `[${new Date().toLocaleTimeString()}] Cosmic Expansion Decoupled: ${data.cosmological_expansion_decoupled ? "CONFIRMED" : "PENDING"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Metric phase incoherence detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] GENERATION ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -138,6 +145,7 @@ export function DeSitterRepulsionStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchNodes}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs transition"
@@ -148,6 +156,18 @@ export function DeSitterRepulsionStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metric Telemetry Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -250,6 +270,7 @@ export function DeSitterRepulsionStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleGenerate}
               disabled={generating}
               className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-amber-600 to-cyan-600 hover:from-amber-500 hover:to-cyan-500 text-white font-medium text-xs transition disabled:opacity-50"

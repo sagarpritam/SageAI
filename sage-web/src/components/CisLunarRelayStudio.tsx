@@ -50,17 +50,20 @@ export function CisLunarRelayStudio() {
   const [selectedSource, setSelectedSource] = useState("EARTH-OCP-TENERIFE");
   const [selectedTarget, setSelectedTarget] = useState("LAGRANGE-L1-HALO-1");
   const [lastTransmission, setLastTransmission] = useState<TransmissionResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cislunar-relay/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        throw new Error(`Transceiver nodes fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Cis-Lunar transceiver nodes.");
     } finally {
       setLoading(false);
     }
@@ -72,6 +75,7 @@ export function CisLunarRelayStudio() {
 
   const handleEstablishLink = async () => {
     setTransmitting(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Aligning 1550nm narrow-beam laser optical link (${selectedSource} -> ${selectedTarget})...`,
       ...prev,
@@ -89,17 +93,20 @@ export function CisLunarRelayStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setLastTransmission(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] Link established: ${data.distance_km.toLocaleString()} km | Shapiro Delay: ${data.shapiro_delay_nsec} ns | QBER: ${(data.quantum_bit_error_rate_qber * 100).toFixed(2)}% | OAM Throughput: ${data.oam_aggregate_throughput_gbps} Gbps`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Optical link establishment returned HTTP ${res.status}`);
       }
-    } catch {
+      const data = await res.json();
+      setLastTransmission(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] Optical alignment error: Signal degraded`,
+        `[${new Date().toLocaleTimeString()}] Link established: ${data.distance_km.toLocaleString()} km | Shapiro Delay: ${data.shapiro_delay_nsec} ns | QBER: ${(data.quantum_bit_error_rate_qber * 100).toFixed(2)}% | OAM Throughput: ${data.oam_aggregate_throughput_gbps} Gbps`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Optical alignment error: Signal degraded";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -128,6 +135,7 @@ export function CisLunarRelayStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchNodes}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
           >
@@ -136,6 +144,18 @@ export function CisLunarRelayStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Control Panel & Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -251,6 +271,7 @@ export function CisLunarRelayStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleEstablishLink}
                 disabled={transmitting}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs py-2 transition disabled:opacity-50"

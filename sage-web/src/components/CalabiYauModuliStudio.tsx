@@ -49,17 +49,20 @@ export function CalabiYauModuliStudio() {
   const [targetVolume, setTargetVolume] = useState(50.0);
   const [fluxFactor, setFluxFactor] = useState(1.0);
   const [lastResult, setLastResult] = useState<ModuliResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchManifolds = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/calabi-yau/manifolds");
-      if (res.ok) {
-        const data = await res.json();
-        setManifolds(data);
+      if (!res.ok) {
+        throw new Error(`Manifolds fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setManifolds(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Calabi-Yau manifolds.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ export function CalabiYauModuliStudio() {
 
   const handleStabilize = async () => {
     setStabilizing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Freezing Kahler and complex structure moduli for ${selectedManifold} at vol=${targetVolume}...`,
       ...prev,
@@ -92,20 +96,23 @@ export function CalabiYauModuliStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: ModuliResult = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] MODULI FROZEN: ${data.result_id}`,
-          `[${new Date().toLocaleTimeString()}] Kahler Mass: ${data.kahler_moduli_mass_gev.toExponential(2)} GeV | Anti-D3 Uplift: ${data.anti_d3_uplift_energy_gev.toExponential(2)} GeV`,
-          `[${new Date().toLocaleTimeString()}] Fixed Moduli: ${data.complex_structure_moduli_fixed} Complex + Kahler | Decompact Barrier: ${data.decompactification_barrier_height_gev.toExponential(2)} GeV`,
-          `[${new Date().toLocaleTimeString()}] Topological Invariance: ${data.topological_invariance_verified ? "PROVEN" : "UNVERIFIED"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Moduli stabilization returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: ModuliResult = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] STABILIZATION ERROR: Moduli runaway decompactification detected.`,
+        `[${new Date().toLocaleTimeString()}] MODULI FROZEN: ${data.result_id}`,
+        `[${new Date().toLocaleTimeString()}] Kahler Mass: ${data.kahler_moduli_mass_gev.toExponential(2)} GeV | Anti-D3 Uplift: ${data.anti_d3_uplift_energy_gev.toExponential(2)} GeV`,
+        `[${new Date().toLocaleTimeString()}] Fixed Moduli: ${data.complex_structure_moduli_fixed} Complex + Kahler | Decompact Barrier: ${data.decompactification_barrier_height_gev.toExponential(2)} GeV`,
+        `[${new Date().toLocaleTimeString()}] Topological Invariance: ${data.topological_invariance_verified ? "PROVEN" : "UNVERIFIED"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Moduli runaway decompactification detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] STABILIZATION ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -138,6 +145,7 @@ export function CalabiYauModuliStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchManifolds}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs transition"
@@ -148,6 +156,18 @@ export function CalabiYauModuliStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metric Telemetry Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -256,6 +276,7 @@ export function CalabiYauModuliStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleStabilize}
               disabled={stabilizing}
               className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-medium text-xs transition disabled:opacity-50"

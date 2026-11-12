@@ -49,17 +49,20 @@ export function AnyonBraidingStudio() {
   const [targetQubit, setTargetQubit] = useState("TOPO-QUBIT-01");
   const [gateType, setGateType] = useState("HADAMARD");
   const [lastBraid, setLastBraid] = useState<BraidOperationResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchMatrices = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/anyon-braiding/matrices");
-      if (res.ok) {
-        const data = await res.json();
-        setMatrices(data);
+      if (!res.ok) {
+        throw new Error(`Matrices fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setMatrices(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load anyon braiding matrices.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ export function AnyonBraidingStudio() {
 
   const handleBraid = async () => {
     setBraiding(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Executing physical anyon adiabatic worldline exchange: " + braidWord + " on " + targetQubit + "...",
       ...prev,
@@ -93,18 +97,21 @@ export function AnyonBraidingStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: BraidOperationResult = await res.json();
-        setLastBraid(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] Unitary " + data.synthesized_quantum_gate + " gate synthesized! Topological fidelity: " + data.topological_fidelity_pct + "%",
-          "[" + new Date().toLocaleTimeString() + "] Output state: " + data.qubit_superposition_state + " (" + data.status + ")",
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Topological braid returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: BraidOperationResult = await res.json();
+      setLastBraid(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] Error executing topological anyon braid.",
+        "[" + new Date().toLocaleTimeString() + "] Unitary " + data.synthesized_quantum_gate + " gate synthesized! Topological fidelity: " + data.topological_fidelity_pct + "%",
+        "[" + new Date().toLocaleTimeString() + "] Output state: " + data.qubit_superposition_state + " (" + data.status + ")",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error executing topological anyon braid.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] " + msg,
         ...prev,
       ]);
     } finally {
@@ -137,6 +144,7 @@ export function AnyonBraidingStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchMatrices}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-900/40 hover:bg-emerald-800/50 border border-emerald-700/50 text-emerald-200 text-sm font-medium transition-all"
@@ -146,6 +154,18 @@ export function AnyonBraidingStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Matrices Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -226,6 +246,7 @@ export function AnyonBraidingStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleBraid}
               disabled={braiding}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2"

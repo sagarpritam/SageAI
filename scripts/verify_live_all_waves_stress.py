@@ -1181,6 +1181,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 36 (Opt B): Floquet-Bloch Harvest Baseload",
         ),
+        # Wave 37: MERA Tensor RG, AQFT Haag-Kastler Net, BPST Instanton Shield & Time-Crystal Josephson Grid
+        (
+            "GET",
+            "/api/mera-tensor-renorm/networks",
+            None,
+            "Wave 37 (Cap 131): MERA Tensor Networks List",
+        ),
+        (
+            "POST",
+            "/api/mera-tensor-renorm/renormalize-cone",
+            {
+                "network_id": "MERA-TERNARY-ADS3-01",
+                "bond_dim_chi": 32,
+                "rg_layers": 14,
+                "central_charge": 12.0,
+                "disentangler_gain": 1.6,
+            },
+            "Wave 37 (Cap 131): MERA Causal-Cone Renormalize",
+        ),
+        (
+            "GET",
+            "/api/algebraic-qft-haag/algebras",
+            None,
+            "Wave 37 (Cap 132): AQFT Haag-Kastler Algebras List",
+        ),
+        (
+            "POST",
+            "/api/algebraic-qft-haag/seal-net",
+            {
+                "algebra_id": "AQFT-HAAG-DIAMOND-01",
+                "diamond_radius": 2.4,
+                "split_distance": 0.45,
+                "modular_temp": 1.0,
+                "nuclearity_gain": 1.6,
+            },
+            "Wave 37 (Cap 132): AQFT Haag-Kastler Net Seal",
+        ),
+        (
+            "GET",
+            "/api/skyrmion-instanton-qcd/lattices",
+            None,
+            "Wave 37 (Cap 133): Skyrmion-Instanton Lattices List",
+        ),
+        (
+            "POST",
+            "/api/skyrmion-instanton-qcd/clamp-instanton",
+            {
+                "lattice_id": "BPST-INSTANTON-SU2-01",
+                "winding_q": 2,
+                "instanton_size_rho": 0.35,
+                "gauge_coupling": 1.25,
+                "theta_clamp_gain": 1.6,
+            },
+            "Wave 37 (Cap 133): BPST Instanton Topology Clamp",
+        ),
+        (
+            "GET",
+            "/api/time-crystal-power/arrays",
+            None,
+            "Wave 37 (Opt B): Time-Crystal Josephson Arrays List",
+        ),
+        (
+            "POST",
+            "/api/time-crystal-power/harvest-subharmonic",
+            {
+                "array_id": "TIME-CRYSTAL-ORBIT-01",
+                "shapiro_freq_ghz": 34.0,
+                "ratchet_gain": 1.6,
+            },
+            "Wave 37 (Opt B): Time-Crystal Subharmonic Harvest",
+        ),
     ]
 
 
@@ -1210,7 +1281,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-36, CAPS 1-130) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-37, CAPS 1-133) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1225,7 +1296,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-36 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-37 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1282,7 +1353,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-36){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-37){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1298,7 +1369,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-36 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-37 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1310,7 +1381,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 184)
+        total_requests if total_requests is not None else max(endpoints_count, 192)
     )
 
     if in_process:

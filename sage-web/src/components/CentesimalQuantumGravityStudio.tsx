@@ -49,17 +49,20 @@ export function CentesimalQuantumGravityStudio() {
   const [bounceDamping, setBounceDamping] = useState(1.0);
   const [areaGap, setAreaGap] = useState(1.0);
   const [lastResult, setLastResult] = useState<MetricSynthesisResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchFabrics = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/centesimal-quantum-gravity/fabrics");
-      if (res.ok) {
-        const data = await res.json();
-        setFabrics(data);
+      if (!res.ok) {
+        throw new Error(`Spacetime fabrics fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setFabrics(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load quantum spacetime fabrics.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ export function CentesimalQuantumGravityStudio() {
 
   const handleSynthesize = async () => {
     setSynthesizing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Synthesizing singularity-free Riemannian metric for " + selectedFabric + "...",
       ...prev,
@@ -90,18 +94,21 @@ export function CentesimalQuantumGravityStudio() {
           area_gap_gain: areaGap,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Century Milestone Certified! Metric is Geodesically Complete (100.0%).",
-          "[" + new Date().toLocaleTimeString() + "] Quantum Bounce Radius: " + (data.quantum_bounce_radius_meters * 1e35).toFixed(3) + " x 10^-35 m | Kretschmann Scalar: " + data.regularized_kretschmann_scalar.toExponential(2) + " m^-4",
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Metric synthesis returned HTTP ${res.status}`);
       }
-    } catch {
+      const data = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Quantum metric synthesis failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Century Milestone Certified! Metric is Geodesically Complete (100.0%).",
+        "[" + new Date().toLocaleTimeString() + "] Quantum Bounce Radius: " + (data.quantum_bounce_radius_meters * 1e35).toFixed(3) + " x 10^-35 m | Kretschmann Scalar: " + data.regularized_kretschmann_scalar.toExponential(2) + " m^-4",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Quantum metric synthesis failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -135,6 +142,7 @@ export function CentesimalQuantumGravityStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchFabrics}
           className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-sm text-amber-300 transition-colors self-start md:self-auto font-medium"
         >
@@ -142,6 +150,18 @@ export function CentesimalQuantumGravityStudio() {
           Refresh Fabrics
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -249,6 +269,7 @@ export function CentesimalQuantumGravityStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleSynthesize}
             disabled={synthesizing}
             className="w-full py-3 bg-gradient-to-r from-amber-600 via-purple-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 disabled:opacity-50 text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-900/30"

@@ -48,17 +48,20 @@ export function DBraneTadpoleStudio() {
   const [fluxQuanta, setFluxQuanta] = useState(1);
   const [gsBoost, setGsBoost] = useState(1.0);
   const [lastResult, setLastResult] = useState<TadpoleCancellationResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchStacks = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/dbrane-tadpole/stacks");
-      if (res.ok) {
-        const data = await res.json();
-        setStacks(data);
+      if (!res.ok) {
+        throw new Error(`D-Brane stacks fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setStacks(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load D-Brane orientifold stacks.");
     } finally {
       setLoading(false);
     }
@@ -75,6 +78,7 @@ export function DBraneTadpoleStudio() {
 
   const handleCancelTadpole = async () => {
     setCancelling(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Injecting compensatory RR counter-flux into " + selectedStack + "...",
       ...prev,
@@ -89,18 +93,21 @@ export function DBraneTadpoleStudio() {
           green_schwarz_boost: gsBoost,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Tadpole charge cancelled (Remaining excess: " + data.post_filtering_tadpole_excess + ").",
-          "[" + new Date().toLocaleTimeString() + "] Excised " + data.tachyonic_modes_excised_count + " tachyonic destabilizing modes | Injected GS Counterterm: " + data.green_schwarz_counterterm_injected.toFixed(4),
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Tadpole cancellation returned HTTP ${res.status}`);
       }
-    } catch {
+      const data = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Tadpole cancellation failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Tadpole charge cancelled (Remaining excess: " + data.post_filtering_tadpole_excess + ").",
+        "[" + new Date().toLocaleTimeString() + "] Excised " + data.tachyonic_modes_excised_count + " tachyonic destabilizing modes | Injected GS Counterterm: " + data.green_schwarz_counterterm_injected.toFixed(4),
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Tadpole cancellation failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -129,6 +136,7 @@ export function DBraneTadpoleStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchStacks}
           className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg text-sm text-purple-300 transition-colors self-start md:self-auto"
         >
@@ -136,6 +144,18 @@ export function DBraneTadpoleStudio() {
           Refresh Stacks
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -243,6 +263,7 @@ export function DBraneTadpoleStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleCancelTadpole}
             disabled={cancelling}
             className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-900/30"

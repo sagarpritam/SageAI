@@ -30,6 +30,7 @@ from app.routers import (
     airgap_exploit_routes,
     airgap_llm_guard_routes,
     alcubierre_lentz_warp_routes,
+    algebraic_qft_routes,
     amplituhedron_scattering_routes,
     antimatter_containment_routes,
     antimatter_fusion_routes,
@@ -135,6 +136,7 @@ from app.routers import (
     mantle_geoneutrino_routes,
     marine_sonar_routes,
     matrix_bfss_routes,
+    mera_tensor_routes,
     mfa_routes,
     mhd_plasma_stealth_routes,
     micro_hotpatch_routes,
@@ -177,6 +179,7 @@ from app.routers import (
     sdn_shield_routes,
     simulation_routes,
     singularity_containment_routes,
+    skyrmion_instanton_routes,
     solar_sail_laser_routes,
     space_ground_qkd_routes,
     spin_foam_routes,
@@ -193,6 +196,7 @@ from app.routers import (
     threat_hunting_routes,
     threat_hunting_swarm_routes,
     threat_modeling_routes,
+    time_crystal_routes,
     tmf_cohomology_routes,
     twistor_holonomy_routes,
     unruh_rindler_routes,
@@ -500,6 +504,10 @@ app.include_router(matrix_bfss_routes.router)
 app.include_router(cft_defect_bcft_routes.router)
 app.include_router(entanglement_wedge_routes.router)
 app.include_router(bloch_schwinger_routes.router)
+app.include_router(mera_tensor_routes.router)
+app.include_router(algebraic_qft_routes.router)
+app.include_router(skyrmion_instanton_routes.router)
+app.include_router(time_crystal_routes.router)
 
 
 # ---------------------

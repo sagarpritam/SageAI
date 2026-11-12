@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–36 • Current",
-    range: "Capabilities 101–130 + Option B",
+    wave: "Waves 27–37 • Current",
+    range: "Capabilities 101–133 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "BFSS/IKKT Matrix Fuzzball Firewall, Cardy BCFT g-Theorem Interface Shield, Reflected Entropy & Entanglement Wedge E_W Guard, JT Wormhole Matrix & Floquet-Bloch Photonic Power Grid.",
+    detail: "MERA/cMERA Tensor Renormalization Firewall, AQFT Haag-Kastler Tomita-Takesaki Shield, Skyrmion-Instanton BPST Theta-Vacuum Guard, BFSS Matrix Fuzzball & Time-Crystal Josephson Grid.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 36 BFSS Matrix Fuzzball, BCFT g-Theorem &amp; Entanglement Wedge E_W orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 37 MERA Tensor RG, AQFT Haag-Kastler &amp; BPST Instanton Shield orchestration.
           </p>
         </div>
 

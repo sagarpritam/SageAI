@@ -47,17 +47,20 @@ export function CosmicCensorshipStudio() {
   const [overspinTorque, setOverspinTorque] = useState(2.5);
   const [dampingGain, setDampingGain] = useState(1.0);
   const [lastEvent, setLastEvent] = useState<CensorshipEnforcementResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/cosmic-censorship/singularities");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        throw new Error(`Singularity nodes fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load spacetime curvature nodes.");
     } finally {
       setLoading(false);
     }
@@ -74,6 +77,7 @@ export function CosmicCensorshipStudio() {
 
   const handleEnforce = async () => {
     setEnforcing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Neutralizing overspin anomaly at ${selectedNode} (+${overspinTorque}% torque, gain ${dampingGain}x)...`,
       ...prev,
@@ -90,20 +94,23 @@ export function CosmicCensorshipStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: CensorshipEnforcementResult = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] HORIZON EXPANDED & CLOAKED: ${data.enforcement_id}`,
-          `[${new Date().toLocaleTimeString()}] Extremality Parameter: ${data.pre_enforcement_extremality_ratio.toFixed(4)} -> ${data.post_enforcement_extremality_ratio.toFixed(4)} (Clamped)`,
-          `[${new Date().toLocaleTimeString()}] Horizon Expansion: +${data.outer_horizon_expansion_meters.toFixed(1)} m | Damped J: ${data.angular_momentum_damped_j_s.toExponential(2)} J·s`,
-          `[${new Date().toLocaleTimeString()}] Naked Singularity Prevented: ${data.naked_singularity_prevented ? "CONFIRMED" : "FAILED"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Cosmic censorship enforcement returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: CensorshipEnforcementResult = await res.json();
+      setLastEvent(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] ENFORCEMENT ERROR: Naked curvature divergence detected.`,
+        `[${new Date().toLocaleTimeString()}] HORIZON EXPANDED & CLOAKED: ${data.enforcement_id}`,
+        `[${new Date().toLocaleTimeString()}] Extremality Parameter: ${data.pre_enforcement_extremality_ratio.toFixed(4)} -> ${data.post_enforcement_extremality_ratio.toFixed(4)} (Clamped)`,
+        `[${new Date().toLocaleTimeString()}] Horizon Expansion: +${data.outer_horizon_expansion_meters.toFixed(1)} m | Damped J: ${data.angular_momentum_damped_j_s.toExponential(2)} J·s`,
+        `[${new Date().toLocaleTimeString()}] Naked Singularity Prevented: ${data.naked_singularity_prevented ? "CONFIRMED" : "FAILED"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Naked curvature divergence detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] ENFORCEMENT ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -136,6 +143,7 @@ export function CosmicCensorshipStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchNodes}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 flex items-center gap-1.5 transition-colors"
@@ -150,6 +158,18 @@ export function CosmicCensorshipStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid: Singularity Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -265,6 +285,7 @@ export function CosmicCensorshipStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleEnforce}
               disabled={enforcing}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-purple-900/30"

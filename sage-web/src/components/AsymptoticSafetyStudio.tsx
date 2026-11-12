@@ -48,17 +48,20 @@ export function AsymptoticSafetyStudio() {
   const [scaleK, setScaleK] = useState(1.22);
   const [regulatorShape, setRegulatorShape] = useState(1.0);
   const [lastResult, setLastResult] = useState<RGStabilizationResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/asymptotic-safety/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        throw new Error(`RG nodes fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load asymptotic safety RG nodes.");
     } finally {
       setLoading(false);
     }
@@ -75,6 +78,7 @@ export function AsymptoticSafetyStudio() {
 
   const handleStabilizeFlow = async () => {
     setStabilizing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Integrating FRG flow equation toward Reuter fixed point at " + scaleK + "x10^19 GeV...",
       ...prev,
@@ -89,18 +93,21 @@ export function AsymptoticSafetyStudio() {
           regulator_shape_parameter: regulatorShape,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Reuter UV Fixed Point Attained (" + data.uv_fixed_point_reach_pct.toFixed(3) + "%). Divergence: " + data.post_flow_divergence_measure + ".",
-          "[" + new Date().toLocaleTimeString() + "] Anomalous Graviton Dimension: eta = " + data.anomalous_graviton_dimension_eta.toFixed(4) + " | Effective Action: Gamma = " + data.effective_average_action_gamma.toFixed(3),
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`RG flow stabilization returned HTTP ${res.status}`);
       }
-    } catch {
+      const data = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: RG flow stabilization failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Reuter UV Fixed Point Attained (" + data.uv_fixed_point_reach_pct.toFixed(3) + "%). Divergence: " + data.post_flow_divergence_measure + ".",
+        "[" + new Date().toLocaleTimeString() + "] Anomalous Graviton Dimension: eta = " + data.anomalous_graviton_dimension_eta.toFixed(4) + " | Effective Action: Gamma = " + data.effective_average_action_gamma.toFixed(3),
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "RG flow stabilization failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -129,6 +136,7 @@ export function AsymptoticSafetyStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchNodes}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-sm text-emerald-300 transition-colors self-start md:self-auto"
         >
@@ -136,6 +144,18 @@ export function AsymptoticSafetyStudio() {
           Refresh Nodes
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -242,6 +262,7 @@ export function AsymptoticSafetyStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleStabilizeFlow}
             disabled={stabilizing}
             className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30"

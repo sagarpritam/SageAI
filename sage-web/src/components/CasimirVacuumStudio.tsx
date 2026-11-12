@@ -50,17 +50,20 @@ export function CasimirVacuumStudio() {
   const [pumpPower, setPumpPower] = useState(50.0);
   const [durationUs, setDurationUs] = useState(100.0);
   const [lastResult, setLastResult] = useState<FluxHarvestResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const fetchResonators = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/casimir-vacuum/resonators");
-      if (res.ok) {
-        const data = await res.json();
-        setResonators(data);
+      if (!res.ok) {
+        throw new Error(`Resonators fetch returned HTTP ${res.status}`);
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setResonators(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Casimir vacuum resonators.");
     } finally {
       setLoading(false);
     }
@@ -77,6 +80,7 @@ export function CasimirVacuumStudio() {
 
   const handleHarvest = async () => {
     setHarvesting(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Pumping SQUID junction array at 2&omega;₀ on " + selectedResonator + "...",
       ...prev,
@@ -93,18 +97,21 @@ export function CasimirVacuumStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: FluxHarvestResult = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] Vacuum pair creation verified! " + data.correlated_photon_pairs_emitted.toLocaleString() + " pairs emitted (" + data.two_mode_squeezing_db + " dB squeezing)",
-          "[" + new Date().toLocaleTimeString() + "] Fidelity: " + data.quantum_state_fidelity + "% (" + data.status + ")",
-          ...prev,
-        ]);
+      if (!res.ok) {
+        throw new Error(`Vacuum flux harvest returned HTTP ${res.status}`);
       }
-    } catch {
+      const data: FluxHarvestResult = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] Error discharging Casimir parametric flux pump.",
+        "[" + new Date().toLocaleTimeString() + "] Vacuum pair creation verified! " + data.correlated_photon_pairs_emitted.toLocaleString() + " pairs emitted (" + data.two_mode_squeezing_db + " dB squeezing)",
+        "[" + new Date().toLocaleTimeString() + "] Fidelity: " + data.quantum_state_fidelity + "% (" + data.status + ")",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error discharging Casimir parametric flux pump.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] " + msg,
         ...prev,
       ]);
     } finally {
@@ -137,6 +144,7 @@ export function CasimirVacuumStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchResonators}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-900/40 hover:bg-cyan-800/50 border border-cyan-700/50 text-cyan-200 text-sm font-medium transition-all"
@@ -146,6 +154,18 @@ export function CasimirVacuumStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs font-mono text-red-300 flex items-center justify-between gap-3"
+        >
+          <span>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Resonators Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -224,6 +244,7 @@ export function CasimirVacuumStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleHarvest}
               disabled={harvesting}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-cyan-900/30 flex items-center justify-center gap-2"
