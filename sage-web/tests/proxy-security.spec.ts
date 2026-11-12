@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v7.8.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v7.9.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("7.8.0");
-    expect(healthJson.version).toBe("7.8.0");
+    expect(healthJson.platform_version).toBe("7.9.0");
+    expect(healthJson.version).toBe("7.9.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1018,6 +1018,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(spinBody.status).toBe("SPIN_CALORITRONIC_GRID_OPTIMAL");
     expect(spinBody.zero_fossil_carbon).toBe(true);
     expect(Number(spinBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 39 studios (Caps 137-139 & Option B) return 200 deterministically offline
+    const toposList = await request.get("/api/topos-grothendieck-firewall/sites");
+    expect(toposList.status()).toBe(200);
+    const toposSim = await request.post("/api/topos-grothendieck-firewall/seal-sheaf", {
+      data: {
+        site_id: "TOPOS-ETALE-Z3-01",
+        sheaf_dimension: 8,
+        cech_cover_rank: 12,
+        omega_classifier_depth: 6,
+      },
+    });
+    expect(toposSim.status()).toBe(200);
+    expect(((await toposSim.json()) as { status?: string }).status).toBe(
+      "TOPOS_SHEAF_SEALED"
+    );
+
+    const motivicList = await request.get("/api/motivic-galois-cohomology/motives");
+    expect(motivicList.status()).toBe(200);
+    const motivicSim = await request.post("/api/motivic-galois-cohomology/seal-motive", {
+      data: {
+        motive_id: "MOTIVE-MIXED-TATE-01",
+        tate_twist_weight: 4,
+        beilinson_regulator_order: 6,
+        hodge_filtration_rank: 8,
+      },
+    });
+    expect(motivicSim.status()).toBe(200);
+    expect(((await motivicSim.json()) as { status?: string }).status).toBe(
+      "MOTIVIC_PERIOD_SEALED"
+    );
+
+    const resurgList = await request.get("/api/resurgence-transseries-shield/transseries");
+    expect(resurgList.status()).toBe(200);
+    const resurgSim = await request.post("/api/resurgence-transseries-shield/resum-borel", {
+      data: {
+        transseries_id: "ECALLE-STOKES-SU2-01",
+        borel_pade_degree: 24,
+        stokes_ray_sectors: 8,
+        alien_instanton_order: 4,
+      },
+    });
+    expect(resurgSim.status()).toBe(200);
+    expect(((await resurgSim.json()) as { status?: string }).status).toBe(
+      "BOREL_TRANSSERIES_SEALED"
+    );
+
+    const berryList = await request.get("/api/berry-curvature-power/arrays");
+    expect(berryList.status()).toBe(200);
+    const berrySim = await request.post("/api/berry-curvature-power/harvest-berry", {
+      data: {
+        array_id: "BERRY-MOIRE-BLG-01",
+        terahertz_pump_thz: 1.8,
+        berry_dipole_gain: 1.6,
+      },
+    });
+    expect(berrySim.status()).toBe(200);
+    const berryBody = (await berrySim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(berryBody.status).toBe("BERRY_CURVATURE_GRID_OPTIMAL");
+    expect(berryBody.zero_fossil_carbon).toBe(true);
+    expect(Number(berryBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

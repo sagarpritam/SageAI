@@ -53,16 +53,20 @@ export function QuantumGravitationalStudio() {
   const [integrationTime, setIntegrationTime] = useState(30.0);
   const [lastObs, setLastObs] = useState<DistortionObservation | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/quantum-gravitational/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load quantum gravitational interferometer nodes");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load quantum gravitational interferometer nodes");
     } finally {
       setLoading(false);
     }
@@ -79,6 +83,7 @@ export function QuantumGravitationalStudio() {
 
   const handleMeasure = async () => {
     setMeasuring(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Firing Bragg optical lattice pulse through " + selectedNode + "...",
       ...prev,
@@ -95,18 +100,22 @@ export function QuantumGravitationalStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: DistortionObservation = await res.json();
-        setLastObs(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] Metric deviation resolved: &delta;g = " + data.metric_perturbation_delta_g.toExponential(4) + " (Confidence: " + data.confidence_score + "%)",
-          "[" + new Date().toLocaleTimeString() + "] Observation status: " + data.status,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Quantum gravitational distortion measurement failed");
       }
-    } catch {
+      const data: DistortionObservation = await res.json();
+      setLastObs(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] Error connecting to quantum gravitational node.",
+        "[" + new Date().toLocaleTimeString() + "] Metric deviation resolved: δg = " + data.metric_perturbation_delta_g.toExponential(4) + " (Confidence: " + data.confidence_score + "%)",
+        "[" + new Date().toLocaleTimeString() + "] Observation status: " + data.status,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error connecting to quantum gravitational node.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] Error: " + msg,
         ...prev,
       ]);
     } finally {
@@ -139,6 +148,7 @@ export function QuantumGravitationalStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchNodes}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-900/40 hover:bg-violet-800/50 border border-violet-700/50 text-violet-200 text-sm font-medium transition-all"
@@ -148,6 +158,25 @@ export function QuantumGravitationalStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Nodes Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -225,6 +254,7 @@ export function QuantumGravitationalStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleMeasure}
               disabled={measuring}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-900/30 flex items-center justify-center gap-2"

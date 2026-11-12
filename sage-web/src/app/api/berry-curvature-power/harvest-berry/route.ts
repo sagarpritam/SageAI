@@ -1,0 +1,63 @@
+import { NextResponse } from "next/server";
+import { fetchBackend, safeUpstreamJson } from "@/lib/proxy-utils";
+
+const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
+
+function buildSimulatedHarvest(body: Record<string, unknown>) {
+  const arrayId =
+    typeof body.array_id === "string" && body.array_id
+      ? body.array_id
+      : "BERRY-MOIRE-BLG-01";
+  const pumpThz = Math.max(0.5, Math.min(Number(body.terahertz_pump_thz ?? 1.8) || 1.8, 25.0));
+  const gain = Math.max(0.8, Math.min(Number(body.berry_dipole_gain ?? 1.5) || 1.5, 2.5));
+
+  const effPct = Number(
+    Math.min(99.65, 98.18 + 0.35 * Math.tanh(0.65 * (gain - 0.8))).toFixed(2)
+  );
+  const rawGw = 290.0 * (0.86 + 0.14 * (pumpThz / 1.8)) * (0.8 + 0.25 * gain);
+  const netGw = Number((rawGw * (effPct / 100.0)).toFixed(2));
+
+  return {
+    array_id: arrayId,
+    location: "Sub-Crustal Moire Bilayer Graphene Berry Dipole Collector",
+    berry_dipole_nm: 4.2,
+    terahertz_pump_thz: Number(pumpThz.toFixed(2)),
+    berry_dipole_gain: Number(gain.toFixed(3)),
+    conversion_efficiency_pct: effPct,
+    net_grid_output_gw: netGw,
+    nonlinear_hall_locked: true,
+    zero_fossil_carbon: true,
+    zero_fissile_waste: true,
+    status: "BERRY_CURVATURE_GRID_OPTIMAL",
+    timestamp: Date.now() / 1000,
+  };
+}
+
+export async function POST(req: Request) {
+  let body: Record<string, unknown> = {};
+  try {
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    body = {};
+  }
+
+  try {
+    const res = await fetchBackend(
+      `${BACKEND}/api/berry-curvature-power/harvest-berry`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        cache: "no-store",
+      },
+      5000
+    );
+    if (res.ok) {
+      return NextResponse.json(await safeUpstreamJson(res, buildSimulatedHarvest(body)));
+    }
+  } catch {
+    // Fallback when standalone offline or backend unreachable
+  }
+  return NextResponse.json(buildSimulatedHarvest(body));
+}
+

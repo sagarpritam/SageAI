@@ -1323,6 +1323,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 38 (Opt B): Spin-Caloritronic Magnon Harvest",
         ),
+        # Wave 39: Grothendieck Topos Sheaf, Motivic Galois Cohomology, Ecalle Resurgence & Berry-Curvature Grid
+        (
+            "GET",
+            "/api/topos-grothendieck-firewall/sites",
+            None,
+            "Wave 39 (Cap 137): Grothendieck Topos Sites List",
+        ),
+        (
+            "POST",
+            "/api/topos-grothendieck-firewall/seal-sheaf",
+            {
+                "site_id": "TOPOS-ETALE-Z3-01",
+                "sheaf_dimension": 8,
+                "cech_cover_rank": 12,
+                "omega_classifier_depth": 6,
+                "topos_gain": 1.6,
+            },
+            "Wave 39 (Cap 137): Grothendieck Topos Sheaf Seal",
+        ),
+        (
+            "GET",
+            "/api/motivic-galois-cohomology/motives",
+            None,
+            "Wave 39 (Cap 138): Motivic Galois Complexes List",
+        ),
+        (
+            "POST",
+            "/api/motivic-galois-cohomology/seal-motive",
+            {
+                "motive_id": "MOTIVE-MIXED-TATE-01",
+                "tate_twist_weight": 4,
+                "beilinson_regulator_order": 6,
+                "hodge_filtration_rank": 8,
+                "motivic_gain": 1.6,
+            },
+            "Wave 39 (Cap 138): Motivic Galois Period Seal",
+        ),
+        (
+            "GET",
+            "/api/resurgence-transseries-shield/transseries",
+            None,
+            "Wave 39 (Cap 139): Resurgence Transseries List",
+        ),
+        (
+            "POST",
+            "/api/resurgence-transseries-shield/resum-borel",
+            {
+                "transseries_id": "ECALLE-STOKES-SU2-01",
+                "borel_pade_degree": 24,
+                "stokes_ray_sectors": 8,
+                "alien_instanton_order": 4,
+                "resurgence_gain": 1.6,
+            },
+            "Wave 39 (Cap 139): Ecalle Borel-Pade Resummation",
+        ),
+        (
+            "GET",
+            "/api/berry-curvature-power/arrays",
+            None,
+            "Wave 39 (Opt B): Berry-Curvature Harvest Arrays List",
+        ),
+        (
+            "POST",
+            "/api/berry-curvature-power/harvest-berry",
+            {
+                "array_id": "BERRY-MOIRE-BLG-01",
+                "terahertz_pump_thz": 1.8,
+                "berry_dipole_gain": 1.6,
+            },
+            "Wave 39 (Opt B): Berry-Curvature Baseload Harvest",
+        ),
     ]
 
 
@@ -1352,7 +1423,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-38, CAPS 1-136) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-39, CAPS 1-139) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1367,7 +1438,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-37 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-39 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1424,7 +1495,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-38){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-39){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1440,7 +1511,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-38 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-39 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1452,7 +1523,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 200)
+        total_requests if total_requests is not None else max(endpoints_count, 208)
     )
 
     if in_process:
@@ -1488,7 +1559,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-38, Capabilities 1-136) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-39, Capabilities 1-139) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

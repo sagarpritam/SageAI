@@ -54,14 +54,27 @@ export function NeuralBCIStudio() {
   const [syntheticReplay, setSyntheticReplay] = useState<boolean>(false);
   const [evaluating, setEvaluating] = useState(false);
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
-  const [svidResult, setSvidResult] = useState<any | null>(null);
+  const [svidResult, setSvidResult] = useState<{
+    algorithm: string;
+    spiffe_id: string;
+    token_sha384: string;
+    validity: string;
+  } | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasInitializedSelectionRef = useRef(false);
 
   const fetchOperators = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/neural-bci/operators");
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        operators?: OperatorProfile[];
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load Neural BCI operators");
+      }
       if (data.operators) {
         setOperators(data.operators);
         if (!hasInitializedSelectionRef.current && data.operators.length > 0) {
@@ -71,6 +84,8 @@ export function NeuralBCIStudio() {
           setN400Ms(data.operators[0].nominal_n400_ms);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Neural BCI operators");
     } finally {
       setLoading(false);
     }
@@ -83,6 +98,7 @@ export function NeuralBCIStudio() {
   async function handleEvaluateIntent() {
     if (!selectedOperator) return;
     setEvaluating(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/neural-bci/evaluate-intent", {
         method: "POST",
@@ -95,7 +111,13 @@ export function NeuralBCIStudio() {
           synthetic_replay_flag: syntheticReplay,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as {
+        evaluation?: EvaluationResult;
+        error?: string;
+      };
+      if (!res.ok) {
+        throw new Error(data.error || "Neural BCI cognitive intent verification failed");
+      }
       if (data.evaluation) {
         const item: EvaluationResult = {
           ...data.evaluation,
@@ -119,23 +141,21 @@ export function NeuralBCIStudio() {
           handleIssueSvid();
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Neural BCI cognitive intent verification failed");
     } finally {
       setEvaluating(false);
     }
   }
 
-  async function handleIssueSvid() {
+  function handleIssueSvid() {
     if (!selectedOperator) return;
-    try {
-      setSvidResult({
-        algorithm: "ML-DSA-65_POST_QUANTUM",
-        spiffe_id: `spiffe://sageai.sovereign/bci/${selectedOperator.operator_id}`,
-        token_sha384: "d8e9f01824ef819284ba019284ca901824ef819284ba019284ca901824ef819284ba019284ca",
-        validity: "300s Ephemeral",
-      });
-    } catch {
-      // ignore
-    }
+    setSvidResult({
+      algorithm: "ML-DSA-65_POST_QUANTUM",
+      spiffe_id: `spiffe://sageai.sovereign/bci/${selectedOperator.operator_id}`,
+      token_sha384: "d8e9f01824ef819284ba019284ca901824ef819284ba019284ca901824ef819284ba019284ca",
+      validity: "300s Ephemeral",
+    });
   }
 
   const totalCoercion = operators.reduce((acc, curr) => acc + (curr.coercion_attacks_blocked || 0), 0);
@@ -167,6 +187,7 @@ export function NeuralBCIStudio() {
         </div>
 
         <button
+          type="button"
           onClick={fetchOperators}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
@@ -175,6 +196,25 @@ export function NeuralBCIStudio() {
           Refresh Operator Enclave
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -343,6 +383,7 @@ export function NeuralBCIStudio() {
                 <div className="text-xs text-zinc-400 flex flex-wrap gap-2">
                   <span className="text-zinc-500">Quick Test Cases:</span>
                   <button
+                    type="button"
                     onClick={() => {
                       setStressIndex(0.22);
                       setSyntheticReplay(false);
@@ -353,6 +394,7 @@ export function NeuralBCIStudio() {
                     Nominal Intent
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setStressIndex(0.94);
                       setSyntheticReplay(false);
@@ -362,6 +404,7 @@ export function NeuralBCIStudio() {
                     Physical Duress / Hostage
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setSyntheticReplay(true);
                     }}
@@ -372,6 +415,7 @@ export function NeuralBCIStudio() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleEvaluateIntent}
                   disabled={evaluating}
                   className="w-full py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-lg shadow-purple-500/20 transition disabled:opacity-50 flex items-center justify-center gap-2"

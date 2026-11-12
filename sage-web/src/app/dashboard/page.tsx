@@ -248,6 +248,10 @@ import SubfactorJonesPlanarStudio from "@/components/SubfactorJonesPlanarStudio"
 import BVBRSTCohomologyStudio from "@/components/BVBRSTCohomologyStudio";
 import PAdicHolographyStudio from "@/components/PAdicHolographyStudio";
 import SpinCaloritronicPowerStudio from "@/components/SpinCaloritronicPowerStudio";
+import ToposGrothendieckStudio from "@/components/ToposGrothendieckStudio";
+import MotivicGaloisStudio from "@/components/MotivicGaloisStudio";
+import ResurgenceTransseriesStudio from "@/components/ResurgenceTransseriesStudio";
+import BerryCurvaturePowerStudio from "@/components/BerryCurvaturePowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -256,6 +260,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "topos-grothendieck-firewall", label: "Grothendieck Topos (Cap 137)", icon: Layers },
+  { id: "motivic-galois-cohomology", label: "Motivic Galois (Cap 138)", icon: GitBranch },
+  { id: "resurgence-transseries-shield", label: "Resurgence Transseries (Cap 139)", icon: Activity },
+  { id: "berry-curvature-power", label: "Berry-Curvature Grid (Option B)", icon: Zap },
   { id: "subfactor-jones-planars", label: "Subfactor Jones (Cap 134)", icon: Layers },
   { id: "bv-brst-cohomology", label: "BV-BRST Cohomology (Cap 135)", icon: Shield },
   { id: "adic-p-adic-holography", label: "p-Adic Holography (Cap 136)", icon: GitBranch },
@@ -655,6 +663,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "topos-grothendieck-firewall" && <ToposGrothendieckStudio />}
+          {activeTab === "motivic-galois-cohomology" && <MotivicGaloisStudio />}
+          {activeTab === "resurgence-transseries-shield" && <ResurgenceTransseriesStudio />}
+          {activeTab === "berry-curvature-power" && <BerryCurvaturePowerStudio />}
           {activeTab === "subfactor-jones-planars" && <SubfactorJonesPlanarStudio />}
           {activeTab === "bv-brst-cohomology" && <BVBRSTCohomologyStudio />}
           {activeTab === "adic-p-adic-holography" && <PAdicHolographyStudio />}

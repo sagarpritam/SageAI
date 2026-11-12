@@ -13,6 +13,7 @@ import {
   Layers,
   Database,
   ArrowRightLeft,
+  AlertTriangle,
 } from "lucide-react";
 
 interface HolographicBoundaryNode {
@@ -49,16 +50,20 @@ export function RyuTakayanagiStudio() {
   const [flowRate, setFlowRate] = useState(48.0);
   const [lastSiphon, setLastSiphon] = useState<SiphonResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/ryu-takayanagi/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load holographic boundary nodes");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load holographic boundary nodes");
     } finally {
       setLoading(false);
     }
@@ -75,6 +80,7 @@ export function RyuTakayanagiStudio() {
 
   const handleSiphon = async () => {
     setSiphoning(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Calculating static minimal surface gamma_A in AdS5 bulk...",
       ...prev,
@@ -89,18 +95,22 @@ export function RyuTakayanagiStudio() {
           siphon_flow_rate_gb_s: flowRate,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastSiphon(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Siphoned " + data.siphoned_boundary_entropy_nats.toFixed(3) + " nats into AdS5 minimal surface area.",
-          "[" + new Date().toLocaleTimeString() + "] Reconstruction Fidelity: " + data.holographic_reconstruction_fidelity_pct.toFixed(3) + "% | Boundary Quench: " + data.bulk_asymptotic_boundary_quench_db.toFixed(1) + " dB",
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Holographic entropy siphon command failed");
       }
-    } catch {
+      const data = await res.json();
+      setLastSiphon(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Siphon command failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Siphoned " + data.siphoned_boundary_entropy_nats.toFixed(3) + " nats into AdS5 minimal surface area.",
+        "[" + new Date().toLocaleTimeString() + "] Reconstruction Fidelity: " + data.holographic_reconstruction_fidelity_pct.toFixed(3) + "% | Boundary Quench: " + data.bulk_asymptotic_boundary_quench_db.toFixed(1) + " dB",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Siphon command failed.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -129,6 +139,7 @@ export function RyuTakayanagiStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchNodes}
           className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-sm text-cyan-300 transition-colors self-start md:self-auto"
         >
@@ -136,6 +147,25 @@ export function RyuTakayanagiStudio() {
           Refresh Nodes
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -244,6 +274,7 @@ export function RyuTakayanagiStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleSiphon}
             disabled={siphoning}
             className="w-full py-3 bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-900/30"

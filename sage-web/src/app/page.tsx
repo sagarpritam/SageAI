@@ -567,7 +567,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Subfactor Jones (Cap 134), BV-BRST Cohomology (Cap 135), p-Adic Holography (Cap 136), MERA Tensor RG (Cap 131) & Spin-Caloritronic Grid.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Grothendieck Topos (Cap 137), Motivic Galois (Cap 138), Ecalle Resurgence (Cap 139), Subfactor Jones (Cap 134) & Berry-Curvature Grid.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {
@@ -740,7 +740,7 @@ const SecurityScore = () => {
 
 const HackerNews = () => {
   const news = [
-    { title: 'Wave 38 Subfactor Jones & BV-BRST Live', time: '2m ago' },
+    { title: 'Wave 39 Grothendieck Topos & Motivic Galois Live', time: '2m ago' },
     { title: '1,780 CISA KEV CVEs Synced', time: '15m ago' },
     { title: 'FIPS 203 ML-KEM Enclaves Verified', time: '1h ago' }
   ];

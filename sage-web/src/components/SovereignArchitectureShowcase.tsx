@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–38 • Current",
-    range: "Capabilities 101–136 + Option B",
+    wave: "Waves 27–39 • Current",
+    range: "Capabilities 101–139 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Vaughan-Jones Subfactor Planar Algebra Firewall, BV-BRST Antifield Cohomology Master Shield, p-Adic Bruhat-Tits Holography Ultrametric Shield, MERA Tensor RG & Spin-Caloritronic Magnon Grid.",
+    detail: "Grothendieck Topos Site Sheaf Firewall, Motivic Galois Voevodsky Mixed-Tate Shield, Ecalle Alien-Calculus Borel-Pade Resurgence Shield, Subfactor Jones Planars & Berry-Curvature Nonlinear Hall Grid.",
   },
 ];
 
@@ -180,7 +180,7 @@ export function SovereignArchitectureShowcase() {
             One Command Center. <span className="text-emerald-400">{PLATFORM_CAPABILITIES_COUNT} Sovereign Capabilities.</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 38 Subfactor Jones Planars, BV-BRST Cohomology &amp; p-Adic Holography orchestration.
+            From classical DevSecOps and 9-engine THE ABYSS OSINT to NIST FIPS 203/204 Post-Quantum Enclaves and Wave 39 Grothendieck Topos, Motivic Galois &amp; Ecalle Resurgence orchestration.
           </p>
         </div>
 

@@ -12,6 +12,7 @@ import {
   Sparkles,
   Sliders,
   Maximize2,
+  AlertTriangle,
 } from "lucide-react";
 
 interface RSBraneNode {
@@ -48,16 +49,20 @@ export function RandallSundrumStudio() {
   const [fluxBoost, setFluxBoost] = useState(1.0);
   const [lastEvent, setLastEvent] = useState<RadionStabilizationResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchBranes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/randall-sundrum/branes");
-      if (res.ok) {
-        const data = await res.json();
-        setBranes(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load RS-1 5D brane nodes");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setBranes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load RS-1 5D brane nodes");
     } finally {
       setLoading(false);
     }
@@ -74,6 +79,7 @@ export function RandallSundrumStudio() {
 
   const handleStabilize = async () => {
     setStabilizing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Pumping Goldberger-Wise scalar potential at ${selectedBrane} (Target r_c: ${targetRc} l_Pl, Boost: ${fluxBoost}x)...`,
       ...prev,
@@ -90,20 +96,24 @@ export function RandallSundrumStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: RadionStabilizationResult = await res.json();
-        setLastEvent(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] RADION MODULUS CLAMPED: ${data.stabilization_id}`,
-          `[${new Date().toLocaleTimeString()}] Radion Mass: ${data.radion_mass_eigenvalue_gev.toFixed(1)} GeV | Warp Factor: ${data.effective_warp_factor.toExponential(2)}`,
-          `[${new Date().toLocaleTimeString()}] Bulk Graviton Quench: ${data.bulk_graviton_leakage_quench_db.toFixed(1)} dB | Metric Drift: ${data.trans_dimensional_metric_drift_pct}%`,
-          `[${new Date().toLocaleTimeString()}] Status: ${data.status}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Radion modulus stabilization failed");
       }
-    } catch {
+      const data: RadionStabilizationResult = await res.json();
+      setLastEvent(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] STABILIZATION ERROR: Trans-dimensional bulk shear detected.`,
+        `[${new Date().toLocaleTimeString()}] RADION MODULUS CLAMPED: ${data.stabilization_id}`,
+        `[${new Date().toLocaleTimeString()}] Radion Mass: ${data.radion_mass_eigenvalue_gev.toFixed(1)} GeV | Warp Factor: ${data.effective_warp_factor.toExponential(2)}`,
+        `[${new Date().toLocaleTimeString()}] Bulk Graviton Quench: ${data.bulk_graviton_leakage_quench_db.toFixed(1)} dB | Metric Drift: ${data.trans_dimensional_metric_drift_pct}%`,
+        `[${new Date().toLocaleTimeString()}] Status: ${data.status}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Trans-dimensional bulk shear detected.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] STABILIZATION ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -136,6 +146,7 @@ export function RandallSundrumStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchBranes}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 flex items-center gap-1.5 transition-colors"
@@ -150,6 +161,25 @@ export function RandallSundrumStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid: Brane Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -257,6 +287,7 @@ export function RandallSundrumStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleStabilize}
               disabled={stabilizing}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30"

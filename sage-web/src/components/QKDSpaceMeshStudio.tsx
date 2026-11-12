@@ -12,6 +12,7 @@ import {
   Network,
   Share2,
   Lock,
+  AlertTriangle,
 } from "lucide-react";
 
 interface QKDNode {
@@ -50,16 +51,20 @@ export function QKDSpaceMeshStudio() {
   const [destNode, setDestNode] = useState("QKD-PROBE-MARS-ORBIT-04");
   const [lastSwap, setLastSwap] = useState<EntanglementSwapResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchNodes = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/qkd-space-mesh/nodes");
-      if (res.ok) {
-        const data = await res.json();
-        setNodes(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load QKD space-mesh nodes");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setNodes(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load QKD space-mesh nodes");
     } finally {
       setLoading(false);
     }
@@ -77,6 +82,7 @@ export function QKDSpaceMeshStudio() {
 
   const handleSwap = async () => {
     setSwapping(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Initiating Bell-State Entanglement Swap between ${originNode} and ${destNode} via ${relayNode}...`,
       ...prev,
@@ -93,20 +99,24 @@ export function QKDSpaceMeshStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: EntanglementSwapResult = await res.json();
-        setLastSwap(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] SWAP SUCCESS: ${data.swap_id}`,
-          `[${new Date().toLocaleTimeString()}] Entanglement Fidelity: ${(data.entanglement_fidelity * 100).toFixed(2)}% | Distance: ${(data.end_to_end_distance_km / 1e6).toFixed(1)}M km`,
-          `[${new Date().toLocaleTimeString()}] Key Rate: ${data.secure_key_rate_kbps} kbps | Shapiro Delay: ${data.shapiro_delay_compensation_ms.toFixed(3)} ms`,
-          `[${new Date().toLocaleTimeString()}] Zero-Trust Quantum Signature: ${data.zero_trust_signature_verified ? "VERIFIED" : "UNVERIFIED"}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Bell-state entanglement swap failed");
       }
-    } catch {
+      const data: EntanglementSwapResult = await res.json();
+      setLastSwap(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] SWAP FAILED: Network timeout or optical diffraction packet drop.`,
+        `[${new Date().toLocaleTimeString()}] SWAP SUCCESS: ${data.swap_id}`,
+        `[${new Date().toLocaleTimeString()}] Entanglement Fidelity: ${(data.entanglement_fidelity * 100).toFixed(2)}% | Distance: ${(data.end_to_end_distance_km / 1e6).toFixed(1)}M km`,
+        `[${new Date().toLocaleTimeString()}] Key Rate: ${data.secure_key_rate_kbps} kbps | Shapiro Delay: ${data.shapiro_delay_compensation_ms.toFixed(3)} ms`,
+        `[${new Date().toLocaleTimeString()}] Zero-Trust Quantum Signature: ${data.zero_trust_signature_verified ? "VERIFIED" : "UNVERIFIED"}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Network timeout or optical diffraction packet drop.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] SWAP FAILED: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -139,6 +149,7 @@ export function QKDSpaceMeshStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchNodes}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs transition"
@@ -149,6 +160,25 @@ export function QKDSpaceMeshStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metric Telemetry Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -255,6 +285,7 @@ export function QKDSpaceMeshStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleSwap}
               disabled={swapping}
               className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-medium text-xs transition disabled:opacity-50"

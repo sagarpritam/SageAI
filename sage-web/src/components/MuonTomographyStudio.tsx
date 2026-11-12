@@ -64,16 +64,20 @@ export function MuonTomographyStudio() {
   const [exposureHours, setExposureHours] = useState(12.0);
   const [lastScan, setLastScan] = useState<ScanResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchStations = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/muon-tomography/stations");
-      if (res.ok) {
-        const data = await res.json();
-        setStations(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load muon telescope stations");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setStations(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load muon telescope stations");
     } finally {
       setLoading(false);
     }
@@ -85,6 +89,7 @@ export function MuonTomographyStudio() {
 
   const handleExecuteScan = async () => {
     setScanning(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Initializing cosmic muon radiographic scan at ${selectedStation} (Target: ${targetZone}, Depth: ${targetDepth}m)...`,
       ...prev,
@@ -102,17 +107,21 @@ export function MuonTomographyStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setLastScan(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] 3D Inversion complete in ${data.reconstruction_time_ms}ms: ${data.integrated_muon_events.toLocaleString()} muons | Voids: ${data.void_detection_confidence_pct}% | High-Z Masses: ${data.high_z_material_confidence_pct}%`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Muon tomographic inversion failed");
       }
-    } catch {
+      const data = await res.json();
+      setLastScan(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] Scan failed: Muon telescope acquisition timeout`,
+        `[${new Date().toLocaleTimeString()}] 3D Inversion complete in ${data.reconstruction_time_ms}ms: ${data.integrated_muon_events.toLocaleString()} muons | Voids: ${data.void_detection_confidence_pct}% | High-Z Masses: ${data.high_z_material_confidence_pct}%`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Muon telescope acquisition timeout";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Scan failed: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -141,6 +150,7 @@ export function MuonTomographyStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchStations}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
           >
@@ -149,6 +159,25 @@ export function MuonTomographyStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -260,6 +289,7 @@ export function MuonTomographyStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleExecuteScan}
                 disabled={scanning}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-medium text-xs py-2 transition disabled:opacity-50"

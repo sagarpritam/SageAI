@@ -11,6 +11,7 @@ import {
   Sparkles,
   Cpu,
   Flame,
+  AlertTriangle,
 } from "lucide-react";
 
 interface HPMSatelliteNode {
@@ -53,16 +54,20 @@ export function OrbitalHPMStudio() {
   const [pulseDurationNs, setPulseDurationNs] = useState(250.0);
   const [lastDischarge, setLastDischarge] = useState<HPMPulseDischargeResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSatellites = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/orbital-hpm/arrays");
-      if (res.ok) {
-        const data = await res.json();
-        setSatellites(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load Orbital HPM satellite arrays");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setSatellites(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load Orbital HPM satellite arrays");
     } finally {
       setLoading(false);
     }
@@ -79,6 +84,7 @@ export function OrbitalHPMStudio() {
 
   const handleDischarge = async () => {
     setDischarging(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Sighting target ${targetId} (${targetCat}) from ${selectedSat}...`,
       `[${new Date().toLocaleTimeString()}] Discharging ${pulseDurationNs} ns HPM pulse...`,
@@ -97,20 +103,24 @@ export function OrbitalHPMStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: HPMPulseDischargeResult = await res.json();
-        setLastDischarge(data);
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] TARGET ELECTRONICS DESTROYED: ${data.discharge_id}`,
-          `[${new Date().toLocaleTimeString()}] Field Intensity: ${data.field_intensity_kv_m.toFixed(1)} kV/m | Delivered Energy: ${data.delivered_energy_kj.toFixed(1)} kJ`,
-          `[${new Date().toLocaleTimeString()}] Induced Junction Voltage: ${data.induced_junction_voltage_volts.toFixed(0)} V (LNA Burnout: ${data.lna_burnout_achieved ? "YES" : "NO"})`,
-          `[${new Date().toLocaleTimeString()}] Microcontroller Latchup: ${data.microcontroller_latchup ? "CONFIRMED" : "FAILED"} | Kill Rate: ${data.target_functional_kill_pct}%`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Orbital HPM pulse discharge failed");
       }
-    } catch {
+      const data: HPMPulseDischargeResult = await res.json();
+      setLastDischarge(data);
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] DISCHARGE ERROR: Beam pointing telemetry desynchronization.`,
+        `[${new Date().toLocaleTimeString()}] TARGET ELECTRONICS DESTROYED: ${data.discharge_id}`,
+        `[${new Date().toLocaleTimeString()}] Field Intensity: ${data.field_intensity_kv_m.toFixed(1)} kV/m | Delivered Energy: ${data.delivered_energy_kj.toFixed(1)} kJ`,
+        `[${new Date().toLocaleTimeString()}] Induced Junction Voltage: ${data.induced_junction_voltage_volts.toFixed(0)} V (LNA Burnout: ${data.lna_burnout_achieved ? "YES" : "NO"})`,
+        `[${new Date().toLocaleTimeString()}] Microcontroller Latchup: ${data.microcontroller_latchup ? "CONFIRMED" : "FAILED"} | Kill Rate: ${data.target_functional_kill_pct}%`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Beam pointing telemetry desynchronization.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] DISCHARGE ERROR: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -143,6 +153,7 @@ export function OrbitalHPMStudio() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchSatellites}
               disabled={loading}
               className="px-3 py-1.5 text-xs font-mono rounded-lg border border-yellow-500/40 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20 flex items-center gap-1.5 transition-colors"
@@ -157,6 +168,25 @@ export function OrbitalHPMStudio() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid: Satellite Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -279,6 +309,7 @@ export function OrbitalHPMStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleDischarge}
               disabled={discharging}
               className="w-full py-2.5 rounded-lg bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white font-semibold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-yellow-900/30"

@@ -46,6 +46,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     axion_haloscope_routes,
+    berry_curvature_routes,
     billing_routes,
     binary_deobfuscator_routes,
     bloch_schwinger_routes,
@@ -144,6 +145,7 @@ from app.routers import (
     mirror_symmetry_routes,
     modular_bootstrap_routes,
     monopole_battery_routes,
+    motivic_galois_routes,
     muon_tomography_routes,
     neural_bci_routes,
     neuromorphic_snn_routes,
@@ -172,6 +174,7 @@ from app.routers import (
     redteam_routes,
     regulatory_commander_routes,
     report_routes,
+    resurgence_transseries_routes,
     rule_synthesizer_routes,
     ryu_takayanagi_routes,
     sbom_vex_routes,
@@ -202,6 +205,7 @@ from app.routers import (
     threat_modeling_routes,
     time_crystal_routes,
     tmf_cohomology_routes,
+    topos_grothendieck_routes,
     twistor_holonomy_routes,
     unruh_rindler_routes,
     web3_security_routes,
@@ -516,6 +520,10 @@ app.include_router(subfactor_jones_routes.router)
 app.include_router(bv_brst_routes.router)
 app.include_router(p_adic_holography_routes.router)
 app.include_router(spin_caloritronic_routes.router)
+app.include_router(topos_grothendieck_routes.router)
+app.include_router(motivic_galois_routes.router)
+app.include_router(resurgence_transseries_routes.router)
+app.include_router(berry_curvature_routes.router)
 
 
 # ---------------------

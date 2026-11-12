@@ -50,16 +50,20 @@ export function TachyonHorizonStudio() {
   const [apparentV, setApparentV] = useState(1.45);
   const [lastAlert, setLastAlert] = useState<PreCausalAlert | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSentinels = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/tachyon-horizon/sentinels");
-      if (res.ok) {
-        const data = await res.json();
-        setSentinels(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load tachyon horizon sentinels");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setSentinels(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load tachyon horizon sentinels");
     } finally {
       setLoading(false);
     }
@@ -76,6 +80,7 @@ export function TachyonHorizonStudio() {
 
   const handleSample = async () => {
     setSampling(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Probing spacelike quantum field fluctuations (m² < 0) at " + selectedSentinel + "...",
       ...prev,
@@ -92,18 +97,22 @@ export function TachyonHorizonStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data: PreCausalAlert = await res.json();
-        setLastAlert(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] Pre-causal Cerenkov cone detected! Lead time: " + data.pre_causal_lead_time_us + " &mu;s prior to causal wave arrival.",
-          "[" + new Date().toLocaleTimeString() + "] Anticipatory shield armed: " + data.anticipatory_countermeasure_triggered,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Pre-causal tachyon horizon sampling failed");
       }
-    } catch {
+      const data: PreCausalAlert = await res.json();
+      setLastAlert(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] Error sampling tachyon horizon metamaterial.",
+        "[" + new Date().toLocaleTimeString() + "] Pre-causal Cerenkov cone detected! Lead time: " + data.pre_causal_lead_time_us + " us prior to causal wave arrival.",
+        "[" + new Date().toLocaleTimeString() + "] Anticipatory shield armed: " + data.anticipatory_countermeasure_triggered,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error sampling tachyon horizon metamaterial.";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] Error: " + msg,
         ...prev,
       ]);
     } finally {
@@ -136,6 +145,7 @@ export function TachyonHorizonStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchSentinels}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-900/40 hover:bg-teal-800/50 border border-teal-700/50 text-teal-200 text-sm font-medium transition-all"
@@ -145,6 +155,25 @@ export function TachyonHorizonStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Sentinels Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -221,6 +250,7 @@ export function TachyonHorizonStudio() {
             </div>
 
             <button
+              type="button"
               onClick={handleSample}
               disabled={sampling}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold text-sm transition-all shadow-lg shadow-teal-900/30 flex items-center justify-center gap-2"

@@ -13,6 +13,7 @@ import {
   Database,
   RotateCcw,
   CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface TemporalLoopNode {
@@ -47,16 +48,20 @@ export function NovikovGeodesicStudio() {
   const [phaseGain, setPhaseGain] = useState(1.0);
   const [lastResult, setLastResult] = useState<NovikovNormalizationResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchLoops = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/novikov-geodesic/loops");
-      if (res.ok) {
-        const data = await res.json();
-        setLoops(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load closed timelike geodesic loops");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setLoops(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load closed timelike geodesic loops");
     } finally {
       setLoading(false);
     }
@@ -73,6 +78,7 @@ export function NovikovGeodesicStudio() {
 
   const handleNormalizeLoop = async () => {
     setNormalizing(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       "[" + new Date().toLocaleTimeString() + "] Applying path integral action weighting to " + selectedLoop + "...",
       ...prev,
@@ -86,18 +92,22 @@ export function NovikovGeodesicStudio() {
           phase_adjustment_gain: phaseGain,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setLastResult(data);
-        setLogs((prev) => [
-          "[" + new Date().toLocaleTimeString() + "] SUCCESS: Closed timelike loop normalized. Paradox Probability = 0.000 (Strict Novikov).",
-          "[" + new Date().toLocaleTimeString() + "] Attosecond Phase Slip: " + (data.attosecond_topological_phase_slip_fs * 1000).toFixed(4) + " as | Action Shift: " + data.action_phase_adjustment_rad.toFixed(4) + " rad",
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Geodesic loop normalization failed");
       }
-    } catch {
+      const data = await res.json();
+      setLastResult(data);
       setLogs((prev) => [
-        "[" + new Date().toLocaleTimeString() + "] ERROR: Geodesic loop normalization failed.",
+        "[" + new Date().toLocaleTimeString() + "] SUCCESS: Closed timelike loop normalized. Paradox Probability = 0.000 (Strict Novikov).",
+        "[" + new Date().toLocaleTimeString() + "] Attosecond Phase Slip: " + (data.attosecond_topological_phase_slip_fs * 1000).toFixed(4) + " as | Action Shift: " + data.action_phase_adjustment_rad.toFixed(4) + " rad",
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Geodesic loop normalization failed";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        "[" + new Date().toLocaleTimeString() + "] ERROR: " + msg,
         ...prev,
       ]);
     } finally {
@@ -126,6 +136,7 @@ export function NovikovGeodesicStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchLoops}
           className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-sm text-amber-300 transition-colors self-start md:self-auto"
         >
@@ -133,6 +144,25 @@ export function NovikovGeodesicStudio() {
           Refresh Loops
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -224,6 +254,7 @@ export function NovikovGeodesicStudio() {
           </div>
 
           <button
+            type="button"
             onClick={handleNormalizeLoop}
             disabled={normalizing}
             className="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 disabled:opacity-50 text-white font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-900/30"

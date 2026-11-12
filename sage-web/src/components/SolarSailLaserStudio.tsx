@@ -12,6 +12,7 @@ import {
   Rocket,
   Target,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 
 interface LaserArray {
@@ -57,16 +58,20 @@ export function SolarSailLaserStudio() {
   const [durationSec, setDurationSec] = useState(120.0);
   const [lastEvent, setLastEvent] = useState<PropulsionEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchArrays = async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/solar-sail-laser/arrays");
-      if (res.ok) {
-        const data = await res.json();
-        setArrays(data);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Failed to load solar sail laser arrays");
       }
-    } catch {
-      // Fallback
+      const data = await res.json();
+      setArrays(data);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load solar sail laser arrays");
     } finally {
       setLoading(false);
     }
@@ -78,6 +83,7 @@ export function SolarSailLaserStudio() {
 
   const handleFirePulse = async () => {
     setDischarging(true);
+    setErrorMsg(null);
     setLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Locking coherent phased laser array ${selectedArray} (${powerGw} GW, 1064nm) onto ${targetId}...`,
       ...prev,
@@ -99,20 +105,24 @@ export function SolarSailLaserStudio() {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setLastEvent(data);
-        const relInfo = targetType.includes("LIGHTSAIL")
-          ? `Terminal Velocity: ${(data.terminal_velocity_fraction_c * 100).toFixed(1)}% c`
-          : `Deflection Miss: ${data.projected_miss_distance_km.toLocaleString()} km`;
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] Photonic discharge complete: Thrust ${data.total_photonic_thrust_newtons} N | Pressure ${data.radiation_pressure_pa} Pa | ${relInfo}`,
-          ...prev,
-        ]);
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errData.error || "Phased laser radiation pulse failed");
       }
-    } catch {
+      const data = await res.json();
+      setLastEvent(data);
+      const relInfo = targetType.includes("LIGHTSAIL")
+        ? `Terminal Velocity: ${(data.terminal_velocity_fraction_c * 100).toFixed(1)}% c`
+        : `Deflection Miss: ${data.projected_miss_distance_km.toLocaleString()} km`;
       setLogs((prev) => [
-        `[${new Date().toLocaleTimeString()}] Laser pulse error: Atmospheric adaptive optics de-phased`,
+        `[${new Date().toLocaleTimeString()}] Photonic discharge complete: Thrust ${data.total_photonic_thrust_newtons} N | Pressure ${data.radiation_pressure_pa} Pa | ${relInfo}`,
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Atmospheric adaptive optics de-phased";
+      setErrorMsg(msg);
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Laser pulse error: ${msg}`,
         ...prev,
       ]);
     } finally {
@@ -141,6 +151,7 @@ export function SolarSailLaserStudio() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchArrays}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
           >
@@ -149,6 +160,25 @@ export function SolarSailLaserStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="bg-red-950/30 border border-red-800/60 rounded-lg px-4 py-2.5 text-xs font-mono text-red-300 flex items-center justify-between gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-red-300 hover:text-white underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -290,6 +320,7 @@ export function SolarSailLaserStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={handleFirePulse}
                 disabled={discharging}
                 className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs py-2.5 transition disabled:opacity-50"
