@@ -35,9 +35,7 @@ def run_wave44_drill() -> None:
         f"  ✓ Knot={k_res['knot_id']} | Coherence={k_res['foam_homotopy_coherence']} | Unitarity={k_res['categorified_unitarity_pct']:.5f}% | Suppression={k_res['khovanov_suppression_db']:.2f} dB | Status={k_res['status']}\n"
     )
 
-    print(
-        "[2/3] Capability 153: Derived Algebraic Geometry & Spectral Scheme Firewall"
-    )
+    print("[2/3] Capability 153: Derived Algebraic Geometry & Spectral Scheme Firewall")
     s_res = get_derived_spectral_scheme_firewall().seal_spectral_scheme(
         scheme_id="SPECTRAL-AFFINE-E1-01",
         spectral_rank=4,
@@ -49,9 +47,7 @@ def run_wave44_drill() -> None:
         f"  ✓ Scheme={s_res['scheme_id']} | Fidelity={s_res['spectral_descent_fidelity']} | Unitarity={s_res['spectral_unitarity_pct']:.5f}% | Suppression={s_res['scheme_suppression_db']:.2f} dB | Status={s_res['status']}\n"
     )
 
-    print(
-        "[3/3] Capability 154: Quantum Cohomology & Gromov-Witten Invariant Shield"
-    )
+    print("[3/3] Capability 154: Quantum Cohomology & Gromov-Witten Invariant Shield")
     g_res = get_quantum_gromov_witten_shield().seal_gromov_witten(
         invariant_id="GW-QUINTIC-CY3-01",
         curve_genus=0,

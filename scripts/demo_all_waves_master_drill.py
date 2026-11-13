@@ -88,15 +88,12 @@ from app.services.counter_quantum_matrix.counter_quantum_engine import (
 )
 from app.services.dark_energy_harvester import dark_energy_harvester
 from app.services.dbrane_tadpole_filter import get_dbrane_tadpole_filter
-from app.services.derived_spectral_scheme import get_derived_spectral_scheme_firewall
-from app.services.khovanov_foam_cobordism import get_khovanov_foam_shield
-from app.services.quantum_gromov_witten import get_quantum_gromov_witten_shield
-from app.services.weyl_chiral_supergrid import get_weyl_chiral_supergrid
 from app.services.deep_crustal_mhd_vault import deep_crustal_mhd_vault
 from app.services.deep_space_laser.deep_space_laser_mesh import deep_space_laser_mesh
 from app.services.derived_shifted_symplectic import (
     get_derived_shifted_symplectic_shield,
 )
+from app.services.derived_spectral_scheme import get_derived_spectral_scheme_firewall
 from app.services.desitter_repulsion_grid import desitter_repulsion_grid
 from app.services.drone_swarm_shield.kinetic_drone_shield import kinetic_drone_shield
 from app.services.ds_static_patch import get_ds_static_patch_shield
@@ -145,6 +142,7 @@ from app.services.kagome_chern_supergrid import get_kagome_chern_supergrid
 from app.services.kashiwara_quantum_affine_yangian import (
     get_quantum_affine_yangian_shield,
 )
+from app.services.khovanov_foam_cobordism import get_khovanov_foam_shield
 from app.services.ktheory_dbrane.ktheory_dbrane import (
     get_ktheory_dbrane_classifier,
 )
@@ -189,6 +187,7 @@ from app.services.plasma_shield_network.spaceborne_plasma_shield import (
 from app.services.qkd_space_mesh_relay import qkd_space_mesh_relay
 from app.services.quantum_extremal_island import get_quantum_extremal_island_auditor
 from app.services.quantum_gravitational_sensor import quantum_gravitational_sensor
+from app.services.quantum_gromov_witten import get_quantum_gromov_witten_shield
 from app.services.quantum_thermoelectric_ratchet import (
     get_quantum_thermoelectric_ratchet_grid,
 )
@@ -219,6 +218,7 @@ from app.services.topos_grothendieck_firewall import get_topos_grothendieck_fire
 from app.services.twisted_bilayer_supergrid import get_twisted_trilayer_supergrid
 from app.services.twistor_holonomy import get_twistor_holonomy_stabilizer
 from app.services.unruh_rindler_power import get_unruh_rindler_power_grid
+from app.services.weyl_chiral_supergrid import get_weyl_chiral_supergrid
 
 CYAN = "\033[96m"
 GREEN = "\033[92m"

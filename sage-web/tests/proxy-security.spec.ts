@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.3.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.4.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.3.0");
-    expect(healthJson.version).toBe("8.3.0");
+    expect(healthJson.platform_version).toBe("8.4.0");
+    expect(healthJson.version).toBe("8.4.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1343,6 +1343,71 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(altBody.status).toBe("ALTERMAGNETIC_SUPERGRID_OPTIMAL");
     expect(altBody.zero_fossil_carbon).toBe(true);
     expect(Number(altBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 44 studios (Caps 152-154 & Option B) return 200 deterministically offline
+    const khList = await request.get("/api/khovanov-foam-cobordism/knots");
+    expect(khList.status()).toBe(200);
+    const khSim = await request.post("/api/khovanov-foam-cobordism/seal-khovanov", {
+      data: {
+        knot_id: "KNOT-TREFOIL-KH4-01",
+        knot_rank: 4,
+        crossing_depth: 12,
+        foam_facets: 14,
+      },
+    });
+    expect(khSim.status()).toBe(200);
+    expect(((await khSim.json()) as { status?: string }).status).toBe(
+      "KHOVANOV_FOAM_SEALED"
+    );
+
+    const dssList = await request.get("/api/derived-spectral-scheme/schemes");
+    expect(dssList.status()).toBe(200);
+    const dssSim = await request.post("/api/derived-spectral-scheme/seal-scheme", {
+      data: {
+        scheme_id: "SCHEME-EINF-SPHERE-01",
+        ring_spectrum_degree: 4,
+        tor_dimension_cutoff: 6,
+        spectral_etale_depth: 5,
+      },
+    });
+    expect(dssSim.status()).toBe(200);
+    expect(((await dssSim.json()) as { status?: string }).status).toBe(
+      "DERIVED_SCHEME_SEALED"
+    );
+
+    const gwList = await request.get("/api/quantum-gromov-witten/invariants");
+    expect(gwList.status()).toBe(200);
+    const gwSim = await request.post("/api/quantum-gromov-witten/seal-gromov", {
+      data: {
+        invariant_id: "GW-P2-DEG3-N0-01",
+        curve_genus_g: 0,
+        marked_points_n: 0,
+        homology_degree_d: 3,
+      },
+    });
+    expect(gwSim.status()).toBe(200);
+    expect(((await gwSim.json()) as { status?: string }).status).toBe(
+      "GROMOV_WITTEN_SEALED"
+    );
+
+    const weylList = await request.get("/api/weyl-chiral-supergrid/arrays");
+    expect(weylList.status()).toBe(200);
+    const weylSim = await request.post("/api/weyl-chiral-supergrid/harvest-weyl", {
+      data: {
+        array_id: "WEYL-TATS-ARRAY-01",
+        weyl_separation_mev: 520.0,
+        fermi_arc_coherence_gain: 1.6,
+      },
+    });
+    expect(weylSim.status()).toBe(200);
+    const weylBody = (await weylSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(weylBody.status).toBe("WEYL_SUPERGRID_OPTIMAL");
+    expect(weylBody.zero_fossil_carbon).toBe(true);
+    expect(Number(weylBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

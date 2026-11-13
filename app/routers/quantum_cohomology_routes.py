@@ -17,9 +17,7 @@ router = APIRouter(
 
 class SealGromovWittenRequest(BaseModel):
     invariant_id: str = Field(..., description="ID of the Gromov-Witten invariant")
-    curve_genus: int = Field(
-        default=0, ge=0, le=8, description="Stable curve genus g"
-    )
+    curve_genus: int = Field(default=0, ge=0, le=8, description="Stable curve genus g")
     marked_points: int = Field(
         default=14, ge=3, le=64, description="Marked evaluation points n"
     )

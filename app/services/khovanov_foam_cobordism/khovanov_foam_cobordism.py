@@ -77,7 +77,8 @@ class KhovanovFoamShield:
         gain = max(0.85, min(float(khovanov_gain), 2.5))
 
         s_residual = round(
-            (1.0e-5 / (1.0 + 0.16 * crossings + 0.14 * facets)) / (10.0 ** (3.27 * gain)),
+            (1.0e-5 / (1.0 + 0.16 * crossings + 0.14 * facets))
+            / (10.0 ** (3.27 * gain)),
             12,
         )
         foam_coherence = round(

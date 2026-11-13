@@ -156,6 +156,8 @@ def test_wave44_404_error_handling():
 
 def test_wave44_service_singletons():
     assert get_khovanov_foam_shield() is get_khovanov_foam_shield()
-    assert get_derived_spectral_scheme_firewall() is get_derived_spectral_scheme_firewall()
+    assert (
+        get_derived_spectral_scheme_firewall() is get_derived_spectral_scheme_firewall()
+    )
     assert get_quantum_gromov_witten_shield() is get_quantum_gromov_witten_shield()
     assert get_weyl_chiral_supergrid() is get_weyl_chiral_supergrid()

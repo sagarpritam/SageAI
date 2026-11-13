@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 43 Waves (Capabilities 1 to 151).
+Live Multi-Domain Stress Test & Verification across All 44 Waves (Capabilities 1 to 154).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -1678,6 +1678,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 43 (Opt B): Altermagnetic Supergrid Baseload Harvest",
         ),
+        # Wave 44 (Caps 152-154 & Option B)
+        (
+            "GET",
+            "/api/khovanov-foam-cobordism/knots",
+            None,
+            "Wave 44 (Cap 152): Khovanov Knots List",
+        ),
+        (
+            "POST",
+            "/api/khovanov-foam-cobordism/seal-khovanov",
+            {
+                "knot_id": "KNOT-TREFOIL-KH4-01",
+                "knot_rank": 4,
+                "crossing_depth": 12,
+                "foam_facets": 14,
+                "khovanov_gain": 1.6,
+            },
+            "Wave 44 (Cap 152): Khovanov Homology & Foam Seal",
+        ),
+        (
+            "GET",
+            "/api/derived-spectral-scheme/schemes",
+            None,
+            "Wave 44 (Cap 153): Derived Spectral Schemes List",
+        ),
+        (
+            "POST",
+            "/api/derived-spectral-scheme/seal-scheme",
+            {
+                "scheme_id": "SPECTRAL-AFFINE-E1-01",
+                "spectral_rank": 4,
+                "cotangent_truncation": 12,
+                "etale_sheaf_strata": 14,
+                "scheme_gain": 1.6,
+            },
+            "Wave 44 (Cap 153): Derived Spectral Scheme Seal",
+        ),
+        (
+            "GET",
+            "/api/quantum-gromov-witten/invariants",
+            None,
+            "Wave 44 (Cap 154): Quantum Gromov-Witten Invariants List",
+        ),
+        (
+            "POST",
+            "/api/quantum-gromov-witten/seal-gromov",
+            {
+                "invariant_id": "GW-QUINTIC-CY3-01",
+                "curve_genus": 0,
+                "marked_points": 14,
+                "novikov_degree": 12,
+                "quantum_gain": 1.6,
+            },
+            "Wave 44 (Cap 154): Gromov-Witten Invariant Seal",
+        ),
+        (
+            "GET",
+            "/api/weyl-chiral-supergrid/arrays",
+            None,
+            "Wave 44 (Opt B): Weyl Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/weyl-chiral-supergrid/harvest-weyl",
+            {
+                "array_id": "WEYL-TAAS-ARRAY-01",
+                "fermi_arc_angstrom": 0.42,
+                "chiral_anomaly_gain": 1.6,
+            },
+            "Wave 44 (Opt B): Weyl Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1707,7 +1778,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-43, CAPS 1-151) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-44, CAPS 1-154) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -1722,7 +1793,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-43 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-44 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1779,7 +1850,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-43){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-44){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1795,7 +1866,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-43 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-44 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1807,7 +1878,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 240)
+        total_requests if total_requests is not None else max(endpoints_count, 248)
     )
 
     if in_process:
@@ -1843,7 +1914,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-43, Capabilities 1-151) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-44, Capabilities 1-154) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

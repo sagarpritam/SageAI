@@ -77,7 +77,8 @@ class DerivedSpectralSchemeFirewall:
         gain = max(0.85, min(float(scheme_gain), 2.5))
 
         cotangent_residual = round(
-            (1.0e-5 / (1.0 + 0.17 * truncation + 0.15 * strata)) / (10.0 ** (3.29 * gain)),
+            (1.0e-5 / (1.0 + 0.17 * truncation + 0.15 * strata))
+            / (10.0 ** (3.29 * gain)),
             12,
         )
         descent_fidelity = round(
