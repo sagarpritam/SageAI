@@ -17,6 +17,7 @@ import {
   Cpu,
   Radio,
   Eye,
+  AlertTriangle,
 } from "lucide-react";
 
 interface LabyrinthRecord {
@@ -35,6 +36,7 @@ export function LabyrinthHoneynetStudio() {
   const [mazes, setMazes] = useState<LabyrinthRecord[]>([]);
   const [selectedMaze, setSelectedMaze] = useState<LabyrinthRecord | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Probe simulator state
   const [probeCmd, setProbeCmd] = useState("cat /etc/shadow");
@@ -44,15 +46,23 @@ export function LabyrinthHoneynetStudio() {
 
   const fetchMazes = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/labyrinth-honeynet/mazes");
-      const data = await res.json();
-      if (data.mazes) {
-        setMazes(data.mazes);
-        if (data.mazes.length > 0) {
-          setSelectedMaze((prev) => prev || data.mazes[0]);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.mazes) {
+          setMazes(data.mazes);
+          if (data.mazes.length > 0) {
+            setSelectedMaze((prev) => prev || data.mazes[0]);
+          }
         }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Failed to fetch labyrinths (status ${res.status})`);
       }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to fetch labyrinths");
     } finally {
       setLoading(false);
     }
@@ -66,6 +76,7 @@ export function LabyrinthHoneynetStudio() {
     e.preventDefault();
     if (!selectedMaze) return;
     setTrapping(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/labyrinth-honeynet/trap-adversary", {
         method: "POST",
@@ -76,19 +87,26 @@ export function LabyrinthHoneynetStudio() {
           probe_command: probeCmd,
         }),
       });
-      const data = await res.json();
-      if (data.trap) {
-        setTrapResult(data.trap);
-        setSelectedMaze((prev) =>
-          prev
-            ? {
-                ...prev,
-                adversaries_trapped: prev.adversaries_trapped + 1,
-                total_dwell_time_sec: prev.total_dwell_time_sec + 30,
-              }
-            : null
-        );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.trap) {
+          setTrapResult(data.trap);
+          setSelectedMaze((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  adversaries_trapped: prev.adversaries_trapped + 1,
+                  total_dwell_time_sec: prev.total_dwell_time_sec + 30,
+                }
+              : null
+          );
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Probe simulation failed with status ${res.status}`);
       }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Probe simulation failed");
     } finally {
       setTrapping(false);
     }
@@ -114,12 +132,29 @@ export function LabyrinthHoneynetStudio() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchMazes}
           className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-4 bg-rose-950/40 border border-rose-500/50 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+            <p className="text-sm text-rose-300">{errorMsg}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs font-mono px-2 py-1 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Labyrinth Metrics Counters */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

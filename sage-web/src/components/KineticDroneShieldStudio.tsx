@@ -72,20 +72,27 @@ export function KineticDroneShieldStudio() {
   const [detection, setDetection] = useState<SwarmDetection | null>(null);
   const [interception, setInterception] = useState<InterceptionResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSites = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/drone-swarm-shield/sites");
-      const data = await res.json();
-      if (data.sites) {
-        setSites(data.sites);
-        if (data.sites.length > 0) {
-          setSelectedSite((prev) => prev || data.sites[0]);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.sites) {
+          setSites(data.sites);
+          if (data.sites.length > 0) {
+            setSelectedSite((prev) => prev || data.sites[0]);
+          }
         }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Failed to fetch defense sites (status ${res.status})`);
       }
     } catch (err) {
-      console.error("Failed to fetch defense sites", err);
+      setErrorMsg(err instanceof Error ? err.message : "Failed to fetch defense sites");
     } finally {
       setLoading(false);
     }
@@ -99,6 +106,7 @@ export function KineticDroneShieldStudio() {
     if (!selectedSite) return;
     setDetecting(true);
     setDetection(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/drone-swarm-shield/detect-swarm", {
         method: "POST",
@@ -112,25 +120,30 @@ export function KineticDroneShieldStudio() {
           approach_velocity_mps: velocity,
         }),
       });
-      const data = await res.json();
-      if (data.detection) {
-        setDetection(data.detection);
-        if (data.detection.threat_detected) {
-          setSites((prev) =>
-            prev.map((s) =>
-              s.site_id === selectedSite.site_id
-                ? { ...s, status: "HOSTILE_SWARM_INBOUND" }
-                : s
-            )
-          );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.detection) {
+          setDetection(data.detection);
+          if (data.detection.threat_detected) {
+            setSites((prev) =>
+              prev.map((s) =>
+                s.site_id === selectedSite.site_id
+                  ? { ...s, status: "HOSTILE_SWARM_INBOUND" }
+                  : s
+              )
+            );
+          }
+          setLogs((prev) => [
+            `[${new Date().toLocaleTimeString()}] SWARM TRACK: ${selectedSite.site_id} -> ${data.detection.threat_type} (${data.detection.swarm_units_tracked} drones @ ${data.detection.approach_velocity_mps} m/s, TTI: ${data.detection.time_to_impact_sec}s)`,
+            ...prev.slice(0, 15),
+          ]);
         }
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] SWARM TRACK: ${selectedSite.site_id} -> ${data.detection.threat_type} (${data.detection.swarm_units_tracked} drones @ ${data.detection.approach_velocity_mps} m/s, TTI: ${data.detection.time_to_impact_sec}s)`,
-          ...prev.slice(0, 15),
-        ]);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Detection failed with status ${res.status}`);
       }
     } catch (err) {
-      console.error("Detection failed", err);
+      setErrorMsg(err instanceof Error ? err.message : "Detection failed");
     } finally {
       setDetecting(false);
     }
@@ -139,6 +152,7 @@ export function KineticDroneShieldStudio() {
   async function handleFire() {
     if (!selectedSite) return;
     setFiring(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/drone-swarm-shield/fire-directed-energy", {
         method: "POST",
@@ -149,30 +163,35 @@ export function KineticDroneShieldStudio() {
           burst_duration_ms: 3.8,
         }),
       });
-      const data = await res.json();
-      if (data.interception) {
-        setInterception(data.interception);
-        setSites((prev) =>
-          prev.map((s) =>
-            s.site_id === selectedSite.site_id
-              ? {
-                  ...s,
-                  status: "AIRSPACE_SECURED",
-                  swarms_neutralized: s.swarms_neutralized + 1,
-                }
-              : s
-          )
-        );
-        setSelectedSite((prev) =>
-          prev ? { ...prev, status: "AIRSPACE_SECURED" } : null
-        );
-        setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] DIRECTED-ENERGY BURST: Fired ${data.interception.pulse_power_megawatts} MW ${data.interception.countermeasure_type} -> 100% Swarm Kill Confirmed in ${data.interception.burst_duration_ms}ms`,
-          ...prev.slice(0, 15),
-        ]);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.interception) {
+          setInterception(data.interception);
+          setSites((prev) =>
+            prev.map((s) =>
+              s.site_id === selectedSite.site_id
+                ? {
+                    ...s,
+                    status: "AIRSPACE_SECURED",
+                    swarms_neutralized: s.swarms_neutralized + 1,
+                  }
+                : s
+            )
+          );
+          setSelectedSite((prev) =>
+            prev ? { ...prev, status: "AIRSPACE_SECURED" } : null
+          );
+          setLogs((prev) => [
+            `[${new Date().toLocaleTimeString()}] DIRECTED-ENERGY BURST: Fired ${data.interception.pulse_power_megawatts} MW ${data.interception.countermeasure_type} -> 100% Swarm Kill Confirmed in ${data.interception.burst_duration_ms}ms`,
+            ...prev.slice(0, 15),
+          ]);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Firing failed with status ${res.status}`);
       }
     } catch (err) {
-      console.error("Firing failed", err);
+      setErrorMsg(err instanceof Error ? err.message : "Firing failed");
     } finally {
       setFiring(false);
     }
@@ -200,6 +219,7 @@ export function KineticDroneShieldStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchSites}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -209,6 +229,22 @@ export function KineticDroneShieldStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-4 bg-rose-950/40 border border-rose-500/50 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+            <p className="text-sm text-rose-300">{errorMsg}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs font-mono px-2 py-1 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -425,6 +461,7 @@ export function KineticDroneShieldStudio() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={handleDetect}
                   disabled={detecting}
                   className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-sm transition-all shadow-lg shadow-red-900/30"
@@ -434,6 +471,7 @@ export function KineticDroneShieldStudio() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleFire}
                   disabled={firing || selectedSite.status !== "HOSTILE_SWARM_INBOUND"}
                   className={`flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all shadow-lg ${

@@ -271,6 +271,10 @@ import ClusterAssociahedronStudio from "@/components/ClusterAssociahedronStudio"
 import QuantumYangianStudio from "@/components/QuantumYangianStudio";
 import InfinityCobordismStudio from "@/components/InfinityCobordismStudio";
 import AltermagneticSupergridPowerStudio from "@/components/AltermagneticSupergridPowerStudio";
+import KhovanovFoamStudio from "@/components/KhovanovFoamStudio";
+import SpectralSchemeStudio from "@/components/SpectralSchemeStudio";
+import QuantumCohomologyStudio from "@/components/QuantumCohomologyStudio";
+import WeylSupergridPowerStudio from "@/components/WeylSupergridPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -279,6 +283,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "khovanov-foam-cobordism", label: "Khovanov Foam (Cap 152)", icon: Orbit },
+  { id: "derived-spectral-scheme", label: "Spectral Scheme (Cap 153)", icon: Layers },
+  { id: "quantum-gromov-witten", label: "Quantum Cohomology (Cap 154)", icon: InfinityIcon },
+  { id: "weyl-chiral-supergrid", label: "Weyl Supergrid (Option B)", icon: Zap },
   { id: "cluster-algebra-associahedron", label: "Cluster Associahedron (Cap 149)", icon: Hexagon },
   { id: "kashiwara-quantum-affine-yangian", label: "Quantum Yangian (Cap 150)", icon: GitBranch },
   { id: "infinity-topos-lurie-cobordism", label: "Infinity Cobordism (Cap 151)", icon: InfinityIcon },
@@ -698,6 +706,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "khovanov-foam-cobordism" && <KhovanovFoamStudio />}
+          {activeTab === "derived-spectral-scheme" && <SpectralSchemeStudio />}
+          {activeTab === "quantum-gromov-witten" && <QuantumCohomologyStudio />}
+          {activeTab === "weyl-chiral-supergrid" && <WeylSupergridPowerStudio />}
           {activeTab === "cluster-algebra-associahedron" && <ClusterAssociahedronStudio />}
           {activeTab === "kashiwara-quantum-affine-yangian" && <QuantumYangianStudio />}
           {activeTab === "infinity-topos-lurie-cobordism" && <InfinityCobordismStudio />}

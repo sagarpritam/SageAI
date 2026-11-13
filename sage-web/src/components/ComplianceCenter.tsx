@@ -172,9 +172,13 @@ export function ComplianceCenter() {
         ],
       });
       setDebrief(data);
-    } catch (err) {
-      console.error("Failed to generate debrief", err);
-      setErrorMsg("Failed to synthesize localized CISO boardroom debrief. Please try again.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Failed to synthesize localized CISO boardroom debrief. Please try again.")
+      );
     } finally {
       setLoadingDebrief(false);
     }

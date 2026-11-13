@@ -68,9 +68,12 @@ export function CTIHub() {
       } else {
         setErrorMsg(`Failed to generate STIX 2.1 bundle (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error("STIX generate failed", e);
-      setErrorMsg("Unable to generate STIX 2.1 bundle. Please check your connection and try again.");
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error
+          ? e.message
+          : "Unable to generate STIX 2.1 bundle. Please check your connection and try again."
+      );
     } finally {
       setLoading(false);
     }

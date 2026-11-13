@@ -19,18 +19,23 @@ export function ITDRCommandCenter() {
   const [containLoading, setContainLoading] = useState<string | null>(null);
   const [itdrReport, setItdrReport] = useState<any>(null);
   const [containmentResult, setContainmentResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchTelemetry = async () => {
     setLoading(true);
     setContainmentResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/itdr/telemetry");
       if (res.ok) {
         const data = await res.json();
         setItdrReport(data.itdr_report);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Telemetry ingest failed with status ${res.status}`);
       }
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to ingest identity telemetry");
     } finally {
       setLoading(false);
     }
@@ -38,6 +43,7 @@ export function ITDRCommandCenter() {
 
   const containUser = async (userEmail: string, action: string) => {
     setContainLoading(userEmail);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/itdr/contain", {
         method: "POST",
@@ -47,9 +53,12 @@ export function ITDRCommandCenter() {
       if (res.ok) {
         const data = await res.json();
         setContainmentResult(data.containment_result);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Containment failed with status ${res.status}`);
       }
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to execute containment");
     } finally {
       setContainLoading(null);
     }
@@ -72,6 +81,7 @@ export function ITDRCommandCenter() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={fetchTelemetry}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 text-white font-medium rounded-lg text-sm transition-all shadow-lg shadow-purple-950/40 disabled:opacity-50"
@@ -81,6 +91,22 @@ export function ITDRCommandCenter() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-4 bg-rose-950/40 border border-rose-500/50 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+            <p className="text-sm text-rose-300">{errorMsg}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs font-mono px-2 py-1 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {itdrReport ? (
         <div className="space-y-6">
@@ -144,6 +170,7 @@ export function ITDRCommandCenter() {
                     Playbook: {threat.recommended_action}
                   </div>
                   <button
+                    type="button"
                     onClick={() => containUser(threat.user_affected, threat.recommended_action)}
                     disabled={containLoading === threat.user_affected}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-medium rounded-lg transition-all shadow-md disabled:opacity-50"

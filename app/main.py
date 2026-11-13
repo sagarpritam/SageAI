@@ -138,6 +138,7 @@ from app.routers import (
     itdr_routes,
     jt_wormhole_routes,
     kagome_supergrid_routes,
+    khovanov_foam_routes,
     kms_hsm_routes,
     ktheory_dbrane_routes,
     kugelblitz_hawking_routes,
@@ -179,6 +180,7 @@ from app.routers import (
     posture_routes,
     pqc_routes,
     qkd_space_mesh_routes,
+    quantum_cohomology_routes,
     quantum_extremal_island_routes,
     quantum_gravitational_routes,
     quantum_thermoelectric_routes,
@@ -202,6 +204,7 @@ from app.routers import (
     skyrmion_instanton_routes,
     solar_sail_laser_routes,
     space_ground_qkd_routes,
+    spectral_scheme_routes,
     spin_caloritronic_routes,
     spin_foam_routes,
     sso_routes,
@@ -225,6 +228,7 @@ from app.routers import (
     twistor_holonomy_routes,
     unruh_rindler_routes,
     web3_security_routes,
+    weyl_supergrid_routes,
     webhook_routes,
     workload_identity_routes,
     ws_routes,
@@ -556,6 +560,10 @@ app.include_router(cluster_associahedron_routes.router)
 app.include_router(quantum_yangian_routes.router)
 app.include_router(infinity_cobordism_routes.router)
 app.include_router(altermagnetic_supergrid_routes.router)
+app.include_router(khovanov_foam_routes.router)
+app.include_router(spectral_scheme_routes.router)
+app.include_router(quantum_cohomology_routes.router)
+app.include_router(weyl_supergrid_routes.router)
 
 
 # ---------------------

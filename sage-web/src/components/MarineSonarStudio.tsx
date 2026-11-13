@@ -14,6 +14,7 @@ import {
   Compass,
   Radio,
   Navigation,
+  AlertTriangle,
 } from "lucide-react";
 
 interface SonarNode {
@@ -69,6 +70,7 @@ export function MarineSonarStudio() {
   const [analysis, setAnalysis] = useState<AcousticAnalysis | null>(null);
   const [triangulation, setTriangulation] = useState<TriangulationEvent | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const addLog = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 19)]);
@@ -76,18 +78,28 @@ export function MarineSonarStudio() {
 
   const fetchNodes = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/marine-sonar/nodes");
-      const data = await res.json();
-      if (data.status === "success" && data.nodes) {
-        setNodes(data.nodes);
-        if (data.nodes.length > 0) {
-          setSelectedNode((prev) => prev || data.nodes[0]);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === "success" && data.nodes) {
+          setNodes(data.nodes);
+          if (data.nodes.length > 0) {
+            setSelectedNode((prev) => prev || data.nodes[0]);
+          }
+          addLog(`Loaded ${data.nodes.length} ocean floor hydrophone sonar arrays.`);
         }
-        addLog(`Loaded ${data.nodes.length} ocean floor hydrophone sonar arrays.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        const msg = err.detail || `Failed to fetch sonar arrays (status ${res.status})`;
+        setErrorMsg(msg);
+        addLog(msg);
       }
-    } catch {
-      addLog("Failed to fetch sonar arrays; using fallback telemetry.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to fetch sonar arrays; using fallback telemetry.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setLoading(false);
     }
@@ -100,6 +112,7 @@ export function MarineSonarStudio() {
   const handleAnalyze = async (simulateAUV = false) => {
     if (!selectedNode) return;
     setAnalyzing(true);
+    setErrorMsg(null);
     const testSpl = simulateAUV ? 98.5 : splDb;
     const testHz = simulateAUV ? 95.0 : spectralHz;
     const testDoppler = simulateAUV ? 14.2 : dopplerMps;
@@ -117,17 +130,26 @@ export function MarineSonarStudio() {
           acoustic_doppler_mps: testDoppler,
         }),
       });
-      const data = await res.json();
-      if (data.analysis) {
-        setAnalysis(data.analysis);
-        if (data.analysis.threat_detected) {
-          addLog(`⚠️ CRITICAL: ${data.analysis.threat_type} isolated! SNR: +${data.analysis.snr_db} dB. Recommendation: ${data.analysis.action_recommended}`);
-        } else {
-          addLog(`✓ Ambient ocean soundscape nominal: ${data.analysis.action_recommended}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.analysis) {
+          setAnalysis(data.analysis);
+          if (data.analysis.threat_detected) {
+            addLog(`⚠️ CRITICAL: ${data.analysis.threat_type} isolated! SNR: +${data.analysis.snr_db} dB. Recommendation: ${data.analysis.action_recommended}`);
+          } else {
+            addLog(`✓ Ambient ocean soundscape nominal: ${data.analysis.action_recommended}`);
+          }
         }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        const msg = err.detail || `Marine acoustic analysis failed with status ${res.status}`;
+        setErrorMsg(msg);
+        addLog(msg);
       }
-    } catch {
-      addLog("Marine acoustic analysis failed.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Marine acoustic analysis failed.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setAnalyzing(false);
     }
@@ -136,6 +158,7 @@ export function MarineSonarStudio() {
   const handleTriangulate = async () => {
     if (!selectedNode) return;
     setTriangulating(true);
+    setErrorMsg(null);
     try {
       addLog(`Executing sub-18ms hyperbolic multi-lateration (TDOA) on ${selectedNode.node_id}...`);
       const res = await fetch("/api/marine-sonar/triangulate", {
@@ -147,13 +170,22 @@ export function MarineSonarStudio() {
           estimated_depth_m: 850.0,
         }),
       });
-      const data = await res.json();
-      if (data.triangulation_event) {
-        setTriangulation(data.triangulation_event);
-        addLog(`⚓ Contact Triangulated in ${data.triangulation_event.triangulation_speed_ms} ms! Bearing: ${data.triangulation_event.bearing_degrees}°, Depth: ${data.triangulation_event.estimated_target_depth_m}m.`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.triangulation_event) {
+          setTriangulation(data.triangulation_event);
+          addLog(`⚓ Contact Triangulated in ${data.triangulation_event.triangulation_speed_ms} ms! Bearing: ${data.triangulation_event.bearing_degrees}°, Depth: ${data.triangulation_event.estimated_target_depth_m}m.`);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        const msg = err.detail || `Failed to triangulate contact (status ${res.status})`;
+        setErrorMsg(msg);
+        addLog(msg);
       }
-    } catch {
-      addLog("Failed to triangulate contact.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to triangulate contact.";
+      setErrorMsg(msg);
+      addLog(msg);
     } finally {
       setTriangulating(false);
     }
@@ -183,6 +215,7 @@ export function MarineSonarStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchNodes}
             disabled={loading}
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 px-3.5 py-1.5 text-xs font-medium text-neutral-200 transition hover:bg-neutral-700/80"
@@ -192,6 +225,22 @@ export function MarineSonarStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-4 bg-rose-950/40 border border-rose-500/50 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+            <p className="text-sm text-rose-300">{errorMsg}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs font-mono px-2 py-1 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Grid of Seabed Sonar Arrays */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -283,6 +332,7 @@ export function MarineSonarStudio() {
 
           <div className="flex flex-wrap gap-2 pt-2">
             <button
+              type="button"
               onClick={() => handleAnalyze(false)}
               disabled={analyzing}
               className="flex items-center gap-1.5 rounded-lg bg-teal-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow hover:bg-teal-500"
@@ -291,6 +341,7 @@ export function MarineSonarStudio() {
               Analyze Soundscape
             </button>
             <button
+              type="button"
               onClick={() => handleAnalyze(true)}
               disabled={analyzing}
               className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/30 px-3.5 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-900/40"
@@ -299,6 +350,7 @@ export function MarineSonarStudio() {
               Simulate AUV Cavitation
             </button>
             <button
+              type="button"
               onClick={handleTriangulate}
               disabled={triangulating}
               className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/30 px-3.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/40"

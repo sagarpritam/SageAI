@@ -93,9 +93,13 @@ export function EnterpriseSecurityHub() {
       if (res.data?.capabilities) {
         setCapabilities(res.data.capabilities);
       }
-    } catch (err) {
-      console.error("Failed to load enterprise capabilities", err);
-      setErrorMsg("Unable to load enterprise capabilities telemetry.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Unable to load enterprise capabilities telemetry.")
+      );
     } finally {
       setLoadingCaps(false);
     }
@@ -130,9 +134,13 @@ export function EnterpriseSecurityHub() {
       if (res.data?.status === "SUCCESS") {
         setDrillResult(res.data);
       }
-    } catch (err) {
-      console.error("Failed to execute enterprise security drill", err);
-      setErrorMsg("Failed to execute 10-stage enterprise security drill.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Failed to execute 10-stage enterprise security drill.")
+      );
     } finally {
       if (stageInterval) clearInterval(stageInterval);
       setRunningDrill(false);
@@ -147,9 +155,13 @@ export function EnterpriseSecurityHub() {
         setReportMarkdown(res.data.markdown_report);
         setShowReportModal(true);
       }
-    } catch (err) {
-      console.error("Failed to fetch compliance report", err);
-      setErrorMsg("Unable to fetch executive compliance & audit report.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Unable to fetch executive compliance & audit report.")
+      );
     }
   };
 

@@ -567,7 +567,7 @@ const InteractiveTerminal = () => {
     if (cmd === 'scan') {
       response = '[!] Dispatching THE ABYSS (9 OSINT modules) + 5-LLM Consensus sweep... [!] Found: 1 IMDSv2 SSRF, 1 HNDL TLS key, 2 CISA KEV matches -> SagePatch PR ready.';
     } else if (cmd === 'waves') {
-      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Hitchin Moduli (Cap 143), Geometric Satake (Cap 144), HoTT Univalence (Cap 145), Factorization Homology (Cap 140) & Andreev Supergrid.`;
+      response = `[+] ${PLATFORM_WAVES_RANGE} Active: Caps 1-${PLATFORM_CAPABILITIES_COUNT} including Khovanov Foam (Cap 152), Spectral Scheme (Cap 153), Quantum Cohomology (Cap 154) & Weyl Supergrid.`;
     } else if (cmd === 'pillars') {
       response = '[+] 10/10 Defense Pillars nominal: RevEng | Deception | WAF | NIDS/C2 | CISA KEV | UEBA | SOAR | AI Red-Team | Cyber Range | Merkle Audit Chain.';
     } else if (cmd === 'pqc') {

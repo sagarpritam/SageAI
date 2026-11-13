@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Chromatic Morava (Cap 146), Cluster Associahedron (Cap 149), Quantum Yangian (Cap 150), and Lurie Infinity Cobordism (Cap 151).",
+        "Includes Centesimal Quantum Gravity (Cap 100), Khovanov Foam Cobordism (Cap 152), Derived Spectral Scheme (Cap 153), Quantum Gromov-Witten (Cap 154), and Weyl Chiral Supergrid.",
     },
   ];
 

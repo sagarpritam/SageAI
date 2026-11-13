@@ -106,9 +106,13 @@ export function HoneypotCenter() {
         setCreatedToken(res.data.canary_token);
         fetchData();
       }
-    } catch (err) {
-      console.error(err);
-      setErrorMsg("Failed to forge tripwire canary token.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Failed to forge tripwire canary token.")
+      );
     } finally {
       setGenerating(false);
     }
@@ -127,9 +131,13 @@ export function HoneypotCenter() {
         setSimulationResult(res.data.simulation);
         fetchData(); // Refresh alerts and tokens
       }
-    } catch (err) {
-      console.error(err);
-      setErrorMsg("Failed to simulate deception mesh intrusion journey.");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { detail?: string; error?: string } } };
+      setErrorMsg(
+        ax?.response?.data?.detail ||
+          ax?.response?.data?.error ||
+          (err instanceof Error ? err.message : "Failed to simulate deception mesh intrusion journey.")
+      );
     } finally {
       setSimulating(false);
     }

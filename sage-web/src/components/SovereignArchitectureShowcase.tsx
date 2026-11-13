@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–43 • Current",
-    range: "Capabilities 101–151 + Option B",
+    wave: "Waves 27–44 • Current",
+    range: "Capabilities 101–154 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Cluster Algebra Associahedron Firewall, Quantum Affine Yangian R-Matrix Shield, Lurie (infinity,n)-Category Bordism Hypothesis, Chromatic Morava & Altermagnetic Magnon Supergrid.",
+    detail: "Khovanov Homology & Foam Cobordism, Derived Spectral Scheme & Artin Stack, Quantum Cohomology & Gromov-Witten Invariants, Cluster Associahedron & Weyl Chiral Supergrid.",
   },
 ];
 

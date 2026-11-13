@@ -11,6 +11,7 @@ import {
   Users,
   Copy,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 
 export function KMSHSMStudio() {
@@ -19,6 +20,7 @@ export function KMSHSMStudio() {
   const [reconLoading, setReconLoading] = useState(false);
   const [splitResult, setSplitResult] = useState<any>(null);
   const [recoveredSecret, setRecoveredSecret] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const keys = [
     { id: "key-hsm-root-01", alias: "master-sovereign-root-key", alg: "AES-256-GCM", enclave: "FIPS 140-3 Level 3", version: 2, status: "ACTIVE" },
@@ -28,6 +30,7 @@ export function KMSHSMStudio() {
   const splitSecret = async () => {
     setLoading(true);
     setRecoveredSecret(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/kms-hsm/split", {
         method: "POST",
@@ -37,9 +40,12 @@ export function KMSHSMStudio() {
       if (res.ok) {
         const data = await res.json();
         setSplitResult(data.split_result);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Secret splitting failed with status ${res.status}`);
       }
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to split secret");
     } finally {
       setLoading(false);
     }
@@ -48,6 +54,7 @@ export function KMSHSMStudio() {
   const reconstructFromShares = async () => {
     if (!splitResult) return;
     setReconLoading(true);
+    setErrorMsg(null);
     try {
       // Pick 3 shares to simulate 3-of-5 threshold quorum
       const selectedShares = [
@@ -63,9 +70,12 @@ export function KMSHSMStudio() {
       if (res.ok) {
         const data = await res.json();
         setRecoveredSecret(data.reconstructed?.recovered_secret || secretToSplit);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setErrorMsg(err.detail || `Secret reconstruction failed with status ${res.status}`);
       }
     } catch (e) {
-      console.error(e);
+      setErrorMsg(e instanceof Error ? e.message : "Failed to reconstruct secret from shares");
     } finally {
       setReconLoading(false);
     }
@@ -87,6 +97,22 @@ export function KMSHSMStudio() {
           </p>
         </div>
       </div>
+
+      {errorMsg && (
+        <div role="alert" className="p-4 bg-rose-950/40 border border-rose-500/50 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+            <p className="text-sm text-rose-300">{errorMsg}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs font-mono px-2 py-1 rounded bg-rose-900/60 hover:bg-rose-800 text-rose-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* HSM Keys Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -123,6 +149,7 @@ export function KMSHSMStudio() {
             placeholder="Enter secret to split..."
           />
           <button
+            type="button"
             onClick={splitSecret}
             disabled={loading}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-yellow-700 hover:from-amber-500 hover:to-yellow-600 text-white font-medium rounded-lg text-xs transition-all shadow-md disabled:opacity-50"
@@ -150,6 +177,7 @@ export function KMSHSMStudio() {
                 <p className="text-[11px] text-zinc-400">Combine shares #1, #3, and #5 to reconstruct the original secret.</p>
               </div>
               <button
+                type="button"
                 onClick={reconstructFromShares}
                 disabled={reconLoading}
                 className="flex items-center gap-2 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition-all disabled:opacity-50"

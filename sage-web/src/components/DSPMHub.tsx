@@ -57,9 +57,10 @@ export function DSPMHub() {
       } else {
         setErrorMsg(`DSPM scan failed (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error("DSPM scan failed", e);
-      setErrorMsg("Unable to complete DSPM store scan. Please try again.");
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Unable to complete DSPM store scan. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -81,9 +82,10 @@ export function DSPMHub() {
       } else {
         setErrorMsg(`Failed to generate Terraform remediation policy (HTTP ${res.status}).`);
       }
-    } catch (e) {
-      console.error("Remediation failed", e);
-      setErrorMsg("Unable to generate Terraform remediation policy.");
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Unable to generate Terraform remediation policy."
+      );
     } finally {
       setLoading(false);
     }
