@@ -10,24 +10,28 @@ import {
   Layers,
   CheckCircle,
   Copy,
+  AlertTriangle,
 } from "lucide-react";
 
 export function SBOMVexStudio() {
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"vex" | "cyclonedx">("vex");
   const [vexData, setVexData] = useState<any>(null);
   const [cyclonedxData, setCyclonedxData] = useState<any>(null);
 
   const fetchVex = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/sbom-vex/openvex");
-      if (res.ok) {
-        const data = await res.json();
-        setVexData(data);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load OpenVEX statements");
       }
-    } catch (e) {
-      console.error(e);
+      setVexData(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load OpenVEX statements");
     } finally {
       setLoading(false);
     }
@@ -35,14 +39,16 @@ export function SBOMVexStudio() {
 
   const fetchCycloneDX = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/sbom-vex/cyclonedx");
-      if (res.ok) {
-        const data = await res.json();
-        setCyclonedxData(data);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load CycloneDX SBOM");
       }
-    } catch (e) {
-      console.error(e);
+      setCyclonedxData(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load CycloneDX SBOM");
     } finally {
       setLoading(false);
     }
@@ -65,6 +71,7 @@ export function SBOMVexStudio() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => {
               if (activeTab === "vex") fetchVex();
               else fetchCycloneDX();
@@ -78,9 +85,29 @@ export function SBOMVexStudio() {
         </div>
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
         <button
+          type="button"
           onClick={() => {
             setActiveTab("vex");
             if (!vexData) fetchVex();
@@ -95,6 +122,7 @@ export function SBOMVexStudio() {
           OpenVEX Exploitability Statements
         </button>
         <button
+          type="button"
           onClick={() => {
             setActiveTab("cyclonedx");
             if (!cyclonedxData) fetchCycloneDX();

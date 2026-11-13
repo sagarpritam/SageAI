@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Trash2,
   Globe,
+  AlertTriangle,
 } from "lucide-react";
 
 interface IsolationRecord {
@@ -30,6 +31,7 @@ interface IsolationRecord {
 export function SDNShieldStudio() {
   const [isolations, setIsolations] = useState<IsolationRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [assetId, setAssetId] = useState("i-0a8f9c1e2b4d5e");
   const [assetType, setAssetType] = useState("AWS_EC2");
@@ -39,14 +41,16 @@ export function SDNShieldStudio() {
 
   const fetchIsolations = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/sdn-shield/isolations");
-      if (res.ok) {
-        const data = await res.json();
-        setIsolations(data.active_isolations || []);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load network isolations");
       }
-    } catch (e) {
-      console.error(e);
+      setIsolations(data.active_isolations || []);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load network isolations");
     } finally {
       setLoading(false);
     }
@@ -58,6 +62,7 @@ export function SDNShieldStudio() {
 
   const triggerIsolation = async () => {
     setActionLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/sdn-shield/isolate", {
         method: "POST",
@@ -70,28 +75,33 @@ export function SDNShieldStudio() {
           ttl_minutes: ttlMinutes,
         }),
       });
-      if (res.ok) {
-        await fetchIsolations();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to trigger network isolation");
       }
-    } catch (e) {
-      console.error(e);
+      await fetchIsolations();
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to trigger network isolation");
     } finally {
       setActionLoading(false);
     }
   };
 
   const releaseAsset = async (isoId: string) => {
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/sdn-shield/isolate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isolation_id: isoId }),
       });
-      if (res.ok) {
-        setIsolations((prev) => prev.filter((i) => i.isolation_id !== isoId));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to release network asset");
       }
-    } catch (e) {
-      console.error(e);
+      setIsolations((prev) => prev.filter((i) => i.isolation_id !== isoId));
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to release network asset");
     }
   };
 
@@ -122,6 +132,7 @@ export function SDNShieldStudio() {
             <div className="text-sm font-bold text-cyan-400 font-mono">32.4 ms avg</div>
           </div>
           <button
+            type="button"
             onClick={fetchIsolations}
             disabled={loading}
             className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition"
@@ -130,6 +141,25 @@ export function SDNShieldStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -215,6 +245,7 @@ export function SDNShieldStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={triggerIsolation}
                 disabled={actionLoading}
                 className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium text-sm transition shadow-lg shadow-red-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
@@ -273,6 +304,7 @@ export function SDNShieldStudio() {
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => releaseAsset(iso.isolation_id)}
                         className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition"
                       >

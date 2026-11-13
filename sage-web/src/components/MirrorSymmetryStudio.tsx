@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { FlipHorizontal, RefreshCw, Activity, Shield, Sparkles, Orbit } from 'lucide-react';
+import { FlipHorizontal, RefreshCw, Activity, Shield, Sparkles, Orbit, AlertTriangle } from 'lucide-react';
 
 interface MirrorPair {
   manifold_id: string;
@@ -42,20 +42,25 @@ export default function MirrorSymmetryStudio() {
   const [degreeMax, setDegreeMax] = useState<number>(5);
   const [gain, setGain] = useState<number>(1.05);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<InvertResult | null>(null);
 
   const fetchManifolds = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/mirror-symmetry/manifolds');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to load mirror pairs');
+      }
       if (data.manifolds) {
         setManifolds(data.manifolds);
         if (data.manifolds.length > 0) {
           setSelectedManifold((prev) => prev || data.manifolds[0].manifold_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load mirror pairs', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load mirror pairs');
     }
   }, []);
 
@@ -65,6 +70,7 @@ export default function MirrorSymmetryStudio() {
 
   const handleInvert = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/mirror-symmetry/invert-hodge', {
         method: 'POST',
@@ -76,10 +82,13 @@ export default function MirrorSymmetryStudio() {
           duality_coupling_gain: gain,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Mirror symmetry inversion failed');
+      }
       setTelemetry(data);
-    } catch (err) {
-      console.error('Mirror symmetry inversion failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Mirror symmetry inversion failed');
     } finally {
       setLoading(false);
     }
@@ -102,6 +111,7 @@ export default function MirrorSymmetryStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchManifolds}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -109,6 +119,25 @@ export default function MirrorSymmetryStudio() {
           <span>Refresh Pairs</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {manifolds.map((m) => (
@@ -199,6 +228,7 @@ export default function MirrorSymmetryStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleInvert}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-teal-950/50"

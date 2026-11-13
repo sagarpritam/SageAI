@@ -47,6 +47,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     axion_haloscope_routes,
+    beilinson_drinfeld_routes,
     berry_curvature_routes,
     billing_routes,
     binary_deobfuscator_routes,
@@ -93,6 +94,7 @@ from app.routers import (
     deep_space_laser_routes,
     derived_symplectic_routes,
     desitter_repulsion_routes,
+    donaldson_thomas_routes,
     drone_swarm_shield_routes,
     ds_static_patch_routes,
     dspm_routes,
@@ -111,6 +113,7 @@ from app.routers import (
     false_vacuum_routes,
     fibonacci_anyon_routes,
     firmware_attestation_routes,
+    floer_novikov_routes,
     forensics_routes,
     fukaya_floer_routes,
     gdpr_routes,
@@ -147,6 +150,7 @@ from app.routers import (
     m_theory_g2_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
+    majorana_supergrid_routes,
     malware_routes,
     mantle_geoneutrino_routes,
     marine_sonar_routes,
@@ -564,6 +568,10 @@ app.include_router(khovanov_foam_routes.router)
 app.include_router(spectral_scheme_routes.router)
 app.include_router(quantum_cohomology_routes.router)
 app.include_router(weyl_supergrid_routes.router)
+app.include_router(donaldson_thomas_routes.router)
+app.include_router(floer_novikov_routes.router)
+app.include_router(beilinson_drinfeld_routes.router)
+app.include_router(majorana_supergrid_routes.router)
 
 
 # ---------------------

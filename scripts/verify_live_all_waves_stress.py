@@ -1749,6 +1749,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 44 (Opt B): Weyl Supergrid Baseload Harvest",
         ),
+        # Wave 45 (Caps 155-157 & Option B)
+        (
+            "GET",
+            "/api/donaldson-thomas-sheaf/sheaves",
+            None,
+            "Wave 45 (Cap 155): DT Sheaves List",
+        ),
+        (
+            "POST",
+            "/api/donaldson-thomas-sheaf/seal-dt",
+            {
+                "sheaf_id": "DT-CY3-QUINTIC-01",
+                "sheaf_rank": 4,
+                "chern_degree": 12,
+                "stability_chamber_depth": 14,
+                "dt_gain": 1.6,
+            },
+            "Wave 45 (Cap 155): DT Coherent Sheaf Moduli Seal",
+        ),
+        (
+            "GET",
+            "/api/floer-novikov-gradient/critical-manifolds",
+            None,
+            "Wave 45 (Cap 156): Floer-Novikov Critical Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/floer-novikov-gradient/seal-novikov",
+            {
+                "manifold_id": "NOVIKOV-T4-SYMPL-01",
+                "critical_point_rank": 4,
+                "gradient_flow_lines": 12,
+                "novikov_filtration_depth": 14,
+                "novikov_gain": 1.6,
+            },
+            "Wave 45 (Cap 156): Floer-Novikov Homology Gradient Seal",
+        ),
+        (
+            "GET",
+            "/api/beilinson-drinfeld-chiral/algebras",
+            None,
+            "Wave 45 (Cap 157): Beilinson-Drinfeld Chiral Algebras List",
+        ),
+        (
+            "POST",
+            "/api/beilinson-drinfeld-chiral/seal-chiral",
+            {
+                "algebra_id": "CHIRAL-SL2-AFFINE-01",
+                "algebra_level_k": 4,
+                "curve_points_n": 12,
+                "factorization_depth": 14,
+                "chiral_gain": 1.6,
+            },
+            "Wave 45 (Cap 157): Beilinson-Drinfeld Chiral Grassmannian Seal",
+        ),
+        (
+            "GET",
+            "/api/majorana-zero-supergrid/arrays",
+            None,
+            "Wave 45 (Opt B): Majorana Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/majorana-zero-supergrid/harvest-majorana",
+            {
+                "array_id": "MAJORANA-NANOWIRE-ARRAY-01",
+                "topological_gap_muev": 640.0,
+                "braid_coherence_gain": 1.6,
+            },
+            "Wave 45 (Opt B): Majorana Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1793,7 +1864,7 @@ def execute_stress_suite(
     endpoints_to_test = build_wave_endpoints()
 
     print(
-        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-44 endpoints...{RESET}"
+        f"{BOLD}[1/2] Verifying functional correctness across {len(endpoints_to_test)} multi-domain Wave 1-45 endpoints...{RESET}"
     )
     for method, path, data, label in endpoints_to_test:
         status, lat, resp = run_single_request(client, method, path, headers, data)
@@ -1850,7 +1921,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-44){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-45){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -1866,7 +1937,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-44 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-45 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 
@@ -1878,7 +1949,7 @@ def run_live_all_waves_stress_test(
 ) -> None:
     endpoints_count = len(build_wave_endpoints())
     req_count = (
-        total_requests if total_requests is not None else max(endpoints_count, 248)
+        total_requests if total_requests is not None else max(endpoints_count, 256)
     )
 
     if in_process:
@@ -1914,7 +1985,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-44, Capabilities 1-154) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-45, Capabilities 1-157) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

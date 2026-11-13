@@ -12,6 +12,7 @@ import {
   Crosshair,
   Flame,
   Sun,
+  AlertTriangle,
 } from "lucide-react";
 
 interface PlasmaPlatform {
@@ -59,19 +60,25 @@ export function PlasmaShieldStudio() {
   const [latestWindow, setLatestWindow] = useState<WindowResult | null>(null);
   const [latestDeflection, setLatestDeflection] = useState<DeflectionResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [engaging, setEngaging] = useState(false);
   const [firing, setFiring] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
   const fetchPlatformsAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [platRes, metRes] = await Promise.all([
         fetch("/api/plasma-shield/platforms"),
         fetch("/api/plasma-shield/metrics"),
       ]);
-      const platData = await platRes.json();
-      const metData = await metRes.json();
+      const platData = await platRes.json().catch(() => ({}));
+      const metData = await metRes.json().catch(() => ({}));
+
+      if (!platRes.ok) {
+        throw new Error(platData.error || "Failed to load spaceborne plasma shield data");
+      }
 
       if (platData.platforms) {
         setPlatforms(platData.platforms);
@@ -82,8 +89,8 @@ export function PlasmaShieldStudio() {
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
-      console.error("Failed to load spaceborne plasma shield data", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load spaceborne plasma shield data");
     } finally {
       setLoading(false);
     }
@@ -96,6 +103,7 @@ export function PlasmaShieldStudio() {
   const handleEngageWindow = async () => {
     if (!selectedPlatformId) return;
     setEngaging(true);
+    setErrorMsg(null);
     try {
       const payload = {
         platform_id: selectedPlatformId,
@@ -109,13 +117,16 @@ export function PlasmaShieldStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to engage plasma window");
+      }
       if (data.window_event) {
         setLatestWindow(data.window_event);
         fetchPlatformsAndMetrics();
       }
-    } catch (e) {
-      console.error("Failed to engage plasma window", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to engage plasma window");
     } finally {
       setEngaging(false);
     }
@@ -124,6 +135,7 @@ export function PlasmaShieldStudio() {
   const handleFirePulse = async () => {
     if (!selectedPlatformId) return;
     setFiring(true);
+    setErrorMsg(null);
     try {
       const payload = {
         platform_id: selectedPlatformId,
@@ -137,13 +149,16 @@ export function PlasmaShieldStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to discharge plasma pulse");
+      }
       if (data.deflection_event) {
         setLatestDeflection(data.deflection_event);
         fetchPlatformsAndMetrics();
       }
-    } catch (e) {
-      console.error("Failed to fire plasma deflection pulse", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to discharge plasma pulse");
     } finally {
       setFiring(false);
     }
@@ -175,6 +190,7 @@ export function PlasmaShieldStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchPlatformsAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -183,6 +199,25 @@ export function PlasmaShieldStudio() {
             Scan Fleet
           </button>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+          >
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Global Metrics Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/60">
@@ -225,6 +260,7 @@ export function PlasmaShieldStudio() {
             <div className="space-y-2">
               {platforms.map((p) => (
                 <button
+                  type="button"
                   key={p.platform_id}
                   onClick={() => setSelectedPlatformId(p.platform_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -292,6 +328,7 @@ export function PlasmaShieldStudio() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={handleEngageWindow}
                   disabled={engaging}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-sky-600/20 disabled:opacity-50"
@@ -300,6 +337,7 @@ export function PlasmaShieldStudio() {
                   {engaging ? "Igniting..." : "Engage Plasma Window"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleFirePulse}
                   disabled={firing}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-rose-600/20 disabled:opacity-50"

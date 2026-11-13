@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Khovanov Foam Cobordism (Cap 152), Derived Spectral Scheme (Cap 153), Quantum Gromov-Witten (Cap 154), and Weyl Chiral Supergrid.",
+        "Includes Centesimal Quantum Gravity (Cap 100), Donaldson-Thomas Sheaf (Cap 155), Floer-Novikov Gradient (Cap 156), Beilinson-Drinfeld Chiral (Cap 157), and Majorana Zero Supergrid.",
     },
   ];
 

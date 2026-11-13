@@ -62,17 +62,22 @@ export function QuantumSafeStudio() {
 
   // HNDL Scanner state
   const [scanResult, setScanResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const generateKeys = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/generate-keys", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Key generation failed");
+      }
+      if (data.keypair) {
         setKeypair(data.keypair);
       }
-    } catch (e) {
-      console.error("Key generation failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Key generation failed");
     } finally {
       setLoading(false);
     }
@@ -81,6 +86,7 @@ export function QuantumSafeStudio() {
   const encryptPayload = async () => {
     if (!keypair) return;
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/encrypt", {
         method: "POST",
@@ -91,13 +97,16 @@ export function QuantumSafeStudio() {
           ml_kem_public_key: keypair.ml_kem_public_key,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "PQC encrypt failed");
+      }
+      if (data.envelope) {
         setEnvelope(data.envelope);
         setDecryptedText("");
       }
-    } catch (e) {
-      console.error("PQC encrypt failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "PQC encrypt failed");
     } finally {
       setLoading(false);
     }
@@ -106,6 +115,7 @@ export function QuantumSafeStudio() {
   const decryptPayload = async () => {
     if (!envelope || !keypair) return;
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/decrypt", {
         method: "POST",
@@ -116,12 +126,15 @@ export function QuantumSafeStudio() {
           ml_kem_public_key: keypair.ml_kem_public_key,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "PQC decrypt failed");
+      }
+      if (data.plaintext) {
         setDecryptedText(data.plaintext);
       }
-    } catch (e) {
-      console.error("PQC decrypt failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "PQC decrypt failed");
     } finally {
       setLoading(false);
     }
@@ -129,14 +142,18 @@ export function QuantumSafeStudio() {
 
   const generateSigningKeys = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/generate-signing-keys", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Signing key generation failed");
+      }
+      if (data.keypair) {
         setSigningKeys(data.keypair);
       }
-    } catch (e) {
-      console.error("Signing key generation failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Signing key generation failed");
     } finally {
       setLoading(false);
     }
@@ -146,6 +163,7 @@ export function QuantumSafeStudio() {
     if (!signingKeys) return;
     setLoading(true);
     setVerifyStatus(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/sign", {
         method: "POST",
@@ -157,12 +175,15 @@ export function QuantumSafeStudio() {
           ml_dsa_public_key: signingKeys.ml_dsa_public_key,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Hybrid sign failed");
+      }
+      if (data.signature) {
         setSignatureResult(data.signature);
       }
-    } catch (e) {
-      console.error("Hybrid sign failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Hybrid sign failed");
     } finally {
       setLoading(false);
     }
@@ -171,6 +192,7 @@ export function QuantumSafeStudio() {
   const verifySignature = async () => {
     if (!signatureResult || !signingKeys) return;
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/verify-signature", {
         method: "POST",
@@ -182,12 +204,13 @@ export function QuantumSafeStudio() {
           ml_dsa_public_key: signingKeys.ml_dsa_public_key,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setVerifyStatus(data.valid ? "VALID" : "INVALID");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Signature verify failed");
       }
-    } catch (e) {
-      console.error("Signature verify failed", e);
+      setVerifyStatus(data.valid ? "VALID" : "INVALID");
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Signature verify failed");
       setVerifyStatus("ERROR");
     } finally {
       setLoading(false);
@@ -199,6 +222,7 @@ export function QuantumSafeStudio() {
     setLoading(true);
     setUnsealResult(null);
     setUnsealError(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/zero-egress/seal", {
         method: "POST",
@@ -213,13 +237,16 @@ export function QuantumSafeStudio() {
           recipient_ml_kem_pub: keypair.ml_kem_public_key,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Seal zero-egress failed");
+      }
+      if (data.sealed_envelope) {
         setSealedEnvelope(data.sealed_envelope);
         setUnsealRegion(targetRegion);
       }
-    } catch (e) {
-      console.error("Seal zero-egress failed", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Seal zero-egress failed");
     } finally {
       setLoading(false);
     }
@@ -230,6 +257,7 @@ export function QuantumSafeStudio() {
     setLoading(true);
     setUnsealError(null);
     setUnsealResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/pqc/zero-egress/unseal", {
         method: "POST",
@@ -243,16 +271,18 @@ export function QuantumSafeStudio() {
           current_region: unsealRegion,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.unsealed_result) {
         setUnsealResult(data.unsealed_result);
       } else {
-        const err = await res.json();
-        setUnsealError(err.detail || "Unseal rejected: cross-region policy violation or invalid signature");
+        const msg = data.detail || data.error || "Unseal rejected: cross-region policy violation or invalid signature";
+        setUnsealError(msg);
+        setErrorMsg(msg);
       }
-    } catch (e) {
-      console.error("Unseal zero-egress failed", e);
-      setUnsealError("Decryption or verification failed");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Unseal zero-egress failed";
+      setUnsealError(msg);
+      setErrorMsg(msg);
     } finally {
       setLoading(false);
     }
@@ -260,6 +290,7 @@ export function QuantumSafeStudio() {
 
   const runHNDLScan = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const ciphersuites = [
         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
@@ -272,12 +303,13 @@ export function QuantumSafeStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ciphersuites }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setScanResult(data);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "PQC risk scan failed");
       }
-    } catch (e) {
-      console.error("PQC risk scan failed", e);
+      setScanResult(data);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "PQC risk scan failed");
     } finally {
       setLoading(false);
     }
@@ -344,9 +376,28 @@ export function QuantumSafeStudio() {
         </div>
       </div>
 
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Sub Tabs */}
       <div className="flex gap-2 border-b border-zinc-800 pb-2">
-        <button
+        <button type="button"
           onClick={() => setActiveTab("keygen")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
             activeTab === "keygen"
@@ -357,7 +408,7 @@ export function QuantumSafeStudio() {
           <Key className="w-3.5 h-3.5" />
           Hybrid Key Generator
         </button>
-        <button
+        <button type="button"
           onClick={() => setActiveTab("encrypt")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
             activeTab === "encrypt"
@@ -368,7 +419,7 @@ export function QuantumSafeStudio() {
           <Lock className="w-3.5 h-3.5" />
           Quantum Envelope Encryption
         </button>
-        <button
+        <button type="button"
           onClick={() => setActiveTab("dsa-signing")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
             activeTab === "dsa-signing"
@@ -379,7 +430,7 @@ export function QuantumSafeStudio() {
           <Sparkles className="w-3.5 h-3.5" />
           Dilithium (ML-DSA) Signatures
         </button>
-        <button
+        <button type="button"
           onClick={() => setActiveTab("zero-egress-seal")}
           className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-2 ${
             activeTab === "zero-egress-seal"
@@ -390,7 +441,7 @@ export function QuantumSafeStudio() {
           <ShieldCheck className="w-3.5 h-3.5" />
           Zero-Egress PQC Sealer
         </button>
-        <button
+        <button type="button"
           onClick={() => {
             setActiveTab("hndl-scan");
             if (!scanResult) runHNDLScan();
@@ -416,7 +467,7 @@ export function QuantumSafeStudio() {
                 X25519 (Classical 256-bit ECDH) + ML-KEM-768 (Lattice 1184-byte Public Key).
               </p>
             </div>
-            <button
+            <button type="button"
               onClick={generateKeys}
               disabled={loading}
               className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50"
@@ -476,7 +527,7 @@ export function QuantumSafeStudio() {
           </div>
 
           <div className="flex gap-2">
-            <button
+            <button type="button"
               onClick={encryptPayload}
               disabled={loading}
               className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -485,7 +536,7 @@ export function QuantumSafeStudio() {
               Encrypt with Hybrid ML-KEM
             </button>
             {envelope && (
-              <button
+              <button type="button"
                 onClick={decryptPayload}
                 disabled={loading}
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -535,7 +586,7 @@ export function QuantumSafeStudio() {
                 Lattice-based digital signatures providing unforgeable authenticity resilient against both classical and quantum computing attacks.
               </p>
             </div>
-            <button
+            <button type="button"
               onClick={generateSigningKeys}
               disabled={loading}
               className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -579,7 +630,7 @@ export function QuantumSafeStudio() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            <button type="button"
               onClick={signPayload}
               disabled={loading || !signMessage}
               className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -588,7 +639,7 @@ export function QuantumSafeStudio() {
               Sign with Hybrid Ed25519 + ML-DSA-65
             </button>
             {signatureResult && (
-              <button
+              <button type="button"
                 onClick={verifySignature}
                 disabled={loading}
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -682,7 +733,7 @@ export function QuantumSafeStudio() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            <button type="button"
               onClick={sealZeroEgressPayload}
               disabled={loading || !zeroEgressPlaintext}
               className="px-4 py-2 bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-violet-950/30"
@@ -752,7 +803,7 @@ export function QuantumSafeStudio() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <button
+                    <button type="button"
                       onClick={unsealZeroEgressPayload}
                       disabled={loading}
                       className="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"
@@ -805,7 +856,7 @@ export function QuantumSafeStudio() {
                 Identifies legacy public-key algorithms vulnerable to Shor's algorithm on quantum computers.
               </p>
             </div>
-            <button
+            <button type="button"
               onClick={runHNDLScan}
               disabled={loading}
               className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2"

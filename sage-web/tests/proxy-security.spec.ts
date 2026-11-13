@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.4.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.5.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.4.0");
-    expect(healthJson.version).toBe("8.4.0");
+    expect(healthJson.platform_version).toBe("8.5.0");
+    expect(healthJson.version).toBe("8.5.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1408,6 +1408,74 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(weylBody.status).toBe("WEYL_SUPERGRID_OPTIMAL");
     expect(weylBody.zero_fossil_carbon).toBe(true);
     expect(Number(weylBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 45 studios (Caps 155-157 & Option B) return 200 deterministically offline
+    const dtList = await request.get("/api/donaldson-thomas-sheaf/sheaves");
+    expect(dtList.status()).toBe(200);
+    const dtSim = await request.post("/api/donaldson-thomas-sheaf/seal-dt", {
+      data: {
+        sheaf_id: "DT-CY3-QUINTIC-01",
+        sheaf_rank: 4,
+        chern_degree: 12,
+        stability_chamber_depth: 14,
+        dt_gain: 1.6,
+      },
+    });
+    expect(dtSim.status()).toBe(200);
+    expect(((await dtSim.json()) as { status?: string }).status).toBe(
+      "DONALDSON_THOMAS_SEALED"
+    );
+
+    const fnList = await request.get("/api/floer-novikov-gradient/critical-manifolds");
+    expect(fnList.status()).toBe(200);
+    const fnSim = await request.post("/api/floer-novikov-gradient/seal-novikov", {
+      data: {
+        manifold_id: "NOVIKOV-T4-SYMPL-01",
+        critical_point_rank: 4,
+        gradient_flow_lines: 12,
+        novikov_filtration_depth: 14,
+        novikov_gain: 1.6,
+      },
+    });
+    expect(fnSim.status()).toBe(200);
+    expect(((await fnSim.json()) as { status?: string }).status).toBe(
+      "FLOER_NOVIKOV_SEALED"
+    );
+
+    const bdList = await request.get("/api/beilinson-drinfeld-chiral/algebras");
+    expect(bdList.status()).toBe(200);
+    const bdSim = await request.post("/api/beilinson-drinfeld-chiral/seal-chiral", {
+      data: {
+        algebra_id: "CHIRAL-SL2-AFFINE-01",
+        algebra_level_k: 4,
+        curve_points_n: 12,
+        factorization_depth: 14,
+        chiral_gain: 1.6,
+      },
+    });
+    expect(bdSim.status()).toBe(200);
+    expect(((await bdSim.json()) as { status?: string }).status).toBe(
+      "BEILINSON_DRINFELD_SEALED"
+    );
+
+    const majList = await request.get("/api/majorana-zero-supergrid/arrays");
+    expect(majList.status()).toBe(200);
+    const majSim = await request.post("/api/majorana-zero-supergrid/harvest-majorana", {
+      data: {
+        array_id: "MAJORANA-NANOWIRE-ARRAY-01",
+        topological_gap_muev: 640.0,
+        braid_coherence_gain: 1.6,
+      },
+    });
+    expect(majSim.status()).toBe(200);
+    const majBody = (await majSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_grid_output_gw?: number;
+    };
+    expect(majBody.status).toBe("MAJORANA_SUPERGRID_OPTIMAL");
+    expect(majBody.zero_fossil_carbon).toBe(true);
+    expect(Number(majBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

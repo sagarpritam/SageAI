@@ -68,6 +68,7 @@ export function NeutrinoArrayStudio() {
   const [latestAnalysis, setLatestAnalysis] = useState<FluxAnalysis | null>(null);
   const [latestTriangulation, setLatestTriangulation] = useState<TriangulationResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [triangulating, setTriangulating] = useState(false);
   const [promptBurstSim, setPromptBurstSim] = useState(false);
@@ -75,13 +76,18 @@ export function NeutrinoArrayStudio() {
 
   const fetchDetectorsAndMetrics = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const [detRes, metRes] = await Promise.all([
         fetch("/api/neutrino-array/detectors"),
         fetch("/api/neutrino-array/metrics"),
       ]);
-      const detData = await detRes.json();
-      const metData = await metRes.json();
+      const detData = await detRes.json().catch(() => ({}));
+      const metData = await metRes.json().catch(() => ({}));
+
+      if (!detRes.ok) {
+        throw new Error(detData.error || "Failed to load neutrino array data");
+      }
 
       if (detData.detectors) {
         setDetectors(detData.detectors);
@@ -92,8 +98,8 @@ export function NeutrinoArrayStudio() {
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
-      console.error("Failed to load neutrino array data", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to load neutrino array data");
     } finally {
       setLoading(false);
     }
@@ -106,6 +112,7 @@ export function NeutrinoArrayStudio() {
   const handleAnalyzeFlux = async () => {
     if (!selectedDetectorId) return;
     setAnalyzing(true);
+    setErrorMsg(null);
     try {
       const payload = {
         detector_id: selectedDetectorId,
@@ -121,13 +128,16 @@ export function NeutrinoArrayStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to analyze neutrino flux");
+      }
       if (data.analysis) {
         setLatestAnalysis(data.analysis);
         fetchDetectorsAndMetrics();
       }
-    } catch (e) {
-      console.error("Failed to analyze neutrino flux", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to analyze neutrino flux");
     } finally {
       setAnalyzing(false);
     }
@@ -135,6 +145,7 @@ export function NeutrinoArrayStudio() {
 
   const handleTriangulate = async () => {
     setTriangulating(true);
+    setErrorMsg(null);
     try {
       const payload = {
         event_label: "SUBTERRANEAN_FISSILE_SURGE_TRIANGULATION",
@@ -151,12 +162,15 @@ export function NeutrinoArrayStudio() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to triangulate fissile event");
+      }
       if (data.triangulation) {
         setLatestTriangulation(data.triangulation);
       }
-    } catch (e) {
-      console.error("Failed to triangulate fissile event", e);
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Failed to triangulate fissile event");
     } finally {
       setTriangulating(false);
     }
@@ -188,6 +202,7 @@ export function NeutrinoArrayStudio() {
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchDetectorsAndMetrics}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-sm transition-all"
@@ -196,6 +211,25 @@ export function NeutrinoArrayStudio() {
             Refresh Array
           </button>
         </div>
+
+        {errorMsg && (
+          <div
+            role="alert"
+            className="mt-4 flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+          >
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Global Metrics Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/60">
@@ -238,6 +272,7 @@ export function NeutrinoArrayStudio() {
             <div className="space-y-2">
               {detectors.map((d) => (
                 <button
+                  type="button"
                   key={d.detector_id}
                   onClick={() => setSelectedDetectorId(d.detector_id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -317,6 +352,7 @@ export function NeutrinoArrayStudio() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={handleAnalyzeFlux}
                   disabled={analyzing}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-cyan-600/20 disabled:opacity-50"
@@ -325,6 +361,7 @@ export function NeutrinoArrayStudio() {
                   {analyzing ? "Analyzing IBD..." : "Analyze Flux"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleTriangulate}
                   disabled={triangulating}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50"

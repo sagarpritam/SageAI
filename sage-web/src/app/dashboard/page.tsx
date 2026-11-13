@@ -275,6 +275,10 @@ import KhovanovFoamStudio from "@/components/KhovanovFoamStudio";
 import SpectralSchemeStudio from "@/components/SpectralSchemeStudio";
 import QuantumCohomologyStudio from "@/components/QuantumCohomologyStudio";
 import WeylSupergridPowerStudio from "@/components/WeylSupergridPowerStudio";
+import DonaldsonThomasStudio from "@/components/DonaldsonThomasStudio";
+import FloerNovikovStudio from "@/components/FloerNovikovStudio";
+import BeilinsonDrinfeldStudio from "@/components/BeilinsonDrinfeldStudio";
+import MajoranaSupergridPowerStudio from "@/components/MajoranaSupergridPowerStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -283,6 +287,10 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "donaldson-thomas-sheaf", label: "Donaldson-Thomas (Cap 155)", icon: ShieldCheck },
+  { id: "floer-novikov-gradient", label: "Floer-Novikov (Cap 156)", icon: Activity },
+  { id: "beilinson-drinfeld-chiral", label: "Beilinson-Drinfeld (Cap 157)", icon: GitBranch },
+  { id: "majorana-zero-supergrid", label: "Majorana Supergrid (Option B)", icon: Zap },
   { id: "khovanov-foam-cobordism", label: "Khovanov Foam (Cap 152)", icon: Orbit },
   { id: "derived-spectral-scheme", label: "Spectral Scheme (Cap 153)", icon: Layers },
   { id: "quantum-gromov-witten", label: "Quantum Cohomology (Cap 154)", icon: InfinityIcon },
@@ -706,6 +714,10 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "donaldson-thomas-sheaf" && <DonaldsonThomasStudio />}
+          {activeTab === "floer-novikov-gradient" && <FloerNovikovStudio />}
+          {activeTab === "beilinson-drinfeld-chiral" && <BeilinsonDrinfeldStudio />}
+          {activeTab === "majorana-zero-supergrid" && <MajoranaSupergridPowerStudio />}
           {activeTab === "khovanov-foam-cobordism" && <KhovanovFoamStudio />}
           {activeTab === "derived-spectral-scheme" && <SpectralSchemeStudio />}
           {activeTab === "quantum-gromov-witten" && <QuantumCohomologyStudio />}

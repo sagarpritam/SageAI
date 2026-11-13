@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { BatteryCharging, RefreshCw, Activity, Shield, Zap, Gauge, Flame } from 'lucide-react';
+import { BatteryCharging, RefreshCw, Activity, Shield, Zap, Gauge, Flame, AlertTriangle } from 'lucide-react';
 
 interface MonopoleTrap {
   trap_id: string;
@@ -38,20 +38,25 @@ export default function MonopoleBatteryStudio() {
   const [boost, setBoost] = useState<number>(1.05);
   const [demand, setDemand] = useState<number>(100.0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<CatalysisResult | null>(null);
 
   const fetchTraps = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/monopole-battery/traps');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to load monopole traps');
+      }
       if (data.traps) {
         setTraps(data.traps);
         if (data.traps.length > 0) {
           setSelectedTrap((prev) => prev || data.traps[0].trap_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load monopole traps', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load monopole traps');
     }
   }, []);
 
@@ -61,6 +66,7 @@ export default function MonopoleBatteryStudio() {
 
   const handleCatalyze = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/monopole-battery/catalyze-decay', {
         method: 'POST',
@@ -72,10 +78,13 @@ export default function MonopoleBatteryStudio() {
           load_demand_gw: demand,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Monopole catalysis failed');
+      }
       setTelemetry(data);
-    } catch (err) {
-      console.error('Monopole catalysis failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Monopole catalysis failed');
     } finally {
       setLoading(false);
     }
@@ -98,6 +107,7 @@ export default function MonopoleBatteryStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchTraps}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -105,6 +115,25 @@ export default function MonopoleBatteryStudio() {
           <span>Refresh Traps</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {traps.map((t) => (
@@ -194,6 +223,7 @@ export default function MonopoleBatteryStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleCatalyze}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-cyan-950/50"

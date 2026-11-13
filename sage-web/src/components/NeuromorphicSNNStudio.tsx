@@ -14,6 +14,7 @@ import {
   Layers,
   BatteryCharging,
   Fingerprint,
+  AlertTriangle,
 } from "lucide-react";
 
 interface NeuromorphicCore {
@@ -58,6 +59,7 @@ export function NeuromorphicSNNStudio() {
   const [cores, setCores] = useState<NeuromorphicCore[]>([]);
   const [selectedCore, setSelectedCore] = useState<NeuromorphicCore | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [spikeRate, setSpikeRate] = useState<number>(125.0);
   const [aerJitter, setAerJitter] = useState<number>(18.0);
   const [voltageDeviation, setVoltageDeviation] = useState<number>(25.0);
@@ -70,17 +72,21 @@ export function NeuromorphicSNNStudio() {
 
   const fetchCores = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/neuromorphic-snn/cores");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load neuromorphic cores");
+      }
       if (data.cores) {
         setCores(data.cores);
         if (data.cores.length > 0) {
           setSelectedCore((prev) => prev || data.cores[0]);
         }
       }
-    } catch (err) {
-      console.error("Failed to load neuromorphic cores", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load neuromorphic cores");
     } finally {
       setLoading(false);
     }
@@ -94,6 +100,7 @@ export function NeuromorphicSNNStudio() {
     if (!selectedCore) return;
     setClassifying(true);
     setClassification(null);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/neuromorphic-snn/classify-spikes", {
         method: "POST",
@@ -106,7 +113,10 @@ export function NeuromorphicSNNStudio() {
           bus_payload_entropy: busEntropy,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Classification failed");
+      }
       if (data.classification) {
         setClassification(data.classification);
         if (data.classification.threat_detected) {
@@ -123,8 +133,8 @@ export function NeuromorphicSNNStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Classification failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Classification failed");
     } finally {
       setClassifying(false);
     }
@@ -133,6 +143,7 @@ export function NeuromorphicSNNStudio() {
   async function handleClamp() {
     if (!selectedCore) return;
     setClamping(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/neuromorphic-snn/inject-clamp", {
         method: "POST",
@@ -143,7 +154,10 @@ export function NeuromorphicSNNStudio() {
           response_latency_ns: 385.0,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Clamp failed");
+      }
       if (data.clamp) {
         setClampResult(data.clamp);
         setCores((prev) =>
@@ -173,8 +187,8 @@ export function NeuromorphicSNNStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Clamp failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Clamp failed");
     } finally {
       setClamping(false);
     }
@@ -202,6 +216,7 @@ export function NeuromorphicSNNStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchCores}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -211,6 +226,25 @@ export function NeuromorphicSNNStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -410,6 +444,7 @@ export function NeuromorphicSNNStudio() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={handleClassify}
                   disabled={classifying}
                   className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-900/30"
@@ -419,6 +454,7 @@ export function NeuromorphicSNNStudio() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleClamp}
                   disabled={clamping || selectedCore.status !== "ANOMALY_SPIKE_DETECTED"}
                   className={`flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all shadow-lg ${

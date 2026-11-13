@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Maximize2, RefreshCw, Activity, Shield, Sparkles, Sliders } from 'lucide-react';
+import { Maximize2, RefreshCw, Activity, Shield, Sparkles, Sliders, AlertTriangle } from 'lucide-react';
 
 interface NonCommManifold {
   manifold_id: string;
@@ -38,20 +38,25 @@ export default function NonCommutativeSpacetimeStudio() {
   const [starOrder, setStarOrder] = useState<number>(4);
   const [dampingGain, setDampingGain] = useState<number>(1.1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<ProtectionResult | null>(null);
 
   const fetchManifolds = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/noncommutative-spacetime/manifolds');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to load non-commutative manifolds');
+      }
       if (data.manifolds) {
         setManifolds(data.manifolds);
         if (data.manifolds.length > 0) {
           setSelectedManifold((prev) => prev || data.manifolds[0].manifold_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load non-commutative manifolds', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load non-commutative manifolds');
     }
   }, []);
 
@@ -61,6 +66,7 @@ export default function NonCommutativeSpacetimeStudio() {
 
   const handleProtect = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/noncommutative-spacetime/protect-phase-space', {
         method: 'POST',
@@ -72,10 +78,13 @@ export default function NonCommutativeSpacetimeStudio() {
           damping_gain: dampingGain,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Phase space protection failed');
+      }
       setTelemetry(data);
-    } catch (err) {
-      console.error('Phase space protection failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Phase space protection failed');
     } finally {
       setLoading(false);
     }
@@ -98,6 +107,7 @@ export default function NonCommutativeSpacetimeStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchManifolds}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -105,6 +115,25 @@ export default function NonCommutativeSpacetimeStudio() {
           <span>Refresh Manifolds</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {manifolds.map((m) => (
@@ -194,6 +223,7 @@ export default function NonCommutativeSpacetimeStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleProtect}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-violet-950/50"

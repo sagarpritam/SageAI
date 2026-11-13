@@ -39,6 +39,7 @@ export function MicroHotpatchStudio() {
   const [patches, setPatches] = useState<HotpatchRecord[]>([]);
   const [selectedPatch, setSelectedPatch] = useState<HotpatchRecord | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [verificationOutput, setVerificationOutput] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<"catalog" | "generator">("catalog");
@@ -51,17 +52,21 @@ export function MicroHotpatchStudio() {
 
   const fetchPatches = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/micro-hotpatch/patches");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load hotpatches");
+      }
       if (data.patches) {
         setPatches(data.patches);
         if (data.patches.length > 0) {
           setSelectedPatch((prev) => prev || data.patches[0]);
         }
       }
-    } catch (err) {
-      console.error("Failed to load hotpatches", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load hotpatches");
     } finally {
       setLoading(false);
     }
@@ -73,13 +78,17 @@ export function MicroHotpatchStudio() {
 
   async function handleInject(patchId: string) {
     setActionInProgress(patchId);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/micro-hotpatch/inject", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ patch_id: patchId }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Hotpatch injection failed");
+      }
       if (data.status === "success") {
         setPatches((prev) =>
           prev.map((p) =>
@@ -92,6 +101,8 @@ export function MicroHotpatchStudio() {
           setSelectedPatch((prev) => (prev ? { ...prev, status: "ACTIVE" } : null));
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Hotpatch injection failed");
     } finally {
       setActionInProgress(null);
     }
@@ -124,6 +135,7 @@ export function MicroHotpatchStudio() {
   async function handleGeneratePatch(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/micro-hotpatch/patches", {
         method: "POST",
@@ -135,12 +147,17 @@ export function MicroHotpatchStudio() {
           patch_strategy: strategy,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to synthesize hotpatch");
+      }
       if (data.patch) {
         setPatches((prev) => [data.patch, ...prev]);
         setSelectedPatch(data.patch);
         setActiveTab("catalog");
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to synthesize hotpatch");
     } finally {
       setLoading(false);
     }
@@ -167,6 +184,7 @@ export function MicroHotpatchStudio() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={fetchPatches}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition"
           >
@@ -175,6 +193,25 @@ export function MicroHotpatchStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-xl text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -210,6 +247,7 @@ export function MicroHotpatchStudio() {
         <div className="lg:col-span-1 space-y-4">
           <div className="flex gap-2 p-1 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
             <button
+              type="button"
               onClick={() => setActiveTab("catalog")}
               className={`flex-1 py-1.5 rounded-lg transition font-medium ${
                 activeTab === "catalog"
@@ -220,6 +258,7 @@ export function MicroHotpatchStudio() {
               Active Catalog ({patches.length})
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("generator")}
               className={`flex-1 py-1.5 rounded-lg transition font-medium ${
                 activeTab === "generator"
@@ -347,6 +386,7 @@ export function MicroHotpatchStudio() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleVerify(selectedPatch.patch_id)}
                     disabled={actionInProgress === selectedPatch.patch_id}
                     className="px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 text-xs font-medium border border-indigo-500/40 transition flex items-center gap-1.5"
@@ -355,6 +395,7 @@ export function MicroHotpatchStudio() {
                     Verify Invariants
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleInject(selectedPatch.patch_id)}
                     disabled={actionInProgress === selectedPatch.patch_id || selectedPatch.status === "ACTIVE"}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
