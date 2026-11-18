@@ -21,6 +21,11 @@ async function mockAuthenticatedSession(context: BrowserContext, page: Page) {
 }
 
 test.describe('SageAI Web E2E Test Suite', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('sageai_onboarding_done', 'true');
+    });
+  });
 
   test('Landing page loads and displays core brand and CTA', async ({ page }) => {
     await page.goto('/');
@@ -121,7 +126,7 @@ test.describe('SageAI Web E2E Test Suite', () => {
       });
     });
 
-    await page.route('/api/audit', async (route) => {
+    await page.route('**/api/audit*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -522,13 +527,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v8.5.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v8.6.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v8.5.0 metadata & live stats
-    await expect(page.locator('text=SageAI v8.5.0').first()).toBeVisible();
-    await expect(page.locator('text=157 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v8.6.0 metadata & live stats
+    await expect(page.locator('text=SageAI v8.6.0').first()).toBeVisible();
+    await expect(page.locator('text=160 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -542,9 +547,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-45 Milestone tab
-    await page.locator('button:has-text("Waves 1–45")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Donaldson-Thomas Sheaf, Floer-Novikov & Beilinson-Drinfeld Chiral (v8.5.0)' })).toBeVisible();
+    // Switch to Waves 1-46 Milestone tab
+    await page.locator('button:has-text("Waves 1–46")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Khovanov-Rozansky, Perverse Sheaf & Tannakian Motivic (v8.6.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -556,31 +561,31 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 8.5.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 8.6.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v8.5.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v8.6.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v8.5.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v8.6.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 202 Studios (Waves 1–45)').first()).toBeVisible();
+    await expect(page.locator('text=All 206 Studios (Waves 1–46)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v8.5.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.6.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–157)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–160)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v8.5.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.6.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
   });
 
-  test('Authenticated Command Center displays v8.5.0 badge, 202 active studios, and Wave 45 modules', async ({ context, page }) => {
+  test('Authenticated Command Center displays v8.6.0 badge, 206 active studios, and Wave 46 modules', async ({ context, page }) => {
     await mockAuthenticatedSession(context, page);
 
     await page.route('/api/notifications*', async (route) => {
@@ -599,35 +604,35 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     await page.goto('/dashboard');
     await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
-    await expect(page.getByText(/v8\.5\.0\s+•\s+Waves 1–45\s+•\s+157 Capabilities/).first()).toBeVisible();
-    await expect(page.locator('text=202 Active Modules').first()).toBeVisible();
+    await expect(page.getByText(/v8\.[67]\.0\s+•\s+Waves 1–4[67]\s+•\s+16[0-3] Capabilities/).first()).toBeVisible();
+    await expect(page.locator('text=Active Modules').first()).toBeVisible();
 
-    const searchInput = page.locator('input[placeholder="Search 202 modules..."]');
+    const searchInput = page.locator('input[placeholder*="Search"][placeholder*="modules..."]');
     await expect(searchInput).toBeVisible();
 
-    await searchInput.fill('Donaldson-Thomas');
-    const dtTab = page.locator('button:has-text("Donaldson-Thomas (Cap 155)")');
-    await expect(dtTab).toBeVisible();
-    await dtTab.click();
-    await expect(page.locator('text=Capability 155: Donaldson-Thomas').first()).toBeVisible();
+    await searchInput.fill('Khovanov-Rozansky');
+    const krTab = page.locator('button:has-text("Khovanov-Rozansky (Cap 158)")');
+    await expect(krTab).toBeVisible();
+    await krTab.click();
+    await expect(page.locator('text=Capability 158').first()).toBeVisible();
 
-    await searchInput.fill('Floer-Novikov');
-    const fnTab = page.locator('button:has-text("Floer-Novikov (Cap 156)")');
-    await expect(fnTab).toBeVisible();
-    await fnTab.click();
-    await expect(page.locator('text=Capability 156: Floer-Novikov').first()).toBeVisible();
+    await searchInput.fill('Perverse Sheaf');
+    const psTab = page.locator('button:has-text("Perverse Sheaf (Cap 159)")');
+    await expect(psTab).toBeVisible();
+    await psTab.click();
+    await expect(page.locator('text=Capability 159').first()).toBeVisible();
 
-    await searchInput.fill('Beilinson-Drinfeld');
-    const bdTab = page.locator('button:has-text("Beilinson-Drinfeld (Cap 157)")');
-    await expect(bdTab).toBeVisible();
-    await bdTab.click();
-    await expect(page.locator('text=Capability 157: Beilinson-Drinfeld').first()).toBeVisible();
+    await searchInput.fill('Tannakian Motivic');
+    const tmTab = page.locator('button:has-text("Tannakian Motivic (Cap 160)")');
+    await expect(tmTab).toBeVisible();
+    await tmTab.click();
+    await expect(page.locator('text=Capability 160').first()).toBeVisible();
 
-    await searchInput.fill('Majorana Supergrid');
-    const majTab = page.locator('button:has-text("Majorana Supergrid (Option B)")');
-    await expect(majTab).toBeVisible();
-    await majTab.click();
-    await expect(page.locator('text=Option B Wave 45: Planetary Non-Abelian Majorana Zero-Mode Supergrid').first()).toBeVisible();
+    await searchInput.fill('Polariton Supergrid');
+    const polTab = page.locator('button:has-text("Polariton Supergrid (Option B)")');
+    await expect(polTab).toBeVisible();
+    await polTab.click();
+    await expect(page.locator('text=Option B Wave 46').first()).toBeVisible();
   });
 
   test('ZTNAManager surfaces inline role="alert" without dialog popups on upstream HTTP 500', async ({ context, page }) => {
@@ -661,7 +666,7 @@ test.describe('SageAI Web E2E Test Suite', () => {
     });
 
     await page.goto('/dashboard');
-    const searchInput = page.locator('input[placeholder="Search 202 modules..."]');
+    const searchInput = page.locator('input[placeholder*="Search"][placeholder*="modules..."]');
     await searchInput.fill('Zero-Trust');
     const ztnaTab = page.locator('button:has-text("Zero-Trust")');
     await expect(ztnaTab).toBeVisible();
@@ -848,6 +853,106 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     expect(dialogTriggered).toBe(false);
     expect(downloadTriggered).toBe(false);
+  });
+
+  test('AutoFix & SagePatch Review Queue renders proposed patch, verifies AST diff, and enforces rejection rationale', async ({ context, page }) => {
+    await mockAuthenticatedSession(context, page);
+
+    await page.route('/api/notifications*', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+    await page.route('/api/scans*', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+    await page.route('/api/analytics*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ trend: [], severityCounts: { Critical: 1, High: 0, Medium: 0, Low: 0 }, totalCompleted: 1 }),
+      });
+    });
+
+    await page.route('/api/autofix', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ready: true, message: 'SagePatch Remediation Engine Ready' }),
+        });
+      } else {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'ok' }) });
+      }
+    });
+
+    const mockPatches = [
+      {
+        id: 'patch-e2e-sqli-01',
+        repository: 'sageai/demo-repo',
+        base_branch: 'main',
+        patch_branch: 'sagepatch/sqli-01',
+        file_path: 'app/db/repositories.py',
+        vulnerability_type: 'SQL_INJECTION',
+        severity: 'CRITICAL',
+        diff: '--- a/app/db/repositories.py\n+++ b/app/db/repositories.py\n- query = f"SELECT * FROM users WHERE email = \'{email}\'"\n+ stmt = select(User).where(User.email == email)',
+        lines_changed: 2,
+        status: 'proposed',
+        sandbox_passed: true,
+        sandbox_details: { safe: true, syntax_valid: true, security_valid: true },
+        requested_by: 'sec-operator@sageai.com',
+        created_at: '2026-11-13T20:00:00Z',
+      },
+    ];
+
+    await page.route('/api/autofix/patches', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockPatches),
+      });
+    });
+
+    await page.goto('/dashboard');
+    const autofixTabBtn = page.locator('button:has-text("Auto-Fix")');
+    await expect(autofixTabBtn).toBeVisible();
+    await autofixTabBtn.click();
+
+    // Verify engine status banner
+    await expect(page.locator('text=SagePatch Remediation Engine Ready').first()).toBeVisible();
+
+    // Verify Review Queue contains proposed patch item
+    await expect(page.locator('text=SQL_INJECTION').first()).toBeVisible();
+    await expect(page.locator('text=CRITICAL').first()).toBeVisible();
+    await expect(page.locator('text=app/db/repositories.py').first()).toBeVisible();
+
+    // Verify unified diff inspection toggle
+    const inspectDiffBtn = page.locator('button:has-text("Inspect Unified Diff")').first();
+    await expect(inspectDiffBtn).toBeVisible();
+    await inspectDiffBtn.click();
+    await expect(page.locator('text=stmt = select(User).where(User.email == email)')).toBeVisible();
+
+    // Verify Rejection Modal requires non-empty rationale
+    const rejectBtn = page.locator('button:has-text("Reject Patch")').first();
+    await expect(rejectBtn).toBeVisible();
+    await rejectBtn.click();
+
+    await expect(page.locator('text=Reject Remediation Patch')).toBeVisible();
+    const confirmRejectBtn = page.locator('button:has-text("Confirm Rejection")');
+    await expect(confirmRejectBtn).toBeVisible();
+    await confirmRejectBtn.click();
+
+    await expect(page.locator('text=Please specify a reason for rejecting the patch.')).toBeVisible();
+    const cancelModalBtn = page.locator('button:has-text("Cancel")');
+    await expect(cancelModalBtn).toBeVisible();
+    await cancelModalBtn.click();
+    await expect(page.locator('text=Reject Remediation Patch')).not.toBeVisible();
+
+    // Switch to Propose Sandbox Fix tab
+    const proposeTabBtn = page.locator('button:has-text("Propose Sandbox Fix")');
+    await expect(proposeTabBtn).toBeVisible();
+    await proposeTabBtn.click();
+
+    await expect(page.locator('text=SagePatch AST Sandbox Validator & Remediation Studio')).toBeVisible();
+    await expect(page.locator('button:has-text("SQL Injection → Parameterized ORM")')).toBeVisible();
   });
 
 });

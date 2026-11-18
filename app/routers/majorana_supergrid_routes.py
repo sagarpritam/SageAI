@@ -57,3 +57,4 @@ async def get_majorana_metrics_route():
     """Return aggregate Majorana Zero-Mode Supergrid metrics."""
     sg = get_majorana_zero_supergrid()
     return sg.get_grid_metrics()
+

@@ -135,3 +135,4 @@ _floer_novikov_firewall = FloerNovikovFirewall()
 
 def get_floer_novikov_firewall() -> FloerNovikovFirewall:
     return _floer_novikov_firewall
+

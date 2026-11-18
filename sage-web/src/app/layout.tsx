@@ -143,10 +143,10 @@ export default async function RootLayout({
         {userEmail && (
           <>
             <CommandPalette />
-            <OnboardingWizard />
             <CopilotDrawer />
           </>
         )}
+        <OnboardingWizard />
         <Analytics />
         <SpeedInsights />
       </body>

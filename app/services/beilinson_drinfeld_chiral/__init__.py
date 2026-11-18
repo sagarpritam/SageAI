@@ -4,3 +4,4 @@ from app.services.beilinson_drinfeld_chiral.beilinson_drinfeld_chiral import (
 )
 
 __all__ = ["BeilinsonDrinfeldChiralShield", "get_beilinson_drinfeld_chiral_shield"]
+

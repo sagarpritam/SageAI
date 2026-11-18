@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   LayoutDashboard,
+  TrendingUp,
   Clock,
   Activity,
   GitBranch,
@@ -26,6 +27,7 @@ import {
   Lock,
   Cpu,
   Terminal,
+  Server,
   Cloud,
   Package,
   Search,
@@ -279,6 +281,17 @@ import DonaldsonThomasStudio from "@/components/DonaldsonThomasStudio";
 import FloerNovikovStudio from "@/components/FloerNovikovStudio";
 import BeilinsonDrinfeldStudio from "@/components/BeilinsonDrinfeldStudio";
 import MajoranaSupergridPowerStudio from "@/components/MajoranaSupergridPowerStudio";
+import KhovanovRozanskyStudio from "@/components/KhovanovRozanskyStudio";
+import PerverseSheafStudio from "@/components/PerverseSheafStudio";
+import TannakianMotivicStudio from "@/components/TannakianMotivicStudio";
+import PolaritonSupergridPowerStudio from "@/components/PolaritonSupergridPowerStudio";
+import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
+import BggCategoryOStudio from "@/components/BggCategoryOStudio";
+import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
+import MajoranaZeroModePowerStudio from "@/components/MajoranaZeroModePowerStudio";
+import MultiCloudClusterStudio from "@/components/MultiCloudClusterStudio";
+import RevOpsPipelineStudio from "@/components/RevOpsPipelineStudio";
+import RedBlueWarDrillStudio from "@/components/RedBlueWarDrillStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -287,6 +300,17 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
+  { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
+  { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "fibonacci-anyon-braiding", label: "Fibonacci Anyon (Cap 161)", icon: Cpu },
+  { id: "bgg-category-o-shield", label: "BGG Category O (Cap 162)", icon: Layers },
+  { id: "cryogenic-flux-qubit", label: "Cryogenic Qubit (Cap 163)", icon: ShieldCheck },
+  { id: "majorana-supergrid-power", label: "Majorana Supergrid (Option B)", icon: Zap },
+  { id: "khovanov-rozansky-homology", label: "Khovanov-Rozansky (Cap 158)", icon: Orbit },
+  { id: "perverse-sheaf-deligne", label: "Perverse Sheaf (Cap 159)", icon: Layers },
+  { id: "tannakian-motivic-shield", label: "Tannakian Motivic (Cap 160)", icon: ShieldCheck },
+  { id: "polariton-bec-supergrid", label: "Polariton Supergrid (Option B)", icon: Zap },
   { id: "donaldson-thomas-sheaf", label: "Donaldson-Thomas (Cap 155)", icon: ShieldCheck },
   { id: "floer-novikov-gradient", label: "Floer-Novikov (Cap 156)", icon: Activity },
   { id: "beilinson-drinfeld-chiral", label: "Beilinson-Drinfeld (Cap 157)", icon: GitBranch },
@@ -714,6 +738,17 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
+          {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "revops-pipeline" && <RevOpsPipelineStudio />}
+          {activeTab === "fibonacci-anyon-braiding" && <FibonacciAnyonBraidingStudio />}
+          {activeTab === "bgg-category-o-shield" && <BggCategoryOStudio />}
+          {activeTab === "cryogenic-flux-qubit" && <CryogenicFluxQubitStudio />}
+          {activeTab === "majorana-supergrid-power" && <MajoranaZeroModePowerStudio />}
+          {activeTab === "khovanov-rozansky-homology" && <KhovanovRozanskyStudio />}
+          {activeTab === "perverse-sheaf-deligne" && <PerverseSheafStudio />}
+          {activeTab === "tannakian-motivic-shield" && <TannakianMotivicStudio />}
+          {activeTab === "polariton-bec-supergrid" && <PolaritonSupergridPowerStudio />}
           {activeTab === "donaldson-thomas-sheaf" && <DonaldsonThomasStudio />}
           {activeTab === "floer-novikov-gradient" && <FloerNovikovStudio />}
           {activeTab === "beilinson-drinfeld-chiral" && <BeilinsonDrinfeldStudio />}

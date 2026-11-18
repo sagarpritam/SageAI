@@ -237,14 +237,14 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     }
   });
 
-  test("Health and Auth proxy routes expose v8.5.0 metadata and avoid 500s when backend is offline", async ({
+  test("Health and Auth proxy routes expose v8.6.0 metadata and avoid 500s when backend is offline", async ({
     request,
   }) => {
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(healthJson.platform_version).toBe("8.5.0");
-    expect(healthJson.version).toBe("8.5.0");
+    expect(healthJson.platform_version).toBe("8.6.0");
+    expect(healthJson.version).toBe("8.6.0");
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 
@@ -1476,6 +1476,75 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(majBody.status).toBe("MAJORANA_SUPERGRID_OPTIMAL");
     expect(majBody.zero_fossil_carbon).toBe(true);
     expect(Number(majBody.net_grid_output_gw)).toBeGreaterThan(300.0);
+
+    // Wave 46 studios (Caps 158-160 & Option B) return 200 deterministically offline
+    const krList = await request.get("/api/khovanov-rozansky-homology/complexes");
+    expect(krList.status()).toBe(200);
+    const krSim = await request.post("/api/khovanov-rozansky-homology/seal-rozansky", {
+      data: {
+        complex_id: "KR-GL2-HOPF-01",
+        lie_algebra_n: 3,
+        crossing_number: 6,
+        filtration_depth: 8,
+        kr_gain: 1.6,
+      },
+    });
+    expect(krSim.status()).toBe(200);
+    expect(((await krSim.json()) as { status?: string }).status).toBe(
+      "KHOVANOV_ROZANSKY_SEALED"
+    );
+
+    const psList = await request.get("/api/perverse-sheaf-deligne/strata");
+    expect(psList.status()).toBe(200);
+    const psSim = await request.post("/api/perverse-sheaf-deligne/seal-perverse", {
+      data: {
+        stratum_id: "BBDG-SCHUBERT-STRATA-01",
+        variety_dimension: 6,
+        strata_depth: 8,
+        frobenius_weight: 4,
+        perverse_gain: 1.6,
+      },
+    });
+    expect(psSim.status()).toBe(200);
+    expect(((await psSim.json()) as { status?: string }).status).toBe(
+      "PERVERSE_SHEAF_SEALED"
+    );
+
+    const tmList = await request.get("/api/tannakian-motivic-shield/categories");
+    expect(tmList.status()).toBe(200);
+    const tmSim = await request.post("/api/tannakian-motivic-shield/seal-tannakian", {
+      data: {
+        category_id: "TANNAKA-MOTIVE-NUM-01",
+        tannakian_rank: 4,
+        period_dimension: 8,
+        hodge_weight: 2,
+        tannakian_gain: 1.6,
+      },
+    });
+    expect(tmSim.status()).toBe(200);
+    expect(((await tmSim.json()) as { status?: string }).status).toBe(
+      "TANNAKIAN_MOTIVIC_SEALED"
+    );
+
+    const polList = await request.get("/api/polariton-bec-supergrid/arrays");
+    expect(polList.status()).toBe(200);
+    const polSim = await request.post("/api/polariton-bec-supergrid/harvest-polariton", {
+      data: {
+        array_id: "POLARITON-BEC-ARRAY-01",
+        condensate_density: 4.8e14,
+        detuning_mev: 0.0,
+        pump_power_mw: 350.0,
+      },
+    });
+    expect(polSim.status()).toBe(200);
+    const polBody = (await polSim.json()) as {
+      status?: string;
+      zero_fossil_carbon?: boolean;
+      net_power_output_gw?: number;
+    };
+    expect(polBody.status).toBe("POLARITON_SUPERGRID_HARVESTED");
+    expect(polBody.zero_fossil_carbon).toBe(true);
+    expect(Number(polBody.net_power_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

@@ -123,7 +123,7 @@ export default function Features() {
       badge: `${PLATFORM_WAVES_RANGE}`,
       title: `Trans-Century Frontier (Caps 100–${PLATFORM_CAPABILITIES_COUNT})`,
       description:
-        "Includes Centesimal Quantum Gravity (Cap 100), Donaldson-Thomas Sheaf (Cap 155), Floer-Novikov Gradient (Cap 156), Beilinson-Drinfeld Chiral (Cap 157), and Majorana Zero Supergrid.",
+        "Includes Centesimal Quantum Gravity (Cap 100), Khovanov-Rozansky (Cap 158), Perverse Sheaf (Cap 159), Tannakian Motivic (Cap 160), and Polariton Supergrid (Option B).",
     },
   ];
 

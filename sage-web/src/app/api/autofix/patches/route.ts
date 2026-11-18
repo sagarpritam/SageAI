@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
-  isStandaloneOfflineMode,
-  offlineBackendResponse,
+  fetchBackend,
   safeJsonBody,
   safeUpstreamJson,
 } from "@/lib/proxy-utils";
@@ -14,10 +13,6 @@ export async function GET(req: Request) {
   const token = cookieStore.get("sageai_jwt")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (isStandaloneOfflineMode()) {
-    return offlineBackendResponse("Autofix service not configured (set BACKEND_URL)");
-  }
-
   const url = new URL(req.url);
   const statusFilter = url.searchParams.get("status");
   const targetUrl = statusFilter
@@ -25,11 +20,10 @@ export async function GET(req: Request) {
     : `${BACKEND}/autofix/patches`;
 
   try {
-    const res = await fetch(targetUrl, {
+    const res = await fetchBackend(targetUrl, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
-      signal: AbortSignal.timeout(8000),
-    });
+    }, 10000);
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from autofix service",
     });
@@ -52,20 +46,19 @@ export async function POST(req: Request) {
     return parsed.response;
   }
 
-  if (isStandaloneOfflineMode()) {
-    return offlineBackendResponse("Autofix service not configured (set BACKEND_URL)");
-  }
-
   try {
-    const res = await fetch(`${BACKEND}/autofix/propose`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const res = await fetchBackend(
+      `${BACKEND}/autofix/propose`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
       },
-      body: JSON.stringify(parsed.data),
-      signal: AbortSignal.timeout(8000),
-    });
+      45000
+    );
     const data = await safeUpstreamJson(res, {
       error: "Invalid response from autofix service",
     });

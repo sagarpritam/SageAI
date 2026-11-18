@@ -227,10 +227,15 @@ export function AutoFixPanel() {
           text: res.data?.detail || "Failed to propose patch.",
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const detail = axios.isAxiosError(err)
+        ? err.response?.data?.detail || err.response?.data?.error || err.message
+        : err instanceof Error
+        ? err.message
+        : "Sandbox validation failed.";
       setProposeMsg({
         type: "error",
-        text: err?.response?.data?.detail || err?.message || "Sandbox validation failed.",
+        text: detail,
       });
     } finally {
       setProposing(false);
@@ -268,8 +273,8 @@ export function AutoFixPanel() {
     setSimConfirmPatchId(null);
     try {
       const url = simulate
-        ? `/api/autofix/patches/${patchId}/approve?simulate=true`
-        : `/api/autofix/patches/${patchId}/approve`;
+        ? `/api/autofix/patches/${encodeURIComponent(patchId)}/approve?simulate=true`
+        : `/api/autofix/patches/${encodeURIComponent(patchId)}/approve`;
       await axios.post(url);
       await fetchPatches();
     } catch (err: unknown) {
@@ -296,7 +301,7 @@ export function AutoFixPanel() {
     setRejectError(null);
     setActionLoadingId(patchId);
     try {
-      await axios.post(`/api/autofix/patches/${patchId}/reject`, {
+      await axios.post(`/api/autofix/patches/${encodeURIComponent(patchId)}/reject`, {
         reason: rejectionReason,
       });
       setRejectionModalId(null);
@@ -355,6 +360,7 @@ export function AutoFixPanel() {
       {/* Navigation Tabs */}
       <div className="flex items-center gap-3 border-b border-zinc-800 pb-3">
         <button
+          type="button"
           onClick={() => setActiveTab("queue")}
           className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
             activeTab === "queue"
@@ -370,6 +376,7 @@ export function AutoFixPanel() {
           )}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("scan")}
           className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
             activeTab === "scan"
@@ -380,6 +387,7 @@ export function AutoFixPanel() {
           <GitBranch className="w-4 h-4" /> Scan Repository
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("propose")}
           className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${
             activeTab === "propose"
@@ -400,6 +408,7 @@ export function AutoFixPanel() {
               Human-in-the-Loop Patch Approvals
             </h3>
             <button
+              type="button"
               onClick={fetchPatches}
               disabled={loadingPatches}
               className="text-xs text-zinc-400 hover:text-white transition-colors"
@@ -546,6 +555,7 @@ export function AutoFixPanel() {
                     {/* Diff Inspection View */}
                     <div>
                       <button
+                        type="button"
                         onClick={() =>
                           setExpandedDiffId(isExpanded ? null : patch.id)
                         }
@@ -622,6 +632,7 @@ export function AutoFixPanel() {
                         )}
                         <div className="flex items-center justify-end gap-3 flex-wrap">
                           <button
+                            type="button"
                             onClick={() => {
                               setRejectError(null);
                               setRejectionModalId(patch.id);
@@ -632,6 +643,7 @@ export function AutoFixPanel() {
                             Reject Patch
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleApprove(patch.id, true)}
                             disabled={isActionLoading}
                             className="px-3 py-1.5 rounded-lg border border-emerald-700/60 hover:bg-emerald-950/40 text-emerald-300 text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
@@ -639,6 +651,7 @@ export function AutoFixPanel() {
                             <Play className="w-3 h-3 text-emerald-400" /> Simulate PR
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleApprove(patch.id, false)}
                             disabled={isActionLoading}
                             className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950 disabled:opacity-50"
@@ -693,6 +706,7 @@ export function AutoFixPanel() {
                 )}
                 <div className="flex items-center justify-end gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setRejectionModalId(null);
                       setRejectionReason("");
@@ -703,6 +717,7 @@ export function AutoFixPanel() {
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleReject(rejectionModalId)}
                     disabled={actionLoadingId === rejectionModalId}
                     className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold"
@@ -740,6 +755,7 @@ export function AutoFixPanel() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {BENCHMARK_TEMPLATES.map((tmpl) => (
                   <button
+                    type="button"
                     key={tmpl.id}
                     onClick={() => setSelectedTemplateId(tmpl.id)}
                     className={`text-left p-3 rounded-lg border text-xs font-mono transition-all ${
@@ -753,6 +769,7 @@ export function AutoFixPanel() {
                   </button>
                 ))}
                 <button
+                  type="button"
                   onClick={() => setSelectedTemplateId("custom")}
                   className={`text-left p-3 rounded-lg border text-xs font-mono transition-all ${
                     selectedTemplateId === "custom"
@@ -860,6 +877,7 @@ export function AutoFixPanel() {
 
                 <div className="pt-2 flex justify-end">
                   <button
+                    type="button"
                     onClick={handleProposeSandboxPatch}
                     disabled={proposing || !customOrigCode.trim() || !customPatchedCode.trim()}
                     className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
@@ -918,6 +936,7 @@ export function AutoFixPanel() {
 
                     {proposeMsg && (
                       <div
+                        role="alert"
                         className={`p-3 rounded-lg text-xs font-mono border ${
                           proposeMsg.type === "success"
                             ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
@@ -930,6 +949,7 @@ export function AutoFixPanel() {
 
                     <div className="pt-2 flex justify-end">
                       <button
+                        type="button"
                         onClick={handleProposeSandboxPatch}
                         disabled={proposing}
                         className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors disabled:opacity-50 shadow-lg shadow-emerald-950"
@@ -991,6 +1011,7 @@ export function AutoFixPanel() {
                 />
               </label>
               <button
+                type="button"
                 onClick={handleRun}
                 disabled={running || !repo.trim()}
                 className="ml-auto bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 text-white font-bold px-6 py-2 rounded-lg transition-colors text-sm flex items-center gap-2"
