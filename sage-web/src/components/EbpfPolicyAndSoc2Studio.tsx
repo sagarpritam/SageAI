@@ -170,8 +170,8 @@ export default function EbpfPolicyAndSoc2Studio() {
         setSelectedPolicy(data.policy);
         setNotification(`Kernel Policy Synthesized: ${data.policy.policy_id} (JIT Verified)`);
       }
-    } catch (err) {
-      setNotification(`Synthesis failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Synthesis failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsSynthesizing(false);
     }
@@ -193,8 +193,8 @@ export default function EbpfPolicyAndSoc2Studio() {
         }
         setNotification(`Policy ${policyId} attached to XDP_INGRESS hook (0.00ms drop activated).`);
       }
-    } catch (err) {
-      setNotification(`Attachment failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Attachment failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -212,8 +212,8 @@ export default function EbpfPolicyAndSoc2Studio() {
         );
         setNotification("SOC 2 Type II bundle successfully recompiled and cryptographically sealed!");
       }
-    } catch (err) {
-      setNotification(`Generation failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Generation failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsGeneratingSoc2(false);
     }

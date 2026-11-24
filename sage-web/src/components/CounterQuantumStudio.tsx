@@ -90,7 +90,7 @@ export function CounterQuantumStudio() {
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load counter-quantum telemetry");
     } finally {
       setLoading(false);
@@ -127,7 +127,7 @@ export function CounterQuantumStudio() {
         setLatestInjection(data.injection);
         fetchInterceptorsAndMetrics();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to inject quantum honey-chaff");
     } finally {
       setInjecting(false);
@@ -158,7 +158,7 @@ export function CounterQuantumStudio() {
         setLatestDecoherence(data.decoherence);
         fetchInterceptorsAndMetrics();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to trigger quantum decoherence");
     } finally {
       setTrippingDecoherence(false);

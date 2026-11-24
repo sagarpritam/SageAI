@@ -93,7 +93,7 @@ export function AtomicClockStudio() {
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load atomic clock data");
     } finally {
       setLoading(false);
@@ -127,7 +127,7 @@ export function AtomicClockStudio() {
         setLatestSync(data.sync);
         fetchClocksAndMetrics();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to sync atomic clock mesh");
     } finally {
       setSyncing(false);
@@ -158,7 +158,7 @@ export function AtomicClockStudio() {
         setLatestTimestamp(data.timestamp_record);
         fetchClocksAndMetrics();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to issue atomic timestamp");
     } finally {
       setSigning(false);

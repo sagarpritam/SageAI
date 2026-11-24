@@ -2115,6 +2115,79 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 49 (Opt B): Rydberg Polariton Superfluid Power Harvest",
         ),
+        # Wave 50 (Caps 170-172 & Option B Wave 50)
+        (
+            "GET",
+            "/api/langlands-automorphic/packets",
+            None,
+            "Wave 50 (Cap 170): Langlands Automorphic Packets List",
+        ),
+        (
+            "POST",
+            "/api/langlands-automorphic/synthesize-hecke",
+            {
+                "packet_id": "LANGLANDS-GL2-MODULAR-01",
+                "prime_cutoff": 17,
+                "ram_bound_tolerance": 1e-5,
+                "l_function_s": 1.0,
+                "hecke_gain": 1.25,
+            },
+            "Wave 50 (Cap 170): Langlands Hecke Eigenform Synthesis",
+        ),
+        (
+            "GET",
+            "/api/calabi-yau-mirror/pairs",
+            None,
+            "Wave 50 (Cap 171): Calabi-Yau Mirror Pairs List",
+        ),
+        (
+            "POST",
+            "/api/calabi-yau-mirror/solve-picard-fuchs",
+            {
+                "pair_id": "CY-QUINTIC-GREENE-PLESSER-01",
+                "deformation_psi": 0.5,
+                "instanton_degree": 4,
+                "monodromy_damping": 1.25,
+                "frobenius_precision": 1e-6,
+            },
+            "Wave 50 (Cap 171): Calabi-Yau Picard-Fuchs Monodromy Solution",
+        ),
+        (
+            "GET",
+            "/api/connes-spectral-geometry/triples",
+            None,
+            "Wave 50 (Cap 172): Connes Spectral Triples List",
+        ),
+        (
+            "POST",
+            "/api/connes-spectral-geometry/evaluate-action",
+            {
+                "triple_id": "CONNES-STANDARD-MODEL-01",
+                "energy_cutoff_gev": 1e16,
+                "heat_kernel_order": 4,
+                "dixmier_trace_scale": 1.15,
+                "gauge_coupling_unification": 0.98,
+            },
+            "Wave 50 (Cap 172): Connes-Chamseddine Spectral Action Evaluation",
+        ),
+        (
+            "GET",
+            "/api/gravitational-phonon/lattices",
+            None,
+            "Wave 50 (Opt B): Gravitational Phonon Lattices List",
+        ),
+        (
+            "POST",
+            "/api/gravitational-phonon/harvest-phonons",
+            {
+                "lattice_id": "PHONON-ANTARCTIC-DIAMOND-01",
+                "strain_amplitude_h": 1e-22,
+                "acoustic_coupling": 0.88,
+                "piezo_efficiency": 0.94,
+                "extraction_duration_s": 60.0,
+            },
+            "Wave 50 (Opt B): Gravitational-Wave Phonon Resonant Energy Harvest",
+        ),
     ]
 
 

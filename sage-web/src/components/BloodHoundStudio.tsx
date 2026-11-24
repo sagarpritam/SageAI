@@ -33,7 +33,7 @@ export function BloodHoundStudio() {
       }
       const data = await res.json();
       setAdReport(data.ad_report);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to scan Active Directory attack paths");
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ export function BloodHoundStudio() {
       }
       const data = await res.json();
       setLockdownScript(data.lockdown_script);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to generate Active Directory hardening script");
     } finally {
       setScriptLoading(false);

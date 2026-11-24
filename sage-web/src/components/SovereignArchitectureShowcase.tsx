@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Spin(7) Cayley 4-Cycle Shields, Voevodsky Motivic Homotopy Barriers, Twisted K-Theory Freed-Witten Firewalls & Planetary Ultra-Dense Rydberg Polariton Condensate Supergrid.",
+    detail: "Langlands Automorphic Duality Engine, Superstring Calabi-Yau Mirror Symmetry Wall, Non-Commutative Connes Spectral Geometry Armor & Planetary Gravitational-Wave Resonant Phonon Lattice Supergrid.",
   },
 ];
 

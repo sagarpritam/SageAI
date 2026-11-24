@@ -294,6 +294,10 @@ import Spin7CayleyStudio from "@/components/Spin7CayleyStudio";
 import VoevodskyMotivicStudio from "@/components/VoevodskyMotivicStudio";
 import TwistedKTheoryStudio from "@/components/TwistedKTheoryStudio";
 import RydbergPolaritonSupergridStudio from "@/components/RydbergPolaritonSupergridStudio";
+import LanglandsAutomorphicStudio from "@/components/LanglandsAutomorphicStudio";
+import CalabiYauMirrorStudio from "@/components/CalabiYauMirrorStudio";
+import ConnesSpectralStudio from "@/components/ConnesSpectralStudio";
+import GravitationalPhononStudio from "@/components/GravitationalPhononStudio";
 import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
 import BggCategoryOStudio from "@/components/BggCategoryOStudio";
 import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
@@ -324,6 +328,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "langlands-automorphic", label: "Langlands Automorphic (Cap 170)", icon: Binary },
+  { id: "calabi-yau-mirror", label: "Calabi-Yau Mirror (Cap 171)", icon: Layers },
+  { id: "connes-spectral-geometry", label: "Connes Spectral Armor (Cap 172)", icon: Compass },
+  { id: "gravitational-phonon-lattice", label: "Gravitational Phonon (Option B W50)", icon: Activity },
   { id: "spin7-cayley-shield", label: "Spin(7) Cayley Shield (Cap 167)", icon: Shield },
   { id: "voevodsky-motivic-shield", label: "Voevodsky Motivic Shield (Cap 168)", icon: Binary },
   { id: "twisted-k-theory", label: "Twisted K-Theory (Cap 169)", icon: Flame },
@@ -775,6 +783,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "langlands-automorphic" && <LanglandsAutomorphicStudio />}
+          {activeTab === "calabi-yau-mirror" && <CalabiYauMirrorStudio />}
+          {activeTab === "connes-spectral-geometry" && <ConnesSpectralStudio />}
+          {activeTab === "gravitational-phonon-lattice" && <GravitationalPhononStudio />}
           {activeTab === "spin7-cayley-shield" && <Spin7CayleyStudio />}
           {activeTab === "voevodsky-motivic-shield" && <VoevodskyMotivicStudio />}
           {activeTab === "twisted-k-theory" && <TwistedKTheoryStudio />}

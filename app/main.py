@@ -57,6 +57,7 @@ from app.routers import (
     bloodhound_routes,
     bv_brst_routes,
     calabi_yau_routes,
+    calabi_yau_mirror_routes,
     canary_fabric_routes,
     cardy_boundary_cft_routes,
     carrollian_holography_routes,
@@ -80,6 +81,7 @@ from app.routers import (
     complexity_holography_routes,
     condensed_liquid_routes,
     conformal_bootstrap_routes,
+    connes_spectral_geometry_routes,
     consensus_routes,
     copilot_routes,
     cosmic_censorship_routes,
@@ -129,6 +131,7 @@ from app.routers import (
     geometric_langlands_routes,
     geometric_satake_affine_routes,
     geometric_satake_routes,
+    gravitational_phonon_routes,
     gravitational_seismic_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
@@ -158,6 +161,7 @@ from app.routers import (
     kugelblitz_hawking_routes,
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
+    langlands_automorphic_routes,
     m_theory_g2_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
@@ -606,6 +610,10 @@ app.include_router(spin7_cayley_routes.router)
 app.include_router(voevodsky_motivic_routes.router)
 app.include_router(twisted_k_theory_routes.router)
 app.include_router(rydberg_polariton_supergrid_routes.router)
+app.include_router(langlands_automorphic_routes.router)
+app.include_router(calabi_yau_mirror_routes.router)
+app.include_router(connes_spectral_geometry_routes.router)
+app.include_router(gravitational_phonon_routes.router)
 
 
 # ---------------------
@@ -623,7 +631,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "8.9.0",
+        "version": "9.0.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

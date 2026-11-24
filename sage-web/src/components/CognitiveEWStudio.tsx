@@ -100,7 +100,7 @@ export function CognitiveEWStudio() {
       if (metData.metrics) {
         setMetrics(metData.metrics);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load cognitive EW telemetry");
     } finally {
       setLoading(false);
@@ -138,7 +138,7 @@ export function CognitiveEWStudio() {
       if (data.waveform) {
         setLatestWaveform(data.waveform);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to synthesize DRFM waveform");
     } finally {
       setSynthesizing(false);
@@ -170,7 +170,7 @@ export function CognitiveEWStudio() {
         setLatestEngagement(data.engagement);
         fetchEmittersAndMetrics();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to engage cognitive countermeasure");
     } finally {
       setEngaging(false);
