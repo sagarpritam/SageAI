@@ -319,9 +319,18 @@ export default function SocPlaybookStudio() {
         </div>
 
         {notification && (
-          <div className="mt-4 p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-lg text-xs text-emerald-200 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{notification}</span>
+          <div role="alert" className="mt-4 p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-lg text-xs text-emerald-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{notification}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNotification(null)}
+              className="text-[10px] bg-emerald-900/60 hover:bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700/50 text-emerald-200 transition"
+            >
+              Dismiss
+            </button>
           </div>
         )}
       </div>

@@ -229,8 +229,8 @@ export default function SeriesAScaleStudio() {
         setEvents((prev) => [data.event, ...prev]);
         setNotification(`Kernel Probe Ingested: ${data.event.event_type} dropped at ${data.event.node_id}`);
       }
-    } catch (err) {
-      setNotification(`Ingest failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Ingest failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsIngesting(false);
     }
@@ -249,8 +249,8 @@ export default function SeriesAScaleStudio() {
         await fetchPortal(selectedTenantId);
         setNotification(`AST Patch ${patchId} Approved by CISO and deployed to production.`);
       }
-    } catch (err) {
-      setNotification(`Approval failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Approval failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsApproving(false);
     }
@@ -272,8 +272,8 @@ export default function SeriesAScaleStudio() {
         const data: { escalation: { escalation_id: string } } = await res.json();
         setNotification(`Tier-3 SOC Incident Engaged: Escalation ID ${data.escalation.escalation_id}`);
       }
-    } catch (err) {
-      setNotification(`Escalation failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Escalation failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsEscalating(false);
     }
@@ -289,8 +289,8 @@ export default function SeriesAScaleStudio() {
       if (res.ok) {
         setNotification("Series A Institutional Memorandum recompiled and cryptographically sealed!");
       }
-    } catch (err) {
-      setNotification(`Recompile failed: ${String(err)}`);
+    } catch (err: unknown) {
+      setNotification(`Recompile failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsRecompiling(false);
     }
@@ -388,7 +388,7 @@ export default function SeriesAScaleStudio() {
 
       {/* Notification Toast */}
       {notification && (
-        <div className="p-4 bg-indigo-950/40 border border-indigo-800/50 rounded-xl flex items-center justify-between text-indigo-300 text-sm">
+        <div role="alert" className="p-4 bg-indigo-950/40 border border-indigo-800/50 rounded-xl flex items-center justify-between text-indigo-300 text-sm">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-indigo-400 flex-shrink-0" />
             <span>{notification}</span>

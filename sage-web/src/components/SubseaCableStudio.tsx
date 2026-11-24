@@ -54,9 +54,11 @@ export function SubseaCableStudio() {
   const [inspecting, setInspecting] = useState(false);
   const [inspectionResult, setInspectionResult] = useState<InspectionResult | null>(null);
   const [cableLogs, setCableLogs] = useState<InspectionResult[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchCables = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/subsea-cable/cables");
       const data = await res.json();
@@ -66,6 +68,8 @@ export function SubseaCableStudio() {
           setSelectedCable((prev) => prev || data.cables[0]);
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load subsea cables");
     } finally {
       setLoading(false);
     }
@@ -78,6 +82,7 @@ export function SubseaCableStudio() {
   async function handleInspect() {
     if (!selectedCable) return;
     setInspecting(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/subsea-cable/inspect-telemetry", {
         method: "POST",
@@ -111,6 +116,8 @@ export function SubseaCableStudio() {
           );
         }
       }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to inspect telemetry");
     } finally {
       setInspecting(false);
     }
@@ -146,6 +153,7 @@ export function SubseaCableStudio() {
         </div>
 
         <button
+          type="button"
           onClick={fetchCables}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
@@ -154,6 +162,25 @@ export function SubseaCableStudio() {
           Refresh Ocean Bed Telemetry
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 bg-red-950/60 border border-red-500/40 rounded-xl flex items-center justify-between text-red-200 text-xs"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-[10px] bg-red-900/60 hover:bg-red-900 px-2 py-0.5 rounded border border-red-700/50 text-red-200 transition"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

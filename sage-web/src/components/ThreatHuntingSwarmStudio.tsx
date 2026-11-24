@@ -42,9 +42,11 @@ export function ThreatHuntingSwarmStudio() {
   const [loading, setLoading] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchHunts = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/threat-hunting-swarm/hunts");
       if (res.ok) {
@@ -54,8 +56,8 @@ export function ThreatHuntingSwarmStudio() {
           setSelectedHunt((prev) => prev || data.hunts[0]);
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load threat hunts");
     } finally {
       setLoading(false);
     }
@@ -67,6 +69,7 @@ export function ThreatHuntingSwarmStudio() {
 
   const launchNewHunt = async (topic: string) => {
     setLaunching(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/threat-hunting-swarm/launch", {
         method: "POST",
@@ -78,8 +81,8 @@ export function ThreatHuntingSwarmStudio() {
         setHunts((prev) => [data.hunt, ...prev]);
         setSelectedHunt(data.hunt);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to launch threat hunt");
     } finally {
       setLaunching(false);
     }
@@ -87,6 +90,7 @@ export function ThreatHuntingSwarmStudio() {
 
   const executeContainment = async (huntId: string, action: string) => {
     setActionLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/threat-hunting-swarm/action", {
         method: "POST",
@@ -105,8 +109,8 @@ export function ThreatHuntingSwarmStudio() {
           setSelectedHunt((prev) => prev ? { ...prev, status: "CONTAINMENT_ENFORCED", enforced_action: action } : null);
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to execute containment action");
     } finally {
       setActionLoading(false);
     }
@@ -135,6 +139,7 @@ export function ThreatHuntingSwarmStudio() {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => launchNewHunt("Process Injection & Memory Hollowing")}
             disabled={launching}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-sm transition shadow-lg shadow-purple-600/20 disabled:opacity-50"
@@ -144,6 +149,25 @@ export function ThreatHuntingSwarmStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 bg-red-950/60 border border-red-500/40 rounded-xl flex items-center justify-between text-red-200 text-xs"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-[10px] bg-red-900/60 hover:bg-red-900 px-2 py-0.5 rounded border border-red-700/50 text-red-200 transition"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Preset Launcher Bar */}
       <div className="flex flex-wrap gap-2 items-center p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono">

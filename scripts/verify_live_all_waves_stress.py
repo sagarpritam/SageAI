@@ -1970,6 +1970,78 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             None,
             "Wave 47 (Executive Suite): Executive Pitch Deck Pipeline Metrics",
         ),
+        # Wave 48 (Caps 164-166 & Option B Wave 48)
+        (
+            "GET",
+            "/api/g2-octonionic-shield/manifolds",
+            None,
+            "Wave 48 (Cap 164): G2 Octonionic Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/g2-octonionic-shield/calibrate-associative",
+            {
+                "manifold_id": "G2-JOYCE-TORUS-01",
+                "instanton_charge": 3,
+                "torsion_free_precision": 1e-6,
+                "associative_refinement_depth": 8,
+                "calibration_gain": 1.2,
+            },
+            "Wave 48 (Cap 164): G2 Associative 3-Cycle Calibration",
+        ),
+        (
+            "GET",
+            "/api/azumaya-brauer-shield/algebras",
+            None,
+            "Wave 48 (Cap 165): Derived Azumaya Algebras List",
+        ),
+        (
+            "POST",
+            "/api/azumaya-brauer-shield/seal-brauer",
+            {
+                "algebra_id": "AZUMAYA-K3-TWISTED-01",
+                "torsion_order_n": 4,
+                "periodic_cyclic_degree": 2,
+                "morita_equivalence_depth": 8,
+                "brauer_amplification": 1.0,
+            },
+            "Wave 48 (Cap 165): Derived Azumaya Brauer Seal",
+        ),
+        (
+            "GET",
+            "/api/cardy-boundary-cft/states",
+            None,
+            "Wave 48 (Cap 166): Cardy Boundary CFT States List",
+        ),
+        (
+            "POST",
+            "/api/cardy-boundary-cft/seal-boundary",
+            {
+                "state_id": "CARDY-ISING-FREE-01",
+                "modular_s_parameter": 0.7071,
+                "verlinde_fusion_level_k": 4,
+                "boundary_defect_charge": 1.0,
+                "conformal_gain": 1.2,
+            },
+            "Wave 48 (Cap 166): Conformal Boundary CFT Cardy Seal",
+        ),
+        (
+            "GET",
+            "/api/hydride-megabar-supergrid/vaults",
+            None,
+            "Wave 48 (Opt B): Hydride Megabar Supergrid Vaults List",
+        ),
+        (
+            "POST",
+            "/api/hydride-megabar-supergrid/harvest-megabar",
+            {
+                "vault_id": "MEGABAR-LAH10-VAULT-01",
+                "megabar_pressure_gpa": 175.0,
+                "phonon_coupling_alpha2f": 2.8,
+                "rectification_gain": 1.2,
+            },
+            "Wave 48 (Opt B): Hydride Megabar Supergrid Power Harvest",
+        ),
     ]
 
 

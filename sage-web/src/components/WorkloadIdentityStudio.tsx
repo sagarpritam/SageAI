@@ -51,17 +51,19 @@ export function WorkloadIdentityStudio() {
   const [httpMethod, setHttpMethod] = useState("POST");
   const [httpPath, setHttpPath] = useState("/v1/charge");
   const [evalResult, setEvalResult] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchSvids = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/workload-identity/svids");
       if (res.ok) {
         const data = await res.json();
         setSvids(data.svids || []);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to load SVIDs");
     } finally {
       setLoading(false);
     }
@@ -73,6 +75,7 @@ export function WorkloadIdentityStudio() {
 
   const issueSvid = async () => {
     setIssuing(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/workload-identity/issue", {
         method: "POST",
@@ -87,8 +90,8 @@ export function WorkloadIdentityStudio() {
         const data = await res.json();
         setSvids((prev) => [data.svid, ...prev]);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to issue SVID");
     } finally {
       setIssuing(false);
     }
@@ -96,6 +99,7 @@ export function WorkloadIdentityStudio() {
 
   const evaluateL7 = async () => {
     setEvalLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/workload-identity/evaluate", {
         method: "POST",
@@ -111,8 +115,8 @@ export function WorkloadIdentityStudio() {
         const data = await res.json();
         setEvalResult(data);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to evaluate L7 SPIFFE policy");
     } finally {
       setEvalLoading(false);
     }
@@ -123,8 +127,8 @@ export function WorkloadIdentityStudio() {
       setSvids((prev) =>
         prev.map((s) => (s.svid_id === id ? { ...s, status: "REVOKED_COMPROMISED" } : s))
       );
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to revoke SVID");
     }
   };
 
@@ -150,6 +154,7 @@ export function WorkloadIdentityStudio() {
         </div>
 
         <button
+          type="button"
           onClick={fetchSvids}
           disabled={loading}
           className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition"
@@ -157,6 +162,25 @@ export function WorkloadIdentityStudio() {
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-3 bg-red-950/60 border border-red-500/40 rounded-xl flex items-center justify-between text-red-200 text-xs"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-[10px] bg-red-900/60 hover:bg-red-900 px-2 py-0.5 rounded border border-red-700/50 text-red-200 transition"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

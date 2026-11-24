@@ -286,6 +286,10 @@ import SeibergWittenStudio from "@/components/SeibergWittenStudio";
 import HeegaardFloerStudio from "@/components/HeegaardFloerStudio";
 import GeometricSatakeAffineStudio from "@/components/GeometricSatakeAffineStudio";
 import DiamagneticSupergridPowerStudio from "@/components/DiamagneticSupergridPowerStudio";
+import G2OctonionicStudio from "@/components/G2OctonionicStudio";
+import AzumayaBrauerStudio from "@/components/AzumayaBrauerStudio";
+import CardyBoundaryCftStudio from "@/components/CardyBoundaryCftStudio";
+import HydrideMegabarSupergridStudio from "@/components/HydrideMegabarSupergridStudio";
 import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
 import BggCategoryOStudio from "@/components/BggCategoryOStudio";
 import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
@@ -316,6 +320,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "g2-octonionic-shield", label: "G₂ Octonionic Shield (Cap 164)", icon: Shield },
+  { id: "azumaya-brauer-shield", label: "Azumaya-Brauer Shield (Cap 165)", icon: Binary },
+  { id: "cardy-boundary-cft", label: "Cardy Boundary CFT (Cap 166)", icon: Flame },
+  { id: "hydride-megabar-supergrid", label: "Hydride Megabar (Option B W48)", icon: Zap },
   { id: "fibonacci-anyon-braiding", label: "Fibonacci Anyon (Cap 161)", icon: Cpu },
   { id: "bgg-category-o-shield", label: "BGG Category O Shield (Cap 162)", icon: Layers },
   { id: "cryogenic-flux-qubit", label: "Cryogenic Flux Qubit (Cap 163)", icon: Activity },
@@ -759,6 +767,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "g2-octonionic-shield" && <G2OctonionicStudio />}
+          {activeTab === "azumaya-brauer-shield" && <AzumayaBrauerStudio />}
+          {activeTab === "cardy-boundary-cft" && <CardyBoundaryCftStudio />}
+          {activeTab === "hydride-megabar-supergrid" && <HydrideMegabarSupergridStudio />}
           {activeTab === "fibonacci-anyon-braiding" && <FibonacciAnyonBraidingStudio />}
           {activeTab === "bgg-category-o-shield" && <BggCategoryOStudio />}
           {activeTab === "cryogenic-flux-qubit" && <CryogenicFluxQubitStudio />}

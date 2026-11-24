@@ -47,6 +47,7 @@ from app.routers import (
     auth_routes,
     autofix_routes,
     axion_haloscope_routes,
+    azumaya_brauer_routes,
     beilinson_drinfeld_routes,
     berry_curvature_routes,
     bgg_category_o_routes,
@@ -57,6 +58,7 @@ from app.routers import (
     bv_brst_routes,
     calabi_yau_routes,
     canary_fabric_routes,
+    cardy_boundary_cft_routes,
     carrollian_holography_routes,
     cart_routes,
     cas_redteam_swarm_routes,
@@ -121,6 +123,7 @@ from app.routers import (
     floer_novikov_routes,
     forensics_routes,
     fukaya_floer_routes,
+    g2_octonionic_routes,
     gdpr_routes,
     geomagnetic_shield_routes,
     geometric_langlands_routes,
@@ -134,6 +137,7 @@ from app.routers import (
     hitchin_moduli_routes,
     homotopy_univalence_routes,
     horava_lifshitz_routes,
+    hydride_megabar_supergrid_routes,
     hypersonic_defense_routes,
     hyperspectral_interceptor_routes,
     iac_drift_routes,
@@ -590,6 +594,10 @@ app.include_router(bgg_category_o_routes.router)
 app.include_router(cryogenic_flux_qubit_routes.router)
 app.include_router(majorana_supergrid_power_routes.router)
 app.include_router(deck_metrics_routes.router)
+app.include_router(g2_octonionic_routes.router)
+app.include_router(azumaya_brauer_routes.router)
+app.include_router(cardy_boundary_cft_routes.router)
+app.include_router(hydride_megabar_supergrid_routes.router)
 
 
 # ---------------------
@@ -607,7 +615,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "8.7.0",
+        "version": "8.8.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],
