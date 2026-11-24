@@ -1,0 +1,64 @@
+{
+  "dao_id": "DONALDSON-THOMAS-DAO-01",
+  "dao_name": "Donaldson-Thomas Invariant & Cohomological Hall Algebra Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_dt_capital_quadrillion_usd": 1650.0,
+  "projected_annualized_yield_percent": 62.0,
+  "wall_crossing_convergence_percent": 99.99999,
+  "active_dt_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "DONALDSON-THOMAS-CORE-ALPHA",
+      "invariant_type": "BEHREND-CONSTRUCTIBLE-NU",
+      "staked_capital_quadrillion_usd": 490.0,
+      "projected_yield_apy_percent": 62.5,
+      "wall_crossing_phase": "CHAMBER-A",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "COHOMOLOGICAL-HALL-ALGEBRA-POOL",
+      "invariant_type": "KONTSEVICH-SOIBELMAN-COHA",
+      "staked_capital_quadrillion_usd": 400.0,
+      "projected_yield_apy_percent": 61.8,
+      "wall_crossing_phase": "CHAMBER-B",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "BRIDGELAND-WALL-CROSSING-DEX",
+      "invariant_type": "JOYCE-SONG-STABILITY-CONDITION",
+      "staked_capital_quadrillion_usd": 420.0,
+      "projected_yield_apy_percent": 62.2,
+      "wall_crossing_phase": "STABILITY-WALL",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "PANDHARIPANDE-THOMAS-VAULT",
+      "invariant_type": "PT-STABLE-PAIRS",
+      "staked_capital_quadrillion_usd": 340.0,
+      "projected_yield_apy_percent": 61.5,
+      "wall_crossing_phase": "CHAMBER-C",
+      "status": "ACTIVE"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "DT-STAKE-INIT-01",
+      "vault_id": "DONALDSON-THOMAS-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_dt_capital_quadrillion_usd": 1650.0,
+      "projected_yield_apy_percent": 62.5,
+      "status": "INITIALIZED",
+      "timestamp": "2026-11-23T21:30:00.000Z"
+    },
+    {
+      "stake_id": "DT-STAKE-74C6EB70",
+      "vault_id": "DONALDSON-THOMAS-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_dt_capital_quadrillion_usd": 1650.0,
+      "projected_yield_apy_percent": 62.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T16:04:30.915060+00:00"
+    }
+  ],
+  "last_updated": "2026-11-23T16:04:30.915068+00:00"
+}

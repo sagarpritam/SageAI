@@ -1,0 +1,59 @@
+{
+  "bus_id": "LAUGHLIN-ANYON-BUS-01",
+  "bus_name": "Laughlin Quasiparticle Anyonic Fractionally Charged Interconnect Bus",
+  "status": "OPERATIONAL",
+  "filling_factor_nu": "1/3",
+  "fractional_charge_e_star": 0.333333,
+  "optical_bus_throughput_pbps": 5600.0,
+  "anyon_braiding_fidelity": 0.99999999,
+  "thermal_hall_dissipation_nw": 0.0,
+  "channels": [
+    {
+      "channel_id": "LAUGHLIN-NU-ONE-THIRD-ALPHA",
+      "channel_name": "Laughlin e/3 Anyon Quasiparticle Waveguide",
+      "fractional_charge_e": 0.3333,
+      "braiding_phase_rad": 1.0472,
+      "channel_throughput_pbps": 1400.0,
+      "thermal_conductance_ratio": 1.0,
+      "status": "BRAIDING_PHASE_TUNED"
+    },
+    {
+      "channel_id": "FRACTIONAL-STATISTICS-BETA",
+      "channel_name": "Fractional Statistical Angle Phase Shifter",
+      "fractional_charge_e": 0.3333,
+      "braiding_phase_rad": 1.0472,
+      "channel_throughput_pbps": 1400.0,
+      "thermal_conductance_ratio": 1.0,
+      "status": "STATISTICAL_ANGLE_TUNED"
+    },
+    {
+      "channel_id": "THERMAL-HALL-ZERO-GAMMA",
+      "channel_name": "Chiral Edge Mode Dissipationless Transport",
+      "fractional_charge_e": 0.3333,
+      "braiding_phase_rad": 2.0944,
+      "channel_throughput_pbps": 1400.0,
+      "thermal_conductance_ratio": 1.0,
+      "status": "DISSIPATIONLESS_EDGE_ACTIVE"
+    },
+    {
+      "channel_id": "COMPOSITE-FERMION-DELTA",
+      "channel_name": "Composite Fermion 2-Flux Vortex Core",
+      "fractional_charge_e": 0.3333,
+      "braiding_phase_rad": 3.1416,
+      "channel_throughput_pbps": 1400.0,
+      "thermal_conductance_ratio": 1.0,
+      "status": "VORTEX_CORE_PINNED"
+    }
+  ],
+  "modulation_history": [
+    {
+      "modulation_id": "LAUGHLIN-MOD-BC735535",
+      "channel_id": "LAUGHLIN-NU-ONE-THIRD-ALPHA",
+      "braiding_phase_rad": 1.0472,
+      "fractional_charge_e": 0.3333,
+      "braiding_fidelity": 0.99999999,
+      "status": "MODULATED",
+      "timestamp": "2026-11-20T22:32:21.444529+00:00"
+    }
+  ]
+}

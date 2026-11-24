@@ -1,0 +1,43 @@
+{
+  "dao_id": "MODAVE-ATTRACTOR-DAO-01",
+  "attractor_formula": "NABLA_I_ABS_Z_SQ_EQ_0_HORIZON_MODULI_STABILIZATION",
+  "supergravity_regime": "N_EQ_2_D_EQ_4_CALABI_YAU_SPECIAL_GEOMETRY",
+  "total_staked_attractor_capital_quadrillion_usd": 1300.0,
+  "projected_annualized_yield_percent": 50.0,
+  "status": "MODAVE_ATTRACTOR_DAO_ACTIVE",
+  "active_attractor_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "FKS-CENTRAL-CHARGE-CORE",
+      "attractor_vault": "Central Charge Extremal Horizon Attractor |Z_attr|^2 Tranche",
+      "staked_capital_quadrillion_usd": 325.0,
+      "central_charge_modulus": 4.85,
+      "accrued_attractor_yield_apy": 51.5,
+      "status": "ATTRACTOR_HORIZON_STABILIZED"
+    },
+    {
+      "vault_id": "CALABI-YAU-SPECIAL-GEOMETRY-POOL",
+      "attractor_vault": "Kähler Moduli Special Geometry Prepotential F(X) Pool",
+      "staked_capital_quadrillion_usd": 325.0,
+      "central_charge_modulus": 4.50,
+      "accrued_attractor_yield_apy": 50.2,
+      "status": "SPECIAL_GEOMETRY_CONVERGED"
+    },
+    {
+      "vault_id": "BPS-BLACK-HOLE-ENTROPY-DEX",
+      "attractor_vault": "BPS Extremal Area-Entropy S = pi * |Z|^2 Conversion DEX",
+      "staked_capital_quadrillion_usd": 325.0,
+      "central_charge_modulus": 5.10,
+      "accrued_attractor_yield_apy": 49.0,
+      "status": "BPS_ENTROPY_OPTIMAL"
+    },
+    {
+      "vault_id": "NON-BPS-ATTRACTOR-STABILITY-VAULT",
+      "attractor_vault": "Non-BPS Zero-Temperature Attractor Branch Stability Vault",
+      "staked_capital_quadrillion_usd": 325.0,
+      "central_charge_modulus": 4.70,
+      "accrued_attractor_yield_apy": 49.8,
+      "status": "NON_BPS_BRANCH_LOCKED"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "telemetry": {
+    "bus_id": "TCI-SNTE-MIRROR-BUS-01",
+    "crystal_structure": "ROCK_SALT_FMC3M_SNTE",
+    "mirror_chern_number_nm": -2,
+    "dirac_cones_count_per_surface": 4,
+    "crystal_surface_plane": "{001}_AND_{110}",
+    "bus_throughput_petabits_per_sec": 2400.0,
+    "mirror_symmetry_protection_fidelity_percent": 99.99998,
+    "status": "TOPOLOGICAL_SURFACE_BUS_OPTIMAL",
+    "active_crystal_channels": 4
+  },
+  "channels": [
+    {
+      "channel_id": "SNTE-SURFACE-001",
+      "material_phase": "Stoichiometric Tin Telluride (SnTe) {001}",
+      "dirac_velocity_km_s": 520.75,
+      "mirror_symmetry_plane": "M_110_REFLECTION",
+      "surface_band_gap_mev": 0.0,
+      "optical_channel_throughput_pbps": 600.0,
+      "status": "MIRROR_STRAIN_LOCKED"
+    },
+    {
+      "channel_id": "PB1X-SNX-TE-110",
+      "material_phase": "Lead Tin Telluride Alloy (Pb0.6Sn0.4Te) {110}",
+      "dirac_velocity_km_s": 495.0,
+      "mirror_symmetry_plane": "M_001_REFLECTION",
+      "surface_band_gap_mev": 0.0,
+      "optical_channel_throughput_pbps": 600.0,
+      "status": "DUAL_VALLEY_CONE_COHERENT"
+    },
+    {
+      "channel_id": "PBSE-TOPOLOGICAL-VALLEY",
+      "material_phase": "Strained Lead Selenide (PbSe) Epitaxial Film",
+      "dirac_velocity_km_s": 510.0,
+      "mirror_symmetry_plane": "M_1-10_REFLECTION",
+      "surface_band_gap_mev": 0.0,
+      "optical_channel_throughput_pbps": 600.0,
+      "status": "VALLEY_FILTERED_STREAMING"
+    },
+    {
+      "channel_id": "MIRROR-CHERN-M2-CRYSTAL",
+      "material_phase": "Topological Heterostructure SnTe/CdTe Superlattice",
+      "dirac_velocity_km_s": 535.0,
+      "mirror_symmetry_plane": "M_XY_COMPLEX_REFLECTION",
+      "surface_band_gap_mev": 0.0,
+      "optical_channel_throughput_pbps": 600.0,
+      "status": "MIRROR_CHERN_PROTECTED"
+    }
+  ],
+  "modulations": [
+    {
+      "modulation_id": "TCIB-MOD-026070CD",
+      "channel_id": "SNTE-SURFACE-001",
+      "piezoelectric_strain_percent": 0.05,
+      "dirac_cone_shift_ev": 0.002,
+      "measured_velocity_km_s": 520.75,
+      "timestamp": "2026-11-24T15:18:34.118553+00:00",
+      "status": "MIRROR_SYMMETRY_MODULATED_LOCKED"
+    },
+    {
+      "modulation_id": "TCIB-MOD-60B3562A",
+      "channel_id": "SNTE-SURFACE-001",
+      "piezoelectric_strain_percent": 0.05,
+      "dirac_cone_shift_ev": 0.002,
+      "measured_velocity_km_s": 520.75,
+      "timestamp": "2026-11-19T19:15:10.416009+00:00",
+      "status": "MIRROR_SYMMETRY_MODULATED_LOCKED"
+    },
+    {
+      "modulation_id": "TCIB-MOD-INITIAL-01",
+      "channel_id": "SNTE-SURFACE-001",
+      "piezoelectric_strain_percent": 0.05,
+      "dirac_cone_shift_ev": 0.002,
+      "measured_velocity_km_s": 520.0,
+      "timestamp": "2026-11-20T00:40:00Z",
+      "status": "MIRROR_SYMMETRY_MODULATED_LOCKED"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "sentinel_id": "JACKIW-REBBI-SENTINEL-01",
+  "sentinel_name": "Jackiw-Rebbi Soliton Fermion Fractionalization Sentinel",
+  "status": "ARMED_AND_CONFINING",
+  "spectral_asymmetry_index_eta": 0.5,
+  "fractional_charge_e": 0.5,
+  "fermion_zero_mode_fidelity": 0.99999999,
+  "sidechannel_leakage_rejection_db": -156.0,
+  "active_soliton_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "JACKIW-REBBI-ZERO-MODE-ALPHA",
+      "sector_name": "Dirac Fermion Midgap Zero Mode",
+      "fractional_charge_e": 0.5,
+      "soliton_displacement_nm": 0.05,
+      "spectral_index_eta": 0.5,
+      "sidechannel_rejection_db": -157.0,
+      "status": "SOLITON_CLAMPED_ZERO_MODE"
+    },
+    {
+      "sector_id": "SOLITON-ANTISOLITON-BOUNDARY-BETA",
+      "sector_name": "Polyacetylene Kink Domain Wall",
+      "fractional_charge_e": -0.5,
+      "soliton_displacement_nm": 0.12,
+      "spectral_index_eta": -0.5,
+      "sidechannel_rejection_db": -156.0,
+      "status": "DOMAIN_WALL_BOUND"
+    },
+    {
+      "sector_id": "TOPOLOGICAL-INDEX-GAMMA",
+      "sector_name": "Atiyah-Patodi-Singer Spectral Boundary",
+      "fractional_charge_e": 0.5,
+      "soliton_displacement_nm": 0.08,
+      "spectral_index_eta": 1.0,
+      "sidechannel_rejection_db": -157.2,
+      "status": "SPECTRAL_ASYMMETRY_LOCKED"
+    },
+    {
+      "sector_id": "CHIRAL-CONDENSATE-SEAL-DELTA",
+      "sector_name": "Yukawa Mass Inversion Chiral Seal",
+      "fractional_charge_e": 0.0,
+      "soliton_displacement_nm": 0.02,
+      "spectral_index_eta": 0.0,
+      "sidechannel_rejection_db": -158.0,
+      "status": "YUKAWA_INVERSION_CLAMPED"
+    }
+  ],
+  "clamp_history": [
+    {
+      "clamp_id": "JACKIW-CLAMP-A341BDEE",
+      "sector_id": "JACKIW-REBBI-ZERO-MODE-ALPHA",
+      "soliton_displacement_nm": 0.05,
+      "effective_rejection_db": -157.0,
+      "fermion_parity_fidelity": 0.99999999,
+      "status": "CLAMPED",
+      "timestamp": "2026-11-20T22:11:40.068153+00:00"
+    }
+  ]
+}

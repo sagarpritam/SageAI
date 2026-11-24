@@ -1,0 +1,63 @@
+{
+  "dao_id": "VAFA-WITTEN-DAO-01",
+  "dao_name": "Vafa-Witten S-Duality Topological Partition Function Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_vafa_witten_capital_quadrillion_usd": 1550.0,
+  "projected_annualized_yield_percent": 58.0,
+  "instanton_sheaf_convergence_percent": 99.9999,
+  "active_vafa_witten_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "VAFA-WITTEN-CORE-ALPHA",
+      "vault_name": "N=4 SYM Topological Twist Core",
+      "allocated_capital_quadrillion_usd": 530.0,
+      "projected_yield_apy_percent": 58.0,
+      "instanton_convergence": 0.999999,
+      "status": "STAKE_EXPANDED_VAFA_WITTEN"
+    },
+    {
+      "vault_id": "MODULAR-S-DUALITY-POOL",
+      "vault_name": "SL(2, Z) Modular S-Duality Orbit Pool",
+      "allocated_capital_quadrillion_usd": 370.0,
+      "projected_yield_apy_percent": 59.5,
+      "instanton_convergence": 0.999998,
+      "status": "MODULAR_ORBIT_OPTIMAL"
+    },
+    {
+      "vault_id": "EULER-CHARACTERISTIC-DEX",
+      "vault_name": "4-Manifold Euler Characteristic DEX",
+      "allocated_capital_quadrillion_usd": 340.0,
+      "projected_yield_apy_percent": 57.8,
+      "instanton_convergence": 0.999999,
+      "status": "EULER_NUMBER_SUMMED"
+    },
+    {
+      "vault_id": "INSTANTON-SHEAF-VAULT",
+      "vault_name": "Torsion-Free Instanton Sheaf Yield Vault",
+      "allocated_capital_quadrillion_usd": 310.0,
+      "projected_yield_apy_percent": 56.7,
+      "instanton_convergence": 0.999997,
+      "status": "SHEAF_MODULI_STABLE"
+    }
+  ],
+  "stake_history": [
+    {
+      "stake_id": "VAFA-STAKE-D1E2F3A4",
+      "vault_id": "VAFA-WITTEN-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_vafa_witten_capital_quadrillion_usd": 1500.0,
+      "projected_yield_apy_percent": 58.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T21:00:00.000000+00:00"
+    },
+    {
+      "stake_id": "VAFA-STAKE-4C6CA97A",
+      "vault_id": "VAFA-WITTEN-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_vafa_witten_capital_quadrillion_usd": 1550.0,
+      "projected_yield_apy_percent": 58.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T15:36:55.811355+00:00"
+    }
+  ]
+}

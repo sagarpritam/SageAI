@@ -1,0 +1,54 @@
+{
+  "dao_id": "SEN-ENTROPY-DAO-01",
+  "dao_name": "Ashoke Sen Quantum Entropy Function Extremal Microstate Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_entropy_capital_quadrillion_usd": 1410.0,
+  "projected_annualized_yield_percent": 52.0,
+  "attractor_entropy_index": 0.99999,
+  "active_entropy_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "SEN-ENTROPY-FUNCTION-CORE",
+      "vault_name": "Sen Quantum Horizon Legendre Transform Core",
+      "allocated_capital_quadrillion_usd": 420.0,
+      "projected_yield_apy_percent": 52.0,
+      "attractor_depth": 0.99999,
+      "status": "STAKE_EXPANDED_ENTROPY"
+    },
+    {
+      "vault_id": "ADS2-NEAR-HORIZON-POOL",
+      "vault_name": "AdS2 x S2 Enhanced Supergravity Pool",
+      "allocated_capital_quadrillion_usd": 340.0,
+      "projected_yield_apy_percent": 53.5,
+      "attractor_depth": 0.99998,
+      "status": "ADS2_SUPERGRAVITY_ACTIVE"
+    },
+    {
+      "vault_id": "NON-PERTURBATIVE-MICROSTATE-DEX",
+      "vault_name": "Rademacher Series Microstate Counting DEX",
+      "allocated_capital_quadrillion_usd": 330.0,
+      "projected_yield_apy_percent": 51.8,
+      "attractor_depth": 0.99999,
+      "status": "MICROSTATES_INDEXED"
+    },
+    {
+      "vault_id": "MACROSCOPIC-ATTRACTOR-YIELD-VAULT",
+      "vault_name": "Wald Noether Charge Macroscopic Yield Vault",
+      "allocated_capital_quadrillion_usd": 320.0,
+      "projected_yield_apy_percent": 50.7,
+      "attractor_depth": 0.99997,
+      "status": "WALD_CHARGE_MAXIMIZED"
+    }
+  ],
+  "stake_history": [
+    {
+      "stake_id": "SEN-STAKE-D6C8847B",
+      "vault_id": "SEN-ENTROPY-FUNCTION-CORE",
+      "staked_volume_quadrillion_usd": 60.0,
+      "total_staked_entropy_capital_quadrillion_usd": 1410.0,
+      "projected_yield_apy_percent": 52.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-20T22:11:40.078867+00:00"
+    }
+  ]
+}

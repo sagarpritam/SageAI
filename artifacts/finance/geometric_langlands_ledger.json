@@ -1,0 +1,145 @@
+{
+  "dao_id": "LANGLANDS-AUTOMORPHIC-DAO-01",
+  "dao_name": "Geometric Langlands Automorphic Hecke Eigensheaf DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_langlands_capital_quadrillion_usd": 2200.0,
+  "projected_annualized_yield_percent": 66.0,
+  "hecke_eigensheaf_convergence_percent": 99.99999,
+  "active_langlands_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "functor_type": "D-MOD-BUN_G-CATEGORICAL",
+      "staked_capital_quadrillion_usd": 980.0,
+      "projected_yield_apy_percent": 66.5,
+      "hecke_eigen_phase": "EIGENSHEAF-CONVERGED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "HECKE-EIGENSHEAF-POOL",
+      "functor_type": "HECKE-MODIFICATION-ALGEBRA",
+      "staked_capital_quadrillion_usd": 430.0,
+      "projected_yield_apy_percent": 65.8,
+      "hecke_eigen_phase": "HECKE-EIGEN-ALIGNED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "LOCAL-SYSTEMS-LOCSYS-DEX",
+      "functor_type": "QCOH-LOCSYS-SPECTRAL-SIDE",
+      "staked_capital_quadrillion_usd": 440.0,
+      "projected_yield_apy_percent": 66.2,
+      "hecke_eigen_phase": "LOCAL-SYSTEM-SEALED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "WHITTAKER-NORMALIZATION-VAULT",
+      "functor_type": "POINCARE-DUALITY-WHITTAKER",
+      "staked_capital_quadrillion_usd": 350.0,
+      "projected_yield_apy_percent": 65.5,
+      "hecke_eigen_phase": "WHITTAKER-NORMALIZED",
+      "status": "ACTIVE"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "LANGLANDS-STAKE-INIT-01",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1750.0,
+      "projected_yield_apy_percent": 66.5,
+      "status": "INITIALIZED",
+      "timestamp": "2026-11-23T22:30:00.000Z"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-86C68D1E",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1750.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:04:28.464130+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-1F5731B3",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1800.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:13:03.401932+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-3DD7EF15",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1850.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:23:38.142825+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-D16A049E",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1900.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:30:15.482149+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-72AD5113",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 1950.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:30:29.782189+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-234EED81",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 2000.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:36:26.312805+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-92574172",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 2050.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:44:28.797118+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-BA826419",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 2100.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:44:50.638172+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-C0A1F830",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 2150.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:46:06.407253+00:00"
+    },
+    {
+      "stake_id": "LANGLANDS-STAKE-D45FC397",
+      "vault_id": "LANGLANDS-AUTOMORPHIC-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_langlands_capital_quadrillion_usd": 2200.0,
+      "projected_yield_apy_percent": 66.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T17:46:51.468166+00:00"
+    }
+  ],
+  "last_updated": "2026-11-23T17:46:51.468173+00:00"
+}

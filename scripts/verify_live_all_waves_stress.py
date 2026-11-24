@@ -1820,6 +1820,77 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 45 (Opt B): Majorana Supergrid Baseload Harvest",
         ),
+        # Wave 46 (Caps 158-160 & Option B)
+        (
+            "GET",
+            "/api/seiberg-witten-monopole/monopoles",
+            None,
+            "Wave 46 (Cap 158): Seiberg-Witten Monopoles List",
+        ),
+        (
+            "POST",
+            "/api/seiberg-witten-monopole/seal-sw",
+            {
+                "monopole_id": "SW-K3-SPINC-01",
+                "spinor_rank": 4,
+                "dirac_degree": 6,
+                "moduli_chamber_depth": 8,
+                "sw_gain": 1.6,
+            },
+            "Wave 46 (Cap 158): Seiberg-Witten Monopole Invariants Seal",
+        ),
+        (
+            "GET",
+            "/api/heegaard-floer-bordered/diagrams",
+            None,
+            "Wave 46 (Cap 159): Heegaard Floer Diagrams List",
+        ),
+        (
+            "POST",
+            "/api/heegaard-floer-bordered/seal-hf",
+            {
+                "diagram_id": "HF-POINCARE-SPHERE-01",
+                "grid_rank": 4,
+                "contact_depth": 12,
+                "bordered_algebra_dim": 6,
+                "hf_gain": 1.6,
+            },
+            "Wave 46 (Cap 159): Heegaard Floer Bordered Contact Seal",
+        ),
+        (
+            "GET",
+            "/api/geometric-satake-affine/stacks",
+            None,
+            "Wave 46 (Cap 160): Geometric Satake Affine Stacks List",
+        ),
+        (
+            "POST",
+            "/api/geometric-satake-affine/seal-satake",
+            {
+                "stack_id": "SATAKE-PGL2-GR-01",
+                "group_rank": 4,
+                "strata_dimension": 12,
+                "springer_fiber_depth": 6,
+                "satake_gain": 1.6,
+            },
+            "Wave 46 (Cap 160): Geometric Satake Affine Springer Seal",
+        ),
+        (
+            "GET",
+            "/api/room-temp-diamagnetic-supergrid/arrays",
+            None,
+            "Wave 46 (Opt B): Room-Temp Diamagnetic Supergrid Arrays List",
+        ),
+        (
+            "POST",
+            "/api/room-temp-diamagnetic-supergrid/harvest-diamagnetic",
+            {
+                "array_id": "DIAMAGNETIC-LK99-ARRAY-01",
+                "meissner_field_tesla": 14.5,
+                "levitation_gain": 1.6,
+            },
+            "Wave 46 (Opt B): Diamagnetic Supergrid Baseload Harvest",
+        ),
     ]
 
 
@@ -1849,7 +1920,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-44, CAPS 1-154) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-46, CAPS 1-160) [{mode_label}]{RESET}".center(
             78
         )
     )

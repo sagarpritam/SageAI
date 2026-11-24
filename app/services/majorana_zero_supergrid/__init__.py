@@ -4,4 +4,3 @@ from app.services.majorana_zero_supergrid.majorana_zero_supergrid import (
 )
 
 __all__ = ["MajoranaZeroSupergrid", "get_majorana_zero_supergrid"]
-

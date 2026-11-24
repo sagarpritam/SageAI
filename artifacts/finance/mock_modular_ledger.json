@@ -1,0 +1,54 @@
+{
+  "dao_id": "MOCK-MODULAR-DAO-01",
+  "dao_name": "Dabholkar-Gopakumar-Murthy Non-Holomorphic Mock Modular Form Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_mock_modular_capital_quadrillion_usd": 1465.0,
+  "projected_annualized_yield_percent": 54.0,
+  "mock_shadow_convergence_percent": 99.999,
+  "active_mock_modular_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "DGM-MOCK-MODULAR-CORE",
+      "vault_name": "Dabholkar-Gopakumar-Murthy Shadow Completion Core",
+      "allocated_capital_quadrillion_usd": 445.0,
+      "projected_yield_apy_percent": 54.0,
+      "mock_shadow_convergence": 0.99999,
+      "status": "STAKE_EXPANDED_MOCK_MODULAR"
+    },
+    {
+      "vault_id": "RADEMACHER-DYON-SERIES-POOL",
+      "vault_name": "Rademacher Contour Exact Degeneracy Pool",
+      "allocated_capital_quadrillion_usd": 350.0,
+      "projected_yield_apy_percent": 55.5,
+      "mock_shadow_convergence": 0.99998,
+      "status": "RADEMACHER_SERIES_OPTIMAL"
+    },
+    {
+      "vault_id": "APPEL-LERCH-SUM-DEX",
+      "vault_name": "Appell-Lerch Theta Function Arbitrage DEX",
+      "allocated_capital_quadrillion_usd": 340.0,
+      "projected_yield_apy_percent": 53.8,
+      "mock_shadow_convergence": 0.99999,
+      "status": "APPELL_LERCH_SUMMED"
+    },
+    {
+      "vault_id": "NON-HOLOMORPHIC-HORIZON-VAULT",
+      "vault_name": "Non-Holomorphic Modular Shadow Yield Vault",
+      "allocated_capital_quadrillion_usd": 330.0,
+      "projected_yield_apy_percent": 52.7,
+      "mock_shadow_convergence": 0.99997,
+      "status": "HORIZON_SHADOW_MAXIMIZED"
+    }
+  ],
+  "stake_history": [
+    {
+      "stake_id": "MOCK-STAKE-80ED97D3",
+      "vault_id": "DGM-MOCK-MODULAR-CORE",
+      "staked_volume_quadrillion_usd": 65.0,
+      "total_staked_mock_modular_capital_quadrillion_usd": 1465.0,
+      "projected_yield_apy_percent": 54.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-20T22:32:21.469121+00:00"
+    }
+  ]
+}

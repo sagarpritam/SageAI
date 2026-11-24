@@ -1,0 +1,44 @@
+{
+  "sentinel_id": "CASIMIR-POLDER-SENTINEL-01",
+  "dispersion_force_theory": "NON_RETARDED_CASIMIR_POLDER_LIFSHITZ",
+  "dielectric_boundary_model": "POLARITONIC_DRUDE_LORENTZ_SURFACE",
+  "van_der_waals_c3_coefficient": 2.45e-48,
+  "sidechannel_leakage_rejection_db": -138.0,
+  "dispersion_audit_fidelity_percent": 99.99999,
+  "status": "CASIMIR_POLDER_DISPERSION_SENTINEL_ACTIVE",
+  "active_dispersion_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "CASIMIR-POLDER-POTENTIAL-CORE",
+      "dispersion_sector": "Atom-Surface Non-Retarded Potential U(r) ~ -C3/r3",
+      "surface_separation_nm": 1.2,
+      "dispersion_force_pico_n": 48.5,
+      "sidechannel_rejection_db": -139.5,
+      "status": "DISPERSION_POTENTIAL_PINNED"
+    },
+    {
+      "sector_id": "LIFSHITZ-DIELECTRIC-LAYER",
+      "dispersion_sector": "Lifshitz General Retarded Dielectric Dispersion Model",
+      "surface_separation_nm": 2.5,
+      "dispersion_force_pico_n": 32.0,
+      "sidechannel_rejection_db": -138.0,
+      "status": "DIELECTRIC_PERMITTIVITY_BALANCED"
+    },
+    {
+      "sector_id": "EVANESCENT-FIELD-ABSORBER",
+      "dispersion_sector": "Evanescent Vacuum Polariton Dampener",
+      "surface_separation_nm": 1.8,
+      "dispersion_force_pico_n": 41.2,
+      "sidechannel_rejection_db": -137.0,
+      "status": "EVANESCENT_MODES_QUENCHED"
+    },
+    {
+      "sector_id": "NANO-GAP-QUANTUM-LEVITATION",
+      "dispersion_sector": "Repulsive Casimir-Polder Metamaterial Barrier",
+      "surface_separation_nm": 3.0,
+      "dispersion_force_pico_n": -18.5,
+      "sidechannel_rejection_db": -140.0,
+      "status": "REPULSIVE_LEVITATION_ACTIVE"
+    }
+  ]
+}

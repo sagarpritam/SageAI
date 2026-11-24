@@ -12,6 +12,7 @@ import {
   Radar,
   ShieldAlert,
   FileCheck,
+  FileText,
   HeartPulse,
   Rss,
   Globe,
@@ -281,17 +282,19 @@ import DonaldsonThomasStudio from "@/components/DonaldsonThomasStudio";
 import FloerNovikovStudio from "@/components/FloerNovikovStudio";
 import BeilinsonDrinfeldStudio from "@/components/BeilinsonDrinfeldStudio";
 import MajoranaSupergridPowerStudio from "@/components/MajoranaSupergridPowerStudio";
-import KhovanovRozanskyStudio from "@/components/KhovanovRozanskyStudio";
-import PerverseSheafStudio from "@/components/PerverseSheafStudio";
-import TannakianMotivicStudio from "@/components/TannakianMotivicStudio";
-import PolaritonSupergridPowerStudio from "@/components/PolaritonSupergridPowerStudio";
-import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
-import BggCategoryOStudio from "@/components/BggCategoryOStudio";
-import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
-import MajoranaZeroModePowerStudio from "@/components/MajoranaZeroModePowerStudio";
+import SeibergWittenStudio from "@/components/SeibergWittenStudio";
+import HeegaardFloerStudio from "@/components/HeegaardFloerStudio";
+import GeometricSatakeAffineStudio from "@/components/GeometricSatakeAffineStudio";
+import DiamagneticSupergridPowerStudio from "@/components/DiamagneticSupergridPowerStudio";
 import MultiCloudClusterStudio from "@/components/MultiCloudClusterStudio";
 import RevOpsPipelineStudio from "@/components/RevOpsPipelineStudio";
 import RedBlueWarDrillStudio from "@/components/RedBlueWarDrillStudio";
+import SocPlaybookStudio from "@/components/SocPlaybookStudio";
+import BoardDossierStudio from "@/components/BoardDossierStudio";
+import EbpfPolicyAndSoc2Studio from "@/components/EbpfPolicyAndSoc2Studio";
+import EnterprisePlatformSuiteStudio from "@/components/EnterprisePlatformSuiteStudio";
+import SeriesAScaleStudio from "@/components/SeriesAScaleStudio";
+import GlobalScaleSyndicateStudio from "@/components/GlobalScaleSyndicateStudio";
 import {
   PLATFORM_CAPABILITIES_COUNT,
   PLATFORM_VERSION,
@@ -300,17 +303,19 @@ import {
 
 const tabs = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "global-scale-syndicate", label: "Global CTI & Series A Syndicate", icon: Globe },
+  { id: "series-a-scale", label: "Series A Scale & Sensor Mesh", icon: TrendingUp },
+  { id: "enterprise-platform-suite", label: "Enterprise Pilot & D3FEND Suite", icon: ShieldCheck },
+  { id: "ebpf-soc2-studio", label: "eBPF Policy & SOC 2 Bundle", icon: Cpu },
+  { id: "board-dossier", label: "Board Security Dossier", icon: FileText },
+  { id: "soc-playbooks", label: "SOC Playbooks & eBPF", icon: ShieldAlert },
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
-  { id: "fibonacci-anyon-braiding", label: "Fibonacci Anyon (Cap 161)", icon: Cpu },
-  { id: "bgg-category-o-shield", label: "BGG Category O (Cap 162)", icon: Layers },
-  { id: "cryogenic-flux-qubit", label: "Cryogenic Qubit (Cap 163)", icon: ShieldCheck },
-  { id: "majorana-supergrid-power", label: "Majorana Supergrid (Option B)", icon: Zap },
-  { id: "khovanov-rozansky-homology", label: "Khovanov-Rozansky (Cap 158)", icon: Orbit },
-  { id: "perverse-sheaf-deligne", label: "Perverse Sheaf (Cap 159)", icon: Layers },
-  { id: "tannakian-motivic-shield", label: "Tannakian Motivic (Cap 160)", icon: ShieldCheck },
-  { id: "polariton-bec-supergrid", label: "Polariton Supergrid (Option B)", icon: Zap },
+  { id: "seiberg-witten-monopole", label: "Seiberg-Witten (Cap 158)", icon: ShieldCheck },
+  { id: "heegaard-floer-bordered", label: "Heegaard Floer (Cap 159)", icon: Activity },
+  { id: "geometric-satake-affine", label: "Geometric Satake (Cap 160)", icon: Layers },
+  { id: "room-temp-diamagnetic-supergrid", label: "Diamagnetic Supergrid (Option B)", icon: Zap },
   { id: "donaldson-thomas-sheaf", label: "Donaldson-Thomas (Cap 155)", icon: ShieldCheck },
   { id: "floer-novikov-gradient", label: "Floer-Novikov (Cap 156)", icon: Activity },
   { id: "beilinson-drinfeld-chiral", label: "Beilinson-Drinfeld (Cap 157)", icon: GitBranch },
@@ -738,17 +743,19 @@ export default function DashboardPage() {
         {/* Tab Content */}
         <div className="min-h-[500px]">
           {activeTab === "overview" && <DashboardOverview />}
+          {activeTab === "global-scale-syndicate" && <GlobalScaleSyndicateStudio />}
+          {activeTab === "series-a-scale" && <SeriesAScaleStudio />}
+          {activeTab === "enterprise-platform-suite" && <EnterprisePlatformSuiteStudio />}
+          {activeTab === "ebpf-soc2-studio" && <EbpfPolicyAndSoc2Studio />}
+          {activeTab === "board-dossier" && <BoardDossierStudio />}
+          {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
           {activeTab === "revops-pipeline" && <RevOpsPipelineStudio />}
-          {activeTab === "fibonacci-anyon-braiding" && <FibonacciAnyonBraidingStudio />}
-          {activeTab === "bgg-category-o-shield" && <BggCategoryOStudio />}
-          {activeTab === "cryogenic-flux-qubit" && <CryogenicFluxQubitStudio />}
-          {activeTab === "majorana-supergrid-power" && <MajoranaZeroModePowerStudio />}
-          {activeTab === "khovanov-rozansky-homology" && <KhovanovRozanskyStudio />}
-          {activeTab === "perverse-sheaf-deligne" && <PerverseSheafStudio />}
-          {activeTab === "tannakian-motivic-shield" && <TannakianMotivicStudio />}
-          {activeTab === "polariton-bec-supergrid" && <PolaritonSupergridPowerStudio />}
+          {activeTab === "seiberg-witten-monopole" && <SeibergWittenStudio />}
+          {activeTab === "heegaard-floer-bordered" && <HeegaardFloerStudio />}
+          {activeTab === "geometric-satake-affine" && <GeometricSatakeAffineStudio />}
+          {activeTab === "room-temp-diamagnetic-supergrid" && <DiamagneticSupergridPowerStudio />}
           {activeTab === "donaldson-thomas-sheaf" && <DonaldsonThomasStudio />}
           {activeTab === "floer-novikov-gradient" && <FloerNovikovStudio />}
           {activeTab === "beilinson-drinfeld-chiral" && <BeilinsonDrinfeldStudio />}

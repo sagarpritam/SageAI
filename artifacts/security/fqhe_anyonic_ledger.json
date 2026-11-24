@@ -1,0 +1,43 @@
+{
+  "sentinel_id": "FQHE-ANYONIC-SENTINEL-01",
+  "filling_factor_series": "LAUGHLIN_JAIN_COMPOSITE_FERMION_NU_1_3_AND_5_2",
+  "anyonic_statistical_angle": "theta = pi / 3 (Fractional Abelian)",
+  "sidechannel_leakage_rejection_db": -148.0,
+  "topological_braid_fidelity_percent": 99.99999,
+  "status": "FQHE_ANYONIC_SENTINEL_ACTIVE",
+  "active_braid_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "LAUGHLIN-QUASIPARTICLE-CORE",
+      "braid_sector": "nu = 1/3 Fractional Charge e* = e/3 Braiding Node",
+      "filling_factor_nu": "1/3",
+      "braid_phase_radians": 1.0472,
+      "sidechannel_rejection_db": -149.5,
+      "status": "FRACTIONAL_CHARGE_CONFINED"
+    },
+    {
+      "sector_id": "MOORE-READ-NON-ABELIAN-BETA",
+      "braid_sector": "nu = 5/2 Majorana Anyon Pfaffian State Wavefunction",
+      "filling_factor_nu": "5/2",
+      "braid_phase_radians": 1.5708,
+      "sidechannel_rejection_db": -148.0,
+      "status": "NON_ABELIAN_BRAID_LOCKED"
+    },
+    {
+      "sector_id": "CHIRAL-EDGE-LUTTINGER-LAYER",
+      "braid_sector": "Dissipationless 1D Chiral Edge Luttinger Channel",
+      "filling_factor_nu": "1",
+      "braid_phase_radians": 3.14159,
+      "sidechannel_rejection_db": -147.0,
+      "status": "EDGE_TRANSPORT_ISOLATED"
+    },
+    {
+      "sector_id": "COMPOSITE-FERMION-FLUX-TRAP",
+      "braid_sector": "2 Flux Quanta Attached Cherenkov Chern-Simons Trap",
+      "filling_factor_nu": "2/5",
+      "braid_phase_radians": 1.2566,
+      "sidechannel_rejection_db": -150.0,
+      "status": "CHERN_SIMONS_FLUX_PINNED"
+    }
+  ]
+}

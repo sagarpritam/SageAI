@@ -1,0 +1,65 @@
+{
+  "bus_id": "HAAG-KASTLER-BUS-01",
+  "bus_name": "Haag-Kastler Axiomatic Algebraic Quantum Field Theory Net Interconnect Bus",
+  "status": "OPERATIONAL",
+  "optical_bus_throughput_pbps": 6200.0,
+  "microcausality_fidelity": 0.99999999,
+  "causal_split_gap_gev": 1.25,
+  "superluminal_dissipation_nw": 0.0,
+  "channels": [
+    {
+      "channel_id": "HAAG-CAUSAL-DIAMOND-ALPHA",
+      "channel_name": "Double Cone Causal Diamond Waveguide",
+      "diamond_volume_m3": 0.0125,
+      "algebra_type": "TYPE_III_1_FACTOR",
+      "channel_throughput_pbps": 1550.0,
+      "split_property_ratio": 1.0,
+      "status": "MICROCAUSALITY_ENFORCED"
+    },
+    {
+      "channel_id": "VON-NEUMANN-ALGEBRA-BETA",
+      "channel_name": "Local Observable Hyperfinite Factor",
+      "diamond_volume_m3": 0.025,
+      "algebra_type": "TYPE_III_1_FACTOR",
+      "channel_throughput_pbps": 1550.0,
+      "split_property_ratio": 1.0,
+      "status": "HAAG_DUALITY_ACTIVE"
+    },
+    {
+      "channel_id": "SPLIT-INCLUSION-GAMMA",
+      "channel_name": "Type I Factor Product State Bridge",
+      "diamond_volume_m3": 0.0375,
+      "algebra_type": "TYPE_I_FACTOR_SPLIT",
+      "channel_throughput_pbps": 1550.0,
+      "split_property_ratio": 1.0,
+      "status": "STATISTICAL_INDEPENDENCE_SECURED"
+    },
+    {
+      "channel_id": "BISOGNANO-WICHMANN-DELTA",
+      "channel_name": "Modular Wedge Reeh-Schlieder Channel",
+      "diamond_volume_m3": 0.05,
+      "algebra_type": "MODULAR_WEDGE_FACTOR",
+      "channel_throughput_pbps": 1550.0,
+      "split_property_ratio": 1.0,
+      "status": "MODULAR_BOOST_OPTIMAL"
+    }
+  ],
+  "modulation_history": [
+    {
+      "modulation_id": "HAAG-MOD-C1D2E3F4",
+      "channel_id": "HAAG-CAUSAL-DIAMOND-ALPHA",
+      "diamond_volume_m3": 0.0125,
+      "microcausality_fidelity": 0.99999999,
+      "status": "MODULATED",
+      "timestamp": "2026-11-23T21:15:00.000000+00:00"
+    },
+    {
+      "modulation_id": "HAAG-MOD-55A5A103",
+      "channel_id": "HAAG-CAUSAL-DIAMOND-ALPHA",
+      "diamond_volume_m3": 0.0125,
+      "microcausality_fidelity": 0.99999999,
+      "status": "MODULATED",
+      "timestamp": "2026-11-23T15:50:37.396165+00:00"
+    }
+  ]
+}

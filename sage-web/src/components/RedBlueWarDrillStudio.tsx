@@ -140,8 +140,8 @@ export default function RedBlueWarDrillStudio() {
             setActiveRecord(hData.history[0]);
           }
         }
-      } catch (err) {
-        console.error("Failed to load war drill data:", err);
+      } catch (err: unknown) {
+        setNotification(err instanceof Error ? err.message : "Failed to load war drill data.");
       } finally {
         setLoading(false);
       }
@@ -185,9 +185,8 @@ export default function RedBlueWarDrillStudio() {
       setNotification(
         `Drill ${drillResult.drill_id} completed: 100% containment, WAF clamped at ${drillResult.mean_waf_clamp_latency_ms.toFixed(3)} ms (Target <= 0.20 ms), AST AutoFix verified.`
       );
-    } catch (err) {
-      console.error("Error launching drill:", err);
-      setNotification("Failed to complete drill. Please check logs.");
+    } catch (err: unknown) {
+      setNotification(err instanceof Error ? err.message : "Failed to complete drill. Please check logs.");
     } finally {
       setIsRunning(false);
     }

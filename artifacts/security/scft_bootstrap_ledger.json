@@ -1,0 +1,77 @@
+{
+  "posture": {
+    "sentinel_id": "SCFT-BOOTSTRAP-01",
+    "spacetime_dimension": 4,
+    "supersymmetry_extended": "N_EQUALS_2_SCFT",
+    "unitary_central_charge_c": 0.916667,
+    "conformal_anomaly_a": 0.583333,
+    "semidefinite_solver": "SDPB_ARBITRARY_PRECISION",
+    "sidechannel_leakage_rejection_db": -125.0,
+    "bootstrap_crossing_audit_fidelity_percent": 99.99999,
+    "status": "CONFORMAL_CROSSING_BOOTSTRAP_OPTIMAL",
+    "active_bootstrap_sectors": 4
+  },
+  "sectors": [
+    {
+      "sector_id": "MINIMAL-ARGYRES-DOUGLAS",
+      "scft_class": "Rank-1 (A1, A2) Argyres-Douglas Non-Lagrangian",
+      "chiral_algebra": "Vir_2_5_MINIMAL_MODEL",
+      "central_charge_c": 0.5,
+      "flavor_central_charge_k": 0.0,
+      "status": "BOOTSTRAP_BOUND_CONVERGED"
+    },
+    {
+      "sector_id": "SU2-NF4-SEIBERG-WITTEN",
+      "scft_class": "SU(2) with Nf=4 Fundamental Hypermultiplets",
+      "chiral_algebra": "SO(8)_LEVEL_MINUS_2_AFFINE",
+      "central_charge_c": 1.25,
+      "flavor_central_charge_k": 4.0,
+      "status": "S_DUALITY_CROSSING_SATISFIED"
+    },
+    {
+      "sector_id": "SCHUR-INDEX-CHIRAL-ALGEBRA",
+      "scft_class": "2D Chiral Vertex Operator Algebra (VOA)",
+      "chiral_algebra": "W_ALGEBRA_NILPOTENT_REDUCTION",
+      "central_charge_c": -1.0,
+      "flavor_central_charge_k": 3.0,
+      "status": "SCHUR_OPERATOR_CONFINED"
+    },
+    {
+      "sector_id": "CROSSING-SYMMETRY-SDPB",
+      "scft_class": "Semidefinite Functional Bound on OPE Coefficients",
+      "chiral_algebra": "SUPERCONFORMAL_BLOCK_EXPANSION",
+      "central_charge_c": 0.916667,
+      "flavor_central_charge_k": 2.666667,
+      "status": "UNITARITY_EXTREMAL_LOCKED"
+    }
+  ],
+  "solves": [
+    {
+      "solve_id": "SCFT-SOLVE-98E44047",
+      "sector_id": "MINIMAL-ARGYRES-DOUGLAS",
+      "polynomial_vector_derivative_order": 24,
+      "primal_objective_error": 1.12e-28,
+      "dual_objective_error": 8.94e-29,
+      "timestamp": "2026-11-24T15:18:03.740705+00:00",
+      "status": "CROSSING_BOUNDS_EXTREMAL_VERIFIED"
+    },
+    {
+      "solve_id": "SCFT-SOLVE-A7911050",
+      "sector_id": "MINIMAL-ARGYRES-DOUGLAS",
+      "polynomial_vector_derivative_order": 24,
+      "primal_objective_error": 1.12e-28,
+      "dual_objective_error": 8.94e-29,
+      "timestamp": "2026-11-19T20:10:21.979025+00:00",
+      "status": "CROSSING_BOUNDS_EXTREMAL_VERIFIED"
+    },
+    {
+      "solve_id": "SCFT-SOLVE-INITIAL-01",
+      "sector_id": "MINIMAL-ARGYRES-DOUGLAS",
+      "polynomial_vector_derivative_order": 24,
+      "primal_objective_error": 1.12e-28,
+      "dual_objective_error": 8.94e-29,
+      "timestamp": "2026-11-20T01:35:00Z",
+      "status": "CROSSING_BOUNDS_EXTREMAL_VERIFIED"
+    }
+  ]
+}

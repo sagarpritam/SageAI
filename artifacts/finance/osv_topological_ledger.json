@@ -1,0 +1,63 @@
+{
+  "dao_id": "OSV-TOPOLOGICAL-DAO-01",
+  "dao_name": "Ooguri-Strominger-Vafa Topological String Partition Function Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_osv_capital_quadrillion_usd": 1500.0,
+  "projected_annualized_yield_percent": 56.0,
+  "topological_string_convergence_percent": 99.999,
+  "active_osv_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "OSV-PARTITION-FUNCTION-CORE",
+      "vault_name": "OSV Black Hole Microstate Partition Core",
+      "allocated_capital_quadrillion_usd": 500.0,
+      "projected_yield_apy_percent": 56.0,
+      "topological_string_convergence": 0.99999,
+      "status": "STAKE_EXPANDED_OSV_STRING"
+    },
+    {
+      "vault_id": "CALABI-YAU-FREE-ENERGY-POOL",
+      "vault_name": "Calabi-Yau Threefold Topological Free Energy Pool",
+      "allocated_capital_quadrillion_usd": 360.0,
+      "projected_yield_apy_percent": 57.5,
+      "topological_string_convergence": 0.99998,
+      "status": "FREE_ENERGY_MAXIMIZED"
+    },
+    {
+      "vault_id": "BPS-MACROSCOPIC-DEX",
+      "vault_name": "BPS Macroscopic Attractor Black Hole DEX",
+      "allocated_capital_quadrillion_usd": 330.0,
+      "projected_yield_apy_percent": 55.8,
+      "topological_string_convergence": 0.99999,
+      "status": "BPS_ENTROPY_CONVERGED"
+    },
+    {
+      "vault_id": "NON-PERTURBATIVE-D-BRANE-VAULT",
+      "vault_name": "Non-Perturbative D-Brane Instantonic Yield Vault",
+      "allocated_capital_quadrillion_usd": 310.0,
+      "projected_yield_apy_percent": 54.7,
+      "topological_string_convergence": 0.99997,
+      "status": "D_BRANE_INSTANTON_STABLE"
+    }
+  ],
+  "stake_history": [
+    {
+      "stake_id": "OSV-STAKE-C1D2E3F4",
+      "vault_id": "OSV-PARTITION-FUNCTION-CORE",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_osv_capital_quadrillion_usd": 1450.0,
+      "projected_yield_apy_percent": 56.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T20:00:00.000000+00:00"
+    },
+    {
+      "stake_id": "OSV-STAKE-C4428570",
+      "vault_id": "OSV-PARTITION-FUNCTION-CORE",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_osv_capital_quadrillion_usd": 1500.0,
+      "projected_yield_apy_percent": 56.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T15:15:41.493749+00:00"
+    }
+  ]
+}

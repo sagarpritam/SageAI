@@ -1,0 +1,64 @@
+{
+  "sentinel_id": "APS-ETA-SENTINEL-01",
+  "sentinel_name": "Atiyah-Patodi-Singer Eta-Invariant Spectral Flow Sentinel",
+  "status": "ARMED_AND_SPECTRAL",
+  "boundary_anomaly_rejection_db": -168.0,
+  "aps_index_stability": 0.999999999999,
+  "spectral_flow_count": 48,
+  "active_aps_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "APS-SPECTRAL-CORE-ALPHA",
+      "boundary_condition": "P_PLUS-ATIYAH-PATODI-SINGER",
+      "eta_zero_value": 0.7071,
+      "spectral_flow": 12,
+      "rejection_db": -168.0,
+      "status": "APS_ASYMMETRY_CLAMPED"
+    },
+    {
+      "sector_id": "BOUNDARY-ANOMALY-BETA",
+      "boundary_condition": "PARITY-ANOMALY-CANCELLATION",
+      "eta_zero_value": -0.25,
+      "spectral_flow": 12,
+      "rejection_db": -168.5,
+      "status": "ARMED"
+    },
+    {
+      "sector_id": "SPECTRAL-FLOW-GAMMA",
+      "boundary_condition": "ZERO-MODE-CROSSING-CHAMBER",
+      "eta_zero_value": 0.75,
+      "spectral_flow": 12,
+      "rejection_db": -169.0,
+      "status": "ARMED"
+    },
+    {
+      "sector_id": "GRAVITATIONAL-INSTANTON-DELTA",
+      "boundary_condition": "EGUCHI-HANSON-ORBIFOLD-S3",
+      "eta_zero_value": 0.125,
+      "spectral_flow": 12,
+      "rejection_db": -168.2,
+      "status": "ARMED"
+    }
+  ],
+  "clamps": [
+    {
+      "clamp_id": "APS-CLAMP-INIT-01",
+      "sector_id": "APS-SPECTRAL-CORE-ALPHA",
+      "spectral_bias_rad": 0.7071,
+      "effective_rejection_db": -168.0,
+      "aps_stability": 0.999999999999,
+      "status": "INITIALIZED",
+      "timestamp": "2026-11-23T21:40:00.000Z"
+    },
+    {
+      "clamp_id": "APS-CLAMP-A062B6B1",
+      "sector_id": "APS-SPECTRAL-CORE-ALPHA",
+      "spectral_bias_rad": 0.7071,
+      "effective_rejection_db": -168.0,
+      "aps_stability": 0.999999999999,
+      "status": "CLAMPED",
+      "timestamp": "2026-11-23T16:13:51.993657+00:00"
+    }
+  ],
+  "last_updated": "2026-11-23T16:13:51.993663+00:00"
+}

@@ -1,0 +1,43 @@
+{
+  "dao_id": "HAWKING-EVAPORATION-DAO-01",
+  "evaporation_rate_equation": "DM_DT_EQ_MINUS_HBAR_C4_OVER_15360_PI_G2_M2",
+  "hawking_temperature_regime": "T_H_EQ_HBAR_C3_OVER_8_PI_G_M_KB",
+  "total_staked_evaporation_capital_quadrillion_usd": 1100.0,
+  "projected_annualized_yield_percent": 42.0,
+  "status": "HAWKING_EVAPORATION_YIELD_OPTIMAL",
+  "active_evaporation_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "HAWKING-TEMPERATURE-CORE",
+      "evaporation_vault": "Horizon Quantum Thermal Emission Tranche",
+      "staked_capital_quadrillion_usd": 275.0,
+      "hawking_temperature_nanokelvin": 60.5,
+      "accrued_evaporation_yield_apy": 43.5,
+      "status": "HAWKING_EMISSION_ACTIVE"
+    },
+    {
+      "vault_id": "PAGE-TIME-ENTANGLEMENT-POOL",
+      "evaporation_vault": "Page Curve Mutual Information Recovery Pool",
+      "staked_capital_quadrillion_usd": 275.0,
+      "hawking_temperature_nanokelvin": 58.2,
+      "accrued_evaporation_yield_apy": 42.0,
+      "status": "PAGE_CURVE_HARMONIZED"
+    },
+    {
+      "vault_id": "BLACK-HOLE-MASS-EVAPORATION-DEX",
+      "evaporation_vault": "Mass-to-Energy Conversion Radiative DEX",
+      "staked_capital_quadrillion_usd": 275.0,
+      "hawking_temperature_nanokelvin": 62.0,
+      "accrued_evaporation_yield_apy": 41.0,
+      "status": "EVAPORATION_YIELD_OPTIMAL"
+    },
+    {
+      "vault_id": "UNRUH-ACCELERATION-BOND-VAULT",
+      "evaporation_vault": "Rindler Horizon Thermality Liquidity Vault",
+      "staked_capital_quadrillion_usd": 275.0,
+      "hawking_temperature_nanokelvin": 59.8,
+      "accrued_evaporation_yield_apy": 41.5,
+      "status": "UNRUH_BOND_YIELD_LOCKED"
+    }
+  ]
+}

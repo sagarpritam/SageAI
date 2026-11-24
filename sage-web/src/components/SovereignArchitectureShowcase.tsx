@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: "Waves 27–46 • Current",
     range: "Capabilities 101–160 + Option B",
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Categorified Khovanov-Rozansky Homology, Perverse Sheaves & Deligne-Lusztig Characters, Tannakian Motivic Shields & Planetary Exciton-Polariton Supergrid.",
+    detail: "Seiberg-Witten Monopole Invariants, Heegaard Floer Bordered Contact Firewalls, Geometric Satake Affine Springer Shields & Planetary Room-Temperature LK-99 Diamagnetic Supergrid.",
   },
 ];
 

@@ -1,0 +1,66 @@
+{
+  "bus_id": "KITAEV-HONEYCOMB-BUS-01",
+  "bus_name": "Kitaev Honeycomb Toric Spin-Liquid Optical Interconnect Bus",
+  "status": "OPERATIONAL",
+  "exchange_coupling_j": 1.0,
+  "vortex_flux_gap_delta": 0.26,
+  "optical_bus_throughput_pbps": 6000.0,
+  "itinerant_majorana_fidelity": 0.99999999,
+  "z2_flux_pinning_stability": 0.999999999,
+  "channels": [
+    {
+      "channel_id": "KITAEV-DIRAC-CONE-ALPHA",
+      "channel_name": "Gapless Majorana Dirac Cone Waveguide",
+      "exchange_ratio_jx_jy_jz": "1:1:1",
+      "flux_bias_rad": 0.5236,
+      "channel_throughput_pbps": 1500.0,
+      "itinerant_coherence_ratio": 1.0,
+      "status": "DIRAC_CONE_PINNED"
+    },
+    {
+      "channel_id": "Z2-VORTEX-FLUX-BETA",
+      "channel_name": "Static Z2 Plaquette Flux Sector",
+      "exchange_ratio_jx_jy_jz": "1:1:1",
+      "flux_bias_rad": 1.0472,
+      "channel_throughput_pbps": 1500.0,
+      "itinerant_coherence_ratio": 1.0,
+      "status": "Z2_FLUX_ISOLATED"
+    },
+    {
+      "channel_id": "MAJORANA-ITINERANT-GAMMA",
+      "channel_name": "Itinerant Majorana Dispersive Channel",
+      "exchange_ratio_jx_jy_jz": "1:1:1",
+      "flux_bias_rad": 1.5708,
+      "channel_throughput_pbps": 1500.0,
+      "itinerant_coherence_ratio": 1.0,
+      "status": "MAJORANA_DISPERSION_OPTIMAL"
+    },
+    {
+      "channel_id": "CHIRAL-GAPLESS-EDGE-DELTA",
+      "channel_name": "Broken Time-Reversal Chiral Edge Mode",
+      "exchange_ratio_jx_jy_jz": "1:1:1.5",
+      "flux_bias_rad": 2.0944,
+      "channel_throughput_pbps": 1500.0,
+      "itinerant_coherence_ratio": 1.0,
+      "status": "CHIRAL_EDGE_ACTIVE"
+    }
+  ],
+  "modulation_history": [
+    {
+      "modulation_id": "KITAEV-MOD-B1C2D3E4",
+      "channel_id": "KITAEV-DIRAC-CONE-ALPHA",
+      "flux_bias_rad": 0.5236,
+      "itinerant_majorana_fidelity": 0.99999999,
+      "status": "MODULATED",
+      "timestamp": "2026-11-23T21:00:00.000000+00:00"
+    },
+    {
+      "modulation_id": "KITAEV-MOD-7CD5D8C7",
+      "channel_id": "KITAEV-DIRAC-CONE-ALPHA",
+      "flux_bias_rad": 0.5236,
+      "itinerant_majorana_fidelity": 0.99999999,
+      "status": "MODULATED",
+      "timestamp": "2026-11-23T15:36:55.769791+00:00"
+    }
+  ]
+}

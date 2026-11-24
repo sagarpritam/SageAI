@@ -1,0 +1,63 @@
+{
+  "bus_id": "LSM-SPINON-BUS-01",
+  "bus_name": "Lieb-Schultz-Mattis Fractionalized Spinon Interconnect Bus",
+  "status": "OPERATIONAL",
+  "optical_bus_throughput_pbps": 5400.0,
+  "spinon_fermi_velocity_m_s": 1420000.0,
+  "topological_luttinger_parameter_k": 1.0,
+  "spin_charge_separation_fidelity": 0.9999999,
+  "fractional_excitation_fidelity": 0.99999995,
+  "channels": [
+    {
+      "channel_id": "LSM-SPINON-EXCITATION-ALPHA",
+      "channel_name": "LSM Fractionalized Spinon Chain Mode",
+      "spin_quantum_number": 0.5,
+      "spinon_momentum_k_rad": 1.5708,
+      "fermi_velocity_m_s": 1423562.0,
+      "channel_throughput_pbps": 1350.0,
+      "luttinger_parameter_k": 1.0,
+      "status": "SPINON_MOMENTUM_TUNED"
+    },
+    {
+      "channel_id": "HOLON-SPINON-SEPARATION-BETA",
+      "channel_name": "Spin-Charge Separation Waveguide Mode",
+      "spin_quantum_number": 0.5,
+      "spinon_momentum_k_rad": 3.1416,
+      "fermi_velocity_m_s": 1450000.0,
+      "channel_throughput_pbps": 1350.0,
+      "luttinger_parameter_k": 0.985,
+      "status": "SPIN_CHARGE_DECOUPLED"
+    },
+    {
+      "channel_id": "TOPOLOGICAL-ENTANGLEMENT-GAMMA",
+      "channel_name": "Entanglement Entropy Gapless Branch",
+      "spin_quantum_number": 0.5,
+      "spinon_momentum_k_rad": 0.7854,
+      "fermi_velocity_m_s": 1390000.0,
+      "channel_throughput_pbps": 1350.0,
+      "luttinger_parameter_k": 1.015,
+      "status": "GAPLESS_ENTANGLEMENT_BRANCH"
+    },
+    {
+      "channel_id": "DIMERIZED-VALENCE-BOND-DELTA",
+      "channel_name": "Valence Bond Solid (VBS) Resonating Core",
+      "spin_quantum_number": 0.5,
+      "spinon_momentum_k_rad": 2.3562,
+      "fermi_velocity_m_s": 1410000.0,
+      "channel_throughput_pbps": 1350.0,
+      "luttinger_parameter_k": 0.995,
+      "status": "RESONATING_VBS_LOCKED"
+    }
+  ],
+  "modulation_history": [
+    {
+      "modulation_id": "LSM-MOD-F2055F0F",
+      "channel_id": "LSM-SPINON-EXCITATION-ALPHA",
+      "spinon_momentum_k_rad": 1.5708,
+      "adjusted_fermi_velocity_m_s": 1423562.0,
+      "excitation_fidelity": 0.99999995,
+      "status": "MODULATED",
+      "timestamp": "2026-11-20T22:11:40.053873+00:00"
+    }
+  ]
+}

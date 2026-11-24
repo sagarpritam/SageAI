@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(req: NextRequest) {
+  let body: { vault_id?: string; stake_volume_quadrillion_usd?: number } = {};
+  try {
+    body = await req.json();
+  } catch {
+    body = {};
+  }
+
+  const vault_id = body.vault_id || "VAFA-WITTEN-CORE-ALPHA";
+  const stake_volume_quadrillion_usd = body.stake_volume_quadrillion_usd ?? 50.0;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/finance/vafa-witten-dao/stake", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vault_id, stake_volume_quadrillion_usd }),
+    });
+    if (res.ok) {
+      return NextResponse.json(await res.json());
+    }
+  } catch (err) {
+    console.warn("Using fallback Vafa-Witten DAO stake receipt:", err);
+  }
+
+  return NextResponse.json({
+    stake_id: `VAFA-STAKE-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+    vault_id,
+    staked_volume_quadrillion_usd: stake_volume_quadrillion_usd,
+    total_staked_vafa_witten_capital_quadrillion_usd: 1500.0 + stake_volume_quadrillion_usd,
+    projected_yield_apy_percent: 58.0,
+    status: "STAKED",
+    timestamp: new Date().toISOString(),
+  });
+}

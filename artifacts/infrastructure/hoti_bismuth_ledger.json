@@ -1,0 +1,76 @@
+{
+  "telemetry": {
+    "backbone_id": "HOTI-BISMUTH-HINGE-01",
+    "topological_order": "SECOND_ORDER_HOTI_D2",
+    "crystal_phase": "ALPHA_BISMUTH_RHOMBOHEDRAL",
+    "spatial_symmetry_protection": "INVERSION_I_AND_C3_ROTATION",
+    "fractional_corner_charge_e": 0.5,
+    "network_throughput_petabits_per_sec": 2600.0,
+    "corner_state_localization_fidelity_percent": 99.99999,
+    "status": "HOTI_CORNER_HINGE_STREAMING_OPTIMAL",
+    "active_hoti_channels": 4
+  },
+  "channels": [
+    {
+      "channel_id": "BISMUTH-HINGE-01",
+      "hoti_manifold": "1D Chiral Bismuth Hinge State",
+      "hinge_decay_length_angstrom": 12.5,
+      "quantized_quadrupole_qxy": 0.5,
+      "optical_channel_throughput_pbps": 650.0,
+      "status": "CORNER_MODE_TUNED_COHERENT"
+    },
+    {
+      "channel_id": "BI4BR4-CORNER-02",
+      "hoti_manifold": "0D Bi4Br4 Fractionalized Corner Mode",
+      "hinge_decay_length_angstrom": 8.4,
+      "quantized_quadrupole_qxy": 0.5,
+      "optical_channel_throughput_pbps": 650.0,
+      "status": "CORNER_STATE_LOCALIZED"
+    },
+    {
+      "channel_id": "QUADRUPOLE-FRACTIONAL-03",
+      "hoti_manifold": "Benalcazar-Bernevig-Hughes (BBH) Quantized Quadrupole",
+      "hinge_decay_length_angstrom": 10.2,
+      "quantized_quadrupole_qxy": 0.5,
+      "optical_channel_throughput_pbps": 650.0,
+      "status": "QUADRUPOLE_TOPOLOGY_LOCKED"
+    },
+    {
+      "channel_id": "OCTUPOLE-3D-HOTI-04",
+      "hoti_manifold": "3D Octupolar Higher-Order Insulator",
+      "hinge_decay_length_angstrom": 14.1,
+      "quantized_quadrupole_qxy": 0.5,
+      "optical_channel_throughput_pbps": 650.0,
+      "status": "OCTUPOLE_CORNER_COHERENT"
+    }
+  ],
+  "tunings": [
+    {
+      "tuning_id": "HOTI-TUNE-CA131BB8",
+      "channel_id": "BISMUTH-HINGE-01",
+      "hinge_bias_potential_mv": 15.0,
+      "corner_confinement_ratio": 0.999999,
+      "optical_phase_shift_rad": 1.5705,
+      "timestamp": "2026-11-24T15:13:41.958772+00:00",
+      "status": "CORNER_MODE_TUNED_LOCKED"
+    },
+    {
+      "tuning_id": "HOTI-TUNE-9A67F31A",
+      "channel_id": "BISMUTH-HINGE-01",
+      "hinge_bias_potential_mv": 15.0,
+      "corner_confinement_ratio": 0.999999,
+      "optical_phase_shift_rad": 1.5705,
+      "timestamp": "2026-11-19T20:10:21.977339+00:00",
+      "status": "CORNER_MODE_TUNED_LOCKED"
+    },
+    {
+      "tuning_id": "HOTI-TUNE-INITIAL-01",
+      "channel_id": "BISMUTH-HINGE-01",
+      "hinge_bias_potential_mv": 15.0,
+      "corner_confinement_ratio": 0.999999,
+      "optical_phase_shift_rad": 1.5708,
+      "timestamp": "2026-11-20T01:35:00Z",
+      "status": "CORNER_MODE_TUNED_LOCKED"
+    }
+  ]
+}

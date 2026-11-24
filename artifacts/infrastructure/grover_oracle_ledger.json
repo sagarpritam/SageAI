@@ -1,0 +1,43 @@
+{
+  "accelerator_id": "GROVER-ORACLE-ACCELERATOR-01",
+  "database_scale_petabytes": 5000.0,
+  "search_speedup_factor": "O(sqrt(N)) Quadratic Amplitude Amplification",
+  "optical_bus_throughput_pbps": 4200.0,
+  "grover_oracle_fidelity_percent": 99.99999,
+  "status": "GROVER_ORACLE_INDEXING_ACTIVE",
+  "active_oracle_channels": 4,
+  "channels": [
+    {
+      "channel_id": "GROVER-ORACLE-ALPHA",
+      "oracle_operation": "Unstructured DB Inversion Oracle U_omega = I - 2|omega><omega|",
+      "target_space_dimension_n": "2^64",
+      "optimal_grover_iterations": 14.2,
+      "optical_channel_throughput_pbps": 1050.0,
+      "status": "ORACLE_PHASE_INVERSION_LOCKED"
+    },
+    {
+      "channel_id": "DIFFUSION-OPERATOR-BETA",
+      "oracle_operation": "Uniform Amplitude Reflection Diffusion Operator 2|s><s| - I",
+      "target_space_dimension_n": "2^64",
+      "optimal_grover_iterations": 16.8,
+      "optical_channel_throughput_pbps": 1050.0,
+      "status": "DIFFUSION_REFLECTION_OPTIMAL"
+    },
+    {
+      "channel_id": "AMPLIFICATION-LOOP-GAMMA",
+      "oracle_operation": "Multi-Target Amplitude Amplification Feedback Engine",
+      "target_space_dimension_n": "2^64",
+      "optimal_grover_iterations": 18.5,
+      "optical_channel_throughput_pbps": 1050.0,
+      "status": "AMPLITUDE_MAXIMIZED"
+    },
+    {
+      "channel_id": "QUANTUM-INDEX-DELTA",
+      "oracle_operation": "Non-Relational Petabyte Key-Value Index Lookahead",
+      "target_space_dimension_n": "2^64",
+      "optimal_grover_iterations": 12.4,
+      "optical_channel_throughput_pbps": 1050.0,
+      "status": "INDEX_SEARCH_CONVERGED"
+    }
+  ]
+}

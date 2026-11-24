@@ -1478,73 +1478,72 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     expect(Number(majBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     // Wave 46 studios (Caps 158-160 & Option B) return 200 deterministically offline
-    const krList = await request.get("/api/khovanov-rozansky-homology/complexes");
-    expect(krList.status()).toBe(200);
-    const krSim = await request.post("/api/khovanov-rozansky-homology/seal-rozansky", {
+    const swList = await request.get("/api/seiberg-witten-monopole/monopoles");
+    expect(swList.status()).toBe(200);
+    const swSim = await request.post("/api/seiberg-witten-monopole/seal-sw", {
       data: {
-        complex_id: "KR-GL2-HOPF-01",
-        lie_algebra_n: 3,
-        crossing_number: 6,
-        filtration_depth: 8,
-        kr_gain: 1.6,
+        monopole_id: "SW-K3-SPINC-01",
+        spinor_rank: 4,
+        dirac_degree: 6,
+        moduli_chamber_depth: 8,
+        sw_gain: 1.6,
       },
     });
-    expect(krSim.status()).toBe(200);
-    expect(((await krSim.json()) as { status?: string }).status).toBe(
-      "KHOVANOV_ROZANSKY_SEALED"
+    expect(swSim.status()).toBe(200);
+    expect(((await swSim.json()) as { status?: string }).status).toBe(
+      "SEIBERG_WITTEN_SEALED"
     );
 
-    const psList = await request.get("/api/perverse-sheaf-deligne/strata");
-    expect(psList.status()).toBe(200);
-    const psSim = await request.post("/api/perverse-sheaf-deligne/seal-perverse", {
+    const hfList = await request.get("/api/heegaard-floer-bordered/diagrams");
+    expect(hfList.status()).toBe(200);
+    const hfSim = await request.post("/api/heegaard-floer-bordered/seal-hf", {
       data: {
-        stratum_id: "BBDG-SCHUBERT-STRATA-01",
-        variety_dimension: 6,
-        strata_depth: 8,
-        frobenius_weight: 4,
-        perverse_gain: 1.6,
+        diagram_id: "HF-POINCARE-SPHERE-01",
+        grid_rank: 4,
+        contact_depth: 12,
+        bordered_algebra_dim: 6,
+        hf_gain: 1.6,
       },
     });
-    expect(psSim.status()).toBe(200);
-    expect(((await psSim.json()) as { status?: string }).status).toBe(
-      "PERVERSE_SHEAF_SEALED"
+    expect(hfSim.status()).toBe(200);
+    expect(((await hfSim.json()) as { status?: string }).status).toBe(
+      "HEEGAARD_FLOER_SEALED"
     );
 
-    const tmList = await request.get("/api/tannakian-motivic-shield/categories");
-    expect(tmList.status()).toBe(200);
-    const tmSim = await request.post("/api/tannakian-motivic-shield/seal-tannakian", {
+    const satList = await request.get("/api/geometric-satake-affine/stacks");
+    expect(satList.status()).toBe(200);
+    const satSim = await request.post("/api/geometric-satake-affine/seal-satake", {
       data: {
-        category_id: "TANNAKA-MOTIVE-NUM-01",
-        tannakian_rank: 4,
-        period_dimension: 8,
-        hodge_weight: 2,
-        tannakian_gain: 1.6,
+        stack_id: "SATAKE-PGL2-GR-01",
+        group_rank: 4,
+        strata_dimension: 12,
+        springer_fiber_depth: 6,
+        satake_gain: 1.6,
       },
     });
-    expect(tmSim.status()).toBe(200);
-    expect(((await tmSim.json()) as { status?: string }).status).toBe(
-      "TANNAKIAN_MOTIVIC_SEALED"
+    expect(satSim.status()).toBe(200);
+    expect(((await satSim.json()) as { status?: string }).status).toBe(
+      "GEOMETRIC_SATAKE_SEALED"
     );
 
-    const polList = await request.get("/api/polariton-bec-supergrid/arrays");
-    expect(polList.status()).toBe(200);
-    const polSim = await request.post("/api/polariton-bec-supergrid/harvest-polariton", {
+    const diamagList = await request.get("/api/room-temp-diamagnetic-supergrid/arrays");
+    expect(diamagList.status()).toBe(200);
+    const diamagSim = await request.post("/api/room-temp-diamagnetic-supergrid/harvest-diamagnetic", {
       data: {
-        array_id: "POLARITON-BEC-ARRAY-01",
-        condensate_density: 4.8e14,
-        detuning_mev: 0.0,
-        pump_power_mw: 350.0,
+        array_id: "DIAMAGNETIC-LK99-ARRAY-01",
+        meissner_field_tesla: 14.5,
+        levitation_gain: 1.6,
       },
     });
-    expect(polSim.status()).toBe(200);
-    const polBody = (await polSim.json()) as {
+    expect(diamagSim.status()).toBe(200);
+    const diamagBody = (await diamagSim.json()) as {
       status?: string;
       zero_fossil_carbon?: boolean;
-      net_power_output_gw?: number;
+      net_grid_output_gw?: number;
     };
-    expect(polBody.status).toBe("POLARITON_SUPERGRID_HARVESTED");
-    expect(polBody.zero_fossil_carbon).toBe(true);
-    expect(Number(polBody.net_power_output_gw)).toBeGreaterThan(300.0);
+    expect(diamagBody.status).toBe("DIAMAGNETIC_SUPERGRID_OPTIMAL");
+    expect(diamagBody.zero_fossil_carbon).toBe(true);
+    expect(Number(diamagBody.net_grid_output_gw)).toBeGreaterThan(300.0);
 
     expect(Date.now() - startMs).toBeLessThan(10000);
   });

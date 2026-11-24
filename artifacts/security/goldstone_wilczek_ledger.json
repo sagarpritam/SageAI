@@ -1,0 +1,57 @@
+{
+  "sentinel_id": "GOLDSTONE-WILCZEK-SENTINEL-01",
+  "sentinel_name": "Goldstone-Wilczek Fractional Baryon Number Sentinel",
+  "status": "ARMED_AND_CONFINING",
+  "baryon_number_conservation_fidelity": 0.999999999,
+  "sidechannel_leakage_rejection_db": -158.0,
+  "active_baryon_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "GOLDSTONE-WILCZEK-CORE-ALPHA",
+      "sector_name": "Chiral Bag Boundary Inflow",
+      "fractional_baryon_number_b": 0.5,
+      "chiral_angle_rad": 1.5708,
+      "bag_radius_fm": 0.85,
+      "sidechannel_rejection_db": -158.0,
+      "status": "CHIRAL_ANGLE_CLAMPED"
+    },
+    {
+      "sector_id": "SKYRMION-FRACTIONAL-BETA",
+      "sector_name": "Skyrme Field Topological Winding Boundary",
+      "fractional_baryon_number_b": 1.0,
+      "chiral_angle_rad": 3.1416,
+      "bag_radius_fm": 0.9,
+      "sidechannel_rejection_db": -158.0,
+      "status": "SKYRMION_WINDING_BOUND"
+    },
+    {
+      "sector_id": "AXIAL-BARYON-ANOMALY-GAMMA",
+      "sector_name": "Non-Perturbative Chiral Condensate Bag",
+      "fractional_baryon_number_b": 0.25,
+      "chiral_angle_rad": 0.7854,
+      "bag_radius_fm": 0.82,
+      "sidechannel_rejection_db": -159.2,
+      "status": "CONDENSATE_ANOMALY_LOCKED"
+    },
+    {
+      "sector_id": "SPECTRAL-FLOW-BARYON-DELTA",
+      "sector_name": "Dirac Sea Spectral Shift Invariant",
+      "fractional_baryon_number_b": 0.75,
+      "chiral_angle_rad": 2.3562,
+      "bag_radius_fm": 0.88,
+      "sidechannel_rejection_db": -160.0,
+      "status": "SPECTRAL_SHIFT_CONFINED"
+    }
+  ],
+  "clamp_history": [
+    {
+      "clamp_id": "GW-CLAMP-E01C1472",
+      "sector_id": "GOLDSTONE-WILCZEK-CORE-ALPHA",
+      "chiral_angle_rad": 1.5708,
+      "effective_rejection_db": -158.0,
+      "baryon_conservation_fidelity": 0.999999999,
+      "status": "CLAMPED",
+      "timestamp": "2026-11-20T22:32:21.457328+00:00"
+    }
+  ]
+}

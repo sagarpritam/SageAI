@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "dao_id": "CITM-PRIMORDIAL-B-MODE-01",
+    "tensor_to_scalar_ratio_r": 0.024,
+    "tensor_spectral_index_n_t": -0.003,
+    "energy_scale_inflation_gev": 1.2e+16,
+    "b_mode_lensing_subtraction_db": -32.5,
+    "total_staked_polarization_capital_quadrillion_usd": 770.0,
+    "projected_annualized_yield_percent": 28.0,
+    "status": "PRIMORDIAL_GRAVITATIONAL_DAO_OPTIMAL",
+    "active_polarization_vaults": 4
+  },
+  "vaults": [
+    {
+      "vault_id": "CITM-VAULT-PRIMORDIAL-INFLATON",
+      "polarization_signature": "CMB_QUADRUPOLE_RECOMBINATION_PEAK",
+      "multipole_moment_l": 80,
+      "tensor_amplitude_uk2": 0.045,
+      "staked_capital_quadrillion_usd": 280.0,
+      "apy_percent": 28.5,
+      "status": "PRIMORDIAL_GW_YIELD_HARVESTING"
+    },
+    {
+      "vault_id": "CITM-VAULT-LENSING-CLEANSED",
+      "polarization_signature": "DELENSED_GRAVITATIONAL_CMB_MAP",
+      "multipole_moment_l": 500,
+      "tensor_amplitude_uk2": 0.012,
+      "staked_capital_quadrillion_usd": 185.0,
+      "apy_percent": 27.8,
+      "status": "E_TO_B_DEROTATION_ACTIVE"
+    },
+    {
+      "vault_id": "CITM-VAULT-REIONIZATION-BUMP",
+      "polarization_signature": "LARGE_ANGULAR_OPTICAL_DEPTH_TAU",
+      "multipole_moment_l": 6,
+      "tensor_amplitude_uk2": 0.088,
+      "staked_capital_quadrillion_usd": 160.0,
+      "apy_percent": 28.2,
+      "status": "OPTICAL_DEPTH_ACCRETING"
+    },
+    {
+      "vault_id": "CITM-VAULT-SPECTRAL-RUNNING",
+      "polarization_signature": "SECOND_ORDER_SLOW_ROLL_PARAM_XI",
+      "multipole_moment_l": 120,
+      "tensor_amplitude_uk2": 0.031,
+      "staked_capital_quadrillion_usd": 145.0,
+      "apy_percent": 27.5,
+      "status": "INFLATON_POTENTIAL_ACCRETING"
+    }
+  ],
+  "history": [
+    {
+      "stake_id": "CITM-STAKE-EA3F2CF1",
+      "vault_id": "CITM-VAULT-PRIMORDIAL-INFLATON",
+      "staked_volume_quadrillion_usd": 35.0,
+      "vault_total_staked_quadrillion_usd": 245.0,
+      "accrued_tensor_yield_apy": 28.5,
+      "timestamp": "2026-11-19T18:53:06.405409+00:00",
+      "status": "POLARIZATION_CAPITAL_STAKED"
+    },
+    {
+      "stake_id": "CITM-STAKE-97250883",
+      "vault_id": "CITM-VAULT-PRIMORDIAL-INFLATON",
+      "staked_volume_quadrillion_usd": 35.0,
+      "vault_total_staked_quadrillion_usd": 280.0,
+      "accrued_tensor_yield_apy": 28.5,
+      "timestamp": "2026-11-24T15:13:39.958286+00:00",
+      "status": "POLARIZATION_CAPITAL_STAKED"
+    }
+  ]
+}

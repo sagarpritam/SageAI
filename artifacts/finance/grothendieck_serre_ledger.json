@@ -1,0 +1,64 @@
+{
+  "dao_id": "GROTHENDIECK-SERRE-DAO-01",
+  "dao_name": "Grothendieck-Serre Principal Bundle Torsor Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_torsor_capital_quadrillion_usd": 1700.0,
+  "projected_annualized_yield_percent": 64.0,
+  "local_triviality_convergence_percent": 99.99999,
+  "active_torsor_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "GROTHENDIECK-SERRE-CORE-ALPHA",
+      "torsor_type": "REDUCTIVE-GROUP-GL_N",
+      "staked_capital_quadrillion_usd": 500.0,
+      "projected_yield_apy_percent": 64.5,
+      "nisnevich_topology_phase": "TRIVIAL-LOCALLY",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "NISNEVICH-TOPOLOGY-POOL",
+      "torsor_type": "DECOMPOSED-ETALE-COVER",
+      "staked_capital_quadrillion_usd": 420.0,
+      "projected_yield_apy_percent": 63.8,
+      "nisnevich_topology_phase": "COMPLETELY-DECOMPOSED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "PRINCIPAL-BUNDLE-TORSOR-DEX",
+      "torsor_type": "FUNCTION-FIELD-TRIVIALIZATION",
+      "staked_capital_quadrillion_usd": 430.0,
+      "projected_yield_apy_percent": 64.2,
+      "nisnevich_topology_phase": "GENERIC-FIBRE-SEALED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "AZUMAYA-ALGEBRA-VAULT",
+      "torsor_type": "BRAUER-TORSION-CLASS",
+      "staked_capital_quadrillion_usd": 350.0,
+      "projected_yield_apy_percent": 63.5,
+      "nisnevich_topology_phase": "AZUMAYA-REGULAR",
+      "status": "ACTIVE"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "TORSOR-STAKE-INIT-01",
+      "vault_id": "GROTHENDIECK-SERRE-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_torsor_capital_quadrillion_usd": 1700.0,
+      "projected_yield_apy_percent": 64.5,
+      "status": "INITIALIZED",
+      "timestamp": "2026-11-23T21:40:00.000Z"
+    },
+    {
+      "stake_id": "TORSOR-STAKE-9350846F",
+      "vault_id": "GROTHENDIECK-SERRE-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_torsor_capital_quadrillion_usd": 1700.0,
+      "projected_yield_apy_percent": 64.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T16:13:52.010292+00:00"
+    }
+  ],
+  "last_updated": "2026-11-23T16:13:52.010298+00:00"
+}

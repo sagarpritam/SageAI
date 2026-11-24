@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Compass, RefreshCw, Activity, Shield, Layers, Radio } from 'lucide-react';
+import { Compass, RefreshCw, Activity, Shield, Layers, Radio, AlertTriangle } from 'lucide-react';
 
 interface TetradNode {
   node_id: string;
@@ -35,9 +35,11 @@ export default function TeleparallelGravityStudio() {
   const [boostFactor, setBoostFactor] = useState<number>(1.2);
   const [fluxGain, setFluxGain] = useState<number>(1.1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<TelemetryResult | null>(null);
 
   const fetchNodes = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/teleparallel-gravity/nodes');
       const data = await res.json();
@@ -47,8 +49,8 @@ export default function TeleparallelGravityStudio() {
           setSelectedNode((prev) => prev || data.nodes[0].node_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load tetrad nodes', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load tetrad nodes');
     }
   }, []);
 
@@ -58,6 +60,7 @@ export default function TeleparallelGravityStudio() {
 
   const handleModulate = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/teleparallel-gravity/modulate-torsion', {
         method: 'POST',
@@ -70,8 +73,8 @@ export default function TeleparallelGravityStudio() {
       });
       const data = await res.json();
       setTelemetry(data);
-    } catch (err) {
-      console.error('Modulation failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Modulation failed');
     } finally {
       setLoading(false);
     }
@@ -94,6 +97,7 @@ export default function TeleparallelGravityStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchNodes}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -101,6 +105,25 @@ export default function TeleparallelGravityStudio() {
           <span>Refresh Tetrads</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-lg text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {nodes.map((node) => (
@@ -176,6 +199,7 @@ export default function TeleparallelGravityStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleModulate}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50"

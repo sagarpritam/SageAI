@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "dao_id": "BECDE-AXION-SUPERFLUID-01",
+    "ultra_light_axion_mass_ev": 1e-22,
+    "jeans_scale_astronomical_kpc": 1.4,
+    "gross_pitaevskii_quantum_pressure_ratio": 1.0,
+    "dark_energy_equation_of_state_w": -1.0,
+    "total_staked_superfluid_capital_quadrillion_usd": 810.0,
+    "projected_annualized_yield_percent": 29.5,
+    "status": "MACROSCOPIC_BEC_SUPERFLUID_OPTIMAL",
+    "active_condensate_vaults": 4
+  },
+  "vaults": [
+    {
+      "vault_id": "FUZZY-AXION-SOLITON-CORE",
+      "condensate_phase": "Macroscopic Fuzzy Axion Core Condensate",
+      "healing_length_parsecs": 350.0,
+      "staked_capital_quadrillion_usd": 280.0,
+      "target_annual_yield_apy": 31.0,
+      "status": "SOLITON_CORE_COHERENT"
+    },
+    {
+      "vault_id": "GROSS-PITAEVSKII-SUPERFLUID",
+      "condensate_phase": "Gross-Pitaevskii Non-Linear Superfluid Wavefunction",
+      "healing_length_parsecs": 420.0,
+      "staked_capital_quadrillion_usd": 190.0,
+      "target_annual_yield_apy": 29.8,
+      "status": "NONLINEAR_SCHRODINGER_LOCKED"
+    },
+    {
+      "vault_id": "COSMIC-QUANTUM-PRESSURE",
+      "condensate_phase": "Cosmological Bohmian Quantum Pressure Treasury",
+      "healing_length_parsecs": 510.0,
+      "staked_capital_quadrillion_usd": 180.0,
+      "target_annual_yield_apy": 28.5,
+      "status": "QUANTUM_PRESSURE_STABILIZED"
+    },
+    {
+      "vault_id": "DARK-ENERGY-QUINTESSENCE-BEC",
+      "condensate_phase": "Cosmic Quintessence Axion Superfluid Reservoir",
+      "healing_length_parsecs": 640.0,
+      "staked_capital_quadrillion_usd": 160.0,
+      "target_annual_yield_apy": 28.7,
+      "status": "QUINTESSENCE_SUPERFLUID_ACTIVE"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "BECDE-STAKE-7AD76426",
+      "vault_id": "FUZZY-AXION-SOLITON-CORE",
+      "staked_volume_quadrillion_usd": 30.0,
+      "vault_total_staked_quadrillion_usd": 280.0,
+      "accrued_superfluid_yield_apy": 31.0,
+      "timestamp": "2026-11-24T15:13:38.802437+00:00",
+      "status": "SUPERFLUID_CAPITAL_STAKED"
+    },
+    {
+      "stake_id": "BECDE-STAKE-AC339663",
+      "vault_id": "FUZZY-AXION-SOLITON-CORE",
+      "staked_volume_quadrillion_usd": 30.0,
+      "vault_total_staked_quadrillion_usd": 250.0,
+      "accrued_superfluid_yield_apy": 31.0,
+      "timestamp": "2026-11-19T19:15:10.419737+00:00",
+      "status": "SUPERFLUID_CAPITAL_STAKED"
+    },
+    {
+      "stake_id": "BECDE-STAKE-INITIAL-01",
+      "vault_id": "FUZZY-AXION-SOLITON-CORE",
+      "staked_volume_quadrillion_usd": 30.0,
+      "vault_total_staked_quadrillion_usd": 250.0,
+      "accrued_superfluid_yield_apy": 31.0,
+      "timestamp": "2026-11-20T00:40:00Z",
+      "status": "SUPERFLUID_CAPITAL_STAKED"
+    }
+  ]
+}

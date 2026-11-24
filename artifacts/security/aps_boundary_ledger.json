@@ -1,0 +1,54 @@
+{
+  "sentinel_id": "APS-BOUNDARY-SENTINEL-01",
+  "sentinel_name": "Atiyah-Patodi-Singer Eta-Invariant Boundary Sentinel",
+  "status": "ARMED_AND_NONLOCAL_INDEXED",
+  "eta_invariant_rejection_db": -175.0,
+  "spectral_boundary_stability": 0.999999999999,
+  "heat_kernel_dimension": 512,
+  "active_boundary_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "APS-BOUNDARY-ALPHA",
+      "boundary_condition": "SPECTRAL-PROJECTION-PI-POSITIVE",
+      "eta_invariant_val": 0.31415,
+      "spectral_flow": 0,
+      "rejection_db": -175.0,
+      "status": "APS_BOUNDARY_CLAMPED"
+    },
+    {
+      "sector_id": "SPECTRAL-ASYMPTOTICS-BETA",
+      "boundary_condition": "SEELEY-DEWITT-COEFFICIENTS",
+      "eta_invariant_val": 0.58197,
+      "spectral_flow": 0,
+      "rejection_db": -175.5,
+      "status": "ARMED"
+    },
+    {
+      "sector_id": "HEAT-KERNEL-GAMMA",
+      "boundary_condition": "DIRAC-LAPLACIAN-ASYMPTOTIC-EXP",
+      "eta_invariant_val": 1.4142,
+      "spectral_flow": 0,
+      "rejection_db": -176.0,
+      "status": "ARMED"
+    },
+    {
+      "sector_id": "ETA-INVARIANT-DELTA",
+      "boundary_condition": "CHEGER-GROMOV-RHO-INVARIANT",
+      "eta_invariant_val": 0.2718,
+      "spectral_flow": 0,
+      "rejection_db": -175.2,
+      "status": "ARMED"
+    }
+  ],
+  "clamps": [
+    {
+      "clamp_id": "APS-CLAMP-05588295",
+      "sector_id": "APS-BOUNDARY-ALPHA",
+      "spectral_cutoff_rad": 0.31415,
+      "effective_rejection_db": -175.0,
+      "boundary_stability": 0.999999999999,
+      "status": "BOUNDARY_ETA_CLAMPED",
+      "timestamp": "2026-11-23T19:21:33.104297+00:00"
+    }
+  ]
+}

@@ -94,6 +94,7 @@ from app.routers import (
     deep_space_laser_routes,
     derived_symplectic_routes,
     desitter_repulsion_routes,
+    diamagnetic_supergrid_routes,
     donaldson_thomas_routes,
     drone_swarm_shield_routes,
     ds_static_patch_routes,
@@ -119,10 +120,12 @@ from app.routers import (
     gdpr_routes,
     geomagnetic_shield_routes,
     geometric_langlands_routes,
+    geometric_satake_affine_routes,
     geometric_satake_routes,
     gravitational_seismic_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
+    heegaard_floer_routes,
     higher_form_twogroup_routes,
     hitchin_moduli_routes,
     homotopy_univalence_routes,
@@ -203,6 +206,7 @@ from app.routers import (
     schedule_routes,
     schwinger_vacuum_routes,
     sdn_shield_routes,
+    seiberg_witten_monopole_routes,
     simulation_routes,
     singularity_containment_routes,
     skyrmion_instanton_routes,
@@ -572,6 +576,10 @@ app.include_router(donaldson_thomas_routes.router)
 app.include_router(floer_novikov_routes.router)
 app.include_router(beilinson_drinfeld_routes.router)
 app.include_router(majorana_supergrid_routes.router)
+app.include_router(seiberg_witten_monopole_routes.router)
+app.include_router(heegaard_floer_routes.router)
+app.include_router(geometric_satake_affine_routes.router)
+app.include_router(diamagnetic_supergrid_routes.router)
 
 
 # ---------------------
@@ -589,7 +597,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "2.0.0",
+        "version": "8.6.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

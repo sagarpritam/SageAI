@@ -1,0 +1,43 @@
+{
+  "sentinel_id": "KITAEV-PARITY-SENTINEL-01",
+  "hamiltonian_model": "1D_P_WAVE_TOPOLOGICAL_SUPERCONDUCTOR_KITAEV_CHAIN",
+  "fermion_parity_operator": "P = -i * gamma_1 * gamma_2 = +/- 1",
+  "sidechannel_leakage_rejection_db": -150.0,
+  "topological_parity_fidelity_percent": 99.999999,
+  "status": "MAJORANA_PARITY_SENTINEL_ACTIVE",
+  "active_parity_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "KITAEV-CHAIN-ZERO-MODE-ALPHA",
+      "parity_sector": "Unpaired Majorana Boundary State gamma_1 Isolated End Mode",
+      "fermion_parity": "P = +1 (Even Ground State)",
+      "topological_gap_mev": 2.45,
+      "sidechannel_rejection_db": -150.5,
+      "status": "ZERO_MODE_ISOLATED"
+    },
+    {
+      "sector_id": "FERMION-PARITY-CONSERVATION-BETA",
+      "parity_sector": "Non-Local Parity Conservation Measurement Barrier",
+      "fermion_parity": "P = +1 (Even Ground State)",
+      "topological_gap_mev": 2.30,
+      "sidechannel_rejection_db": -149.8,
+      "status": "PARITY_CONSERVED"
+    },
+    {
+      "sector_id": "BRAIDED-T-JUNCTION-GAMMA",
+      "parity_sector": "Majorana Wire T-Junction Exchange Braiding Gate",
+      "fermion_parity": "P = -1 (Odd Parity Excited State)",
+      "topological_gap_mev": 2.60,
+      "sidechannel_rejection_db": -151.2,
+      "status": "TRIJUNCTION_BRAIDED"
+    },
+    {
+      "sector_id": "QUASIPARTICLE-POISONING-FILTER-DELTA",
+      "parity_sector": "Sub-Gap Andreev Bound State Quasiparticle Poisoning Shield",
+      "fermion_parity": "P = +1 (Even Ground State)",
+      "topological_gap_mev": 2.50,
+      "sidechannel_rejection_db": -152.0,
+      "status": "POISONING_QUENCHED"
+    }
+  ]
+}

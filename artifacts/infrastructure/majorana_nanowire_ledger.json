@@ -1,0 +1,77 @@
+{
+  "telemetry": {
+    "backbone_id": "MZM-NANOWIRE-SHUTTLE-01",
+    "semiconductor_core": "EPITAXIAL_INAS_RASHBA",
+    "superconducting_shell": "PROXIMATE_EPITAXIAL_AL",
+    "rashba_spin_orbit_ev_angstrom": 0.2,
+    "topological_gap_delta_mev": 0.25,
+    "zeeman_critical_field_tesla": 1.2,
+    "bus_throughput_petabits_per_sec": 2800.0,
+    "mzm_braiding_fidelity_percent": 99.99999,
+    "status": "MAJORANA_ZERO_MODE_SHUTTLE_ACTIVE",
+    "active_nanowire_channels": 4
+  },
+  "channels": [
+    {
+      "channel_id": "INAS-AL-NANOWIRE-ALPHA",
+      "nanowire_geometry": "Single-Wire End-Mode Pair",
+      "wire_length_microns": 2.5,
+      "majorana_coherence_time_us": 150.0,
+      "optical_channel_throughput_pbps": 700.0,
+      "status": "BRAIDED_TOPOLOGICAL_STABILIZED"
+    },
+    {
+      "channel_id": "T-JUNCTION-SHUTTLE-BETA",
+      "nanowire_geometry": "Tri-Junction Majorana Shuttle Network",
+      "wire_length_microns": 3.8,
+      "majorana_coherence_time_us": 180.0,
+      "optical_channel_throughput_pbps": 700.0,
+      "status": "SHUTTLE_BRAID_COHERENT"
+    },
+    {
+      "channel_id": "PROXIMITY-INDUCED-GAMMA",
+      "nanowire_geometry": "Superconductor-Ferromagnet-Semiconductor Hybrid",
+      "wire_length_microns": 4.2,
+      "majorana_coherence_time_us": 165.0,
+      "optical_channel_throughput_pbps": 700.0,
+      "status": "PROXIMITY_PAIRING_LOCKED"
+    },
+    {
+      "channel_id": "ZEEMAN-TOPOLOGICAL-DELTA",
+      "nanowire_geometry": "In-Plane Spin-Split Nanowire Array",
+      "wire_length_microns": 3.0,
+      "majorana_coherence_time_us": 195.0,
+      "optical_channel_throughput_pbps": 700.0,
+      "status": "ZEEMAN_TUNED_OPTIMAL"
+    }
+  ],
+  "shuttles": [
+    {
+      "shuttle_id": "MZM-SHUTTLE-E91ED1BB",
+      "channel_id": "INAS-AL-NANOWIRE-ALPHA",
+      "gate_voltage_bias_mv": 45.0,
+      "braiding_angle_rad": 1.5708,
+      "braiding_fidelity": 0.999999,
+      "timestamp": "2026-11-24T15:13:46.776675+00:00",
+      "status": "MZM_BRAID_CYCLE_COMPLETED"
+    },
+    {
+      "shuttle_id": "MZM-SHUTTLE-0BA12C60",
+      "channel_id": "INAS-AL-NANOWIRE-ALPHA",
+      "gate_voltage_bias_mv": 45.0,
+      "braiding_angle_rad": 1.5708,
+      "braiding_fidelity": 0.999999,
+      "timestamp": "2026-11-19T20:35:58.324833+00:00",
+      "status": "MZM_BRAID_CYCLE_COMPLETED"
+    },
+    {
+      "shuttle_id": "MZM-SHUTTLE-INITIAL-01",
+      "channel_id": "INAS-AL-NANOWIRE-ALPHA",
+      "gate_voltage_bias_mv": 45.0,
+      "braiding_angle_rad": 1.5708,
+      "braiding_fidelity": 0.999999,
+      "timestamp": "2026-11-20T02:00:00Z",
+      "status": "MZM_BRAID_CYCLE_COMPLETED"
+    }
+  ]
+}

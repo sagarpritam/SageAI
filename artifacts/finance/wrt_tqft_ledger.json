@@ -1,0 +1,54 @@
+{
+  "dao_id": "WRT-TQFT-DAO-01",
+  "dao_name": "Witten-Reshetikhin-Turaev 3D TQFT Quantum Invariant Yield DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_wrt_capital_quadrillion_usd": 2150.0,
+  "projected_annualized_yield_percent": 74.5,
+  "dehn_surgery_invariance_percent": 99.9999999,
+  "active_wrt_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "WRT-CHERN-SIMONS-CORE",
+      "category_type": "SU2_K-MODULAR-TENSOR-CATEGORY",
+      "staked_capital_quadrillion_usd": 900.0,
+      "projected_yield_apy_percent": 75.2,
+      "tqft_surgery_phase": "MODULAR-SURGERY-LOCKED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "RESHETIKHIN-TURAEV-SURGERY-POOL",
+      "category_type": "FRAMED-LINK-3-MANIFOLD-SURGERY",
+      "staked_capital_quadrillion_usd": 500.0,
+      "projected_yield_apy_percent": 74.8,
+      "tqft_surgery_phase": "FRAMED-LINK-REBALANCED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "QUANTUM-GROUP-ROOT-OF-UNITY-DEX",
+      "category_type": "UQ-SL2-QUANTUM-GROUP-LIQUIDITY",
+      "staked_capital_quadrillion_usd": 450.0,
+      "projected_yield_apy_percent": 74.2,
+      "tqft_surgery_phase": "ROOT-OF-UNITY-CONVERGED",
+      "status": "ACTIVE"
+    },
+    {
+      "vault_id": "DEHN-SURGERY-MODULAR-YIELD-VAULT",
+      "category_type": "MAPPING-CLASS-GROUP-ARBITRAGE",
+      "staked_capital_quadrillion_usd": 300.0,
+      "projected_yield_apy_percent": 73.8,
+      "tqft_surgery_phase": "DEHN-TWIST-ARBITRAGED",
+      "status": "ACTIVE"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "WRT-STAKE-A471E9FE",
+      "vault_id": "WRT-CHERN-SIMONS-CORE",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_wrt_capital_quadrillion_usd": 2150.0,
+      "projected_yield_apy_percent": 75.2,
+      "status": "CAPITAL_STAKED",
+      "timestamp": "2026-11-23T20:08:37.478246+00:00"
+    }
+  ]
+}

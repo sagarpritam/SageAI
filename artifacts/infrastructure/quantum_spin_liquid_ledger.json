@@ -1,0 +1,67 @@
+{
+  "telemetry": {
+    "backbone_id": "QSLB-KITAEV-MAJORANA-01",
+    "lattice_symmetry": "HONEYCOMB_C3V_CHIRAL",
+    "kitaev_coupling_k_mev": 8.5,
+    "thermal_hall_conductance_half_integer": 0.5,
+    "vison_flux_gap_kelvin": 12.4,
+    "network_throughput_petabits_per_sec": 2000.0,
+    "topological_braiding_fidelity_percent": 99.99998,
+    "status": "MAJORANA_EDGE_RIBBON_ACTIVE",
+    "active_ribbon_channels": 4
+  },
+  "ribbons": [
+    {
+      "ribbon_id": "QSLB-RIBBON-KITAEV-ALPHA",
+      "material_phase": "ALPHA_RUCL3_HONEYCOMB",
+      "majorana_velocity_km_s": 380.0,
+      "flux_vortices_count": 24,
+      "chiral_edge_width_nm": 4.5,
+      "status": "FRACTIONALIZED_CHIRAL_LOCKED"
+    },
+    {
+      "ribbon_id": "QSLB-RIBBON-Z2-VISON-BETA",
+      "material_phase": "NA2IRO3_HEAVY_ELEMENT",
+      "majorana_velocity_km_s": 410.0,
+      "flux_vortices_count": 24,
+      "chiral_edge_width_nm": 5.2,
+      "status": "Z2_GAUGE_FLUX_PINNED"
+    },
+    {
+      "ribbon_id": "QSLB-RIBBON-CHIRAL-EDGE-GAMMA",
+      "material_phase": "TORIC_CODE_ANALOG_2D",
+      "majorana_velocity_km_s": 450.0,
+      "flux_vortices_count": 32,
+      "chiral_edge_width_nm": 3.8,
+      "status": "THERMAL_HALL_HALF_QUANTIZED"
+    },
+    {
+      "ribbon_id": "QSLB-RIBBON-TORIC-DELTA",
+      "material_phase": "H3LIIRO6_INTERCALATED",
+      "majorana_velocity_km_s": 360.0,
+      "flux_vortices_count": 12,
+      "chiral_edge_width_nm": 6.0,
+      "status": "SPIN_LIQUID_PROTECTED"
+    }
+  ],
+  "history": [
+    {
+      "tuning_id": "QSLB-TUNE-C69214F0",
+      "ribbon_id": "QSLB-RIBBON-KITAEV-ALPHA",
+      "flux_quantum_bias": 0.5,
+      "flux_vortices_stabilized": 20,
+      "edge_mode_velocity_km_s": 380.0,
+      "timestamp": "2026-11-19T18:53:06.394495+00:00",
+      "status": "VISON_VORTEX_TUNED_LOCKED"
+    },
+    {
+      "tuning_id": "QSLB-TUNE-ACBC9F69",
+      "ribbon_id": "QSLB-RIBBON-KITAEV-ALPHA",
+      "flux_quantum_bias": 0.5,
+      "flux_vortices_stabilized": 24,
+      "edge_mode_velocity_km_s": 380.0,
+      "timestamp": "2026-11-24T15:15:47.282503+00:00",
+      "status": "VISON_VORTEX_TUNED_LOCKED"
+    }
+  ]
+}

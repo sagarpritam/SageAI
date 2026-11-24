@@ -1,0 +1,44 @@
+{
+  "sentinel_id": "WALD-NOETHER-SENTINEL-01",
+  "diffeomorphism_invariance": "GENERAL_COVARIANT_NOETHER_CURRENT",
+  "higher_derivative_gravity": "GAUSS_BONNET_LOVELOCK_EXTENDED",
+  "noether_charge_integral_form": "Q_DMINUS2_SURFACE_FORM",
+  "sidechannel_leakage_rejection_db": -135.0,
+  "noether_audit_fidelity_percent": 99.99999,
+  "status": "WALD_NOETHER_CHARGE_SENTINEL_ACTIVE",
+  "active_audit_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "WALD-NOETHER-2FORM-CORE",
+      "differential_form_sector": "Bifurcation Surface Integral Q[xi]",
+      "gauss_bonnet_coupling_alpha": 0.08,
+      "noether_flux_density": 1.45e18,
+      "sidechannel_rejection_db": -136.5,
+      "status": "NOETHER_SURFACE_INTEGRAL_CLOSED"
+    },
+    {
+      "sector_id": "GAUSS-BONNET-EULER-SECTOR",
+      "differential_form_sector": "Lovelock Quadratic Curvature Correction",
+      "gauss_bonnet_coupling_alpha": 0.08,
+      "noether_flux_density": 1.25e18,
+      "sidechannel_rejection_db": -135.0,
+      "status": "GAUSS_BONNET_TOPOLOGY_VERIFIED"
+    },
+    {
+      "sector_id": "KILLING-VECTOR-SYMMETRY",
+      "differential_form_sector": "Horizon Bifurcation Killing Field xi^a",
+      "gauss_bonnet_coupling_alpha": 0.08,
+      "noether_flux_density": 1.15e18,
+      "sidechannel_rejection_db": -134.0,
+      "status": "KILLING_SYMMETRY_PRESERVED"
+    },
+    {
+      "sector_id": "COVARIANT-PHASE-SPACE",
+      "differential_form_sector": "Symplectic Potential theta and Current J",
+      "gauss_bonnet_coupling_alpha": 0.08,
+      "noether_flux_density": 1.55e18,
+      "sidechannel_rejection_db": -137.0,
+      "status": "SYMPLECTIC_FLUX_DAMPED"
+    }
+  ]
+}

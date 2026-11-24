@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "dao_id": "CNBR-RELIC-NEUTRINO-01",
+    "decoupling_temperature_kelvin": 1.95,
+    "relic_neutrino_number_density_cm3": 336.0,
+    "effective_neutrino_species_n_eff": 3.044,
+    "ptolemy_capture_cross_section_cm2": 3.8e-45,
+    "total_staked_relic_capital_quadrillion_usd": 870.0,
+    "projected_annualized_yield_percent": 31.0,
+    "status": "PRIMORDIAL_CNB_YIELD_OPTIMAL",
+    "active_relic_vaults": 4
+  },
+  "vaults": [
+    {
+      "vault_id": "PRIMORDIAL-DECOUPLING-1S",
+      "relic_channel": "Big-Bang Neutrino Decoupling (t ~ 1s)",
+      "neutrino_energy_mev": 0.000168,
+      "staked_capital_quadrillion_usd": 310.0,
+      "target_annual_yield_apy": 32.5,
+      "status": "FREE_STREAMING_COHERENT"
+    },
+    {
+      "vault_id": "PTOLEMY-TRITIUM-CAPTURE",
+      "relic_channel": "Tritium Neutrino Capture on Graphene Target",
+      "neutrino_energy_mev": 0.0186,
+      "staked_capital_quadrillion_usd": 210.0,
+      "target_annual_yield_apy": 31.2,
+      "status": "INVERSE_BETA_RESONANT"
+    },
+    {
+      "vault_id": "FERMI-DIRAC-LEPTON-ASYMMETRY",
+      "relic_channel": "Primordial Lepton Asymmetry Degeneracy",
+      "neutrino_energy_mev": 0.000215,
+      "staked_capital_quadrillion_usd": 180.0,
+      "target_annual_yield_apy": 29.8,
+      "status": "CHEMICAL_POTENTIAL_BOUNDED"
+    },
+    {
+      "vault_id": "RELIC-NEUTRINO-CLUSTERING",
+      "relic_channel": "Galactic Dark Matter Halo Gravitational Clustering",
+      "neutrino_energy_mev": 5.4e-05,
+      "staked_capital_quadrillion_usd": 170.0,
+      "target_annual_yield_apy": 30.5,
+      "status": "GRAVITATIONAL_OVERDENSITY_HARVESTED"
+    }
+  ],
+  "stakes": [
+    {
+      "stake_id": "CNBR-STAKE-857D6B0E",
+      "vault_id": "PRIMORDIAL-DECOUPLING-1S",
+      "staked_volume_quadrillion_usd": 35.0,
+      "vault_total_staked_quadrillion_usd": 310.0,
+      "accrued_relic_yield_apy": 32.5,
+      "timestamp": "2026-11-24T15:13:39.971771+00:00",
+      "status": "RELIC_NEUTRINO_CAPITAL_STAKED"
+    },
+    {
+      "stake_id": "CNBR-STAKE-3EF97FE5",
+      "vault_id": "PRIMORDIAL-DECOUPLING-1S",
+      "staked_volume_quadrillion_usd": 35.0,
+      "vault_total_staked_quadrillion_usd": 275.0,
+      "accrued_relic_yield_apy": 32.5,
+      "timestamp": "2026-11-19T20:10:21.980769+00:00",
+      "status": "RELIC_NEUTRINO_CAPITAL_STAKED"
+    },
+    {
+      "stake_id": "CNBR-STAKE-INITIAL-01",
+      "vault_id": "PRIMORDIAL-DECOUPLING-1S",
+      "staked_volume_quadrillion_usd": 35.0,
+      "vault_total_staked_quadrillion_usd": 275.0,
+      "accrued_relic_yield_apy": 32.5,
+      "timestamp": "2026-11-20T01:35:00Z",
+      "status": "RELIC_NEUTRINO_CAPITAL_STAKED"
+    }
+  ]
+}

@@ -549,7 +549,7 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     // Switch to Waves 1-46 Milestone tab
     await page.locator('button:has-text("Waves 1–46")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Khovanov-Rozansky, Perverse Sheaf & Tannakian Motivic (v8.6.0)' })).toBeVisible();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Seiberg-Witten Monopole, Heegaard Floer & Geometric Satake (v8.6.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -610,28 +610,28 @@ test.describe('SageAI Web E2E Test Suite', () => {
     const searchInput = page.locator('input[placeholder*="Search"][placeholder*="modules..."]');
     await expect(searchInput).toBeVisible();
 
-    await searchInput.fill('Khovanov-Rozansky');
-    const krTab = page.locator('button:has-text("Khovanov-Rozansky (Cap 158)")');
-    await expect(krTab).toBeVisible();
-    await krTab.click();
+    await searchInput.fill('Seiberg-Witten');
+    const swTab = page.locator('button:has-text("Seiberg-Witten (Cap 158)")');
+    await expect(swTab).toBeVisible();
+    await swTab.click();
     await expect(page.locator('text=Capability 158').first()).toBeVisible();
 
-    await searchInput.fill('Perverse Sheaf');
-    const psTab = page.locator('button:has-text("Perverse Sheaf (Cap 159)")');
-    await expect(psTab).toBeVisible();
-    await psTab.click();
+    await searchInput.fill('Heegaard Floer');
+    const hfTab = page.locator('button:has-text("Heegaard Floer (Cap 159)")');
+    await expect(hfTab).toBeVisible();
+    await hfTab.click();
     await expect(page.locator('text=Capability 159').first()).toBeVisible();
 
-    await searchInput.fill('Tannakian Motivic');
-    const tmTab = page.locator('button:has-text("Tannakian Motivic (Cap 160)")');
-    await expect(tmTab).toBeVisible();
-    await tmTab.click();
+    await searchInput.fill('Geometric Satake');
+    const satTab = page.locator('button:has-text("Geometric Satake (Cap 160)")');
+    await expect(satTab).toBeVisible();
+    await satTab.click();
     await expect(page.locator('text=Capability 160').first()).toBeVisible();
 
-    await searchInput.fill('Polariton Supergrid');
-    const polTab = page.locator('button:has-text("Polariton Supergrid (Option B)")');
-    await expect(polTab).toBeVisible();
-    await polTab.click();
+    await searchInput.fill('Diamagnetic Supergrid');
+    const diamagTab = page.locator('button:has-text("Diamagnetic Supergrid (Option B)")');
+    await expect(diamagTab).toBeVisible();
+    await diamagTab.click();
     await expect(page.locator('text=Option B Wave 46').first()).toBeVisible();
   });
 

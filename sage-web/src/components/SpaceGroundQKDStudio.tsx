@@ -62,11 +62,13 @@ export function SpaceGroundQKDStudio() {
   const [swapping, setSwapping] = useState(false);
   const [evaluation, setEvaluation] = useState<QBEREvaluation | null>(null);
   const [swapResult, setSwapResult] = useState<SwapResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const hasInitializedSelectionRef = useRef(false);
 
   const fetchLinks = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/space-ground-qkd/links");
       const data = await res.json();
@@ -78,8 +80,8 @@ export function SpaceGroundQKDStudio() {
           setMeasuredQber(data.links[0].current_qber_pct);
         }
       }
-    } catch (err) {
-      console.error("Failed to fetch QKD links", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to fetch QKD links");
     } finally {
       setLoading(false);
     }
@@ -124,8 +126,8 @@ export function SpaceGroundQKDStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("QBER evaluation failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "QBER evaluation failed");
     } finally {
       setEvaluating(false);
     }
@@ -148,8 +150,8 @@ export function SpaceGroundQKDStudio() {
           ...prev.slice(0, 15),
         ]);
       }
-    } catch (err) {
-      console.error("Swap failed", err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Swap failed");
     } finally {
       setSwapping(false);
     }
@@ -177,6 +179,7 @@ export function SpaceGroundQKDStudio() {
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3">
           <button
+            type="button"
             onClick={fetchLinks}
             disabled={loading}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm font-medium transition-all"
@@ -186,6 +189,25 @@ export function SpaceGroundQKDStudio() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-lg text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -344,6 +366,7 @@ export function SpaceGroundQKDStudio() {
 
                 <div className="flex flex-wrap gap-3 pt-2">
                   <button
+                    type="button"
                     onClick={handleEvaluateQBER}
                     disabled={evaluating}
                     className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm transition-all shadow-lg shadow-cyan-900/30"
@@ -353,6 +376,7 @@ export function SpaceGroundQKDStudio() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={handleExecuteSwap}
                     disabled={swapping}
                     className="flex-1 min-w-[200px] flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-900/30"

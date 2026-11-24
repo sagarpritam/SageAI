@@ -135,4 +135,3 @@ _donaldson_thomas_sheaf_shield = DonaldsonThomasSheafShield()
 
 def get_donaldson_thomas_sheaf_shield() -> DonaldsonThomasSheafShield:
     return _donaldson_thomas_sheaf_shield
-

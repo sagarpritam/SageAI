@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  experimental: {
+    agentUpgrade: "security",
+  },
   // Security headers for production hardening
   async headers() {
     return [

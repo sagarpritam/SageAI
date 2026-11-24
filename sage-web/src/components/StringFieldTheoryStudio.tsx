@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { GitPullRequest, RefreshCw, Activity, Shield, Sparkles, Layers } from 'lucide-react';
+import { GitPullRequest, RefreshCw, Activity, Shield, Sparkles, Layers, AlertTriangle } from 'lucide-react';
 
 interface SFTVertex {
   vertex_id: string;
@@ -37,9 +37,11 @@ export default function StringFieldTheoryStudio() {
   const [truncationLevel, setTruncationLevel] = useState<number>(8);
   const [dampingGain, setDampingGain] = useState<number>(1.1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<CondenseResult | null>(null);
 
   const fetchVertices = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/string-field-theory/vertices');
       const data = await res.json();
@@ -49,8 +51,8 @@ export default function StringFieldTheoryStudio() {
           setSelectedVertex((prev) => prev || data.vertices[0].vertex_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load SFT vertices', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load SFT vertices');
     }
   }, []);
 
@@ -60,6 +62,7 @@ export default function StringFieldTheoryStudio() {
 
   const handleCondense = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/string-field-theory/condense-tachyon', {
         method: 'POST',
@@ -73,8 +76,8 @@ export default function StringFieldTheoryStudio() {
       });
       const data = await res.json();
       setTelemetry(data);
-    } catch (err) {
-      console.error('Tachyon condensation failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Tachyon condensation failed');
     } finally {
       setLoading(false);
     }
@@ -97,6 +100,7 @@ export default function StringFieldTheoryStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchVertices}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -104,6 +108,25 @@ export default function StringFieldTheoryStudio() {
           <span>Refresh Vertices</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-lg text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {vertices.map((v) => (
@@ -193,6 +216,7 @@ export default function StringFieldTheoryStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleCondense}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-amber-950/50"

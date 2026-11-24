@@ -1,0 +1,43 @@
+{
+  "sentinel_id": "CHIRAL-ABJ-SENTINEL-01",
+  "anomaly_equation": "PARTIAL_MU_J5_MU_EQ_E2_OVER_4PI2_E_DOT_B",
+  "spectral_flow_manifold": "WEYL_CONE_AXIAL_SPECTRAL_PUMP_SHIELD",
+  "sidechannel_leakage_rejection_db": -152.0,
+  "topological_anomaly_preservation_fidelity_percent": 99.999999,
+  "status": "CHIRAL_ABJ_SENTINEL_ACTIVE",
+  "active_anomaly_sectors": 4,
+  "sectors": [
+    {
+      "sector_id": "ABJ-SPECTRAL-FLOW-ALPHA",
+      "anomaly_sector": "Adler-Bell-Jackiw Axial Current Spectral Flow Node",
+      "e_dot_b_v2_m2": 4.85e12,
+      "axial_charge_imbalance": 0.0,
+      "sidechannel_rejection_db": -152.5,
+      "status": "SPECTRAL_FLOW_CONFINED"
+    },
+    {
+      "sector_id": "WEYL-VALLEY-TRANSPORT-BETA",
+      "anomaly_sector": "Dissipationless Chiral Valley Hall Transport Channel",
+      "e_dot_b_v2_m2": 4.50e12,
+      "axial_charge_imbalance": 0.0,
+      "sidechannel_rejection_db": -151.8,
+      "status": "VALLEY_TRANSPORT_LOCKED"
+    },
+    {
+      "sector_id": "AXIAL-CHARGE-CONSERVATION-GAMMA",
+      "anomaly_sector": "Axial Anomaly Pump Charge Cancellation Barrier",
+      "e_dot_b_v2_m2": 5.10e12,
+      "axial_charge_imbalance": 0.0,
+      "sidechannel_rejection_db": -153.0,
+      "status": "AXIAL_PUMP_STABILIZED"
+    },
+    {
+      "sector_id": "GAUGE-INTRUSION-CHIRAL-DELTA",
+      "anomaly_sector": "Non-Abelian Gauge Instanton Topological Charge Filter",
+      "e_dot_b_v2_m2": 4.70e12,
+      "axial_charge_imbalance": 0.0,
+      "sidechannel_rejection_db": -152.0,
+      "status": "GAUGE_INSTANTON_QUENCHED"
+    }
+  ]
+}

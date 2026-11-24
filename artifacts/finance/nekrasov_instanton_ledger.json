@@ -1,0 +1,63 @@
+{
+  "dao_id": "NEKRASOV-INSTANTON-DAO-01",
+  "dao_name": "Nekrasov Instanton Partition Function & Omega-Background Arbitrage DAO",
+  "status": "ARBITRAGE_ACTIVE",
+  "total_staked_nekrasov_capital_quadrillion_usd": 1600.0,
+  "projected_annualized_yield_percent": 60.0,
+  "prepotential_convergence_percent": 99.99999,
+  "active_nekrasov_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "NEKRASOV-OMEGA-CORE-ALPHA",
+      "vault_name": "Omega-Background Equivariant Localization Core",
+      "allocated_capital_quadrillion_usd": 550.0,
+      "projected_yield_apy_percent": 60.0,
+      "prepotential_convergence": 0.9999999,
+      "status": "STAKE_EXPANDED_NEKRASOV"
+    },
+    {
+      "vault_id": "YOUNG-TABLEAUX-SUM-POOL",
+      "vault_name": "Colored Young Diagram Tableau Sum Pool",
+      "allocated_capital_quadrillion_usd": 380.0,
+      "projected_yield_apy_percent": 61.5,
+      "prepotential_convergence": 0.9999998,
+      "status": "YOUNG_TABLEAUX_OPTIMAL"
+    },
+    {
+      "vault_id": "SEIBERG-WITTEN-PREPOTENTIAL-DEX",
+      "vault_name": "Seiberg-Witten Prepotential F_0 Arbitrage DEX",
+      "allocated_capital_quadrillion_usd": 350.0,
+      "projected_yield_apy_percent": 59.8,
+      "prepotential_convergence": 0.9999999,
+      "status": "PREPOTENTIAL_LIMIT_CONVERGED"
+    },
+    {
+      "vault_id": "BLOWUP-FORMULA-VAULT",
+      "vault_name": "Nakajima-Yoshioka Blowup Formula Yield Vault",
+      "allocated_capital_quadrillion_usd": 320.0,
+      "projected_yield_apy_percent": 58.7,
+      "prepotential_convergence": 0.9999997,
+      "status": "BLOWUP_RATIO_STABLE"
+    }
+  ],
+  "stake_history": [
+    {
+      "stake_id": "NEKRASOV-STAKE-E1F2A3B4",
+      "vault_id": "NEKRASOV-OMEGA-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_nekrasov_capital_quadrillion_usd": 1550.0,
+      "projected_yield_apy_percent": 60.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T21:15:00.000000+00:00"
+    },
+    {
+      "stake_id": "NEKRASOV-STAKE-C0E38128",
+      "vault_id": "NEKRASOV-OMEGA-CORE-ALPHA",
+      "staked_volume_quadrillion_usd": 50.0,
+      "total_staked_nekrasov_capital_quadrillion_usd": 1600.0,
+      "projected_yield_apy_percent": 60.0,
+      "status": "STAKED",
+      "timestamp": "2026-11-23T15:50:37.416157+00:00"
+    }
+  ]
+}

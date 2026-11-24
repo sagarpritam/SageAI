@@ -1,0 +1,43 @@
+{
+  "dao_id": "PENROSE-PROCESS-DAO-01",
+  "mechanism_equation": "DELTA_E_GT_0_VIA_NEGATIVE_ENERGY_INFALL_BEYOND_STATIC_LIMIT",
+  "ergosphere_extraction_efficiency_limit": "29.0% Maximum Rotational Mass-Energy Conversion",
+  "total_staked_ergosphere_capital_quadrillion_usd": 1050.0,
+  "projected_annualized_yield_percent": 39.5,
+  "status": "PENROSE_ENERGY_ARBITRAGE_OPTIMAL",
+  "active_ergosphere_vaults": 4,
+  "vaults": [
+    {
+      "vault_id": "PENROSE-ERGOSPHERE-CORE",
+      "ergosphere_vault": "Static Limit Superradiant Infall Tranche",
+      "staked_capital_quadrillion_usd": 262.5,
+      "extraction_efficiency_pct": 28.5,
+      "accrued_penrose_yield_apy": 41.0,
+      "status": "ERGOSPHERE_EXTRACTION_ACTIVE"
+    },
+    {
+      "vault_id": "BLANDFORD-ZNAJEK-MHD-VAULT",
+      "ergosphere_vault": "Magnetic Penrose Flux Extraction Pool",
+      "staked_capital_quadrillion_usd": 262.5,
+      "extraction_efficiency_pct": 27.8,
+      "accrued_penrose_yield_apy": 39.5,
+      "status": "MHD_JET_POWER_LOCKED"
+    },
+    {
+      "vault_id": "SUPERRADIANT-SCATTERING-DEX",
+      "ergosphere_vault": "Bosonic Cloud Superradiant Reflection DEX",
+      "staked_capital_quadrillion_usd": 262.5,
+      "extraction_efficiency_pct": 26.9,
+      "accrued_penrose_yield_apy": 38.5,
+      "status": "SUPERRADIANT_AMPLIFIED"
+    },
+    {
+      "vault_id": "FRAME-DRAGGING-LENSE-THIRRING-POOL",
+      "ergosphere_vault": "Spacetime Frame-Dragging Lense-Thirring Arbitrage Vault",
+      "staked_capital_quadrillion_usd": 262.5,
+      "extraction_efficiency_pct": 28.0,
+      "accrued_penrose_yield_apy": 39.0,
+      "status": "FRAME_DRAGGING_OPTIMAL"
+    }
+  ]
+}

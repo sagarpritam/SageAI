@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Layers, RefreshCw, Activity, Shield, Box, Sparkles } from 'lucide-react';
+import { Layers, RefreshCw, Activity, Shield, Box, Sparkles, AlertTriangle } from 'lucide-react';
 
 interface SimplexComplex {
   simplex_id: string;
@@ -38,9 +38,11 @@ export default function SpinFoamStudio() {
   const [immirziGamma, setImmirziGamma] = useState<number>(0.2375);
   const [gain, setGain] = useState<number>(1.1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<QuantizeResult | null>(null);
 
   const fetchSimplices = useCallback(async () => {
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/spin-foam/simplices');
       const data = await res.json();
@@ -50,8 +52,8 @@ export default function SpinFoamStudio() {
           setSelectedSimplex((prev) => prev || data.simplices[0].simplex_id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load spin-foam simplices', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to load spin-foam simplices');
     }
   }, []);
 
@@ -61,6 +63,7 @@ export default function SpinFoamStudio() {
 
   const handleQuantize = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch('/api/spin-foam/quantize-area', {
         method: 'POST',
@@ -74,8 +77,8 @@ export default function SpinFoamStudio() {
       });
       const data = await res.json();
       setTelemetry(data);
-    } catch (err) {
-      console.error('Spin-foam quantization failed', err);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Spin-foam quantization failed');
     } finally {
       setLoading(false);
     }
@@ -98,6 +101,7 @@ export default function SpinFoamStudio() {
           </div>
         </div>
         <button
+          type="button"
           onClick={fetchSimplices}
           className="flex items-center space-x-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
         >
@@ -105,6 +109,25 @@ export default function SpinFoamStudio() {
           <span>Refresh Simplices</span>
         </button>
       </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="flex items-center justify-between bg-red-950/50 border border-red-500/40 text-red-300 p-4 rounded-lg text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs text-red-400 hover:text-red-200 underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {simplices.map((s) => (
@@ -194,6 +217,7 @@ export default function SpinFoamStudio() {
         </div>
 
         <button
+          type="button"
           onClick={handleQuantize}
           disabled={loading}
           className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm rounded-lg transition disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-indigo-950/50"

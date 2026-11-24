@@ -38,7 +38,7 @@ export async function GET() {
       database_pool: data.database_pool || null,
       uptime_seconds: 3600,
       scan_queue: 0,
-      version: data.version || PLATFORM_VERSION,
+      version: PLATFORM_VERSION,
       platform_version: PLATFORM_VERSION,
       backend_configured: Boolean(process.env.BACKEND_URL),
       mode: "connected",
