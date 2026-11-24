@@ -125,9 +125,21 @@ export default function KhovanovRozanskyStudio() {
       </div>
 
       {errorMsg && (
-        <div className="p-3 bg-red-900/30 border border-red-500/40 rounded-lg flex items-center gap-2 text-red-300 text-sm">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>{errorMsg}</span>
+        <div
+          role="alert"
+          className="p-3 bg-red-900/30 border border-red-500/40 rounded-lg flex items-center justify-between text-red-300 text-sm"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs bg-red-900/60 hover:bg-red-900 px-2.5 py-1 rounded border border-red-700/50 text-red-200"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 

@@ -1891,6 +1891,85 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 46 (Opt B): Diamagnetic Supergrid Baseload Harvest",
         ),
+        # Wave 47 (Caps 161-163 & Option B & Pitch Deck)
+        (
+            "GET",
+            "/api/fibonacci-anyon-braiding/braids",
+            None,
+            "Wave 47 (Cap 161): Fibonacci Anyon Braids List",
+        ),
+        (
+            "POST",
+            "/api/fibonacci-anyon-braiding/execute-braid",
+            {
+                "braid_id": "ANYON-FIB-4STRAND-01",
+                "generator_index": 2,
+                "braid_turns": 8,
+                "topological_order_k": 5,
+                "braid_gain": 1.2,
+            },
+            "Wave 47 (Cap 161): Fibonacci Anyon Braiding Execution",
+        ),
+        (
+            "GET",
+            "/api/bgg-category-o-shield/modules",
+            None,
+            "Wave 47 (Cap 162): BGG Category O Modules List",
+        ),
+        (
+            "POST",
+            "/api/bgg-category-o-shield/seal-verma",
+            {
+                "module_id": "BGG-SL2-PRINCIPAL-01",
+                "weyl_length": 4,
+                "polynomial_deg_q": 2,
+                "filtration_steps": 8,
+                "kl_amplification": 1.0,
+            },
+            "Wave 47 (Cap 162): BGG Category O Verma Module Seal",
+        ),
+        (
+            "GET",
+            "/api/cryogenic-flux-qubit/qubits",
+            None,
+            "Wave 47 (Cap 163): Cryogenic Flux Qubits List",
+        ),
+        (
+            "POST",
+            "/api/cryogenic-flux-qubit/clamp-phase-slip",
+            {
+                "qubit_id": "CRYO-FLUX-15MK-01",
+                "magnetic_flux_bias_phi0": 0.5,
+                "microwave_attenuation_db": 60.0,
+                "pump_frequency_ghz": 6.45,
+                "superconducting_gain": 1.2,
+            },
+            "Wave 47 (Cap 163): 15 mK Cryogenic Flux Qubit Phase Slip Clamp",
+        ),
+        (
+            "GET",
+            "/api/majorana-supergrid-power/arrays",
+            None,
+            "Wave 47 (Opt B): 2e^2/h Majorana Supergrid Power Arrays List",
+        ),
+        (
+            "POST",
+            "/api/majorana-supergrid-power/harvest-majorana",
+            {
+                "array_id": "MZM-KODIAK-INAS-01",
+                "zeeman_field_tesla": 1.5,
+                "chemical_potential_mu_mev": 0.5,
+                "supercurrent_bias_ma": 4.2,
+                "grid_gain": 1.0,
+            },
+            "Wave 47 (Opt B): 2e^2/h Majorana Supergrid Power Baseload Harvest",
+        ),
+        (
+            "GET",
+            "/api/deck/metrics",
+            None,
+            "Wave 47 (Executive Suite): Executive Pitch Deck Pipeline Metrics",
+        ),
     ]
 
 

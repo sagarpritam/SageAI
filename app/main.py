@@ -49,6 +49,7 @@ from app.routers import (
     axion_haloscope_routes,
     beilinson_drinfeld_routes,
     berry_curvature_routes,
+    bgg_category_o_routes,
     billing_routes,
     binary_deobfuscator_routes,
     bloch_schwinger_routes,
@@ -82,6 +83,7 @@ from app.routers import (
     cosmic_censorship_routes,
     counter_quantum_routes,
     crossplane_mesh_routes,
+    cryogenic_flux_qubit_routes,
     cspm_routes,
     cti_routes,
     d3fend_routes,
@@ -89,6 +91,7 @@ from app.routers import (
     darkweb_radar_routes,
     dbrane_tadpole_routes,
     deception_routes,
+    deck_metrics_routes,
     deep_analysis_routes,
     deep_crustal_mhd_routes,
     deep_space_laser_routes,
@@ -112,6 +115,7 @@ from app.routers import (
     explain_routes,
     factorization_homology_routes,
     false_vacuum_routes,
+    fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
     firmware_attestation_routes,
     floer_novikov_routes,
@@ -153,6 +157,7 @@ from app.routers import (
     m_theory_g2_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
+    majorana_supergrid_power_routes,
     majorana_supergrid_routes,
     malware_routes,
     mantle_geoneutrino_routes,
@@ -580,6 +585,11 @@ app.include_router(seiberg_witten_monopole_routes.router)
 app.include_router(heegaard_floer_routes.router)
 app.include_router(geometric_satake_affine_routes.router)
 app.include_router(diamagnetic_supergrid_routes.router)
+app.include_router(fibonacci_anyon_braiding_routes.router)
+app.include_router(bgg_category_o_routes.router)
+app.include_router(cryogenic_flux_qubit_routes.router)
+app.include_router(majorana_supergrid_power_routes.router)
+app.include_router(deck_metrics_routes.router)
 
 
 # ---------------------
@@ -597,7 +607,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "8.6.0",
+        "version": "8.7.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

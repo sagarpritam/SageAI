@@ -527,13 +527,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v8.6.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v8.7.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v8.6.0 metadata & live stats
-    await expect(page.locator('text=SageAI v8.6.0').first()).toBeVisible();
-    await expect(page.locator('text=160 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v8.7.0 metadata & live stats
+    await expect(page.locator('text=SageAI v8.7.0').first()).toBeVisible();
+    await expect(page.locator('text=163 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -547,9 +547,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-46 Milestone tab
-    await page.locator('button:has-text("Waves 1–46")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Seiberg-Witten Monopole, Heegaard Floer & Geometric Satake (v8.6.0)' })).toBeVisible();
+    // Switch to Waves 1-47 Milestone tab
+    await page.locator('button:has-text("Waves 1–47")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Fibonacci Anyon Braiding, BGG Category O & Cryogenic Flux Qubit (v8.7.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -561,25 +561,25 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 8.6.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 8.7.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v8.6.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v8.7.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v8.6.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v8.7.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 206 Studios (Waves 1–46)').first()).toBeVisible();
+    await expect(page.locator('text=All 210 Studios (Waves 1–47)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v8.6.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.7.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–160)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–163)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v8.6.0').first()).toBeVisible();
+    await expect(page.locator('text=v8.7.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();

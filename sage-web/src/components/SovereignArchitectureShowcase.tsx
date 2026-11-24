@@ -157,10 +157,10 @@ const FRONTIER_WAVES = [
     detail: "Unified asymptotically safe RG flows, Horava-Lifshitz scaling & singularity-free metric stabilization.",
   },
   {
-    wave: "Waves 27–46 • Current",
-    range: "Capabilities 101–160 + Option B",
+    wave: `${PLATFORM_WAVES_RANGE} • Current`,
+    range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Seiberg-Witten Monopole Invariants, Heegaard Floer Bordered Contact Firewalls, Geometric Satake Affine Springer Shields & Planetary Room-Temperature LK-99 Diamagnetic Supergrid.",
+    detail: "Fibonacci Anyon Braiding & Topological Fusion, BGG Category O Shields, 15 mK Cryogenic Flux Qubits & Planetary 2e^2/h Majorana Conductance Peak Supergrid.",
   },
 ];
 

@@ -120,9 +120,21 @@ export default function BggCategoryOStudio() {
       </div>
 
       {errorMsg && (
-        <div className="mb-6 flex items-center gap-2 rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-xs text-red-300 font-mono">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          <span>{errorMsg}</span>
+        <div
+          role="alert"
+          className="mb-6 flex items-center justify-between rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-xs text-red-300 font-mono"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-[10px] bg-red-900/60 hover:bg-red-900 px-2 py-0.5 rounded border border-red-700/50 text-red-200 transition"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 

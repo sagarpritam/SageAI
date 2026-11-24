@@ -286,6 +286,10 @@ import SeibergWittenStudio from "@/components/SeibergWittenStudio";
 import HeegaardFloerStudio from "@/components/HeegaardFloerStudio";
 import GeometricSatakeAffineStudio from "@/components/GeometricSatakeAffineStudio";
 import DiamagneticSupergridPowerStudio from "@/components/DiamagneticSupergridPowerStudio";
+import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
+import BggCategoryOStudio from "@/components/BggCategoryOStudio";
+import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
+import MajoranaZeroModePowerStudio from "@/components/MajoranaZeroModePowerStudio";
 import MultiCloudClusterStudio from "@/components/MultiCloudClusterStudio";
 import RevOpsPipelineStudio from "@/components/RevOpsPipelineStudio";
 import RedBlueWarDrillStudio from "@/components/RedBlueWarDrillStudio";
@@ -312,6 +316,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "fibonacci-anyon-braiding", label: "Fibonacci Anyon (Cap 161)", icon: Cpu },
+  { id: "bgg-category-o-shield", label: "BGG Category O Shield (Cap 162)", icon: Layers },
+  { id: "cryogenic-flux-qubit", label: "Cryogenic Flux Qubit (Cap 163)", icon: Activity },
+  { id: "majorana-supergrid-power", label: "Majorana Supergrid (Option B)", icon: Zap },
   { id: "seiberg-witten-monopole", label: "Seiberg-Witten (Cap 158)", icon: ShieldCheck },
   { id: "heegaard-floer-bordered", label: "Heegaard Floer (Cap 159)", icon: Activity },
   { id: "geometric-satake-affine", label: "Geometric Satake (Cap 160)", icon: Layers },
@@ -319,7 +327,7 @@ const tabs = [
   { id: "donaldson-thomas-sheaf", label: "Donaldson-Thomas (Cap 155)", icon: ShieldCheck },
   { id: "floer-novikov-gradient", label: "Floer-Novikov (Cap 156)", icon: Activity },
   { id: "beilinson-drinfeld-chiral", label: "Beilinson-Drinfeld (Cap 157)", icon: GitBranch },
-  { id: "majorana-zero-supergrid", label: "Majorana Supergrid (Option B)", icon: Zap },
+  { id: "majorana-zero-supergrid", label: "Majorana Zero-Mode (Option B W45)", icon: Zap },
   { id: "khovanov-foam-cobordism", label: "Khovanov Foam (Cap 152)", icon: Orbit },
   { id: "derived-spectral-scheme", label: "Spectral Scheme (Cap 153)", icon: Layers },
   { id: "quantum-gromov-witten", label: "Quantum Cohomology (Cap 154)", icon: InfinityIcon },
@@ -751,6 +759,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "fibonacci-anyon-braiding" && <FibonacciAnyonBraidingStudio />}
+          {activeTab === "bgg-category-o-shield" && <BggCategoryOStudio />}
+          {activeTab === "cryogenic-flux-qubit" && <CryogenicFluxQubitStudio />}
+          {activeTab === "majorana-supergrid-power" && <MajoranaZeroModePowerStudio />}
           {activeTab === "revops-pipeline" && <RevOpsPipelineStudio />}
           {activeTab === "seiberg-witten-monopole" && <SeibergWittenStudio />}
           {activeTab === "heegaard-floer-bordered" && <HeegaardFloerStudio />}

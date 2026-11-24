@@ -128,9 +128,21 @@ export default function PolaritonSupergridPowerStudio() {
       </div>
 
       {errorMsg && (
-        <div className="p-3 bg-red-950/50 border border-red-500/30 rounded-lg flex items-center space-x-2 text-red-300 text-sm">
-          <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
-          <span>{errorMsg}</span>
+        <div
+          role="alert"
+          className="p-3 bg-red-950/50 border border-red-500/30 rounded-lg flex items-center justify-between space-x-2 text-red-300 text-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="text-xs bg-red-900/60 hover:bg-red-900 px-2.5 py-1 rounded border border-red-700/50 text-red-200"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
