@@ -44,7 +44,7 @@ export function KMSHSMStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Secret splitting failed with status ${res.status}`);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to split secret");
     } finally {
       setLoading(false);
@@ -74,7 +74,7 @@ export function KMSHSMStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Secret reconstruction failed with status ${res.status}`);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to reconstruct secret from shares");
     } finally {
       setReconLoading(false);

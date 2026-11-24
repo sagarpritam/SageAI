@@ -2188,6 +2188,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 50 (Opt B): Gravitational-Wave Phonon Resonant Energy Harvest",
         ),
+        (
+            "GET",
+            "/api/kontsevich-deformation/manifolds",
+            None,
+            "Wave 51 (Cap 173): Kontsevich Poisson Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/kontsevich-deformation/quantize-deformation",
+            {
+                "manifold_id": "KONTSEVICH-MOYAL-PLANE-01",
+                "hbar_order": 4,
+                "harmonic_precision": 1e-6,
+                "deformation_gain": 1.25,
+            },
+            "Wave 51 (Cap 173): Kontsevich Formality Deformation Quantization",
+        ),
+        (
+            "GET",
+            "/api/novikov-shubin/coverings",
+            None,
+            "Wave 51 (Cap 174): Novikov-Shubin Galois Coverings List",
+        ),
+        (
+            "POST",
+            "/api/novikov-shubin/compute-invariants",
+            {
+                "covering_id": "NOVIKOV-SOLV-4D-02",
+                "spectral_order": 6,
+                "dilatational_cutoff": 1e-4,
+                "barrier_gain": 1.25,
+            },
+            "Wave 51 (Cap 174): Novikov-Shubin Invariants & L2-Betti Inversion",
+        ),
+        (
+            "GET",
+            "/api/aps-eta-firewall/manifolds",
+            None,
+            "Wave 51 (Cap 175): APS Boundary Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/aps-eta-firewall/evaluate-eta",
+            {
+                "manifold_id": "APS-DIRAC-CYLINDER-01",
+                "spectral_s": 0.0,
+                "eigenvalue_cutoff": 50,
+                "boundary_damping": 1.25,
+            },
+            "Wave 51 (Cap 175): APS Spectral Asymmetry eta-Invariant Evaluation",
+        ),
+        (
+            "GET",
+            "/api/magneto-acoustic-soliton-supergrid/cavities",
+            None,
+            "Wave 51 (Opt B): Magneto-Acoustic Soliton Cavities List",
+        ),
+        (
+            "POST",
+            "/api/magneto-acoustic-soliton-supergrid/harvest-solitons",
+            {
+                "cavity_id": "SOLITON-PACIFIC-RIM-01",
+                "magnetic_field_tesla": 0.005,
+                "acoustic_velocity_km_s": 13.6,
+                "piezo_efficiency": 0.95,
+                "extraction_duration_s": 60.0,
+            },
+            "Wave 51 (Opt B): CMB Magneto-Acoustic Solitary Wave Energy Harvest",
+        ),
     ]
 
 

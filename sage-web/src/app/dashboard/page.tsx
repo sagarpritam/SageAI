@@ -294,6 +294,10 @@ import Spin7CayleyStudio from "@/components/Spin7CayleyStudio";
 import VoevodskyMotivicStudio from "@/components/VoevodskyMotivicStudio";
 import TwistedKTheoryStudio from "@/components/TwistedKTheoryStudio";
 import RydbergPolaritonSupergridStudio from "@/components/RydbergPolaritonSupergridStudio";
+import KontsevichDeformationStudio from "@/components/KontsevichDeformationStudio";
+import NovikovShubinStudio from "@/components/NovikovShubinStudio";
+import ApsEtaFirewallStudio from "@/components/ApsEtaFirewallStudio";
+import MagnetoAcousticSolitonStudio from "@/components/MagnetoAcousticSolitonStudio";
 import LanglandsAutomorphicStudio from "@/components/LanglandsAutomorphicStudio";
 import CalabiYauMirrorStudio from "@/components/CalabiYauMirrorStudio";
 import ConnesSpectralStudio from "@/components/ConnesSpectralStudio";
@@ -328,6 +332,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "kontsevich-deformation", label: "Kontsevich Deformation (Cap 173)", icon: Shield },
+  { id: "novikov-shubin", label: "Novikov-Shubin Barrier (Cap 174)", icon: Binary },
+  { id: "aps-eta-firewall", label: "APS Eta Firewall (Cap 175)", icon: Compass },
+  { id: "magneto-acoustic-soliton-supergrid", label: "Magneto-Acoustic Soliton (Option B W51)", icon: Activity },
   { id: "langlands-automorphic", label: "Langlands Automorphic (Cap 170)", icon: Binary },
   { id: "calabi-yau-mirror", label: "Calabi-Yau Mirror (Cap 171)", icon: Layers },
   { id: "connes-spectral-geometry", label: "Connes Spectral Armor (Cap 172)", icon: Compass },
@@ -783,6 +791,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "kontsevich-deformation" && <KontsevichDeformationStudio />}
+          {activeTab === "novikov-shubin" && <NovikovShubinStudio />}
+          {activeTab === "aps-eta-firewall" && <ApsEtaFirewallStudio />}
+          {activeTab === "magneto-acoustic-soliton-supergrid" && <MagnetoAcousticSolitonStudio />}
           {activeTab === "langlands-automorphic" && <LanglandsAutomorphicStudio />}
           {activeTab === "calabi-yau-mirror" && <CalabiYauMirrorStudio />}
           {activeTab === "connes-spectral-geometry" && <ConnesSpectralStudio />}

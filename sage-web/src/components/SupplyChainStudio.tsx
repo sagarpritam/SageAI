@@ -53,7 +53,7 @@ export function SupplyChainStudio() {
         const data = await res.json();
         setSbomData(data);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
     } finally {
       setLoading(false);

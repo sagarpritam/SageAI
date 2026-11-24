@@ -211,7 +211,7 @@ export default function EnterprisePlatformSuiteStudio() {
         }
         setNotification(`KMS Key Ring for ${tenantId} rotated to v${data.details.new_version} and anchored to Merkle ledger.`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setNotification(`Key rotation failed: ${String(err)}`);
     } finally {
       setIsRotatingKey(false);
@@ -246,7 +246,7 @@ export default function EnterprisePlatformSuiteStudio() {
         );
         setNotification(`Mitigation evaluated & aligned with D3FEND: ${data.evaluation.mapping.mitigation_component}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setNotification(`Evaluation failed: ${String(err)}`);
     } finally {
       setIsEvaluating(false);
@@ -296,7 +296,7 @@ export default function EnterprisePlatformSuiteStudio() {
         }
         setNotification(`Live Sensor Mesh Heartbeat Confirmed: ${data.telemetry.sensor_nodes_count} Nodes reporting (< ${data.telemetry.avg_latency_ms}ms).`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setNotification(`Heartbeat check failed: ${String(err)}`);
     } finally {
       setIsVerifyingPing(false);

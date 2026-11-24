@@ -96,7 +96,7 @@ export function MarineSonarStudio() {
         setErrorMsg(msg);
         addLog(msg);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to fetch sonar arrays; using fallback telemetry.";
       setErrorMsg(msg);
       addLog(msg);
@@ -146,7 +146,7 @@ export function MarineSonarStudio() {
         setErrorMsg(msg);
         addLog(msg);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Marine acoustic analysis failed.";
       setErrorMsg(msg);
       addLog(msg);
@@ -182,7 +182,7 @@ export function MarineSonarStudio() {
         setErrorMsg(msg);
         addLog(msg);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to triangulate contact.";
       setErrorMsg(msg);
       addLog(msg);

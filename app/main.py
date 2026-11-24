@@ -39,6 +39,7 @@ from app.routers import (
     api_shield_routes,
     apikey_routes,
     apt_attribution_routes,
+    aps_eta_firewall_routes,
     asm_routes,
     asset_routes,
     asymptotic_safety_routes,
@@ -157,12 +158,14 @@ from app.routers import (
     kagome_supergrid_routes,
     khovanov_foam_routes,
     kms_hsm_routes,
+    kontsevich_deformation_routes,
     ktheory_dbrane_routes,
     kugelblitz_hawking_routes,
     kyber_mesh_vpn_routes,
     labyrinth_honeynet_routes,
     langlands_automorphic_routes,
     m_theory_g2_routes,
+    magneto_acoustic_soliton_supergrid_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
     majorana_supergrid_power_routes,
@@ -187,6 +190,7 @@ from app.routers import (
     noncommutative_spacetime_routes,
     notification_routes,
     novikov_geodesic_routes,
+    novikov_shubin_routes,
     operadic_bar_cobar_routes,
     orbital_debris_routes,
     orbital_hpm_routes,
@@ -614,6 +618,10 @@ app.include_router(langlands_automorphic_routes.router)
 app.include_router(calabi_yau_mirror_routes.router)
 app.include_router(connes_spectral_geometry_routes.router)
 app.include_router(gravitational_phonon_routes.router)
+app.include_router(kontsevich_deformation_routes.router)
+app.include_router(novikov_shubin_routes.router)
+app.include_router(aps_eta_firewall_routes.router)
+app.include_router(magneto_acoustic_soliton_supergrid_routes.router)
 
 
 # ---------------------
@@ -631,7 +639,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.0.0",
+        "version": "9.1.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

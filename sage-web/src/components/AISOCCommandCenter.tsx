@@ -50,7 +50,7 @@ export function AISOCCommandCenter() {
       }
       const data = await res.json();
       setTriageReport(data.triage_report);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Neural alert triage failed");
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ export function AISOCCommandCenter() {
       }
       const data = await res.json();
       setBriefing(data.executive_briefing);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "CISO briefing generation failed");
     } finally {
       setBriefingLoading(false);
