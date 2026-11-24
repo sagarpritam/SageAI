@@ -290,6 +290,10 @@ import G2OctonionicStudio from "@/components/G2OctonionicStudio";
 import AzumayaBrauerStudio from "@/components/AzumayaBrauerStudio";
 import CardyBoundaryCftStudio from "@/components/CardyBoundaryCftStudio";
 import HydrideMegabarSupergridStudio from "@/components/HydrideMegabarSupergridStudio";
+import Spin7CayleyStudio from "@/components/Spin7CayleyStudio";
+import VoevodskyMotivicStudio from "@/components/VoevodskyMotivicStudio";
+import TwistedKTheoryStudio from "@/components/TwistedKTheoryStudio";
+import RydbergPolaritonSupergridStudio from "@/components/RydbergPolaritonSupergridStudio";
 import FibonacciAnyonBraidingStudio from "@/components/FibonacciAnyonBraidingStudio";
 import BggCategoryOStudio from "@/components/BggCategoryOStudio";
 import CryogenicFluxQubitStudio from "@/components/CryogenicFluxQubitStudio";
@@ -320,6 +324,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "spin7-cayley-shield", label: "Spin(7) Cayley Shield (Cap 167)", icon: Shield },
+  { id: "voevodsky-motivic-shield", label: "Voevodsky Motivic Shield (Cap 168)", icon: Binary },
+  { id: "twisted-k-theory", label: "Twisted K-Theory (Cap 169)", icon: Flame },
+  { id: "rydberg-polariton-supergrid", label: "Rydberg Polariton (Option B W49)", icon: Zap },
   { id: "g2-octonionic-shield", label: "G₂ Octonionic Shield (Cap 164)", icon: Shield },
   { id: "azumaya-brauer-shield", label: "Azumaya-Brauer Shield (Cap 165)", icon: Binary },
   { id: "cardy-boundary-cft", label: "Cardy Boundary CFT (Cap 166)", icon: Flame },
@@ -767,6 +775,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "spin7-cayley-shield" && <Spin7CayleyStudio />}
+          {activeTab === "voevodsky-motivic-shield" && <VoevodskyMotivicStudio />}
+          {activeTab === "twisted-k-theory" && <TwistedKTheoryStudio />}
+          {activeTab === "rydberg-polariton-supergrid" && <RydbergPolaritonSupergridStudio />}
           {activeTab === "g2-octonionic-shield" && <G2OctonionicStudio />}
           {activeTab === "azumaya-brauer-shield" && <AzumayaBrauerStudio />}
           {activeTab === "cardy-boundary-cft" && <CardyBoundaryCftStudio />}

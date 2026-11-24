@@ -209,6 +209,7 @@ from app.routers import (
     report_routes,
     resurgence_transseries_routes,
     rule_synthesizer_routes,
+    rydberg_polariton_supergrid_routes,
     ryu_takayanagi_routes,
     sbom_vex_routes,
     scan_routes,
@@ -222,6 +223,7 @@ from app.routers import (
     solar_sail_laser_routes,
     space_ground_qkd_routes,
     spectral_scheme_routes,
+    spin7_cayley_routes,
     spin_caloritronic_routes,
     spin_foam_routes,
     sso_routes,
@@ -241,9 +243,11 @@ from app.routers import (
     time_crystal_routes,
     tmf_cohomology_routes,
     topos_grothendieck_routes,
+    twisted_k_theory_routes,
     twisted_supergrid_routes,
     twistor_holonomy_routes,
     unruh_rindler_routes,
+    voevodsky_motivic_routes,
     web3_security_routes,
     webhook_routes,
     weyl_supergrid_routes,
@@ -598,6 +602,10 @@ app.include_router(g2_octonionic_routes.router)
 app.include_router(azumaya_brauer_routes.router)
 app.include_router(cardy_boundary_cft_routes.router)
 app.include_router(hydride_megabar_supergrid_routes.router)
+app.include_router(spin7_cayley_routes.router)
+app.include_router(voevodsky_motivic_routes.router)
+app.include_router(twisted_k_theory_routes.router)
+app.include_router(rydberg_polariton_supergrid_routes.router)
 
 
 # ---------------------
@@ -615,7 +623,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "8.8.0",
+        "version": "8.9.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

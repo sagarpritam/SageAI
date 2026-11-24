@@ -91,7 +91,7 @@ export function KineticDroneShieldStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Failed to fetch defense sites (status ${res.status})`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to fetch defense sites");
     } finally {
       setLoading(false);
@@ -142,7 +142,7 @@ export function KineticDroneShieldStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Detection failed with status ${res.status}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Detection failed");
     } finally {
       setDetecting(false);
@@ -190,7 +190,7 @@ export function KineticDroneShieldStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Firing failed with status ${res.status}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Firing failed");
     } finally {
       setFiring(false);

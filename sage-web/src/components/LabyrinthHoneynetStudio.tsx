@@ -61,7 +61,7 @@ export function LabyrinthHoneynetStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Failed to fetch labyrinths (status ${res.status})`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to fetch labyrinths");
     } finally {
       setLoading(false);
@@ -105,7 +105,7 @@ export function LabyrinthHoneynetStudio() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Probe simulation failed with status ${res.status}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Probe simulation failed");
     } finally {
       setTrapping(false);

@@ -2042,6 +2042,79 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 48 (Opt B): Hydride Megabar Supergrid Power Harvest",
         ),
+        # Wave 49 (Caps 167-169 & Option B Wave 49)
+        (
+            "GET",
+            "/api/spin7-cayley-shield/manifolds",
+            None,
+            "Wave 49 (Cap 167): Spin(7) Cayley Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/spin7-cayley-shield/calibrate-cayley",
+            {
+                "manifold_id": "SPIN7-JOYCE-TORUS-01",
+                "cayley_order": 4,
+                "self_dual_precision": 1e-6,
+                "octonionic_slice_depth": 8,
+                "calibration_gain": 1.25,
+            },
+            "Wave 49 (Cap 167): Spin(7) Cayley 4-Cycle Calibration",
+        ),
+        (
+            "GET",
+            "/api/voevodsky-motivic-shield/motives",
+            None,
+            "Wave 49 (Cap 168): Voevodsky Motivic Schemes List",
+        ),
+        (
+            "POST",
+            "/api/voevodsky-motivic-shield/evaluate-homotopy",
+            {
+                "motive_id": "MOTIVIC-MGL-SPHERE-01",
+                "slice_filtration_level": 3,
+                "nisnevich_cohomology_degree": 2,
+                "weight_p": 4,
+                "homotopy_gain": 1.2,
+            },
+            "Wave 49 (Cap 168): Voevodsky Motivic Homotopy Evaluation",
+        ),
+        (
+            "GET",
+            "/api/twisted-k-theory/complexes",
+            None,
+            "Wave 49 (Cap 169): Twisted K-Theory Complexes List",
+        ),
+        (
+            "POST",
+            "/api/twisted-k-theory/cancel-anomaly",
+            {
+                "complex_id": "TWISTED-K-K3-H3-01",
+                "dixmier_douady_flux": 3,
+                "ahss_filtration_depth": 6,
+                "branes_charge_n": 4,
+                "cancellation_gain": 1.2,
+            },
+            "Wave 49 (Cap 169): Twisted K-Theory Freed-Witten Anomaly Cancellation",
+        ),
+        (
+            "GET",
+            "/api/rydberg-polariton-supergrid/cavities",
+            None,
+            "Wave 49 (Opt B): Rydberg Polariton Cavities List",
+        ),
+        (
+            "POST",
+            "/api/rydberg-polariton-supergrid/harvest-polariton",
+            {
+                "cavity_id": "RYDBERG-PEROVSKITE-CAVITY-01",
+                "exciton_fraction_pct": 50.0,
+                "pump_fluence_uj_cm2": 120.0,
+                "superfluid_coupling_gain": 1.15,
+                "temperature_k": 295.0,
+            },
+            "Wave 49 (Opt B): Rydberg Polariton Superfluid Power Harvest",
+        ),
     ]
 
 

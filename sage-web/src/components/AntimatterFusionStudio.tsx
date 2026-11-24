@@ -59,7 +59,7 @@ export default function AntimatterFusionStudio() {
           setSelectedThruster((prev) => prev || data.thrusters[0].thruster_id);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Failed to load ACF thrusters');
     }
   }, []);
@@ -87,7 +87,7 @@ export default function AntimatterFusionStudio() {
       }
       const data = await res.json();
       setTelemetry(data);
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'ACF pulse ignition failed');
     } finally {
       setLoading(false);

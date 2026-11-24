@@ -66,7 +66,7 @@ export function AirGapLLMGuardStudio() {
           setSelectedModel((prev) => prev || data.models[0]);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to load air-gapped models");
     } finally {
       setLoading(false);
@@ -100,7 +100,7 @@ export function AirGapLLMGuardStudio() {
         setModels((prev) => [data.model, ...prev]);
         setSelectedModel(data.model);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to scan model artifact");
     } finally {
       setScanning(false);
@@ -132,7 +132,7 @@ export function AirGapLLMGuardStudio() {
           m.model_id === modelId ? { ...m, safety_status: "SEALED_AIRGAP_AUTHORIZED" } : m
         )
       );
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to seal model enclave");
     } finally {
       setSealing(false);

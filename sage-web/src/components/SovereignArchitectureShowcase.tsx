@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Fibonacci Anyon Braiding & Topological Fusion, BGG Category O Shields, 15 mK Cryogenic Flux Qubits & Planetary 2e^2/h Majorana Conductance Peak Supergrid.",
+    detail: "Spin(7) Cayley 4-Cycle Shields, Voevodsky Motivic Homotopy Barriers, Twisted K-Theory Freed-Witten Firewalls & Planetary Ultra-Dense Rydberg Polariton Condensate Supergrid.",
   },
 ];
 

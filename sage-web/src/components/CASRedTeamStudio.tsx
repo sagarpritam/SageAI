@@ -72,7 +72,7 @@ export function CASRedTeamStudio() {
           setSelectedCampaign((prev) => prev || data.campaigns[0]);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to fetch red-team campaigns");
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export function CASRedTeamStudio() {
           };
         });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to execute red-team swarm round");
     } finally {
       setRunningRound(false);

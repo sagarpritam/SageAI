@@ -120,7 +120,7 @@ async def test_health_check_fields(client):
     assert data["app"] == "SageAI Security Scanner"
     assert data["environment"] in ("development", "production", "test")
     assert "endpoints" in data
-    assert data["version"] in ("2.0.0", "8.6.0", "8.7.0", "8.8.0")
+    assert data["version"] in ("2.0.0", "8.6.0", "8.7.0", "8.8.0", "8.9.0")
 
 
 @pytest.mark.asyncio
