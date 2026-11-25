@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Lurie Higher Topos Theory & Spectral Shield, Grothendieck-Riemann-Roch BFM Singular Barrier, Kazhdan-Lusztig Hecke Firewall & Planetary ICB Dendritic Solidification Supergrid.",
+    detail: "Kashiwara-Schapira Sheaves on Manifolds & Microlocal Shield, Macdonald Symmetric Polynomials & DAHA Barrier, Gromov-Eliashberg Symplectic Firewall & Planetary F-Layer Slurry Supergrid.",
   },
 ];
 

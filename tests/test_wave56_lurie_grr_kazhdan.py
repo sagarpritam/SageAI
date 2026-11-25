@@ -259,5 +259,5 @@ def test_wave56_platform_health_version():
     assert r.status_code == 200
     data = r.json()
     assert data["status"] in ("healthy", "degraded")
-    assert data["version"] in ("9.5.0", "9.6.0")
+    assert data["version"] in ("9.5.0", "9.6.0", "9.7.0")
     assert len(app.routes) >= 980

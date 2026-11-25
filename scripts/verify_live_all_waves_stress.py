@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 56 Waves (Capabilities 1 to 190).
+Live Multi-Domain Stress Test & Verification across All 57 Waves (Capabilities 1 to 193).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-56 (Caps 1-190)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-57 (Caps 1-193)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -2600,6 +2600,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 56 (Opt B): Planetary Inner-Core Boundary Latent Heat Power Harvest",
         ),
+        # Wave 57 (Caps 191-193 & Option B Wave 57)
+        (
+            "GET",
+            "/api/kashiwara-schapira-microlocal/sheaves",
+            None,
+            "Wave 57 (Cap 191): Kashiwara-Schapira Sheaves List",
+        ),
+        (
+            "POST",
+            "/api/kashiwara-schapira-microlocal/evaluate-microlocal-support",
+            {
+                "sheaf_id": "KS-COTANGENT-BUNDLE-01",
+                "cotangent_order": 4,
+                "contact_gain": 1.25,
+                "phase_cutoff": 1e-4,
+            },
+            "Wave 57 (Cap 191): Kashiwara-Schapira Microlocal Singular Involutivity Evaluate",
+        ),
+        (
+            "GET",
+            "/api/macdonald-daha-polynomial/algebras",
+            None,
+            "Wave 57 (Cap 192): Macdonald DAHA Algebras List",
+        ),
+        (
+            "POST",
+            "/api/macdonald-daha-polynomial/evaluate-macdonald-duality",
+            {
+                "algebra_id": "DAHA-GLN-ROOT-01",
+                "polynomial_degree": 4,
+                "dunkl_order": 6,
+                "barrier_gain": 1.25,
+            },
+            "Wave 57 (Cap 192): Macdonald Polynomial & DAHA Duality Evaluate",
+        ),
+        (
+            "GET",
+            "/api/gromov-eliashberg-symplectic/manifolds",
+            None,
+            "Wave 57 (Cap 193): Gromov-Eliashberg Symplectic Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/gromov-eliashberg-symplectic/evaluate-symplectic-capacity",
+            {
+                "manifold_id": "GROMOV-CYLINDER-PHASE-01",
+                "ball_radius": 1.0,
+                "cylinder_radius": 1.0,
+                "firewall_gain": 1.25,
+            },
+            "Wave 57 (Cap 193): Gromov Symplectic Capacity & Non-Squeezing Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-f-layer-slurry-supergrid/arrays",
+            None,
+            "Wave 57 (Opt B): Planetary F-Layer Slurry Arrays List",
+        ),
+        (
+            "POST",
+            "/api/planetary-f-layer-slurry-supergrid/harvest-slurry-power",
+            {
+                "array_id": "F-LAYER-PACIFIC-SEDIMENT-01",
+                "sedimentation_rate_override_mm_yr": 2.5,
+                "magnetostrictive_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 57 (Opt B): Planetary F-Layer Outer-Core Slurry Power Harvest",
+        ),
     ]
 
 
@@ -2629,7 +2698,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-56, CAPS 1-190) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-57, CAPS 1-193) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -2701,7 +2770,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-56){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-57){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -2717,7 +2786,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-56 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-57 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 

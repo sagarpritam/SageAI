@@ -310,6 +310,10 @@ import LurieToposStudio from "@/components/LurieToposStudio";
 import GRRBaumFultonStudio from "@/components/GRRBaumFultonStudio";
 import KazhdanLusztigStudio from "@/components/KazhdanLusztigStudio";
 import ICBSolidificationStudio from "@/components/ICBSolidificationStudio";
+import { KashiwaraMicrolocalStudio } from "@/components/KashiwaraMicrolocalStudio";
+import { MacdonaldDAHAStudio } from "@/components/MacdonaldDAHAStudio";
+import { GromovSymplecticStudio } from "@/components/GromovSymplecticStudio";
+import { FLayerSlurryStudio } from "@/components/FLayerSlurryStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -352,6 +356,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "kashiwara-schapira-microlocal", label: "Kashiwara Microlocal (Cap 191)", icon: Shield },
+  { id: "macdonald-daha-polynomial", label: "Macdonald DAHA (Cap 192)", icon: Layers },
+  { id: "gromov-eliashberg-symplectic", label: "Gromov Symplectic (Cap 193)", icon: Compass },
+  { id: "planetary-f-layer-slurry-supergrid", label: "F-Layer Slurry (Option B W57)", icon: Flame },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -831,6 +839,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "kashiwara-schapira-microlocal" && <KashiwaraMicrolocalStudio />}
+          {activeTab === "macdonald-daha-polynomial" && <MacdonaldDAHAStudio />}
+          {activeTab === "gromov-eliashberg-symplectic" && <GromovSymplecticStudio />}
+          {activeTab === "planetary-f-layer-slurry-supergrid" && <FLayerSlurryStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

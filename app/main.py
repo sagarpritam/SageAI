@@ -139,6 +139,7 @@ from app.routers import (
     geodynamo_helical_turbulent_supergrid_routes,
     gravitational_phonon_routes,
     gravitational_seismic_routes,
+    gromov_eliashberg_symplectic_routes,
     gromov_witten_cohomology_routes,
     grothendieck_teichmuller_galois_routes,
     grr_baum_fulton_macpherson_routes,
@@ -165,6 +166,7 @@ from app.routers import (
     itdr_routes,
     jt_wormhole_routes,
     kagome_supergrid_routes,
+    kashiwara_schapira_microlocal_routes,
     kazhdan_lusztig_hecke_routes,
     khovanov_foam_routes,
     kms_hsm_routes,
@@ -176,6 +178,7 @@ from app.routers import (
     langlands_automorphic_routes,
     lurie_higher_topos_spectral_routes,
     m_theory_g2_routes,
+    macdonald_daha_polynomial_routes,
     magneto_acoustic_soliton_supergrid_routes,
     magneto_inertial_fusion_routes,
     magnetosphere_dynamo_routes,
@@ -213,6 +216,7 @@ from app.routers import (
     payment_routes,
     perelman_ricci_flow_routes,
     photonic_quantum_routes,
+    planetary_f_layer_slurry_supergrid_routes,
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
@@ -662,6 +666,10 @@ app.include_router(lurie_higher_topos_spectral_routes.router)
 app.include_router(grr_baum_fulton_macpherson_routes.router)
 app.include_router(kazhdan_lusztig_hecke_routes.router)
 app.include_router(icb_dendritic_solidification_supergrid_routes.router)
+app.include_router(kashiwara_schapira_microlocal_routes.router)
+app.include_router(macdonald_daha_polynomial_routes.router)
+app.include_router(gromov_eliashberg_symplectic_routes.router)
+app.include_router(planetary_f_layer_slurry_supergrid_routes.router)
 
 
 # ---------------------
@@ -679,7 +687,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.6.0",
+        "version": "9.7.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       status: "FIBONACCI_BRAID_COMPILED",
       timestamp: Date.now() / 1000,
     });
-  } catch (error) {
+  } catch (_error: unknown) {
     return NextResponse.json({ error: "Failed to compile Fibonacci anyon braid" }, { status: 500 });
   }
 }

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       status: "ACF_THRUSTER_FIRING_OPTIMAL",
       timestamp: Date.now() / 1000,
     });
-  } catch (error) {
+  } catch (_error: unknown) {
     return NextResponse.json({ error: "Failed to ignite antimatter-catalyzed fusion pulse" }, { status: 500 });
   }
 }
