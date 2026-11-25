@@ -331,6 +331,10 @@ import { GaitsgoryLanglandsStudio } from "@/components/GaitsgoryLanglandsStudio"
 import { WilesModularityStudio } from "@/components/WilesModularityStudio";
 import { AtiyahSingerIndexStudio } from "@/components/AtiyahSingerIndexStudio";
 import { GeomagneticFluxCapacitorStudio } from "@/components/GeomagneticFluxCapacitorStudio";
+import { HirzebruchToddStudio } from "@/components/HirzebruchToddStudio";
+import { WeilFrobeniusPurityStudio } from "@/components/WeilFrobeniusPurityStudio";
+import { CyclicHomotopyStudio } from "@/components/CyclicHomotopyStudio";
+import { BirkelandElectrojetStudio } from "@/components/BirkelandElectrojetStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -393,6 +397,10 @@ const tabs = [
   { id: "wiles-taylor-modularity-lifting", label: "Wiles-Taylor R=T (Cap 204)", icon: KeyRound },
   { id: "atiyah-singer-index-heat-kernel", label: "Atiyah-Singer Index (Cap 205)", icon: Flame },
   { id: "planetary-geomagnetic-reversal-flux-capacitor", label: "Geomagnetic Flux (Option B W61)", icon: Compass },
+  { id: "hirzebruch-riemann-roch", label: "Hirzebruch HRR (Cap 206)", icon: Layers },
+  { id: "weil-conjectures-purity", label: "Weil Purity (Cap 207)", icon: Binary },
+  { id: "kontsevich-cyclic-homotopy", label: "Cyclic Homotopy (Cap 208)", icon: InfinityIcon },
+  { id: "planetary-birkeland-auroral-electrojet", label: "Birkeland Electrojet (Option B W62)", icon: Orbit },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -892,6 +900,10 @@ export default function DashboardPage() {
           {activeTab === "wiles-taylor-modularity-lifting" && <WilesModularityStudio />}
           {activeTab === "atiyah-singer-index-heat-kernel" && <AtiyahSingerIndexStudio />}
           {activeTab === "planetary-geomagnetic-reversal-flux-capacitor" && <GeomagneticFluxCapacitorStudio />}
+          {activeTab === "hirzebruch-riemann-roch" && <HirzebruchToddStudio />}
+          {activeTab === "weil-conjectures-purity" && <WeilFrobeniusPurityStudio />}
+          {activeTab === "kontsevich-cyclic-homotopy" && <CyclicHomotopyStudio />}
+          {activeTab === "planetary-birkeland-auroral-electrojet" && <BirkelandElectrojetStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

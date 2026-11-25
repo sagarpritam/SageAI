@@ -2945,6 +2945,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 61 (Opt B): Planetary Geomagnetic Flux Power Harvest",
         ),
+        # Wave 62 (Caps 206-208 & Option B Wave 62)
+        (
+            "GET",
+            "/api/hirzebruch-riemann-roch/sheaves",
+            None,
+            "Wave 62 (Cap 206): Hirzebruch-Riemann-Roch Sheaves List",
+        ),
+        (
+            "POST",
+            "/api/hirzebruch-riemann-roch/evaluate-hrr-todd-genus",
+            {
+                "sheaf_id": "HIRZEBRUCH-K3-TODD-01",
+                "complex_dimension": 2,
+                "bundle_rank": 3,
+                "shield_gain": 1.25,
+            },
+            "Wave 62 (Cap 206): Hirzebruch-Riemann-Roch Todd Evaluate",
+        ),
+        (
+            "GET",
+            "/api/weil-conjectures-purity/varieties",
+            None,
+            "Wave 62 (Cap 207): Weil Conjectures Varieties List",
+        ),
+        (
+            "POST",
+            "/api/weil-conjectures-purity/evaluate-frobenius-purity",
+            {
+                "variety_id": "WEIL-ELLIPTIC-CURVE-FQ-01",
+                "finite_field_q": 7,
+                "cohomology_weight_w": 1,
+                "barrier_gain": 1.25,
+            },
+            "Wave 62 (Cap 207): Weil Frobenius Purity Evaluate",
+        ),
+        (
+            "GET",
+            "/api/kontsevich-cyclic-homotopy/algebras",
+            None,
+            "Wave 62 (Cap 208): Kontsevich Cyclic Algebras List",
+        ),
+        (
+            "POST",
+            "/api/kontsevich-cyclic-homotopy/evaluate-cyclic-formality",
+            {
+                "algebra_id": "CYCLIC-AINFINITY-HKR-01",
+                "arity_m_k": 3,
+                "cyclic_degree": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 62 (Cap 208): Kontsevich Cyclic Formality Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-birkeland-auroral-electrojet/electrojets",
+            None,
+            "Wave 62 (Opt B): Planetary Birkeland Electrojets List",
+        ),
+        (
+            "POST",
+            "/api/planetary-birkeland-auroral-electrojet/harvest-birkeland-electrojet-power",
+            {
+                "electrojet_id": "BIRKELAND-REGION1-AURORAL-OVAL-01",
+                "current_multiplier_override": 1.05,
+                "tether_efficiency": 0.975,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 62 (Opt B): Planetary Birkeland Electrojet Power Harvest",
+        ),
     ]
 
 
