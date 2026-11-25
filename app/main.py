@@ -43,6 +43,7 @@ from app.routers import (
     asm_routes,
     asset_routes,
     asymptotic_safety_routes,
+    atiyah_segal_tqft_routes,
     atomic_clock_routes,
     atomic_redteam_routes,
     auth_routes,
@@ -99,6 +100,7 @@ from app.routers import (
     deception_routes,
     deck_metrics_routes,
     deep_analysis_routes,
+    deligne_lusztig_character_routes,
     deep_crustal_mhd_routes,
     deep_space_laser_routes,
     derived_symplectic_routes,
@@ -176,6 +178,7 @@ from app.routers import (
     majorana_supergrid_routes,
     malware_routes,
     mantle_geoneutrino_routes,
+    mantle_transition_zone_wadsleyite_supergrid_routes,
     marine_sonar_routes,
     matrix_bfss_routes,
     mera_tensor_routes,
@@ -269,6 +272,7 @@ from app.routers import (
     weyl_supergrid_routes,
     workload_identity_routes,
     ws_routes,
+    yau_tian_donaldson_k_stability_routes,
     zkp_routes,
     ztna_routes,
 )
@@ -638,6 +642,10 @@ app.include_router(uhlenbeck_gauge_compactness_routes.router)
 app.include_router(taubes_vortex_sw_routes.router)
 app.include_router(grothendieck_teichmuller_galois_routes.router)
 app.include_router(geodynamo_helical_turbulent_supergrid_routes.router)
+app.include_router(yau_tian_donaldson_k_stability_routes.router)
+app.include_router(deligne_lusztig_character_routes.router)
+app.include_router(atiyah_segal_tqft_routes.router)
+app.include_router(mantle_transition_zone_wadsleyite_supergrid_routes.router)
 
 
 # ---------------------
@@ -655,7 +663,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.3.0",
+        "version": "9.4.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Uhlenbeck Gauge Theory Compactness Shield, Taubes SW=Gr Equivalence Barrier, Grothendieck-Teichmüller Dessins Firewall & Planetary Geodynamo Induction Supergrid.",
+    detail: "Yau-Tian-Donaldson K-Stability Shield, Deligne-Lusztig Character Barrier, Atiyah-Segal TQFT Firewall & Mantle Transition Zone Wadsleyite Supergrid.",
   },
 ];
 

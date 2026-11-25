@@ -368,7 +368,7 @@ export function SecurityPosture() {
           });
           setDebrief(res.data);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to load debrief:", err);
         setErrorMsg("Unable to synthesize localized CISO debrief.");
       } finally {

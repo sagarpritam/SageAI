@@ -63,7 +63,7 @@ export function ThreatFeed() {
           setRuleBundles((prev) => ({ ...prev, [item.id]: synthRes.data.bundle }));
         }
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("Rule synthesis error:", e);
       setErrorMsg(`Failed to synthesize detection rules for ${item.id}.`);
     } finally {

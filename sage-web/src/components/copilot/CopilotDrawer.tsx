@@ -231,7 +231,7 @@ export function CopilotDrawer({
               : msg
           )
         );
-      } catch (err) {
+      } catch (err: unknown) {
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMsgId

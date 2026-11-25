@@ -3,10 +3,10 @@
 > **SageAI** is a production-grade, enterprise sovereign AI cybersecurity and defense ecosystem designed for **Autonomous Vulnerability Assessment**, **Dynamic Binary Reverse Engineering**, **Deception Technology (Honeypots)**, **Web/Network Intrusion Detection (WAF/NIDS)**, **Continuous Threat Intelligence**, and **Automated Incident Response (SOAR)** with zero-trust safety safeguards.
 > Powered by **FastAPI**, **Next.js (Turbopack)**, **PostgreSQL (Supabase RLS)**, and a **Multi-Model AI Consensus Engine** (GPT-4o, Claude 3.7 Sonnet, DeepSeek R1, Nemotron 70B, Gemini 2.5 Pro).
 
-[![Tests](https://img.shields.io/badge/tests-779%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
-[![Next.js](https://img.shields.io/badge/Next.js-715%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-948%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
-[![Version](https://img.shields.io/badge/version-9.3.0%20Uhlenbeck%2C%20Taubes%20%26%20Grothendieck-gold?style=for-the-badge)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-788%20passing-brightgreen?style=for-the-badge&logo=pytest)](tests/)
+[![Next.js](https://img.shields.io/badge/Next.js-727%20Routes%20Compiled-blue?style=for-the-badge&logo=next.js)](sage-web/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-960%20Routes-009688?style=for-the-badge&logo=fastapi)](app/)
+[![Version](https://img.shields.io/badge/version-9.4.0%20YTD%2C%20Deligne--Lusztig%20%26%20Atiyah--Segal-gold?style=for-the-badge)](CHANGELOG.md)
 [![Compliance](https://img.shields.io/badge/compliance-SOC2%20Type%20II%20%7C%20ISO%2027001%20%7C%20FedRAMP-orange?style=for-the-badge)](app/services/audit_chain.py)
 [![Dual Sync](https://img.shields.io/badge/remotes-GitHub%20%26%20GitLab-informational?style=for-the-badge&logo=git)](https://github.com/sagarpritam/SageAI.git)
 

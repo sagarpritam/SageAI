@@ -30,7 +30,7 @@ export default function PricingPage() {
       if (url) {
         window.location.href = url;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("Checkout failed", e);
     }
   };

@@ -2394,6 +2394,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 53 (Opt B): Planetary Outer-Core Geodynamo Induction Power Harvest",
         ),
+        # Wave 54 (Caps 182-184 & Option B Wave 54)
+        (
+            "GET",
+            "/api/yau-tian-donaldson-k-stability/varieties",
+            None,
+            "Wave 54 (Cap 182): YTD Fano Varieties List",
+        ),
+        (
+            "POST",
+            "/api/yau-tian-donaldson-k-stability/verify-k-stability",
+            {
+                "variety_id": "YTD-FANO-CP3-01",
+                "test_configuration_exponent": 2,
+                "coercivity_threshold": 0.05,
+                "kahler_gain": 1.25,
+            },
+            "Wave 54 (Cap 182): YTD K-Stability & Kähler-Einstein Metric Enforce",
+        ),
+        (
+            "GET",
+            "/api/deligne-lusztig-character/varieties",
+            None,
+            "Wave 54 (Cap 183): Deligne-Lusztig Varieties List",
+        ),
+        (
+            "POST",
+            "/api/deligne-lusztig-character/evaluate-character",
+            {
+                "variety_id": "DL-GL3-FLAG-01",
+                "cohomology_degree": 2,
+                "unipotent_rank": 3,
+                "representation_gain": 1.25,
+            },
+            "Wave 54 (Cap 183): Deligne-Lusztig Virtual Character Sheaves Evaluate",
+        ),
+        (
+            "GET",
+            "/api/atiyah-segal-tqft/bordisms",
+            None,
+            "Wave 54 (Cap 184): Atiyah-Segal Bordism Category Configurations List",
+        ),
+        (
+            "POST",
+            "/api/atiyah-segal-tqft/evaluate-functor",
+            {
+                "bordism_id": "TQFT-TORUS-DEHN-TWIST-01",
+                "gluing_cut_count": 2,
+                "mapping_class_order": 12,
+                "functor_gain": 1.25,
+            },
+            "Wave 54 (Cap 184): Atiyah-Segal Axiomatic Functorial TQFT Evaluate",
+        ),
+        (
+            "GET",
+            "/api/mantle-transition-zone-wadsleyite-supergrid/arrays",
+            None,
+            "Wave 54 (Opt B): Mantle Transition Zone Wadsleyite Arrays List",
+        ),
+        (
+            "POST",
+            "/api/mantle-transition-zone-wadsleyite-supergrid/harvest-proton-conduction",
+            {
+                "array_id": "WADSLEYITE-PACIFIC-SLAB-01",
+                "water_content_override_wt_pct": 2.15,
+                "induction_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 54 (Opt B): Planetary Mantle Transition Zone Proton Conduction Power Harvest",
+        ),
     ]
 
 

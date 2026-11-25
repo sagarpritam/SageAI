@@ -298,6 +298,10 @@ import UhlenbeckCompactnessStudio from "@/components/UhlenbeckCompactnessStudio"
 import TaubesVortexStudio from "@/components/TaubesVortexStudio";
 import GrothendieckTeichmullerStudio from "@/components/GrothendieckTeichmullerStudio";
 import GeodynamoTurbulentStudio from "@/components/GeodynamoTurbulentStudio";
+import YauTianDonaldsonStudio from "@/components/YauTianDonaldsonStudio";
+import DeligneLusztigStudio from "@/components/DeligneLusztigStudio";
+import AtiyahSegalTQFTStudio from "@/components/AtiyahSegalTQFTStudio";
+import MantleWadsleyiteStudio from "@/components/MantleWadsleyiteStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -340,6 +344,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "yau-tian-donaldson-k-stability", label: "YTD K-Stability (Cap 182)", icon: Shield },
+  { id: "deligne-lusztig-character", label: "Deligne-Lusztig (Cap 183)", icon: Layers },
+  { id: "atiyah-segal-tqft", label: "Atiyah-Segal TQFT (Cap 184)", icon: Compass },
+  { id: "mantle-transition-zone-wadsleyite-supergrid", label: "Mantle Wadsleyite (Option B W54)", icon: Activity },
   { id: "uhlenbeck-gauge-compactness", label: "Uhlenbeck Compactness (Cap 179)", icon: Shield },
   { id: "taubes-vortex-sw", label: "Taubes Vortices (Cap 180)", icon: Waves },
   { id: "grothendieck-teichmuller-galois", label: "Grothendieck-Teichmuller (Cap 181)", icon: Network },
@@ -807,6 +815,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "yau-tian-donaldson-k-stability" && <YauTianDonaldsonStudio />}
+          {activeTab === "deligne-lusztig-character" && <DeligneLusztigStudio />}
+          {activeTab === "atiyah-segal-tqft" && <AtiyahSegalTQFTStudio />}
+          {activeTab === "mantle-transition-zone-wadsleyite-supergrid" && <MantleWadsleyiteStudio />}
           {activeTab === "uhlenbeck-gauge-compactness" && <UhlenbeckCompactnessStudio />}
           {activeTab === "taubes-vortex-sw" && <TaubesVortexStudio />}
           {activeTab === "grothendieck-teichmuller-galois" && <GrothendieckTeichmullerStudio />}

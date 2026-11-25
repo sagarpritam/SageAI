@@ -154,7 +154,7 @@ export default function Home() {
     try {
       ws = new WebSocket(`${wsBase}/ws/scan/${id}`);
       activeWsRef.current = ws;
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn("WebSocket initialization failed, falling back to telemetry polling", err);
       pollScan(id);
       return;
@@ -190,7 +190,7 @@ export default function Home() {
           ws.close();
           fetchFinalResults(id);
         }
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("WS Parse Error", e);
       }
     };
@@ -222,7 +222,7 @@ export default function Home() {
         setScanState("completed");
         setLogs(prev => [...prev, "[!] Finalizing OSINT Aggregation...", "[+] Scan Completed Successfully!"]);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("Failed to fetch final results via proxy", e);
       setScanState("idle");
     }
