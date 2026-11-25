@@ -2738,6 +2738,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 58 (Opt B): Planetary Outer-Core Tangent Cylinder Jet Power Harvest",
         ),
+        # Wave 59 (Caps 197-199 & Option B Wave 59)
+        (
+            "GET",
+            "/api/scholze-perfectoid-spaces/spaces",
+            None,
+            "Wave 59 (Cap 197): Scholze Perfectoid Spaces List",
+        ),
+        (
+            "POST",
+            "/api/scholze-perfectoid-spaces/evaluate-tilting-equivalence",
+            {
+                "space_id": "SCHOLZE-PERFECTOID-BALL-01",
+                "prime_p": 5,
+                "tilt_precision": 4,
+                "shield_gain": 1.25,
+            },
+            "Wave 59 (Cap 197): Scholze Tilting Equivalence Evaluate",
+        ),
+        (
+            "GET",
+            "/api/borcherds-kac-moody-moonshine/algebras",
+            None,
+            "Wave 59 (Cap 198): Borcherds Moonshine Algebras List",
+        ),
+        (
+            "POST",
+            "/api/borcherds-kac-moody-moonshine/evaluate-automorphic-product",
+            {
+                "algebra_id": "BORCHERDS-MONSTER-VOA-01",
+                "central_charge": 24,
+                "q_expansion_order": 4,
+                "barrier_gain": 1.25,
+            },
+            "Wave 59 (Cap 198): Borcherds Automorphic Product Evaluate",
+        ),
+        (
+            "GET",
+            "/api/kontsevich-noncommutative-motives/motives",
+            None,
+            "Wave 59 (Cap 199): Kontsevich Noncommutative Motives List",
+        ),
+        (
+            "POST",
+            "/api/kontsevich-noncommutative-motives/evaluate-noncommutative-chern-character",
+            {
+                "motive_id": "KONTSEVICH-DG-CAT-01",
+                "categorical_dimension": 3,
+                "hochschild_degree": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 59 (Cap 199): Kontsevich Noncommutative Chern Character Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-innermost-inner-core-anisotropy/arrays",
+            None,
+            "Wave 59 (Opt B): Planetary Innermost Inner Core Arrays List",
+        ),
+        (
+            "POST",
+            "/api/planetary-innermost-inner-core-anisotropy/harvest-innermost-core-power",
+            {
+                "array_id": "IMIC-EQUATORIAL-FAST-AXIS-01",
+                "anisotropy_factor_override": 3.2,
+                "piezo_coupling_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 59 (Opt B): Planetary Innermost Inner Core Power Harvest",
+        ),
     ]
 
 
@@ -2839,7 +2908,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-58){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-59){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -2855,7 +2924,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-58 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-59 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 

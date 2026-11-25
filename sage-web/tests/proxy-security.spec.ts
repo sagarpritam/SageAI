@@ -243,8 +243,8 @@ test.describe("Next.js API Proxy Security & Resilience Regression Suite", () => 
     const healthRes = await request.get("/api/health");
     expect(healthRes.status()).toBe(200);
     const healthJson = (await healthRes.json()) as Record<string, unknown>;
-    expect(["8.6.0", "8.7.0", "8.8.0", "8.9.0", "9.0.0", "9.1.0", "9.2.0", "9.3.0", "9.4.0", "9.5.0", "9.6.0", "9.7.0", "9.8.0"]).toContain(healthJson.platform_version);
-    expect(["8.6.0", "8.7.0", "8.8.0", "8.9.0", "9.0.0", "9.1.0", "9.2.0", "9.3.0", "9.4.0", "9.5.0", "9.6.0", "9.7.0", "9.8.0"]).toContain(healthJson.version);
+    expect(["8.6.0", "8.7.0", "8.8.0", "8.9.0", "9.0.0", "9.1.0", "9.2.0", "9.3.0", "9.4.0", "9.5.0", "9.6.0", "9.7.0", "9.8.0", "9.9.0"]).toContain(healthJson.platform_version);
+    expect(["8.6.0", "8.7.0", "8.8.0", "8.9.0", "9.0.0", "9.1.0", "9.2.0", "9.3.0", "9.4.0", "9.5.0", "9.6.0", "9.7.0", "9.8.0", "9.9.0"]).toContain(healthJson.version);
     expect(healthJson.backend_configured).toBe(false);
     expect(healthJson.mode).toBe("standalone-ui");
 

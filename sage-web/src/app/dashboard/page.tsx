@@ -318,6 +318,10 @@ import { FaltingsAlmostEtaleStudio } from "@/components/FaltingsAlmostEtaleStudi
 import { BeilinsonBernsteinStudio } from "@/components/BeilinsonBernsteinStudio";
 import { ConnesKreimerStudio } from "@/components/ConnesKreimerStudio";
 import { TangentCylinderJetStudio } from "@/components/TangentCylinderJetStudio";
+import { ScholzePerfectoidStudio } from "@/components/ScholzePerfectoidStudio";
+import { BorcherdsMoonshineStudio } from "@/components/BorcherdsMoonshineStudio";
+import { KontsevichMotivesStudio } from "@/components/KontsevichMotivesStudio";
+import { InnermostInnerCoreStudio } from "@/components/InnermostInnerCoreStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -368,6 +372,10 @@ const tabs = [
   { id: "beilinson-bernstein-localization", label: "Beilinson-Bernstein (Cap 195)", icon: Layers },
   { id: "connes-kreimer-hopf", label: "Connes-Kreimer Hopf (Cap 196)", icon: Compass },
   { id: "planetary-outer-core-tangent-cylinder-jet", label: "Tangent Cylinder Jet (Option B W58)", icon: Radio },
+  { id: "scholze-perfectoid-spaces", label: "Scholze Perfectoid (Cap 197)", icon: Shield },
+  { id: "borcherds-kac-moody-moonshine", label: "Borcherds Moonshine (Cap 198)", icon: Cpu },
+  { id: "kontsevich-noncommutative-motives", label: "Kontsevich Motives (Cap 199)", icon: Layers },
+  { id: "planetary-innermost-inner-core-anisotropy", label: "Innermost Inner Core (Option B W59)", icon: Radio },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -855,6 +863,10 @@ export default function DashboardPage() {
           {activeTab === "beilinson-bernstein-localization" && <BeilinsonBernsteinStudio />}
           {activeTab === "connes-kreimer-hopf" && <ConnesKreimerStudio />}
           {activeTab === "planetary-outer-core-tangent-cylinder-jet" && <TangentCylinderJetStudio />}
+          {activeTab === "scholze-perfectoid-spaces" && <ScholzePerfectoidStudio />}
+          {activeTab === "borcherds-kac-moody-moonshine" && <BorcherdsMoonshineStudio />}
+          {activeTab === "kontsevich-noncommutative-motives" && <KontsevichMotivesStudio />}
+          {activeTab === "planetary-innermost-inner-core-anisotropy" && <InnermostInnerCoreStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

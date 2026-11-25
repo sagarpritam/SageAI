@@ -58,6 +58,7 @@ from app.routers import (
     binary_deobfuscator_routes,
     bloch_schwinger_routes,
     bloodhound_routes,
+    borcherds_kac_moody_moonshine_routes,
     bv_brst_routes,
     calabi_yau_routes,
     calabi_yau_mirror_routes,
@@ -174,6 +175,7 @@ from app.routers import (
     khovanov_foam_routes,
     kms_hsm_routes,
     kontsevich_deformation_routes,
+    kontsevich_noncommutative_motives_routes,
     ktheory_dbrane_routes,
     kugelblitz_hawking_routes,
     kyber_mesh_vpn_routes,
@@ -221,6 +223,7 @@ from app.routers import (
     photonic_quantum_routes,
     planetary_f_layer_slurry_supergrid_routes,
     planetary_outer_core_tangent_cylinder_jet_routes,
+    planetary_innermost_inner_core_anisotropy_routes,
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
@@ -244,6 +247,7 @@ from app.routers import (
     sbom_vex_routes,
     scan_routes,
     schedule_routes,
+    scholze_perfectoid_spaces_routes,
     schwinger_vacuum_routes,
     sdn_shield_routes,
     seiberg_witten_monopole_routes,
@@ -678,6 +682,10 @@ app.include_router(faltings_almost_etale_routes.router)
 app.include_router(beilinson_bernstein_localization_routes.router)
 app.include_router(connes_kreimer_hopf_routes.router)
 app.include_router(planetary_outer_core_tangent_cylinder_jet_routes.router)
+app.include_router(scholze_perfectoid_spaces_routes.router)
+app.include_router(borcherds_kac_moody_moonshine_routes.router)
+app.include_router(kontsevich_noncommutative_motives_routes.router)
+app.include_router(planetary_innermost_inner_core_anisotropy_routes.router)
 
 
 # ---------------------
@@ -695,7 +703,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.8.0",
+        "version": "9.9.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],
