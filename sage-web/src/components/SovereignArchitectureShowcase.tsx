@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Yau-Tian-Donaldson K-Stability Shield, Deligne-Lusztig Character Barrier, Atiyah-Segal TQFT Firewall & Mantle Transition Zone Wadsleyite Supergrid.",
+    detail: "Simpson Nonabelian Hodge Correspondence Shield, Cannon-Thurston Hyperbolic Boundary Barrier, Waldhausen Algebraic K-Theory Firewall & Planetary D'' Layer ULVZ Waveguide Supergrid.",
   },
 ];
 

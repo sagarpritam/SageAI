@@ -89,8 +89,9 @@ export default async function RootLayout({
         const payload = JSON.parse(Buffer.from(payloadPart, "base64url").toString());
         userEmail = payload.email || payload.sub || null;
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {}
+    } catch (_e: unknown) {
+      // Ignore token decode error on unauthenticated state
+    }
   }
 
   const navLinks = [

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       const data = await safeUpstreamJson<Record<string, unknown>>(res, {});
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback issue SOC 2 attestation:", e);
   }
 

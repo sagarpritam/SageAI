@@ -2463,6 +2463,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 54 (Opt B): Planetary Mantle Transition Zone Proton Conduction Power Harvest",
         ),
+        (
+            "GET",
+            "/api/simpson-nonabelian-hodge/bundles",
+            None,
+            "Wave 55 (Cap 185): Simpson Nonabelian Hodge Bundles List",
+        ),
+        (
+            "POST",
+            "/api/simpson-nonabelian-hodge/solve-hitchin-simpson",
+            {
+                "bundle_id": "HODGE-HIGGS-SL2-01",
+                "harmonic_damping": 0.05,
+                "spectral_cutoff": 4,
+                "hodge_gain": 1.25,
+            },
+            "Wave 55 (Cap 185): Hitchin-Simpson System & Harmonic Metric Solve",
+        ),
+        (
+            "GET",
+            "/api/cannon-thurston-hyperbolic/groups",
+            None,
+            "Wave 55 (Cap 186): Cannon-Thurston Hyperbolic Groups List",
+        ),
+        (
+            "POST",
+            "/api/cannon-thurston-hyperbolic/verify-boundary-rigidity",
+            {
+                "group_id": "CT-FIBERED-SURFACE-01",
+                "geodesic_ray_steps": 100,
+                "delta_hyperbolicity_tolerance": 0.05,
+                "barrier_gain": 1.25,
+            },
+            "Wave 55 (Cap 186): Cannon-Thurston Boundary Rigidity Verify",
+        ),
+        (
+            "GET",
+            "/api/waldhausen-algebraic-k/complexes",
+            None,
+            "Wave 55 (Cap 187): Waldhausen Algebraic K Complexes List",
+        ),
+        (
+            "POST",
+            "/api/waldhausen-algebraic-k/evaluate-cyclotomic-trace",
+            {
+                "complex_id": "WALDHAUSEN-S-DOT-SPHERE-01",
+                "filtration_degree": 3,
+                "cyclotomic_prime": 3,
+                "firewall_gain": 1.25,
+            },
+            "Wave 55 (Cap 187): Waldhausen Goodwillie Cyclotomic Trace Evaluate",
+        ),
+        (
+            "GET",
+            "/api/ulvz-magneto-thermal-waveguide-supergrid/arrays",
+            None,
+            "Wave 55 (Opt B): Planetary D'' Layer ULVZ Waveguide Arrays List",
+        ),
+        (
+            "POST",
+            "/api/ulvz-magneto-thermal-waveguide-supergrid/harvest-waveguide-power",
+            {
+                "array_id": "ULVZ-HAWAII-PLUME-ROOT-01",
+                "iron_enrichment_override_x_fe": 0.18,
+                "waveguide_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 55 (Opt B): Planetary D'' Layer ULVZ Waveguide Power Harvest",
+        ),
     ]
 
 
@@ -2492,7 +2560,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-46, CAPS 1-160) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-55, CAPS 1-187) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -2564,7 +2632,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-45){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-55){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -2628,7 +2696,7 @@ def run_live_all_waves_stress_test(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="SageAI All-Waves (Waves 1-45, Capabilities 1-157) Live & In-Process Stress Verifier"
+        description="SageAI All-Waves (Waves 1-55, Capabilities 1-187) Live & In-Process Stress Verifier"
     )
     parser.add_argument(
         "--in-process",

@@ -61,6 +61,7 @@ from app.routers import (
     calabi_yau_routes,
     calabi_yau_mirror_routes,
     canary_fabric_routes,
+    cannon_thurston_hyperbolic_routes,
     cardy_boundary_cft_routes,
     carrollian_holography_routes,
     cart_routes,
@@ -235,6 +236,7 @@ from app.routers import (
     sdn_shield_routes,
     seiberg_witten_monopole_routes,
     simulation_routes,
+    simpson_nonabelian_hodge_routes,
     singularity_containment_routes,
     skyrmion_instanton_routes,
     solar_sail_laser_routes,
@@ -265,8 +267,10 @@ from app.routers import (
     twisted_supergrid_routes,
     twistor_holonomy_routes,
     uhlenbeck_gauge_compactness_routes,
+    ulvz_magneto_thermal_waveguide_supergrid_routes,
     unruh_rindler_routes,
     voevodsky_motivic_routes,
+    waldhausen_algebraic_k_routes,
     web3_security_routes,
     webhook_routes,
     weyl_supergrid_routes,
@@ -646,6 +650,10 @@ app.include_router(yau_tian_donaldson_k_stability_routes.router)
 app.include_router(deligne_lusztig_character_routes.router)
 app.include_router(atiyah_segal_tqft_routes.router)
 app.include_router(mantle_transition_zone_wadsleyite_supergrid_routes.router)
+app.include_router(simpson_nonabelian_hodge_routes.router)
+app.include_router(cannon_thurston_hyperbolic_routes.router)
+app.include_router(waldhausen_algebraic_k_routes.router)
+app.include_router(ulvz_magneto_thermal_waveguide_supergrid_routes.router)
 
 
 # ---------------------
@@ -663,7 +671,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.4.0",
+        "version": "9.5.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

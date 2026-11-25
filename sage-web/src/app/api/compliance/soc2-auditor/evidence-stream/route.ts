@@ -53,7 +53,7 @@ export async function GET() {
       const data = await safeUpstreamJson(res, FALLBACK_STREAM);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback SOC 2 evidence stream:", e);
   }
   return NextResponse.json(FALLBACK_STREAM);

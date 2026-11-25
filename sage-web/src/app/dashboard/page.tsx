@@ -302,6 +302,10 @@ import YauTianDonaldsonStudio from "@/components/YauTianDonaldsonStudio";
 import DeligneLusztigStudio from "@/components/DeligneLusztigStudio";
 import AtiyahSegalTQFTStudio from "@/components/AtiyahSegalTQFTStudio";
 import MantleWadsleyiteStudio from "@/components/MantleWadsleyiteStudio";
+import SimpsonHodgeStudio from "@/components/SimpsonHodgeStudio";
+import CannonThurstonStudio from "@/components/CannonThurstonStudio";
+import WaldhausenKTheoryStudio from "@/components/WaldhausenKTheoryStudio";
+import ULVZWaveguideStudio from "@/components/ULVZWaveguideStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -344,6 +348,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "simpson-nonabelian-hodge", label: "Simpson Hodge (Cap 185)", icon: Layers },
+  { id: "cannon-thurston-hyperbolic", label: "Cannon-Thurston (Cap 186)", icon: Compass },
+  { id: "waldhausen-algebraic-k", label: "Waldhausen K-Theory (Cap 187)", icon: Shield },
+  { id: "ulvz-magneto-thermal-waveguide-supergrid", label: "ULVZ Waveguide (Option B W55)", icon: Zap },
   { id: "yau-tian-donaldson-k-stability", label: "YTD K-Stability (Cap 182)", icon: Shield },
   { id: "deligne-lusztig-character", label: "Deligne-Lusztig (Cap 183)", icon: Layers },
   { id: "atiyah-segal-tqft", label: "Atiyah-Segal TQFT (Cap 184)", icon: Compass },
@@ -815,6 +823,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "simpson-nonabelian-hodge" && <SimpsonHodgeStudio />}
+          {activeTab === "cannon-thurston-hyperbolic" && <CannonThurstonStudio />}
+          {activeTab === "waldhausen-algebraic-k" && <WaldhausenKTheoryStudio />}
+          {activeTab === "ulvz-magneto-thermal-waveguide-supergrid" && <ULVZWaveguideStudio />}
           {activeTab === "yau-tian-donaldson-k-stability" && <YauTianDonaldsonStudio />}
           {activeTab === "deligne-lusztig-character" && <DeligneLusztigStudio />}
           {activeTab === "atiyah-segal-tqft" && <AtiyahSegalTQFTStudio />}
