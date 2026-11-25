@@ -306,6 +306,10 @@ import SimpsonHodgeStudio from "@/components/SimpsonHodgeStudio";
 import CannonThurstonStudio from "@/components/CannonThurstonStudio";
 import WaldhausenKTheoryStudio from "@/components/WaldhausenKTheoryStudio";
 import ULVZWaveguideStudio from "@/components/ULVZWaveguideStudio";
+import LurieToposStudio from "@/components/LurieToposStudio";
+import GRRBaumFultonStudio from "@/components/GRRBaumFultonStudio";
+import KazhdanLusztigStudio from "@/components/KazhdanLusztigStudio";
+import ICBSolidificationStudio from "@/components/ICBSolidificationStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -348,6 +352,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
+  { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
+  { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
+  { id: "icb-dendritic-solidification-supergrid", label: "ICB Solidification (Option B W56)", icon: Flame },
   { id: "simpson-nonabelian-hodge", label: "Simpson Hodge (Cap 185)", icon: Layers },
   { id: "cannon-thurston-hyperbolic", label: "Cannon-Thurston (Cap 186)", icon: Compass },
   { id: "waldhausen-algebraic-k", label: "Waldhausen K-Theory (Cap 187)", icon: Shield },
@@ -823,6 +831,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
+          {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
+          {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}
+          {activeTab === "icb-dendritic-solidification-supergrid" && <ICBSolidificationStudio />}
           {activeTab === "simpson-nonabelian-hodge" && <SimpsonHodgeStudio />}
           {activeTab === "cannon-thurston-hyperbolic" && <CannonThurstonStudio />}
           {activeTab === "waldhausen-algebraic-k" && <WaldhausenKTheoryStudio />}

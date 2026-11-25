@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 44 Waves (Capabilities 1 to 154).
+Live Multi-Domain Stress Test & Verification across All 56 Waves (Capabilities 1 to 190).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-31 (Caps 1-115)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-56 (Caps 1-190)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -2531,6 +2531,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 55 (Opt B): Planetary D'' Layer ULVZ Waveguide Power Harvest",
         ),
+        # Wave 56 (Caps 188-190 & Option B Wave 56)
+        (
+            "GET",
+            "/api/lurie-higher-topos-spectral/topoi",
+            None,
+            "Wave 56 (Cap 188): Lurie Higher Topos Schemes List",
+        ),
+        (
+            "POST",
+            "/api/lurie-higher-topos-spectral/evaluate-spectral-descent",
+            {
+                "topos_id": "LURIE-SPECTRAL-SCHEME-01",
+                "truncation_level": 4,
+                "e_infinity_order": 8,
+                "shield_gain": 1.25,
+            },
+            "Wave 56 (Cap 188): Lurie Higher Topos Spectral Descent Evaluate",
+        ),
+        (
+            "GET",
+            "/api/grr-baum-fulton-macpherson/varieties",
+            None,
+            "Wave 56 (Cap 189): GRR Baum-Fulton-MacPherson Varieties List",
+        ),
+        (
+            "POST",
+            "/api/grr-baum-fulton-macpherson/compute-singular-chern-character",
+            {
+                "variety_id": "BFM-SINGULAR-SCHUBERT-01",
+                "stratification_depth": 3,
+                "todd_degree": 4,
+                "barrier_gain": 1.25,
+            },
+            "Wave 56 (Cap 189): GRR Singular Chern Character & Todd Class Compute",
+        ),
+        (
+            "GET",
+            "/api/kazhdan-lusztig-hecke/pairs",
+            None,
+            "Wave 56 (Cap 190): Kazhdan-Lusztig Hecke Pairs List",
+        ),
+        (
+            "POST",
+            "/api/kazhdan-lusztig-hecke/evaluate-kl-polynomial",
+            {
+                "pair_id": "KL-WEYL-E8-PAIR-01",
+                "hecke_q_parameter": 1.0,
+                "kazhdan_inversion_order": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 56 (Cap 190): Kazhdan-Lusztig Polynomial & Canonical Basis Evaluate",
+        ),
+        (
+            "GET",
+            "/api/icb-dendritic-solidification-supergrid/arrays",
+            None,
+            "Wave 56 (Opt B): Planetary ICB Solidification Arrays List",
+        ),
+        (
+            "POST",
+            "/api/icb-dendritic-solidification-supergrid/harvest-latent-heat",
+            {
+                "array_id": "ICB-EASTERN-HEMISPHERE-01",
+                "crystallization_rate_override_mm_yr": 1.5,
+                "thermo_acoustic_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 56 (Opt B): Planetary Inner-Core Boundary Latent Heat Power Harvest",
+        ),
     ]
 
 
@@ -2560,7 +2629,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-55, CAPS 1-187) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-56, CAPS 1-190) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -2632,7 +2701,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-55){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-56){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -2648,7 +2717,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-45 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-56 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 

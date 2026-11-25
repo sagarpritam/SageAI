@@ -20,7 +20,7 @@ export async function GET() {
       const data = await safeUpstreamJson<typeof FALLBACK_POOL>(res, FALLBACK_POOL);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback dividend pool:", e);
   }
   return NextResponse.json(FALLBACK_POOL);

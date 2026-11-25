@@ -53,7 +53,7 @@ export async function GET() {
       const data = await safeUpstreamJson<typeof FALLBACK_BENEFICIARIES>(res, FALLBACK_BENEFICIARIES);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback dividend beneficiaries:", e);
   }
   return NextResponse.json(FALLBACK_BENEFICIARIES);
