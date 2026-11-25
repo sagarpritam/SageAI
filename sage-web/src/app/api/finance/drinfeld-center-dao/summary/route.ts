@@ -9,7 +9,7 @@ export async function GET() {
     if (res.ok) {
       return NextResponse.json(await res.json());
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Drinfeld Center DAO summary:", err);
   }
 

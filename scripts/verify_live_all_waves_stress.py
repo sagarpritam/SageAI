@@ -3083,6 +3083,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 63 (Opt B): Planetary Schumann Cavity Power Harvest",
         ),
+        # Wave 64 (Caps 212-214 & Option B Wave 64)
+        (
+            "GET",
+            "/api/tate-shafarevich-selmer/curves",
+            None,
+            "Wave 64 (Cap 212): Tate-Shafarevich Curves List",
+        ),
+        (
+            "POST",
+            "/api/tate-shafarevich-selmer/evaluate-selmer-descent",
+            {
+                "curve_id": "SHA-BSD-RANK1-01",
+                "selmer_rank": 1,
+                "sha_order": 1,
+                "shield_gain": 1.25,
+            },
+            "Wave 64 (Cap 212): Tate-Shafarevich Selmer Descent Evaluate",
+        ),
+        (
+            "GET",
+            "/api/bloch-kato-tamagawa/systems",
+            None,
+            "Wave 64 (Cap 213): Bloch-Kato Tamagawa Systems List",
+        ),
+        (
+            "POST",
+            "/api/bloch-kato-tamagawa/evaluate-tamagawa-number",
+            {
+                "system_id": "TAMAGAWA-CYCLOTOMIC-Z-01",
+                "motive_weight": 2,
+                "tamagawa_product": 1,
+                "barrier_gain": 1.25,
+            },
+            "Wave 64 (Cap 213): Bloch-Kato Tamagawa Evaluate",
+        ),
+        (
+            "GET",
+            "/api/fontaine-mazur-geometricity/representations",
+            None,
+            "Wave 64 (Cap 214): Fontaine-Mazur Representations List",
+        ),
+        (
+            "POST",
+            "/api/fontaine-mazur-geometricity/evaluate-galois-geometricity",
+            {
+                "rep_id": "FONTAINE-MAZUR-GL2-DE-RHAM-01",
+                "prime_p": 5,
+                "hodge_tate_span": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 64 (Cap 214): Fontaine-Mazur Geometricity Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-piezoelectric-tectonic-subduction/slabs",
+            None,
+            "Wave 64 (Opt B): Planetary Piezoelectric Subduction Slabs List",
+        ),
+        (
+            "POST",
+            "/api/planetary-piezoelectric-tectonic-subduction/harvest-tectonic-piezo-power",
+            {
+                "slab_id": "SUBDUCTION-CASCADIA-MEGATHRUST-01",
+                "strain_multiplier": 1.05,
+                "piezo_efficiency": 0.982,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 64 (Opt B): Planetary Piezoelectric Subduction Power Harvest",
+        ),
     ]
 
 

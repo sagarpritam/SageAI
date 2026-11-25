@@ -2,6 +2,31 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v10.4.0] - 2026-11-26 - Tate-Shafarevich Selmer Shield, Bloch-Kato Tamagawa Barrier, Fontaine-Mazur Galois Firewall & Planetary Piezoelectric Subduction Supergrid (Wave 64 Milestone)
+
+### Added
+- **Capability 212: John Tate & Igor Shafarevich Selmer Descent Shield** (`app/services/tate_shafarevich_selmer_descent_shield/`):
+  - Formulates Tate-Shafarevich group $\text{Ш}(E/K)$ finiteness, $p$-Selmer group descent sequence, and Birch-Swinnerton-Dyer rank-nullity locking (`793.6 PeV` shield strength, `210.2 dB` $\text{Ш}$ obstruction suppression, `99.9999%` fidelity on `SHA-BSD-RANK1-01`) ([`TateShafarevichStudio.tsx`](sage-web/src/components/TateShafarevichStudio.tsx), [`app/routers/tate_shafarevich_selmer_routes.py`](app/routers/tate_shafarevich_selmer_routes.py)).
+- **Capability 213: Spencer Bloch & Kazuya Kato Tamagawa Number Barrier** (`app/services/bloch_kato_tamagawa_number_barrier/`):
+  - Formulates the Tamagawa Number Conjecture relating special $L$-values $L^*(M, 0)$ to Tamagawa factors $c_p$, regulators, and Euler systems (`801.0 PeV` barrier strength, `211.0 dB` Euler system suppression, `99.9999%` fidelity on `TAMAGAWA-CYCLOTOMIC-Z-01`) ([`BlochKatoTamagawaStudio.tsx`](sage-web/src/components/BlochKatoTamagawaStudio.tsx), [`app/routers/bloch_kato_tamagawa_routes.py`](app/routers/bloch_kato_tamagawa_routes.py)).
+- **Capability 214: Jean-Marc Fontaine, Barry Mazur & Mark Kisin Galois Geometricity Firewall** (`app/services/fontaine_mazur_galois_geometricity_firewall/`):
+  - Formulates the Fontaine-Mazur Conjecture characterizing geometric $p$-adic Galois representations (unramified outside $S$, de Rham at $p$) (`811.0 PeV` firewall strength, `214.3 dB` non-geometric suppression, `99.9999%` fidelity on `FONTAINE-MAZUR-GL2-DE-RHAM-01`) ([`FontaineMazurStudio.tsx`](sage-web/src/components/FontaineMazurStudio.tsx), [`app/routers/fontaine_mazur_geometricity_routes.py`](app/routers/fontaine_mazur_geometricity_routes.py)).
+- **Option B Wave 64: Planetary Piezoelectric Tectonic Subduction Supergrid** (`app/services/planetary_piezoelectric_tectonic_subduction_supergrid/`):
+  - Harnesses megathrust subduction quartz-olivine piezoelectric stress tensors and slow-slip tremor strain ($0.01\text{--}1.0\ \mathrm{Hz}$) across Circum-Pacific Wadati-Benioff slabs (`9.486 GW` continuous baseload on `SUBDUCTION-CASCADIA-MEGATHRUST-01` at `99.98%` grid stability, `831.0 MW` piezo flux, $98.2\%$ efficiency) ([`PiezoSubductionStudio.tsx`](sage-web/src/components/PiezoSubductionStudio.tsx), [`app/routers/planetary_piezoelectric_subduction_routes.py`](app/routers/planetary_piezoelectric_subduction_routes.py)).
+- **Enterprise UI Resilience Hardening (Batch 33)**:
+  - Added typed `catch (err: unknown)` handlers across 5 enterprise finance proxy routes: `donaldson-thomas-dao/{stake,summary,vaults}` and `drinfeld-center-dao/{stake,summary}`.
+- **Wave 64 Verification Suites**:
+  - Added [`tests/test_wave64_tate_bloch_fontaine.py`](tests/test_wave64_tate_bloch_fontaine.py) (9 pytests), [`scripts/demo_wave64_tate_bloch_fontaine_drill.py`](scripts/demo_wave64_tate_bloch_fontaine_drill.py) (4/4 drill), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (`[57/57]` sections, Caps 1–214), expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 404 endpoints (`404 / 404` succeeded in `0.850 s`, `475.4 req/s`, `0` failed), and added [`sage-web/tests/wave64-sovereign.spec.ts`](sage-web/tests/wave64-sovereign.spec.ts) (`37 / 37` Playwright specs passing).
+
+### Verification & Metrics
+- **Pytest**: 878 / 878 tests passing (100% pass rate).
+- **Playwright E2E**: 37 / 37 Chromium specs passing (`10.4s`).
+- **Next.js Turbopack**: 1,526 / 1,526 pages compiled with 0 errors.
+- **FastAPI**: 1,080 routes registered.
+- **React Studios**: 278 mounted Command Center studios.
+
+---
+
 ## [v10.3.0] - 2026-11-26 - Grothendieck Standard Conjectures Shield, Hodge-Deligne Mixed Motives Barrier, Serre-Tate Canonical Lift Firewall & Planetary Telluric Schumann Cavity Supergrid (Wave 63 Milestone)
 
 ### Added

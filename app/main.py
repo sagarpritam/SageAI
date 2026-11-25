@@ -141,6 +141,10 @@ from app.routers import (
     hodge_deligne_mixed_motives_routes,
     serre_tate_canonical_lift_routes,
     planetary_telluric_schumann_cavity_routes,
+    tate_shafarevich_selmer_routes,
+    bloch_kato_tamagawa_routes,
+    fontaine_mazur_geometricity_routes,
+    planetary_piezoelectric_subduction_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -718,6 +722,10 @@ app.include_router(grothendieck_standard_conjectures_routes.router)
 app.include_router(hodge_deligne_mixed_motives_routes.router)
 app.include_router(serre_tate_canonical_lift_routes.router)
 app.include_router(planetary_telluric_schumann_cavity_routes.router)
+app.include_router(tate_shafarevich_selmer_routes.router)
+app.include_router(bloch_kato_tamagawa_routes.router)
+app.include_router(fontaine_mazur_geometricity_routes.router)
+app.include_router(planetary_piezoelectric_subduction_routes.router)
 
 
 # ---------------------
@@ -735,7 +743,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "10.3.0",
+        "version": "10.4.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

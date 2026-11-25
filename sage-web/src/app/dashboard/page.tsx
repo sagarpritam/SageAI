@@ -339,6 +339,10 @@ import { GrothendieckConjecturesStudio } from "@/components/GrothendieckConjectu
 import { HodgeDeligneStudio } from "@/components/HodgeDeligneStudio";
 import { SerreTateLiftStudio } from "@/components/SerreTateLiftStudio";
 import { SchumannCavityStudio } from "@/components/SchumannCavityStudio";
+import { TateShafarevichStudio } from "@/components/TateShafarevichStudio";
+import { BlochKatoTamagawaStudio } from "@/components/BlochKatoTamagawaStudio";
+import { FontaineMazurStudio } from "@/components/FontaineMazurStudio";
+import { PiezoSubductionStudio } from "@/components/PiezoSubductionStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -409,6 +413,10 @@ const tabs = [
   { id: "hodge-deligne-mixed-motives", label: "Hodge-Deligne (Cap 210)", icon: GitBranch },
   { id: "serre-tate-canonical-lift", label: "Serre-Tate Lift (Cap 211)", icon: Cpu },
   { id: "planetary-telluric-schumann-cavity", label: "Schumann Cavity (Option B W63)", icon: Waves },
+  { id: "tate-shafarevich-selmer", label: "Tate-Shafarevich (Cap 212)", icon: Scale },
+  { id: "bloch-kato-tamagawa", label: "Bloch-Kato Tamagawa (Cap 213)", icon: Award },
+  { id: "fontaine-mazur-geometricity", label: "Fontaine-Mazur (Cap 214)", icon: KeyRound },
+  { id: "planetary-piezoelectric-tectonic-subduction", label: "Piezo Subduction (Option B W64)", icon: Mountain },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -916,6 +924,10 @@ export default function DashboardPage() {
           {activeTab === "hodge-deligne-mixed-motives" && <HodgeDeligneStudio />}
           {activeTab === "serre-tate-canonical-lift" && <SerreTateLiftStudio />}
           {activeTab === "planetary-telluric-schumann-cavity" && <SchumannCavityStudio />}
+          {activeTab === "tate-shafarevich-selmer" && <TateShafarevichStudio />}
+          {activeTab === "bloch-kato-tamagawa" && <BlochKatoTamagawaStudio />}
+          {activeTab === "fontaine-mazur-geometricity" && <FontaineMazurStudio />}
+          {activeTab === "planetary-piezoelectric-tectonic-subduction" && <PiezoSubductionStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}
