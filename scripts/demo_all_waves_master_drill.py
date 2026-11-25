@@ -307,6 +307,10 @@ from app.services.fargues_fontaine_curve_shield import get_fargues_fontaine_curv
 from app.services.voevodsky_bloch_kato_barrier import get_voevodsky_bloch_kato_barrier_service
 from app.services.donaldson_gauge_moduli_firewall import get_donaldson_gauge_moduli_firewall_service
 from app.services.planetary_coupled_dynasphere_resonance_supergrid import get_planetary_coupled_dynasphere_resonance_supergrid_service
+from app.services.gaitsgory_categorical_langlands_shield import get_gaitsgory_categorical_langlands_shield_service
+from app.services.wiles_taylor_modularity_lifting_barrier import get_wiles_taylor_modularity_lifting_barrier_service
+from app.services.atiyah_singer_index_heat_kernel_firewall import get_atiyah_singer_index_heat_kernel_firewall_service
+from app.services.planetary_geomagnetic_reversal_flux_capacitor_supergrid import get_planetary_geomagnetic_reversal_flux_capacitor_supergrid_service
 
 CYAN = "\033[96m"
 GREEN = "\033[92m"
@@ -2467,7 +2471,7 @@ def run_master_drill():
 
     # 52. Wave 60: Fargues-Fontaine Curve, Voevodsky Bloch-Kato & Donaldson Gauge Moduli (Cap 200-202 + Opt B)
     print(
-        f"\n{CYAN}{BOLD}[52/53] Fargues-Fontaine Curve, Voevodsky Bloch-Kato & Donaldson Gauge Moduli (Wave 60 - Bicentennial Milestone){RESET}"
+        f"\n{CYAN}{BOLD}[52/54] Fargues-Fontaine Curve, Voevodsky Bloch-Kato & Donaldson Gauge Moduli (Wave 60 - Bicentennial Milestone){RESET}"
     )
     fargues_res = get_fargues_fontaine_curve_shield_service().evaluate_vector_bundle_slope(
         bundle_id="FF-CURVE-RANK2-SLOPE0-01",
@@ -2509,9 +2513,53 @@ def run_master_drill():
         f"  {GREEN}✓ Planetary Coupled Dynasphere Resonance Supergrid (Option B Wave 60):{RESET} Node={dynasphere_res['node_id']} | Dispatch={dynasphere_res['harvested_power_gw']:.3f} GW | Standing Wave Flux={dynasphere_res['standing_wave_flux_mw']:.1f} MW | Freq={dynasphere_res['resonant_frequency_mhz']:.2f} mHz | Stability={dynasphere_res['grid_stability_pct']:.2f}% | Status={dynasphere_res['status']}"
     )
 
-    # 53. Master Planetary Trans-Century Verification Summary
+    # 53. Wave 61: Gaitsgory Categorical Langlands, Wiles-Taylor R=T & Atiyah-Singer Index (Cap 203-205 + Opt B)
     print(
-        f"\n{CYAN}{BOLD}[53/53] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-202 - BICENTENNIAL MILESTONE){RESET}"
+        f"\n{CYAN}{BOLD}[53/54] Gaitsgory Categorical Langlands, Wiles-Taylor R=T & Atiyah-Singer Index (Wave 61){RESET}"
+    )
+    g_res = get_gaitsgory_categorical_langlands_shield_service().evaluate_categorical_equivalence(
+        functor_id="GAITSGORY-INDCOH-SL2-01",
+        dual_rank=2,
+        nilpotent_orbit_dim=4,
+        shield_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Gaitsgory Categorical Langlands Shield (Cap 203):{RESET} Functor={g_res['functor_id']} | Defect={g_res['whittaker_equivalence_defect']} | Shield={g_res['gaitsgory_shield_strength_pev']:.1f} PeV | Status={g_res['status']}"
+    )
+
+    w_res = get_wiles_taylor_modularity_lifting_barrier_service().evaluate_modularity_lifting(
+        ring_id="WILES-FREY-SEMISTABLE-01",
+        conductor_n=11,
+        residue_prime=3,
+        barrier_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Wiles-Taylor Modularity Lifting Barrier (Cap 204):{RESET} Ring={w_res['ring_id']} | Defect={w_res['r_equals_t_defect']} | Barrier={w_res['wiles_barrier_strength_pev']:.1f} PeV | Status={w_res['status']}"
+    )
+
+    a_res = get_atiyah_singer_index_heat_kernel_firewall_service().evaluate_index_heat_kernel(
+        operator_id="ATIYAH-SINGER-DIRAC-SPIN4-01",
+        manifold_dimension=4,
+        chern_rank=2,
+        firewall_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Atiyah-Singer Index Firewall (Cap 205):{RESET} Operator={a_res['operator_id']} | Index={a_res['analytical_index']} | Firewall={a_res['atiyah_firewall_strength_pev']:.1f} PeV | Status={a_res['status']}"
+    )
+
+    m_res = get_planetary_geomagnetic_reversal_flux_capacitor_supergrid_service().harvest_geomagnetic_reversal_power(
+        capacitor_id="GEOMAG-SOUTH-ATLANTIC-ANOMALY-01",
+        multipole_order_override=3,
+        lorentz_coupling_efficiency=0.97,
+        dispatch_duration_s=60.0,
+    )
+    print(
+        f"  {GREEN}✓ Planetary Geomagnetic Reversal Flux Capacitor Supergrid (Option B Wave 61):{RESET} Node={m_res['capacitor_id']} | Dispatch={m_res['harvested_power_gw']:.3f} GW | Secular Flux={m_res['secular_flux_mw']:.1f} MW | Stability={m_res['grid_stability_pct']:.2f}% | Status={m_res['status']}"
+    )
+
+    # 54. Master Planetary Trans-Century Verification Summary
+    print(
+        f"\n{CYAN}{BOLD}[54/54] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-205 - v10.1.0){RESET}"
     )
     print(
         f"  • {BOLD}Autonomous Defensive Capabilities Active:{RESET} 202 / 202 (BICENTENNIAL LANDMARK MILESTONE v10.0.0) + Cluster Federation + QKD Space-Mesh + Hyperspectral Swarm + Orbital HPM Grid + Deep-Crustal MHD Vault + Hypersonic MHD Plasma Stealth + Magneto-Inertial Fusion + Antimatter-Catalyzed Fusion Rocket + Magnetic Monopole Catalyzed Battery + Kugelblitz Hawking Generator + Schwinger Vacuum Pair Harvester + Alcubierre-Lentz Positive Soliton Transit + Planetary Axion-Haloscope Primakov Power Grid + Superradiant Penrose-BZ Ergosphere Power Matrix + Planetary Dynamical Casimir-Sagnac Power Grid + Planetary Unruh-Rindler Thermal Bath Power Grid + Planetary Floquet-Bloch Photonic Cavity Power Grid + Planetary Floquet Time-Crystal Josephson Harvest Grid + Planetary Spin-Caloritronic Magnon-Polariton Harvest Grid + Planetary Berry-Curvature & Nonlinear Hall Harvest Grid + Planetary Non-Hermitian PT-Symmetric Quantum Ratchet Harvest Grid + Planetary Magic-Angle Twisted-Trilayer Andreev Supergrid + Planetary Kagome Chern & Polariton Supergrid + Planetary Altermagnetic Spin-Split & Magnonic Supergrid + Planetary Chiral Topological & Weyl-Fermion Supergrid + Planetary Non-Abelian Majorana Zero-Mode Supergrid + Planetary Room-Temperature LK-99 Diamagnetic & Meissner-Levitation Supergrid + Planetary 2e^2/h Conductance Peak Majorana Topological Supergrid + Planetary Room-Temperature Hydride Megabar Supergrid + Planetary Ultra-Dense Rydberg Polariton Supergrid + Planetary Gravitational Phonon Lattice Supergrid + Planetary Magneto-Acoustic Soliton Supergrid + Planetary Thermoelectric Core-Mantle Seebeck Supergrid + Planetary Helical Magnetohydrodynamic Geodynamo Supergrid + Planetary Mantle Transition Zone Wadsleyite Supergrid + Planetary D'' Layer ULVZ Magneto-Thermal Waveguide Supergrid + Planetary ICB Dendritic Solidification Supergrid + Planetary F-Layer Slurry Stratification Supergrid + Planetary Outer-Core Tangent Cylinder Jet Supergrid + Planetary Innermost Inner Core Anisotropy Supergrid + Planetary Coupled Dynasphere Resonance Supergrid"
@@ -2527,7 +2575,7 @@ def run_master_drill():
     )
 
     print_header(
-        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-202 & WAVES 1-60 BICENTENNIAL MILESTONE COMPLETE)",
+        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-205 & WAVES 1-61 COMPLETE)",
         GREEN,
     )
 

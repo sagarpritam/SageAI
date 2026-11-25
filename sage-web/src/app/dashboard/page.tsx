@@ -327,6 +327,10 @@ import { FarguesFontaineStudio } from "@/components/FarguesFontaineStudio";
 import { VoevodskyBlochKatoStudio } from "@/components/VoevodskyBlochKatoStudio";
 import { DonaldsonGaugeStudio } from "@/components/DonaldsonGaugeStudio";
 import { CoupledDynasphereStudio } from "@/components/CoupledDynasphereStudio";
+import { GaitsgoryLanglandsStudio } from "@/components/GaitsgoryLanglandsStudio";
+import { WilesModularityStudio } from "@/components/WilesModularityStudio";
+import { AtiyahSingerIndexStudio } from "@/components/AtiyahSingerIndexStudio";
+import { GeomagneticFluxCapacitorStudio } from "@/components/GeomagneticFluxCapacitorStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -385,6 +389,10 @@ const tabs = [
   { id: "voevodsky-bloch-kato", label: "Voevodsky Bloch-Kato (Cap 201)", icon: GitFork },
   { id: "donaldson-gauge-moduli", label: "Donaldson Moduli (Cap 202)", icon: Box },
   { id: "planetary-coupled-dynasphere-resonance", label: "Coupled Dynasphere (Option B W60)", icon: Globe },
+  { id: "gaitsgory-categorical-langlands", label: "Gaitsgory Langlands (Cap 203)", icon: Sparkles },
+  { id: "wiles-taylor-modularity-lifting", label: "Wiles-Taylor R=T (Cap 204)", icon: KeyRound },
+  { id: "atiyah-singer-index-heat-kernel", label: "Atiyah-Singer Index (Cap 205)", icon: Flame },
+  { id: "planetary-geomagnetic-reversal-flux-capacitor", label: "Geomagnetic Flux (Option B W61)", icon: Compass },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -880,6 +888,10 @@ export default function DashboardPage() {
           {activeTab === "voevodsky-bloch-kato" && <VoevodskyBlochKatoStudio />}
           {activeTab === "donaldson-gauge-moduli" && <DonaldsonGaugeStudio />}
           {activeTab === "planetary-coupled-dynasphere-resonance" && <CoupledDynasphereStudio />}
+          {activeTab === "gaitsgory-categorical-langlands" && <GaitsgoryLanglandsStudio />}
+          {activeTab === "wiles-taylor-modularity-lifting" && <WilesModularityStudio />}
+          {activeTab === "atiyah-singer-index-heat-kernel" && <AtiyahSingerIndexStudio />}
+          {activeTab === "planetary-geomagnetic-reversal-flux-capacitor" && <GeomagneticFluxCapacitorStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

@@ -2876,6 +2876,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 60 (Opt B): Planetary Coupled Dynasphere Power Harvest",
         ),
+        # Wave 61 (Caps 203-205 & Option B Wave 61)
+        (
+            "GET",
+            "/api/gaitsgory-categorical-langlands/functors",
+            None,
+            "Wave 61 (Cap 203): Gaitsgory Categorical Langlands Functors List",
+        ),
+        (
+            "POST",
+            "/api/gaitsgory-categorical-langlands/evaluate-categorical-equivalence",
+            {
+                "functor_id": "GAITSGORY-INDCOH-SL2-01",
+                "dual_rank": 2,
+                "nilpotent_orbit_dim": 4,
+                "shield_gain": 1.25,
+            },
+            "Wave 61 (Cap 203): Gaitsgory Categorical Equivalence Evaluate",
+        ),
+        (
+            "GET",
+            "/api/wiles-taylor-modularity-lifting/rings",
+            None,
+            "Wave 61 (Cap 204): Wiles-Taylor Deformation Rings List",
+        ),
+        (
+            "POST",
+            "/api/wiles-taylor-modularity-lifting/evaluate-modularity-lifting",
+            {
+                "ring_id": "WILES-FREY-SEMISTABLE-01",
+                "conductor_n": 11,
+                "residue_prime": 3,
+                "barrier_gain": 1.25,
+            },
+            "Wave 61 (Cap 204): Wiles-Taylor Modularity Lifting Evaluate",
+        ),
+        (
+            "GET",
+            "/api/atiyah-singer-index-heat-kernel/operators",
+            None,
+            "Wave 61 (Cap 205): Atiyah-Singer Dirac Operators List",
+        ),
+        (
+            "POST",
+            "/api/atiyah-singer-index-heat-kernel/evaluate-index-heat-kernel",
+            {
+                "operator_id": "ATIYAH-SINGER-DIRAC-SPIN4-01",
+                "manifold_dimension": 4,
+                "chern_rank": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 61 (Cap 205): Atiyah-Singer Index Heat Kernel Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-geomagnetic-reversal-flux-capacitor/capacitors",
+            None,
+            "Wave 61 (Opt B): Planetary Geomagnetic Flux Capacitors List",
+        ),
+        (
+            "POST",
+            "/api/planetary-geomagnetic-reversal-flux-capacitor/harvest-geomagnetic-reversal-power",
+            {
+                "capacitor_id": "GEOMAG-SOUTH-ATLANTIC-ANOMALY-01",
+                "multipole_order_override": 3,
+                "lorentz_coupling_efficiency": 0.97,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 61 (Opt B): Planetary Geomagnetic Flux Power Harvest",
+        ),
     ]
 
 
