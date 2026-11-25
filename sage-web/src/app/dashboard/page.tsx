@@ -314,6 +314,10 @@ import { KashiwaraMicrolocalStudio } from "@/components/KashiwaraMicrolocalStudi
 import { MacdonaldDAHAStudio } from "@/components/MacdonaldDAHAStudio";
 import { GromovSymplecticStudio } from "@/components/GromovSymplecticStudio";
 import { FLayerSlurryStudio } from "@/components/FLayerSlurryStudio";
+import { FaltingsAlmostEtaleStudio } from "@/components/FaltingsAlmostEtaleStudio";
+import { BeilinsonBernsteinStudio } from "@/components/BeilinsonBernsteinStudio";
+import { ConnesKreimerStudio } from "@/components/ConnesKreimerStudio";
+import { TangentCylinderJetStudio } from "@/components/TangentCylinderJetStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -360,6 +364,10 @@ const tabs = [
   { id: "macdonald-daha-polynomial", label: "Macdonald DAHA (Cap 192)", icon: Layers },
   { id: "gromov-eliashberg-symplectic", label: "Gromov Symplectic (Cap 193)", icon: Compass },
   { id: "planetary-f-layer-slurry-supergrid", label: "F-Layer Slurry (Option B W57)", icon: Flame },
+  { id: "faltings-almost-etale", label: "Faltings Almost Étale (Cap 194)", icon: Shield },
+  { id: "beilinson-bernstein-localization", label: "Beilinson-Bernstein (Cap 195)", icon: Layers },
+  { id: "connes-kreimer-hopf", label: "Connes-Kreimer Hopf (Cap 196)", icon: Compass },
+  { id: "planetary-outer-core-tangent-cylinder-jet", label: "Tangent Cylinder Jet (Option B W58)", icon: Radio },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -843,6 +851,10 @@ export default function DashboardPage() {
           {activeTab === "macdonald-daha-polynomial" && <MacdonaldDAHAStudio />}
           {activeTab === "gromov-eliashberg-symplectic" && <GromovSymplecticStudio />}
           {activeTab === "planetary-f-layer-slurry-supergrid" && <FLayerSlurryStudio />}
+          {activeTab === "faltings-almost-etale" && <FaltingsAlmostEtaleStudio />}
+          {activeTab === "beilinson-bernstein-localization" && <BeilinsonBernsteinStudio />}
+          {activeTab === "connes-kreimer-hopf" && <ConnesKreimerStudio />}
+          {activeTab === "planetary-outer-core-tangent-cylinder-jet" && <TangentCylinderJetStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

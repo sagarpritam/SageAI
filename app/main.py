@@ -50,6 +50,7 @@ from app.routers import (
     autofix_routes,
     axion_haloscope_routes,
     azumaya_brauer_routes,
+    beilinson_bernstein_localization_routes,
     beilinson_drinfeld_routes,
     berry_curvature_routes,
     bgg_category_o_routes,
@@ -84,6 +85,7 @@ from app.routers import (
     complexity_holography_routes,
     condensed_liquid_routes,
     conformal_bootstrap_routes,
+    connes_kreimer_hopf_routes,
     connes_spectral_geometry_routes,
     consensus_routes,
     copilot_routes,
@@ -123,6 +125,7 @@ from app.routers import (
     everett_branch_routes,
     explain_routes,
     factorization_homology_routes,
+    faltings_almost_etale_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -217,6 +220,7 @@ from app.routers import (
     perelman_ricci_flow_routes,
     photonic_quantum_routes,
     planetary_f_layer_slurry_supergrid_routes,
+    planetary_outer_core_tangent_cylinder_jet_routes,
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
@@ -670,6 +674,10 @@ app.include_router(kashiwara_schapira_microlocal_routes.router)
 app.include_router(macdonald_daha_polynomial_routes.router)
 app.include_router(gromov_eliashberg_symplectic_routes.router)
 app.include_router(planetary_f_layer_slurry_supergrid_routes.router)
+app.include_router(faltings_almost_etale_routes.router)
+app.include_router(beilinson_bernstein_localization_routes.router)
+app.include_router(connes_kreimer_hopf_routes.router)
+app.include_router(planetary_outer_core_tangent_cylinder_jet_routes.router)
 
 
 # ---------------------
@@ -687,7 +695,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.7.0",
+        "version": "9.8.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

@@ -1,5 +1,5 @@
 """
-Live Multi-Domain Stress Test & Verification across All 57 Waves (Capabilities 1 to 193).
+Live Multi-Domain Stress Test & Verification across All 58 Waves (Capabilities 1 to 196).
 Sends concurrent authenticated requests to core and advanced planetary/quantum/cosmological endpoints,
 measuring p50/p95/p99 latency, request throughput, and verifying zero failures.
 
@@ -35,7 +35,7 @@ EndpointSpec = Tuple[str, str, Optional[Dict[str, Any]], str]
 
 
 def build_wave_endpoints() -> List[EndpointSpec]:
-    """Return representative functional & stress endpoints across Core and Waves 1-57 (Caps 1-193)."""
+    """Return representative functional & stress endpoints across Core and Waves 1-58 (Caps 1-196)."""
     return [
         # Core & Wave 1: Platform, War Room, Deception, Intrusion, Rules
         ("GET", "/health", None, "Core: Platform Health Check"),
@@ -2669,6 +2669,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 57 (Opt B): Planetary F-Layer Outer-Core Slurry Power Harvest",
         ),
+        # Wave 58 (Caps 194-196 & Option B Wave 58)
+        (
+            "GET",
+            "/api/faltings-almost-etale/schemes",
+            None,
+            "Wave 58 (Cap 194): Faltings Almost Étale Schemes List",
+        ),
+        (
+            "POST",
+            "/api/faltings-almost-etale/evaluate-almost-etale-descent",
+            {
+                "scheme_id": "FALTINGS-PADIC-CURVE-01",
+                "p_prime": 5,
+                "truncation_degree": 4,
+                "shield_gain": 1.25,
+            },
+            "Wave 58 (Cap 194): Faltings Almost Étale Descent Evaluate",
+        ),
+        (
+            "GET",
+            "/api/beilinson-bernstein-localization/algebras",
+            None,
+            "Wave 58 (Cap 195): Beilinson-Bernstein Flag Varieties List",
+        ),
+        (
+            "POST",
+            "/api/beilinson-bernstein-localization/evaluate-d-module-localization",
+            {
+                "variety_id": "BB-SL2-FLAG-01",
+                "flag_dimension": 1,
+                "twisted_lambda": 1.0,
+                "barrier_gain": 1.25,
+            },
+            "Wave 58 (Cap 195): Beilinson-Bernstein D-Module Flag Localization Evaluate",
+        ),
+        (
+            "GET",
+            "/api/connes-kreimer-hopf/graphs",
+            None,
+            "Wave 58 (Cap 196): Connes-Kreimer Feynman Graphs List",
+        ),
+        (
+            "POST",
+            "/api/connes-kreimer-hopf/evaluate-birkhoff-decomposition",
+            {
+                "graph_id": "CK-PHI4-TWO-LOOP-01",
+                "loop_order": 2,
+                "dimensional_epsilon": 0.01,
+                "firewall_gain": 1.25,
+            },
+            "Wave 58 (Cap 196): Connes-Kreimer Birkhoff Decomposition Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-outer-core-tangent-cylinder-jet/arrays",
+            None,
+            "Wave 58 (Opt B): Planetary Tangent Cylinder Arrays List",
+        ),
+        (
+            "POST",
+            "/api/planetary-outer-core-tangent-cylinder-jet/harvest-tangent-jet-power",
+            {
+                "array_id": "TC-NORTHERN-ARCTIC-JET-01",
+                "jet_velocity_override_km_yr": 42.5,
+                "mhd_induction_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 58 (Opt B): Planetary Outer-Core Tangent Cylinder Jet Power Harvest",
+        ),
     ]
 
 
@@ -2698,7 +2767,7 @@ def execute_stress_suite(
 ) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-57, CAPS 1-193) [{mode_label}]{RESET}".center(
+        f"{CYAN}{BOLD} ⚡ SAGEAI MULTI-DOMAIN STRESS TEST (WAVES 1-58, CAPS 1-196) [{mode_label}]{RESET}".center(
             78
         )
     )
@@ -2770,7 +2839,7 @@ def execute_stress_suite(
     )
     print(f"{CYAN}{BOLD}{'=' * 80}{RESET}")
     print(
-        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-57){RESET}"
+        f"  Endpoints Verified:     {BOLD}{len(endpoints_to_test)} (Waves 1-58){RESET}"
     )
     print(f"  Total Requests:         {BOLD}{total_requests}{RESET}")
     print(
@@ -2786,7 +2855,7 @@ def execute_stress_suite(
 
     assert errors == 0, f"Stress test encountered {errors} failures"
     print(
-        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-57 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
+        f"{GREEN}{BOLD}✅ MULTI-DOMAIN WAVES 1-58 STRESS VERIFICATION 100% SUCCESSFUL{RESET}\n"
     )
 
 

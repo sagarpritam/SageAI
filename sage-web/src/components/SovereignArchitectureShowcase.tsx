@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Kashiwara-Schapira Sheaves on Manifolds & Microlocal Shield, Macdonald Symmetric Polynomials & DAHA Barrier, Gromov-Eliashberg Symplectic Firewall & Planetary F-Layer Slurry Supergrid.",
+    detail: "Faltings Almost Étale & Fontaine Period Ring Shield, Beilinson-Bernstein Localization Barrier, Connes-Kreimer Hopf Firewall & Planetary Tangent Cylinder Jet Supergrid.",
   },
 ];
 

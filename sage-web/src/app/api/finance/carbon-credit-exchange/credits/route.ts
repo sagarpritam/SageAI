@@ -9,7 +9,7 @@ export async function GET() {
       const data = await res.json();
       return NextResponse.json(data);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Using fallback Carbon Credit tranches:', error);
   }
 
