@@ -3014,6 +3014,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 62 (Opt B): Planetary Birkeland Electrojet Power Harvest",
         ),
+        # Wave 63 (Caps 209-211 & Option B Wave 63)
+        (
+            "GET",
+            "/api/grothendieck-standard-conjectures/motives",
+            None,
+            "Wave 63 (Cap 209): Grothendieck Standard Conjectures Motives List",
+        ),
+        (
+            "POST",
+            "/api/grothendieck-standard-conjectures/evaluate-standard-conjectures",
+            {
+                "motive_id": "GROTHENDIECK-CHOW-K3-01",
+                "cycle_codimension": 1,
+                "lefschetz_degree": 2,
+                "shield_gain": 1.25,
+            },
+            "Wave 63 (Cap 209): Grothendieck Standard Conjectures Evaluate",
+        ),
+        (
+            "GET",
+            "/api/hodge-deligne-mixed-motives/structures",
+            None,
+            "Wave 63 (Cap 210): Hodge-Deligne Mixed Structures List",
+        ),
+        (
+            "POST",
+            "/api/hodge-deligne-mixed-motives/evaluate-mixed-hodge",
+            {
+                "structure_id": "DELIGNE-MIXED-HODGE-01",
+                "weight_filtration_k": 2,
+                "hodge_filtration_p": 1,
+                "barrier_gain": 1.25,
+            },
+            "Wave 63 (Cap 210): Hodge-Deligne Mixed Hodge Evaluate",
+        ),
+        (
+            "GET",
+            "/api/serre-tate-canonical-lift/lifts",
+            None,
+            "Wave 63 (Cap 211): Serre-Tate Canonical Lifts List",
+        ),
+        (
+            "POST",
+            "/api/serre-tate-canonical-lift/evaluate-canonical-lift",
+            {
+                "lift_id": "SERRE-TATE-WITT-LIFT-01",
+                "prime_p": 5,
+                "abelian_dimension_g": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 63 (Cap 211): Serre-Tate Canonical Lift Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-telluric-schumann-cavity/cavities",
+            None,
+            "Wave 63 (Opt B): Planetary Schumann Cavities List",
+        ),
+        (
+            "POST",
+            "/api/planetary-telluric-schumann-cavity/harvest-schumann-cavity-power",
+            {
+                "cavity_id": "SCHUMANN-FUNDAMENTAL-783HZ-01",
+                "q_factor_multiplier": 1.05,
+                "waveguide_efficiency": 0.98,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 63 (Opt B): Planetary Schumann Cavity Power Harvest",
+        ),
     ]
 
 

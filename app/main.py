@@ -137,6 +137,10 @@ from app.routers import (
     weil_conjectures_purity_routes,
     kontsevich_cyclic_homotopy_routes,
     planetary_birkeland_auroral_electrojet_routes,
+    grothendieck_standard_conjectures_routes,
+    hodge_deligne_mixed_motives_routes,
+    serre_tate_canonical_lift_routes,
+    planetary_telluric_schumann_cavity_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -710,6 +714,10 @@ app.include_router(hirzebruch_riemann_roch_routes.router)
 app.include_router(weil_conjectures_purity_routes.router)
 app.include_router(kontsevich_cyclic_homotopy_routes.router)
 app.include_router(planetary_birkeland_auroral_electrojet_routes.router)
+app.include_router(grothendieck_standard_conjectures_routes.router)
+app.include_router(hodge_deligne_mixed_motives_routes.router)
+app.include_router(serre_tate_canonical_lift_routes.router)
+app.include_router(planetary_telluric_schumann_cavity_routes.router)
 
 
 # ---------------------
@@ -727,7 +735,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "10.2.0",
+        "version": "10.3.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

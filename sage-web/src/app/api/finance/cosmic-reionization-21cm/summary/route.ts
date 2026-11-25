@@ -8,7 +8,7 @@ export async function GET() {
     if (!res.ok) throw new Error("Backend response error");
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Cosmic Reionization 21cm summary:", err);
     return NextResponse.json({
       dao_id: "CR21-EPOCH-REIONIZATION-01",

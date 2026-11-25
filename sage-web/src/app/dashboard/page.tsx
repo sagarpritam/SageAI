@@ -335,6 +335,10 @@ import { HirzebruchToddStudio } from "@/components/HirzebruchToddStudio";
 import { WeilFrobeniusPurityStudio } from "@/components/WeilFrobeniusPurityStudio";
 import { CyclicHomotopyStudio } from "@/components/CyclicHomotopyStudio";
 import { BirkelandElectrojetStudio } from "@/components/BirkelandElectrojetStudio";
+import { GrothendieckConjecturesStudio } from "@/components/GrothendieckConjecturesStudio";
+import { HodgeDeligneStudio } from "@/components/HodgeDeligneStudio";
+import { SerreTateLiftStudio } from "@/components/SerreTateLiftStudio";
+import { SchumannCavityStudio } from "@/components/SchumannCavityStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -401,6 +405,10 @@ const tabs = [
   { id: "weil-conjectures-purity", label: "Weil Purity (Cap 207)", icon: Binary },
   { id: "kontsevich-cyclic-homotopy", label: "Cyclic Homotopy (Cap 208)", icon: InfinityIcon },
   { id: "planetary-birkeland-auroral-electrojet", label: "Birkeland Electrojet (Option B W62)", icon: Orbit },
+  { id: "grothendieck-standard-conjectures", label: "Grothendieck Cycles (Cap 209)", icon: Layers },
+  { id: "hodge-deligne-mixed-motives", label: "Hodge-Deligne (Cap 210)", icon: GitBranch },
+  { id: "serre-tate-canonical-lift", label: "Serre-Tate Lift (Cap 211)", icon: Cpu },
+  { id: "planetary-telluric-schumann-cavity", label: "Schumann Cavity (Option B W63)", icon: Waves },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -904,6 +912,10 @@ export default function DashboardPage() {
           {activeTab === "weil-conjectures-purity" && <WeilFrobeniusPurityStudio />}
           {activeTab === "kontsevich-cyclic-homotopy" && <CyclicHomotopyStudio />}
           {activeTab === "planetary-birkeland-auroral-electrojet" && <BirkelandElectrojetStudio />}
+          {activeTab === "grothendieck-standard-conjectures" && <GrothendieckConjecturesStudio />}
+          {activeTab === "hodge-deligne-mixed-motives" && <HodgeDeligneStudio />}
+          {activeTab === "serre-tate-canonical-lift" && <SerreTateLiftStudio />}
+          {activeTab === "planetary-telluric-schumann-cavity" && <SchumannCavityStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

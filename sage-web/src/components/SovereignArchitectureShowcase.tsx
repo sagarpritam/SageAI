@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Hirzebruch-Riemann-Roch Todd Shield, Weil Conjectures Frobenius Purity Barrier, Kontsevich Cyclic Homotopy Firewall & Planetary Birkeland Auroral Electrojet Supergrid.",
+    detail: "Grothendieck Standard Conjectures Shield, Hodge-Deligne Mixed Motives Barrier, Serre-Tate Canonical Lift Firewall & Planetary Telluric Schumann Cavity Supergrid.",
   },
 ];
 
