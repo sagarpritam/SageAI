@@ -2807,6 +2807,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 59 (Opt B): Planetary Innermost Inner Core Power Harvest",
         ),
+        # Wave 60 (Caps 200-202 & Option B Wave 60 - Bicentennial Milestone)
+        (
+            "GET",
+            "/api/fargues-fontaine-curve/bundles",
+            None,
+            "Wave 60 (Cap 200): Fargues-Fontaine Vector Bundles List",
+        ),
+        (
+            "POST",
+            "/api/fargues-fontaine-curve/evaluate-vector-bundle-slope",
+            {
+                "bundle_id": "FF-CURVE-RANK2-SLOPE0-01",
+                "bundle_rank": 2,
+                "bundle_degree": 0,
+                "shield_gain": 1.25,
+            },
+            "Wave 60 (Cap 200): Fargues-Fontaine Vector Bundle Slope Evaluate",
+        ),
+        (
+            "GET",
+            "/api/voevodsky-bloch-kato/complexes",
+            None,
+            "Wave 60 (Cap 201): Voevodsky Motivic Complexes List",
+        ),
+        (
+            "POST",
+            "/api/voevodsky-bloch-kato/evaluate-norm-residue-isomorphism",
+            {
+                "complex_id": "VOEVODSKY-MILNOR-K3-01",
+                "prime_l": 2,
+                "weight_n": 3,
+                "barrier_gain": 1.25,
+            },
+            "Wave 60 (Cap 201): Voevodsky Norm Residue Isomorphism Evaluate",
+        ),
+        (
+            "GET",
+            "/api/donaldson-gauge-moduli/manifolds",
+            None,
+            "Wave 60 (Cap 202): Donaldson Smooth 4-Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/donaldson-gauge-moduli/evaluate-donaldson-invariants",
+            {
+                "manifold_id": "DONALDSON-K3-SURFACE-01",
+                "second_chern_number": 2,
+                "b2_plus": 3,
+                "firewall_gain": 1.25,
+            },
+            "Wave 60 (Cap 202): Donaldson Gauge Moduli Invariants Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-coupled-dynasphere-resonance/nodes",
+            None,
+            "Wave 60 (Opt B): Planetary Coupled Dynasphere Nodes List",
+        ),
+        (
+            "POST",
+            "/api/planetary-coupled-dynasphere-resonance/harvest-dynasphere-resonance-power",
+            {
+                "node_id": "DYNASPHERE-WHOLE-EARTH-RESONATOR-01",
+                "resonance_multiplier_override": 1.05,
+                "telluric_waveguide_efficiency": 0.96,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 60 (Opt B): Planetary Coupled Dynasphere Power Harvest",
+        ),
     ]
 
 

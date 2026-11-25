@@ -110,6 +110,7 @@ from app.routers import (
     derived_symplectic_routes,
     desitter_repulsion_routes,
     diamagnetic_supergrid_routes,
+    donaldson_gauge_moduli_routes,
     donaldson_thomas_routes,
     drone_swarm_shield_routes,
     ds_static_patch_routes,
@@ -127,6 +128,7 @@ from app.routers import (
     explain_routes,
     factorization_homology_routes,
     faltings_almost_etale_routes,
+    fargues_fontaine_curve_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -224,6 +226,7 @@ from app.routers import (
     planetary_f_layer_slurry_supergrid_routes,
     planetary_outer_core_tangent_cylinder_jet_routes,
     planetary_innermost_inner_core_anisotropy_routes,
+    planetary_coupled_dynasphere_resonance_routes,
     plasma_shield_routes,
     posture_routes,
     pqc_routes,
@@ -285,6 +288,7 @@ from app.routers import (
     uhlenbeck_gauge_compactness_routes,
     ulvz_magneto_thermal_waveguide_supergrid_routes,
     unruh_rindler_routes,
+    voevodsky_bloch_kato_routes,
     voevodsky_motivic_routes,
     waldhausen_algebraic_k_routes,
     web3_security_routes,
@@ -686,6 +690,10 @@ app.include_router(scholze_perfectoid_spaces_routes.router)
 app.include_router(borcherds_kac_moody_moonshine_routes.router)
 app.include_router(kontsevich_noncommutative_motives_routes.router)
 app.include_router(planetary_innermost_inner_core_anisotropy_routes.router)
+app.include_router(fargues_fontaine_curve_routes.router)
+app.include_router(voevodsky_bloch_kato_routes.router)
+app.include_router(donaldson_gauge_moduli_routes.router)
+app.include_router(planetary_coupled_dynasphere_resonance_routes.router)
 
 
 # ---------------------
@@ -703,7 +711,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.9.0",
+        "version": "10.0.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

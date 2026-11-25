@@ -76,6 +76,7 @@ import {
   BatteryCharging,
   GitCommitHorizontal,
   GitMerge,
+  GitFork,
   Infinity as InfinityIcon,
   Hexagon,
   X,
@@ -322,6 +323,10 @@ import { ScholzePerfectoidStudio } from "@/components/ScholzePerfectoidStudio";
 import { BorcherdsMoonshineStudio } from "@/components/BorcherdsMoonshineStudio";
 import { KontsevichMotivesStudio } from "@/components/KontsevichMotivesStudio";
 import { InnermostInnerCoreStudio } from "@/components/InnermostInnerCoreStudio";
+import { FarguesFontaineStudio } from "@/components/FarguesFontaineStudio";
+import { VoevodskyBlochKatoStudio } from "@/components/VoevodskyBlochKatoStudio";
+import { DonaldsonGaugeStudio } from "@/components/DonaldsonGaugeStudio";
+import { CoupledDynasphereStudio } from "@/components/CoupledDynasphereStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -376,6 +381,10 @@ const tabs = [
   { id: "borcherds-kac-moody-moonshine", label: "Borcherds Moonshine (Cap 198)", icon: Cpu },
   { id: "kontsevich-noncommutative-motives", label: "Kontsevich Motives (Cap 199)", icon: Layers },
   { id: "planetary-innermost-inner-core-anisotropy", label: "Innermost Inner Core (Option B W59)", icon: Radio },
+  { id: "fargues-fontaine-curve", label: "Fargues-Fontaine (Cap 200)", icon: Layers },
+  { id: "voevodsky-bloch-kato", label: "Voevodsky Bloch-Kato (Cap 201)", icon: GitFork },
+  { id: "donaldson-gauge-moduli", label: "Donaldson Moduli (Cap 202)", icon: Box },
+  { id: "planetary-coupled-dynasphere-resonance", label: "Coupled Dynasphere (Option B W60)", icon: Globe },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -867,6 +876,10 @@ export default function DashboardPage() {
           {activeTab === "borcherds-kac-moody-moonshine" && <BorcherdsMoonshineStudio />}
           {activeTab === "kontsevich-noncommutative-motives" && <KontsevichMotivesStudio />}
           {activeTab === "planetary-innermost-inner-core-anisotropy" && <InnermostInnerCoreStudio />}
+          {activeTab === "fargues-fontaine-curve" && <FarguesFontaineStudio />}
+          {activeTab === "voevodsky-bloch-kato" && <VoevodskyBlochKatoStudio />}
+          {activeTab === "donaldson-gauge-moduli" && <DonaldsonGaugeStudio />}
+          {activeTab === "planetary-coupled-dynasphere-resonance" && <CoupledDynasphereStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Scholze Perfectoid Spaces Shield, Borcherds Moonshine Barrier, Kontsevich Noncommutative Motives Firewall & Planetary Innermost Inner Core Anisotropy Supergrid.",
+    detail: "Fargues-Fontaine Curve Vector Bundle Shield, Voevodsky Bloch-Kato Motivic Barrier, Donaldson Gauge Moduli Firewall & Planetary Coupled Dynasphere Resonance Supergrid.",
   },
 ];
 
