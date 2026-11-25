@@ -294,6 +294,10 @@ import Spin7CayleyStudio from "@/components/Spin7CayleyStudio";
 import VoevodskyMotivicStudio from "@/components/VoevodskyMotivicStudio";
 import TwistedKTheoryStudio from "@/components/TwistedKTheoryStudio";
 import RydbergPolaritonSupergridStudio from "@/components/RydbergPolaritonSupergridStudio";
+import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
+import GromovWittenStudio from "@/components/GromovWittenStudio";
+import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
+import CoreMantleSeebeckStudio from "@/components/CoreMantleSeebeckStudio";
 import KontsevichDeformationStudio from "@/components/KontsevichDeformationStudio";
 import NovikovShubinStudio from "@/components/NovikovShubinStudio";
 import ApsEtaFirewallStudio from "@/components/ApsEtaFirewallStudio";
@@ -332,6 +336,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "perelman-ricci-flow", label: "Perelman Ricci Flow (Cap 176)", icon: Activity },
+  { id: "gromov-witten-cohomology", label: "Gromov-Witten Barrier (Cap 177)", icon: Binary },
+  { id: "quillen-determinant", label: "Quillen Determinant (Cap 178)", icon: Compass },
+  { id: "core-mantle-seebeck-supergrid", label: "Core-Mantle Seebeck (Option B W52)", icon: Flame },
   { id: "kontsevich-deformation", label: "Kontsevich Deformation (Cap 173)", icon: Shield },
   { id: "novikov-shubin", label: "Novikov-Shubin Barrier (Cap 174)", icon: Binary },
   { id: "aps-eta-firewall", label: "APS Eta Firewall (Cap 175)", icon: Compass },
@@ -791,6 +799,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "perelman-ricci-flow" && <PerelmanRicciFlowStudio />}
+          {activeTab === "gromov-witten-cohomology" && <GromovWittenStudio />}
+          {activeTab === "quillen-determinant" && <QuillenDeterminantStudio />}
+          {activeTab === "core-mantle-seebeck-supergrid" && <CoreMantleSeebeckStudio />}
           {activeTab === "kontsevich-deformation" && <KontsevichDeformationStudio />}
           {activeTab === "novikov-shubin" && <NovikovShubinStudio />}
           {activeTab === "aps-eta-firewall" && <ApsEtaFirewallStudio />}

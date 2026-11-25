@@ -33,7 +33,7 @@ export function APIShieldCenter() {
       }
       const data = await res.json();
       setAuditReport(data.api_audit_report);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to audit microservices APIs");
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ export function APIShieldCenter() {
       }
       const data = await res.json();
       setOpaPolicy(data.opa_policy);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to generate OPA Rego policy");
     } finally {
       setRegoLoading(false);

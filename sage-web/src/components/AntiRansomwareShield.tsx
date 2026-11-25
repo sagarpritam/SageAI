@@ -41,7 +41,7 @@ export function AntiRansomwareShield() {
       }
       const data = await res.json();
       setSimulationResult(data.simulation_result);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to run ransomware detonation simulation");
     } finally {
       setLoading(false);

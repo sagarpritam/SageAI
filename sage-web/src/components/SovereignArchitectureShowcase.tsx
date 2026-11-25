@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Kontsevich Deformation Quantization Shield, Novikov-Shubin Anti-Resonance Barrier, APS Spectral Asymmetry Eta-Invariant Firewall & Planetary Magneto-Acoustic Soliton Core-Mantle Supergrid.",
+    detail: "Perelman Ricci Flow with Surgery Shield, Gromov-Witten Quantum Cohomology Barrier, Quillen Determinant Line Bundle Firewall & Planetary Core-Mantle Seebeck Supergrid.",
   },
 ];
 

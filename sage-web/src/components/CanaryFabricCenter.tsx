@@ -53,7 +53,7 @@ export function CanaryFabricCenter() {
       }
       const data = await res.json();
       setCanaries(data.canaries || []);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load canary fabric tokens");
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ export function CanaryFabricCenter() {
       }
       const data = await res.json();
       setCanaries((prev) => [data.canary, ...prev]);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to plant synthetic honeytoken");
     } finally {
       setDeploying(false);
@@ -119,7 +119,7 @@ export function CanaryFabricCenter() {
             : c
         )
       );
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to simulate canary tripwire");
     } finally {
       setTripwireLoading(false);

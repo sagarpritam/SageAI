@@ -280,4 +280,4 @@ def test_wave50_platform_health_version():
     assert r.status_code == 200
     data = r.json()
     assert data["status"] in ("healthy", "degraded")
-    assert data["version"] in ("8.9.0", "9.0.0", "9.1.0")
+    assert data["version"] in ("8.9.0", "9.0.0", "9.1.0", "9.2.0")

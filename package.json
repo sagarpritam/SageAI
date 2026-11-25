@@ -6,13 +6,20 @@
     "dev": "npm run dev --prefix sage-web",
     "build": "npm run build --prefix sage-web",
     "start": "npm run start --prefix sage-web",
-    "lint": "npm run lint --prefix sage-web"
+    "lint": "npm run lint --prefix sage-web",
+    "postinstall": "prisma skills sync || exit 0"
   },
   "dependencies": {
+    "@supabase/server": "^1.9.2",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.2",
     "next": "^16.4.3",
     "openai": "^6.29.0"
   },
   "overrides": {
     "d3-color": "3.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^8.0.0-rc.35"
   }
 }

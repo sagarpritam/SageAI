@@ -89,3 +89,10 @@ test_output.txt
 # Synthesized threat rules
 app/data/synthesized_rules/*
 !app/data/synthesized_rules/.gitkeep
+
+# External tooling & agent configs
+.agents/
+.claude/
+.cursor/
+.devin/
+prisma.config.ts

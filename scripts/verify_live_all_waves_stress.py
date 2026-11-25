@@ -2257,6 +2257,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 51 (Opt B): CMB Magneto-Acoustic Solitary Wave Energy Harvest",
         ),
+        (
+            "GET",
+            "/api/perelman-ricci-flow/manifolds",
+            None,
+            "Wave 52 (Cap 176): Perelman Ricci Flow Manifold List",
+        ),
+        (
+            "POST",
+            "/api/perelman-ricci-flow/execute-surgery",
+            {
+                "manifold_id": "PERELMAN-NECK-PINCH-S2xS1-01",
+                "flow_time_tau": 0.25,
+                "surgery_cutoff": 1e-4,
+                "curvature_gain": 1.25,
+            },
+            "Wave 52 (Cap 176): Perelman Ricci Flow with Surgery Execution",
+        ),
+        (
+            "GET",
+            "/api/gromov-witten-cohomology/targets",
+            None,
+            "Wave 52 (Cap 177): Gromov-Witten Symplectic Targets List",
+        ),
+        (
+            "POST",
+            "/api/gromov-witten-cohomology/compute-quantum-product",
+            {
+                "target_id": "GW-PROJECTIVE-CP2-01",
+                "quantum_degree": 3,
+                "novikov_parameter_q": 0.05,
+                "deformation_gain": 1.25,
+            },
+            "Wave 52 (Cap 177): Gromov-Witten Invariants & Quantum Product",
+        ),
+        (
+            "GET",
+            "/api/quillen-determinant/bundles",
+            None,
+            "Wave 52 (Cap 178): Quillen Determinant Line Bundles List",
+        ),
+        (
+            "POST",
+            "/api/quillen-determinant/evaluate-determinant",
+            {
+                "bundle_id": "QUILLEN-DIRAC-RIEMANN-01",
+                "regularization_cutoff": 1e-5,
+                "zeta_derivative_scale": 1.0,
+                "firewall_gain": 1.25,
+            },
+            "Wave 52 (Cap 178): Quillen Determinant Line Bundle Evaluation",
+        ),
+        (
+            "GET",
+            "/api/core-mantle-seebeck-supergrid/arrays",
+            None,
+            "Wave 52 (Opt B): Core-Mantle Seebeck Arrays List",
+        ),
+        (
+            "POST",
+            "/api/core-mantle-seebeck-supergrid/harvest-thermal-power",
+            {
+                "array_id": "SEEBECK-PACIFIC-TRENCH-01",
+                "delta_temp_override_k": 1250.0,
+                "thermopile_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 52 (Opt B): Planetary Thermoelectric Seebeck Power Harvest",
+        ),
     ]
 
 

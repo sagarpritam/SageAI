@@ -36,7 +36,7 @@ export function AISPMCommandCenter() {
       }
       const data = await res.json();
       setInspectionResult(data.inspection);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Prompt guardrail evaluation failed");
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ export function AISPMCommandCenter() {
       }
       const data = await res.json();
       setRagReport(data.rag_report);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "RAG vector store scan failed");
     } finally {
       setRagLoading(false);

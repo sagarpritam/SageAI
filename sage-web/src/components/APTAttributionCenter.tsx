@@ -64,7 +64,7 @@ export function APTAttributionCenter() {
           setSelectedActor((prev) => prev || data.actors[0]);
         }
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load APT actor profiles");
     } finally {
       setLoading(false);
@@ -96,7 +96,7 @@ export function APTAttributionCenter() {
       if (data.attribution) {
         setAnalysisResult(data.attribution);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to execute IOC attribution query");
     } finally {
       setAnalyzing(false);

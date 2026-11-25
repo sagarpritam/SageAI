@@ -85,6 +85,7 @@ from app.routers import (
     connes_spectral_geometry_routes,
     consensus_routes,
     copilot_routes,
+    core_mantle_seebeck_supergrid_routes,
     cosmic_censorship_routes,
     counter_quantum_routes,
     crossplane_mesh_routes,
@@ -134,6 +135,7 @@ from app.routers import (
     geometric_satake_routes,
     gravitational_phonon_routes,
     gravitational_seismic_routes,
+    gromov_witten_cohomology_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
     heegaard_floer_routes,
@@ -199,6 +201,7 @@ from app.routers import (
     p_adic_holography_routes,
     password_routes,
     payment_routes,
+    perelman_ricci_flow_routes,
     photonic_quantum_routes,
     plasma_shield_routes,
     posture_routes,
@@ -206,6 +209,7 @@ from app.routers import (
     qkd_space_mesh_routes,
     quantum_cohomology_routes,
     quantum_extremal_island_routes,
+    quillen_determinant_routes,
     quantum_gravitational_routes,
     quantum_thermoelectric_routes,
     quantum_yangian_routes,
@@ -622,6 +626,10 @@ app.include_router(kontsevich_deformation_routes.router)
 app.include_router(novikov_shubin_routes.router)
 app.include_router(aps_eta_firewall_routes.router)
 app.include_router(magneto_acoustic_soliton_supergrid_routes.router)
+app.include_router(perelman_ricci_flow_routes.router)
+app.include_router(gromov_witten_cohomology_routes.router)
+app.include_router(quillen_determinant_routes.router)
+app.include_router(core_mantle_seebeck_supergrid_routes.router)
 
 
 # ---------------------
@@ -639,7 +647,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.1.0",
+        "version": "9.2.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],
