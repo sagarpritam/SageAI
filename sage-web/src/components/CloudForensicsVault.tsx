@@ -71,7 +71,7 @@ export function CloudForensicsVault() {
           setSelectedSnapshot((prev) => prev || data.snapshots[0]);
         }
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to load forensic snapshots");
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export function CloudForensicsVault() {
         setSnapshots((prev) => [data.snapshot, ...prev]);
         setSelectedSnapshot(data.snapshot);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to capture cloud forensic snapshot");
     } finally {
       setCreating(false);
@@ -131,7 +131,7 @@ export function CloudForensicsVault() {
       if (data.verification) {
         setVerificationResult(data.verification);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to verify forensic snapshot hashes");
     } finally {
       setVerifying(false);

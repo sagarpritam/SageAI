@@ -33,7 +33,7 @@ export function CARTHub() {
       }
       const data = await res.json();
       setAnalysis(data.analysis);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to analyze enterprise attack graph");
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ export function CARTHub() {
       }
       const data = await res.json();
       setSeveranceResult(data.severance_result);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to sever attack graph choke point");
     } finally {
       setSeverLoading(false);

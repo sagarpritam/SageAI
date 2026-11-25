@@ -41,7 +41,7 @@ export function ShareButton({ scanId }: ShareButtonProps) {
         }
       }
       setStatusUrl(shareUrl);
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(
         e instanceof Error ? e.message : "Failed to generate share link. Please try again."
       );

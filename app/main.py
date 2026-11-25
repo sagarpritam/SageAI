@@ -133,9 +133,11 @@ from app.routers import (
     geometric_langlands_routes,
     geometric_satake_affine_routes,
     geometric_satake_routes,
+    geodynamo_helical_turbulent_supergrid_routes,
     gravitational_phonon_routes,
     gravitational_seismic_routes,
     gromov_witten_cohomology_routes,
+    grothendieck_teichmuller_galois_routes,
     happy_holographic_routes,
     haps_stratosphere_routes,
     heegaard_floer_routes,
@@ -246,6 +248,7 @@ from app.routers import (
     swampland_wgc_routes,
     syk_chaos_routes,
     tachyon_horizon_routes,
+    taubes_vortex_sw_routes,
     telecom_5g_routes,
     telemetry_routes,
     teleparallel_gravity_routes,
@@ -258,6 +261,7 @@ from app.routers import (
     twisted_k_theory_routes,
     twisted_supergrid_routes,
     twistor_holonomy_routes,
+    uhlenbeck_gauge_compactness_routes,
     unruh_rindler_routes,
     voevodsky_motivic_routes,
     web3_security_routes,
@@ -630,6 +634,10 @@ app.include_router(perelman_ricci_flow_routes.router)
 app.include_router(gromov_witten_cohomology_routes.router)
 app.include_router(quillen_determinant_routes.router)
 app.include_router(core_mantle_seebeck_supergrid_routes.router)
+app.include_router(uhlenbeck_gauge_compactness_routes.router)
+app.include_router(taubes_vortex_sw_routes.router)
+app.include_router(grothendieck_teichmuller_galois_routes.router)
+app.include_router(geodynamo_helical_turbulent_supergrid_routes.router)
 
 
 # ---------------------
@@ -647,7 +655,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "9.2.0",
+        "version": "9.3.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

@@ -2325,6 +2325,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 52 (Opt B): Planetary Thermoelectric Seebeck Power Harvest",
         ),
+        # Wave 53 (Caps 179-181 & Option B Wave 53)
+        (
+            "GET",
+            "/api/uhlenbeck-gauge-compactness/configurations",
+            None,
+            "Wave 53 (Cap 179): Uhlenbeck Gauge Connection Configurations List",
+        ),
+        (
+            "POST",
+            "/api/uhlenbeck-gauge-compactness/enforce-compactness",
+            {
+                "connection_id": "UHLENBECK-SU2-INSTANTON-01",
+                "curvature_threshold": 1e-4,
+                "bubbling_radius_delta": 0.02,
+                "sobolev_gain": 1.25,
+            },
+            "Wave 53 (Cap 179): Uhlenbeck Weak Compactness & Epsilon-Regularity Enforce",
+        ),
+        (
+            "GET",
+            "/api/taubes-vortex-sw/manifolds",
+            None,
+            "Wave 53 (Cap 180): Taubes Symplectic Manifolds List",
+        ),
+        (
+            "POST",
+            "/api/taubes-vortex-sw/equate-sw-gromov",
+            {
+                "manifold_id": "TAUBES-CP2-MONOPOLE-01",
+                "vortex_parameter_r": 1.0,
+                "perturbation_eta": 0.01,
+                "coupling_gain": 1.25,
+            },
+            "Wave 53 (Cap 180): Taubes SW=Gr Invariant Equivalence & Vortex Barrier",
+        ),
+        (
+            "GET",
+            "/api/grothendieck-teichmuller-galois/dessins",
+            None,
+            "Wave 53 (Cap 181): Grothendieck Dessins d'Enfants List",
+        ),
+        (
+            "POST",
+            "/api/grothendieck-teichmuller-galois/evaluate-associator",
+            {
+                "dessin_id": "GT-CLEBSCH-CUBIC-01",
+                "drinfeld_lambda": 1.0,
+                "associator_order": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 53 (Cap 181): Grothendieck-Teichmuller Drinfeld Associator Evaluate",
+        ),
+        (
+            "GET",
+            "/api/geodynamo-helical-turbulent-supergrid/arrays",
+            None,
+            "Wave 53 (Opt B): Geodynamo Helical Induction Arrays List",
+        ),
+        (
+            "POST",
+            "/api/geodynamo-helical-turbulent-supergrid/harvest-induction-power",
+            {
+                "array_id": "DYNAMO-EQUATORIAL-COLUMN-01",
+                "helicity_override_alpha": 0.045,
+                "induction_efficiency": 0.95,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 53 (Opt B): Planetary Outer-Core Geodynamo Induction Power Harvest",
+        ),
     ]
 
 

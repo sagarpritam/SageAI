@@ -294,6 +294,10 @@ import Spin7CayleyStudio from "@/components/Spin7CayleyStudio";
 import VoevodskyMotivicStudio from "@/components/VoevodskyMotivicStudio";
 import TwistedKTheoryStudio from "@/components/TwistedKTheoryStudio";
 import RydbergPolaritonSupergridStudio from "@/components/RydbergPolaritonSupergridStudio";
+import UhlenbeckCompactnessStudio from "@/components/UhlenbeckCompactnessStudio";
+import TaubesVortexStudio from "@/components/TaubesVortexStudio";
+import GrothendieckTeichmullerStudio from "@/components/GrothendieckTeichmullerStudio";
+import GeodynamoTurbulentStudio from "@/components/GeodynamoTurbulentStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -336,6 +340,10 @@ const tabs = [
   { id: "war-drill-arena", label: "Red vs Blue War Drill", icon: Swords },
   { id: "revops-pipeline", label: "Enterprise RevOps Pipeline", icon: TrendingUp },
   { id: "multicloud-cluster-ops", label: "Multi-Cloud Cluster Ops", icon: Server },
+  { id: "uhlenbeck-gauge-compactness", label: "Uhlenbeck Compactness (Cap 179)", icon: Shield },
+  { id: "taubes-vortex-sw", label: "Taubes Vortices (Cap 180)", icon: Waves },
+  { id: "grothendieck-teichmuller-galois", label: "Grothendieck-Teichmuller (Cap 181)", icon: Network },
+  { id: "geodynamo-helical-turbulent-supergrid", label: "Geodynamo Turbulent (Option B W53)", icon: Compass },
   { id: "perelman-ricci-flow", label: "Perelman Ricci Flow (Cap 176)", icon: Activity },
   { id: "gromov-witten-cohomology", label: "Gromov-Witten Barrier (Cap 177)", icon: Binary },
   { id: "quillen-determinant", label: "Quillen Determinant (Cap 178)", icon: Compass },
@@ -799,6 +807,10 @@ export default function DashboardPage() {
           {activeTab === "soc-playbooks" && <SocPlaybookStudio />}
           {activeTab === "war-drill-arena" && <RedBlueWarDrillStudio />}
           {activeTab === "multicloud-cluster-ops" && <MultiCloudClusterStudio />}
+          {activeTab === "uhlenbeck-gauge-compactness" && <UhlenbeckCompactnessStudio />}
+          {activeTab === "taubes-vortex-sw" && <TaubesVortexStudio />}
+          {activeTab === "grothendieck-teichmuller-galois" && <GrothendieckTeichmullerStudio />}
+          {activeTab === "geodynamo-helical-turbulent-supergrid" && <GeodynamoTurbulentStudio />}
           {activeTab === "perelman-ricci-flow" && <PerelmanRicciFlowStudio />}
           {activeTab === "gromov-witten-cohomology" && <GromovWittenStudio />}
           {activeTab === "quillen-determinant" && <QuillenDeterminantStudio />}

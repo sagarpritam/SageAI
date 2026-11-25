@@ -34,7 +34,7 @@ export function ITDRCommandCenter() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Telemetry ingest failed with status ${res.status}`);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to ingest identity telemetry");
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ export function ITDRCommandCenter() {
         const err = await res.json().catch(() => ({}));
         setErrorMsg(err.detail || `Containment failed with status ${res.status}`);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : "Failed to execute containment");
     } finally {
       setContainLoading(null);

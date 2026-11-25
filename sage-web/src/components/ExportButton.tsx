@@ -30,7 +30,7 @@ export function ExportButton({ scanId }: ExportButtonProps) {
       a.click();
       window.URL.revokeObjectURL(url);
       a.remove();
-    } catch (e) {
+    } catch (e: unknown) {
       setErrorMsg(
         e instanceof Error ? e.message : "PDF download failed. Please try again."
       );

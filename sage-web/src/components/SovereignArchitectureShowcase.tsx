@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Perelman Ricci Flow with Surgery Shield, Gromov-Witten Quantum Cohomology Barrier, Quillen Determinant Line Bundle Firewall & Planetary Core-Mantle Seebeck Supergrid.",
+    detail: "Uhlenbeck Gauge Theory Compactness Shield, Taubes SW=Gr Equivalence Barrier, Grothendieck-Teichmüller Dessins Firewall & Planetary Geodynamo Induction Supergrid.",
   },
 ];
 
