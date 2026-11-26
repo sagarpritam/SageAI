@@ -347,6 +347,10 @@ import { IharaGaloisBraidStudio } from "@/components/IharaGaloisBraidStudio";
 import { ShimuraTaniyamaStudio } from "@/components/ShimuraTaniyamaStudio";
 import { StarkRegulatorStudio } from "@/components/StarkRegulatorStudio";
 import { ThermohalineSupergridStudio } from "@/components/ThermohalineSupergridStudio";
+import { MazurEisensteinStudio } from "@/components/MazurEisensteinStudio";
+import { RibetLevelLoweringStudio } from "@/components/RibetLevelLoweringStudio";
+import { IwasawaMainConjectureStudio } from "@/components/IwasawaMainConjectureStudio";
+import { StratosphericJetstreamStudio } from "@/components/StratosphericJetstreamStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -425,6 +429,10 @@ const tabs = [
   { id: "shimura-taniyama-modular", label: "Shimura-Taniyama (Cap 216)", icon: Compass },
   { id: "stark-regulator-values", label: "Stark Regulator (Cap 217)", icon: Flame },
   { id: "planetary-oceanic-thermohaline", label: "Thermohaline Grid (Option B W65)", icon: Waves },
+  { id: "mazur-eisenstein-torsion", label: "Mazur Eisenstein (Cap 218)", icon: GitBranch },
+  { id: "ribet-level-lowering", label: "Ribet Level-Lowering (Cap 219)", icon: Compass },
+  { id: "iwasawa-main-conjecture", label: "Iwasawa Conjecture (Cap 220)", icon: Flame },
+  { id: "planetary-stratospheric-jetstream", label: "Jetstream Grid (Option B W66)", icon: Waves },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -940,6 +948,10 @@ export default function DashboardPage() {
           {activeTab === "shimura-taniyama-modular" && <ShimuraTaniyamaStudio />}
           {activeTab === "stark-regulator-values" && <StarkRegulatorStudio />}
           {activeTab === "planetary-oceanic-thermohaline" && <ThermohalineSupergridStudio />}
+          {activeTab === "mazur-eisenstein-torsion" && <MazurEisensteinStudio />}
+          {activeTab === "ribet-level-lowering" && <RibetLevelLoweringStudio />}
+          {activeTab === "iwasawa-main-conjecture" && <IwasawaMainConjectureStudio />}
+          {activeTab === "planetary-stratospheric-jetstream" && <StratosphericJetstreamStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

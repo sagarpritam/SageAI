@@ -211,5 +211,5 @@ def test_wave64_health_version():
     r = client.get("/health")
     assert r.status_code == 200
     data = r.json()
-    assert data["version"] in ("10.3.0", "10.4.0", "10.5.0")
+    assert data["version"] in ("10.3.0", "10.4.0", "10.5.0", "10.6.0")
     assert data["status"] in ("healthy", "degraded")

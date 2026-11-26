@@ -3221,6 +3221,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 65 (Opt B): Planetary Oceanic Thermohaline Power Harvest",
         ),
+        # Wave 66 (Caps 218-220 & Option B Wave 66)
+        (
+            "GET",
+            "/api/mazur-eisenstein-torsion/curves",
+            None,
+            "Wave 66 (Cap 218): Mazur Eisenstein Curves List",
+        ),
+        (
+            "POST",
+            "/api/mazur-eisenstein-torsion/evaluate-eisenstein-torsion",
+            {
+                "curve_id": "MAZUR-EISENSTEIN-X0-11-01",
+                "prime_n": 11,
+                "torsion_order": 5,
+                "shield_gain": 1.25,
+            },
+            "Wave 66 (Cap 218): Mazur Eisenstein Torsion Evaluate",
+        ),
+        (
+            "GET",
+            "/api/ribet-level-lowering/forms",
+            None,
+            "Wave 66 (Cap 219): Ribet Level-Lowering Forms List",
+        ),
+        (
+            "POST",
+            "/api/ribet-level-lowering/evaluate-level-lowering",
+            {
+                "form_id": "RIBET-LEVEL-LOWER-P5-01",
+                "residual_prime_p": 5,
+                "serre_weight_k": 2,
+                "barrier_gain": 1.25,
+            },
+            "Wave 66 (Cap 219): Ribet Level-Lowering Evaluate",
+        ),
+        (
+            "GET",
+            "/api/iwasawa-main-conjecture/extensions",
+            None,
+            "Wave 66 (Cap 220): Iwasawa Extensions List",
+        ),
+        (
+            "POST",
+            "/api/iwasawa-main-conjecture/evaluate-iwasawa-ideal",
+            {
+                "extension_id": "IWASAWA-ZP-CYCLOTOMIC-01",
+                "prime_p": 5,
+                "lambda_invariant": 1,
+                "firewall_gain": 1.25,
+            },
+            "Wave 66 (Cap 220): Iwasawa Main Conjecture Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-stratospheric-jetstream/streams",
+            None,
+            "Wave 66 (Opt B): Planetary Stratospheric Jetstream Streams List",
+        ),
+        (
+            "POST",
+            "/api/planetary-stratospheric-jetstream/harvest-jetstream-power",
+            {
+                "stream_id": "POLAR-FRONT-JETSTREAM-01",
+                "rossby_multiplier": 1.05,
+                "triboelectric_efficiency": 0.986,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 66 (Opt B): Planetary Stratospheric Jetstream Power Harvest",
+        ),
     ]
 
 
