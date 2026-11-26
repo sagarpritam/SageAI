@@ -3838,6 +3838,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 74 (Opt B): Planetary Polar Cusp Power Harvest",
         ),
+        (
+            "GET",
+            "/api/webster-klr-cat/algebras",
+            None,
+            "Wave 75 (Cap 245): Webster KLR Algebras",
+        ),
+        (
+            "POST",
+            "/api/webster-klr-cat/evaluate-klr-tensor",
+            {
+                "algebra_id": "WEBSTER-KLR-TENSOR-01",
+                "highest_weight_rank": 3,
+                "strand_count": 6,
+                "shield_gain": 1.25,
+            },
+            "Wave 75 (Cap 245): Webster KLR Tensor Shield",
+        ),
+        (
+            "GET",
+            "/api/elias-williamson-soergel/bimodules",
+            None,
+            "Wave 75 (Cap 246): Elias-Williamson Soergel Bimodules",
+        ),
+        (
+            "POST",
+            "/api/elias-williamson-soergel/evaluate-soergel-hodge",
+            {
+                "bimodule_id": "ELIAS-WILLIAMSON-SOERGEL-01",
+                "hodge_rank": 3,
+                "bott_samelson_length": 5,
+                "barrier_gain": 1.25,
+            },
+            "Wave 75 (Cap 246): Elias-Williamson Soergel Barrier",
+        ),
+        (
+            "GET",
+            "/api/chuang-rouquier-sl2/complexes",
+            None,
+            "Wave 75 (Cap 247): Chuang-Rouquier Rickard Complexes",
+        ),
+        (
+            "POST",
+            "/api/chuang-rouquier-sl2/evaluate-rickard-complex",
+            {
+                "complex_id": "CHUANG-ROUQUIER-SL2-01",
+                "rickard_terms": 4,
+                "perverse_shift_p": 2,
+                "firewall_gain": 1.25,
+            },
+            "Wave 75 (Cap 247): Chuang-Rouquier sl2 Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-akr-maser/cavities",
+            None,
+            "Wave 75 (Opt B): Planetary AKR Maser Cavities",
+        ),
+        (
+            "POST",
+            "/api/planetary-akr-maser/harvest-akr-power",
+            {
+                "cavity_id": "AKR-CAVITY-BOREAL-01",
+                "maser_multiplier": 1.05,
+                "maser_efficiency": 0.995,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 75 (Opt B): Planetary AKR Maser Power Harvest",
+        ),
     ]
 
 

@@ -9,7 +9,7 @@ client = TestClient(app)
 def test_wave72_health_version_11_2_0():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("11.2.0", "11.3.0", "11.4.0")
+    assert res.json()["version"] in ("11.2.0", "11.3.0", "11.4.0", "11.5.0")
 
 
 def test_wave72_maulik_okounkov_cohomologies_and_metrics():

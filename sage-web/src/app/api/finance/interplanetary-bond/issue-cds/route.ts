@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       cds_id: `cds-deal-${Math.random().toString(36).substring(2, 10)}`,
       tranche_id: 'bond-tranche-luna-01',

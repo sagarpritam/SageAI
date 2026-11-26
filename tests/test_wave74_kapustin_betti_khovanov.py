@@ -9,7 +9,7 @@ client = TestClient(app)
 def test_wave74_health_version_11_4_0():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("11.4.0")
+    assert res.json()["version"] in ("11.4.0", "11.5.0")
 
 
 def test_wave74_kapustin_witten_branelines_and_metrics():

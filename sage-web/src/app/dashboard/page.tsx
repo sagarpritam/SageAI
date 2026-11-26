@@ -383,6 +383,10 @@ import { KapustinWittenStudio } from "@/components/KapustinWittenStudio";
 import { BenZviNadlerStudio } from "@/components/BenZviNadlerStudio";
 import { KhovanovTangleStudio } from "@/components/KhovanovTangleStudio";
 import { PolarCuspFunnelStudio } from "@/components/PolarCuspFunnelStudio";
+import { WebsterKlrStudio } from "@/components/WebsterKlrStudio";
+import { SoergelBimoduleStudio } from "@/components/SoergelBimoduleStudio";
+import { ChuangRouquierStudio } from "@/components/ChuangRouquierStudio";
+import { AuroralAkrMaserStudio } from "@/components/AuroralAkrMaserStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -497,6 +501,10 @@ const tabs = [
   { id: "ben-zvi-nadler-betti", label: "Ben-Zvi-Nadler Betti (Cap 243)", icon: Compass },
   { id: "khovanov-barnatan-tangle", label: "Khovanov-Bar-Natan Tangle (Cap 244)", icon: Flame },
   { id: "planetary-polar-cusp", label: "Polar Cusp Funnel (Option B W74)", icon: Atom },
+  { id: "webster-klr-cat", label: "Webster KLR Cat (Cap 245)", icon: GitBranch },
+  { id: "elias-williamson-soergel", label: "Soergel Bimodules (Cap 246)", icon: Compass },
+  { id: "chuang-rouquier-sl2", label: "Chuang-Rouquier sl2 (Cap 247)", icon: Flame },
+  { id: "planetary-akr-maser", label: "Auroral AKR Maser (Option B W75)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1048,6 +1056,10 @@ export default function DashboardPage() {
           {activeTab === "ben-zvi-nadler-betti" && <BenZviNadlerStudio />}
           {activeTab === "khovanov-barnatan-tangle" && <KhovanovTangleStudio />}
           {activeTab === "planetary-polar-cusp" && <PolarCuspFunnelStudio />}
+          {activeTab === "webster-klr-cat" && <WebsterKlrStudio />}
+          {activeTab === "elias-williamson-soergel" && <SoergelBimoduleStudio />}
+          {activeTab === "chuang-rouquier-sl2" && <ChuangRouquierStudio />}
+          {activeTab === "planetary-akr-maser" && <AuroralAkrMaserStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

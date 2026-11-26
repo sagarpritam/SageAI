@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       clearinghouse_id: 'interplanetary-bond-clearinghouse-01',
       status: 'INTERPLANETARY_SOVEREIGN_DEBT_ACTIVE',
