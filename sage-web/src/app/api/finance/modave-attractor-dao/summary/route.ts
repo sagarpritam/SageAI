@@ -6,7 +6,7 @@ export async function GET() {
     if (!res.ok) throw new Error("Backend response error");
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Modave Attractor DAO summary:", err);
     return NextResponse.json({
       dao_id: "MODAVE-ATTRACTOR-DAO-01",

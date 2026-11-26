@@ -107,4 +107,4 @@ def test_wave67_planetary_mesospheric_plasma_metrics():
 def test_wave67_health_version():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("10.7.0", "10.8.0")
+    assert res.json()["version"] in ("10.7.0", "10.8.0", "10.9.0")

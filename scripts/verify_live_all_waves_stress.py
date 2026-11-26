@@ -3428,6 +3428,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 68 (Opt B): Planetary Thermospheric Dynamo Power Harvest",
         ),
+        # Wave 69 (Caps 227-229 & Option B Wave 69)
+        (
+            "GET",
+            "/api/jacquet-langlands-quaternion/correspondences",
+            None,
+            "Wave 69 (Cap 227): Jacquet-Langlands Correspondences List",
+        ),
+        (
+            "POST",
+            "/api/jacquet-langlands-quaternion/evaluate-quaternion-transfer",
+            {
+                "correspondence_id": "JACQUET-LANGLANDS-GL2-01",
+                "quaternion_discriminant": 6,
+                "level_n": 11,
+                "shield_gain": 1.25,
+            },
+            "Wave 69 (Cap 227): Jacquet-Langlands Transfer Evaluate",
+        ),
+        (
+            "GET",
+            "/api/beilinson-deligne-regulator/regulators",
+            None,
+            "Wave 69 (Cap 228): Beilinson Regulators List",
+        ),
+        (
+            "POST",
+            "/api/beilinson-deligne-regulator/evaluate-beilinson-regulator",
+            {
+                "regulator_id": "BEILINSON-REGULATOR-K2-01",
+                "motivic_weight": 2,
+                "chow_codimension": 2,
+                "barrier_gain": 1.25,
+            },
+            "Wave 69 (Cap 228): Beilinson Regulator Evaluate",
+        ),
+        (
+            "GET",
+            "/api/milnor-norm-residue/symbols",
+            None,
+            "Wave 69 (Cap 229): Milnor Symbols List",
+        ),
+        (
+            "POST",
+            "/api/milnor-norm-residue/evaluate-milnor-symbol",
+            {
+                "symbol_id": "MILNOR-K2-SYMBOL-01",
+                "k_degree_n": 2,
+                "torsion_m": 5,
+                "firewall_gain": 1.25,
+            },
+            "Wave 69 (Cap 229): Milnor Symbol Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-exospheric-geocorona/shells",
+            None,
+            "Wave 69 (Opt B): Planetary Exospheric Geocorona Shells List",
+        ),
+        (
+            "POST",
+            "/api/planetary-exospheric-geocorona/harvest-exospheric-power",
+            {
+                "shell_id": "EXOSPHERE-GEOCORONA-LYMAN-01",
+                "reconnection_multiplier": 1.05,
+                "reconnection_efficiency": 0.989,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 69 (Opt B): Planetary Exospheric Geocorona Power Harvest",
+        ),
     ]
 
 

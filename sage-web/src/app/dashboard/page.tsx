@@ -359,6 +359,10 @@ import { SzpiroAbcHeightStudio } from "@/components/SzpiroAbcHeightStudio";
 import { AndreOortShimuraStudio } from "@/components/AndreOortShimuraStudio";
 import { ArthurEndoscopyStudio } from "@/components/ArthurEndoscopyStudio";
 import { ThermosphericDynamoStudio } from "@/components/ThermosphericDynamoStudio";
+import { JacquetLanglandsStudio } from "@/components/JacquetLanglandsStudio";
+import { BeilinsonRegulatorStudio } from "@/components/BeilinsonRegulatorStudio";
+import { MilnorKTheoryStudio } from "@/components/MilnorKTheoryStudio";
+import { ExosphericGeocoronaStudio } from "@/components/ExosphericGeocoronaStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -449,6 +453,10 @@ const tabs = [
   { id: "andre-oort-shimura", label: "Andre-Oort Shimura (Cap 225)", icon: Compass },
   { id: "langlands-arthur-trace", label: "Arthur Endoscopy (Cap 226)", icon: Flame },
   { id: "planetary-thermospheric-dynamo", label: "Thermospheric Dynamo (Option B W68)", icon: Radio },
+  { id: "jacquet-langlands-quaternion", label: "Jacquet-Langlands (Cap 227)", icon: GitBranch },
+  { id: "beilinson-deligne-regulator", label: "Beilinson Regulator (Cap 228)", icon: Compass },
+  { id: "milnor-norm-residue", label: "Milnor K-Theory (Cap 229)", icon: Flame },
+  { id: "planetary-exospheric-geocorona", label: "Exospheric Geocorona (Option B W69)", icon: Globe },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -976,6 +984,10 @@ export default function DashboardPage() {
           {activeTab === "andre-oort-shimura" && <AndreOortShimuraStudio />}
           {activeTab === "langlands-arthur-trace" && <ArthurEndoscopyStudio />}
           {activeTab === "planetary-thermospheric-dynamo" && <ThermosphericDynamoStudio />}
+          {activeTab === "jacquet-langlands-quaternion" && <JacquetLanglandsStudio />}
+          {activeTab === "beilinson-deligne-regulator" && <BeilinsonRegulatorStudio />}
+          {activeTab === "milnor-norm-residue" && <MilnorKTheoryStudio />}
+          {activeTab === "planetary-exospheric-geocorona" && <ExosphericGeocoronaStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

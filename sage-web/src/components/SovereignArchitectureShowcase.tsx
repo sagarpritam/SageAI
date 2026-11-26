@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Szpiro ABC Height Shield, Andre-Oort Shimura Barrier, Arthur Endoscopy Firewall & Planetary Thermospheric Dynamo Supergrid.",
+    detail: "Jacquet-Langlands Quaternion Shield, Beilinson-Deligne Regulator Barrier, Milnor Norm Residue Firewall & Planetary Exospheric Geocorona Supergrid.",
   },
 ];
 
