@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       tx_id: `CNBD-ARB-${Math.floor(800 + Math.random() * 200)}`,
       pool_id: 'CNBD-POOL-PRIMORDIAL-01',

@@ -107,4 +107,4 @@ def test_wave68_planetary_thermospheric_dynamo_metrics():
 def test_wave68_health_version():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("10.8.0", "10.9.0", "11.0.0", "11.1.0")
+    assert res.json()["version"] in ("10.8.0", "10.9.0", "11.0.0", "11.1.0", "11.2.0")

@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       dao_id: 'DMH-SECURITIZATION-DAO-01',
       total_underwritten_halo_mass_m_sun: 1.45e12,

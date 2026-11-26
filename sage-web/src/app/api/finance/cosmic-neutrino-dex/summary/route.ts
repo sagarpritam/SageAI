@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       dex_id: 'CNBD-RELIC-ARBITRAGE-01',
       relic_neutrino_temp_kelvin: 1.95,

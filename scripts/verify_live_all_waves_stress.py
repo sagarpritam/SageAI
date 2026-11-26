@@ -3634,6 +3634,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 71 (Opt B): Planetary Ring-Current Power Harvest",
         ),
+        (
+            "GET",
+            "/api/maulik-okounkov-qc/cohomologies",
+            None,
+            "Wave 72 (Cap 236): Maulik-Okounkov Quantum Cohomology Registry",
+        ),
+        (
+            "POST",
+            "/api/maulik-okounkov-qc/evaluate-quantum-cohomology",
+            {
+                "cohomology_id": "MAULIK-OKOUNKOV-QC-01",
+                "torus_rank": 4,
+                "quantum_degree": 3,
+                "shield_gain": 1.25,
+            },
+            "Wave 72 (Cap 236): Maulik-Okounkov QC Shield",
+        ),
+        (
+            "GET",
+            "/api/bridgeland-stability/manifolds",
+            None,
+            "Wave 72 (Cap 237): Bridgeland Stability Manifolds",
+        ),
+        (
+            "POST",
+            "/api/bridgeland-stability/evaluate-bridgeland-stability",
+            {
+                "manifold_id": "BRIDGELAND-STAB-K3-01",
+                "heart_shift": 1,
+                "filtration_length": 3,
+                "barrier_gain": 1.25,
+            },
+            "Wave 72 (Cap 237): Bridgeland Stability Barrier",
+        ),
+        (
+            "GET",
+            "/api/getzler-kapranov-operad/operads",
+            None,
+            "Wave 72 (Cap 238): Getzler-Kapranov Modular Operads",
+        ),
+        (
+            "POST",
+            "/api/getzler-kapranov-operad/evaluate-operad-bv",
+            {
+                "operad_id": "GETZLER-KAPRANOV-MODULAR-01",
+                "genus_order": 2,
+                "arity_n": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 72 (Cap 238): Getzler-Kapranov BV Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-magnetotail/lobes",
+            None,
+            "Wave 72 (Opt B): Planetary Magnetotail Lobes",
+        ),
+        (
+            "POST",
+            "/api/planetary-magnetotail/harvest-magnetotail-power",
+            {
+                "lobe_id": "MAGNETOTAIL-XLINE-01",
+                "plasmoid_multiplier": 1.05,
+                "reconnection_efficiency": 0.992,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 72 (Opt B): Planetary Magnetotail Power Harvest",
+        ),
     ]
 
 

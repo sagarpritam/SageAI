@@ -371,6 +371,10 @@ import { NakajimaQuiverStudio } from "@/components/NakajimaQuiverStudio";
 import { PandharipandeThomasStudio } from "@/components/PandharipandeThomasStudio";
 import { JoyceSongHallStudio } from "@/components/JoyceSongHallStudio";
 import { RingCurrentAlfvenStudio } from "@/components/RingCurrentAlfvenStudio";
+import { MaulikOkounkovStudio } from "@/components/MaulikOkounkovStudio";
+import { BridgelandStabilityStudio } from "@/components/BridgelandStabilityStudio";
+import { GetzlerKapranovStudio } from "@/components/GetzlerKapranovStudio";
+import { MagnetotailPlasmoidStudio } from "@/components/MagnetotailPlasmoidStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -473,6 +477,10 @@ const tabs = [
   { id: "pandharipande-thomas-bps", label: "Pandharipande-Thomas (Cap 234)", icon: Compass },
   { id: "joyce-song-hall", label: "Joyce-Song Hall (Cap 235)", icon: Flame },
   { id: "planetary-ring-current", label: "Ring-Current Alfvén (Option B W71)", icon: Atom },
+  { id: "maulik-okounkov-qc", label: "Maulik-Okounkov QC (Cap 236)", icon: GitBranch },
+  { id: "bridgeland-stability", label: "Bridgeland Stability (Cap 237)", icon: Compass },
+  { id: "getzler-kapranov-operad", label: "Getzler-Kapranov Operad (Cap 238)", icon: Flame },
+  { id: "planetary-magnetotail", label: "Magnetotail Plasmoid (Option B W72)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1012,6 +1020,10 @@ export default function DashboardPage() {
           {activeTab === "pandharipande-thomas-bps" && <PandharipandeThomasStudio />}
           {activeTab === "joyce-song-hall" && <JoyceSongHallStudio />}
           {activeTab === "planetary-ring-current" && <RingCurrentAlfvenStudio />}
+          {activeTab === "maulik-okounkov-qc" && <MaulikOkounkovStudio />}
+          {activeTab === "bridgeland-stability" && <BridgelandStabilityStudio />}
+          {activeTab === "getzler-kapranov-operad" && <GetzlerKapranovStudio />}
+          {activeTab === "planetary-magnetotail" && <MagnetotailPlasmoidStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

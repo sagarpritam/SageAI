@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       auction_id: `AUC-DMH-${Math.floor(900 + Math.random() * 100)}`,
       tranche_id: 'DMH-CORE-NFW-01',
