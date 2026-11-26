@@ -2799,9 +2799,58 @@ def run_master_drill():
         f"  {GREEN}✓ Planetary Stratospheric Jetstream Supergrid (Option B Wave 66):{RESET} Stream={js_res['stream_id']} | Dispatch={js_res['harvested_power_gw']:.3f} GW | Stability={js_res['grid_stability_pct']:.2f}% | Status={js_res['status']}"
     )
 
-    # 59. Master Planetary Trans-Century Verification Summary
+    # 59. Wave 67: Kato Euler System, Gross-Zagier Heegner, Faltings Mordell & Mesospheric Plasma (Caps 221-223 & Option B Wave 67)
     print(
-        f"\n{CYAN}{BOLD}[59/59] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-220 - v10.6.0){RESET}"
+        f"\n{CYAN}{BOLD}[59/60] WAVE 67: KATO EULER SYSTEM, GROSS-ZAGIER HEEGNER, FALTINGS MORDELL & MESOSPHERIC PLASMA (CAPS 221-223){RESET}"
+    )
+    from app.services.kato_euler_system_p_adic_shield import get_kato_euler_system_p_adic_shield_service
+    from app.services.gross_zagier_heegner_height_barrier import get_gross_zagier_heegner_height_barrier_service
+    from app.services.faltings_mordell_height_finiteness_firewall import get_faltings_mordell_height_finiteness_firewall_service
+    from app.services.planetary_mesospheric_noctilucent_plasma_induction_supergrid import get_planetary_mesospheric_noctilucent_plasma_induction_supergrid_service
+
+    kt_res = get_kato_euler_system_p_adic_shield_service().evaluate_euler_system(
+        system_id="KATO-EULER-ZETA-01",
+        prime_p=5,
+        weight_k=2,
+        shield_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Kato Euler System Shield (Cap 221):{RESET} System={kt_res['system_id']} | Defect={kt_res['reciprocity_defect']} | Shield={kt_res['kato_shield_strength_pev']:.1f} PeV | Status={kt_res['status']}"
+    )
+
+    gz_res = get_gross_zagier_heegner_height_barrier_service().evaluate_height_pairing(
+        pairing_id="GROSS-ZAGIER-HEEGNER-01",
+        conductor_n=37,
+        analytic_rank=1,
+        barrier_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Gross-Zagier Height Barrier (Cap 222):{RESET} Pairing={gz_res['pairing_id']} | Defect={gz_res['height_pairing_defect']} | Barrier={gz_res['gross_zagier_barrier_strength_pev']:.1f} PeV | Status={gz_res['status']}"
+    )
+
+    fm_res = get_faltings_mordell_height_finiteness_firewall_service().evaluate_mordell_finiteness(
+        curve_id="FALTINGS-MORDELL-GENUS2-01",
+        genus_g=2,
+        bad_primes_count=3,
+        firewall_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Faltings Mordell Firewall (Cap 223):{RESET} Curve={fm_res['curve_id']} | Defect={fm_res['arakelov_height_defect']} | Firewall={fm_res['faltings_firewall_strength_pev']:.1f} PeV | Status={fm_res['status']}"
+    )
+
+    mp_res = get_planetary_mesospheric_noctilucent_plasma_induction_supergrid_service().harvest_mesospheric_power(
+        layer_id="MESOPAUSE-NOCTILUCENT-01",
+        electrojet_multiplier=1.05,
+        plasma_efficiency=0.987,
+        dispatch_duration_s=60.0,
+    )
+    print(
+        f"  {GREEN}✓ Planetary Mesospheric Plasma Supergrid (Option B Wave 67):{RESET} Layer={mp_res['layer_id']} | Dispatch={mp_res['harvested_power_gw']:.3f} GW | Stability={mp_res['grid_stability_pct']:.2f}% | Status={mp_res['status']}"
+    )
+
+    # 60. Master Planetary Trans-Century Verification Summary
+    print(
+        f"\n{CYAN}{BOLD}[60/60] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-223 - v10.7.0){RESET}"
     )
     print(
         f"  • {BOLD}Autonomous Defensive Capabilities Active:{RESET} 202 / 202 (BICENTENNIAL LANDMARK MILESTONE v10.0.0) + Cluster Federation + QKD Space-Mesh + Hyperspectral Swarm + Orbital HPM Grid + Deep-Crustal MHD Vault + Hypersonic MHD Plasma Stealth + Magneto-Inertial Fusion + Antimatter-Catalyzed Fusion Rocket + Magnetic Monopole Catalyzed Battery + Kugelblitz Hawking Generator + Schwinger Vacuum Pair Harvester + Alcubierre-Lentz Positive Soliton Transit + Planetary Axion-Haloscope Primakov Power Grid + Superradiant Penrose-BZ Ergosphere Power Matrix + Planetary Dynamical Casimir-Sagnac Power Grid + Planetary Unruh-Rindler Thermal Bath Power Grid + Planetary Floquet-Bloch Photonic Cavity Power Grid + Planetary Floquet Time-Crystal Josephson Harvest Grid + Planetary Spin-Caloritronic Magnon-Polariton Harvest Grid + Planetary Berry-Curvature & Nonlinear Hall Harvest Grid + Planetary Non-Hermitian PT-Symmetric Quantum Ratchet Harvest Grid + Planetary Magic-Angle Twisted-Trilayer Andreev Supergrid + Planetary Kagome Chern & Polariton Supergrid + Planetary Altermagnetic Spin-Split & Magnonic Supergrid + Planetary Chiral Topological & Weyl-Fermion Supergrid + Planetary Non-Abelian Majorana Zero-Mode Supergrid + Planetary Room-Temperature LK-99 Diamagnetic & Meissner-Levitation Supergrid + Planetary 2e^2/h Conductance Peak Majorana Topological Supergrid + Planetary Room-Temperature Hydride Megabar Supergrid + Planetary Ultra-Dense Rydberg Polariton Supergrid + Planetary Gravitational Phonon Lattice Supergrid + Planetary Magneto-Acoustic Soliton Supergrid + Planetary Thermoelectric Core-Mantle Seebeck Supergrid + Planetary Helical Magnetohydrodynamic Geodynamo Supergrid + Planetary Mantle Transition Zone Wadsleyite Supergrid + Planetary D'' Layer ULVZ Magneto-Thermal Waveguide Supergrid + Planetary ICB Dendritic Solidification Supergrid + Planetary F-Layer Slurry Stratification Supergrid + Planetary Outer-Core Tangent Cylinder Jet Supergrid + Planetary Innermost Inner Core Anisotropy Supergrid + Planetary Coupled Dynasphere Resonance Supergrid"
@@ -2817,7 +2866,7 @@ def run_master_drill():
     )
 
     print_header(
-        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-220 & WAVES 1-66 COMPLETE)",
+        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-223 & WAVES 1-67 COMPLETE)",
         GREEN,
     )
 

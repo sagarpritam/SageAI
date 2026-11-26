@@ -351,6 +351,10 @@ import { MazurEisensteinStudio } from "@/components/MazurEisensteinStudio";
 import { RibetLevelLoweringStudio } from "@/components/RibetLevelLoweringStudio";
 import { IwasawaMainConjectureStudio } from "@/components/IwasawaMainConjectureStudio";
 import { StratosphericJetstreamStudio } from "@/components/StratosphericJetstreamStudio";
+import { KatoEulerSystemStudio } from "@/components/KatoEulerSystemStudio";
+import { GrossZagierHeegnerStudio } from "@/components/GrossZagierHeegnerStudio";
+import { FaltingsMordellStudio } from "@/components/FaltingsMordellStudio";
+import { MesosphericPlasmaStudio } from "@/components/MesosphericPlasmaStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -433,6 +437,10 @@ const tabs = [
   { id: "ribet-level-lowering", label: "Ribet Level-Lowering (Cap 219)", icon: Compass },
   { id: "iwasawa-main-conjecture", label: "Iwasawa Conjecture (Cap 220)", icon: Flame },
   { id: "planetary-stratospheric-jetstream", label: "Jetstream Grid (Option B W66)", icon: Waves },
+  { id: "kato-euler-system", label: "Kato Euler System (Cap 221)", icon: GitBranch },
+  { id: "gross-zagier-heegner", label: "Gross-Zagier Height (Cap 222)", icon: Compass },
+  { id: "faltings-mordell-finiteness", label: "Faltings Mordell (Cap 223)", icon: Flame },
+  { id: "planetary-mesospheric-plasma", label: "Mesospheric Plasma (Option B W67)", icon: Sparkles },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -952,6 +960,10 @@ export default function DashboardPage() {
           {activeTab === "ribet-level-lowering" && <RibetLevelLoweringStudio />}
           {activeTab === "iwasawa-main-conjecture" && <IwasawaMainConjectureStudio />}
           {activeTab === "planetary-stratospheric-jetstream" && <StratosphericJetstreamStudio />}
+          {activeTab === "kato-euler-system" && <KatoEulerSystemStudio />}
+          {activeTab === "gross-zagier-heegner" && <GrossZagierHeegnerStudio />}
+          {activeTab === "faltings-mordell-finiteness" && <FaltingsMordellStudio />}
+          {activeTab === "planetary-mesospheric-plasma" && <MesosphericPlasmaStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

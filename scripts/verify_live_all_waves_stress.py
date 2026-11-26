@@ -3290,6 +3290,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 66 (Opt B): Planetary Stratospheric Jetstream Power Harvest",
         ),
+        # Wave 67 (Caps 221-223 & Option B Wave 67)
+        (
+            "GET",
+            "/api/kato-euler-system/systems",
+            None,
+            "Wave 67 (Cap 221): Kato Euler Systems List",
+        ),
+        (
+            "POST",
+            "/api/kato-euler-system/evaluate-euler-system",
+            {
+                "system_id": "KATO-EULER-ZETA-01",
+                "prime_p": 5,
+                "weight_k": 2,
+                "shield_gain": 1.25,
+            },
+            "Wave 67 (Cap 221): Kato Euler System Evaluate",
+        ),
+        (
+            "GET",
+            "/api/gross-zagier-heegner/pairings",
+            None,
+            "Wave 67 (Cap 222): Gross-Zagier Pairings List",
+        ),
+        (
+            "POST",
+            "/api/gross-zagier-heegner/evaluate-height-pairing",
+            {
+                "pairing_id": "GROSS-ZAGIER-HEEGNER-01",
+                "conductor_n": 37,
+                "analytic_rank": 1,
+                "barrier_gain": 1.25,
+            },
+            "Wave 67 (Cap 222): Gross-Zagier Height Pairing Evaluate",
+        ),
+        (
+            "GET",
+            "/api/faltings-mordell-finiteness/curves",
+            None,
+            "Wave 67 (Cap 223): Faltings Mordell Curves List",
+        ),
+        (
+            "POST",
+            "/api/faltings-mordell-finiteness/evaluate-mordell-finiteness",
+            {
+                "curve_id": "FALTINGS-MORDELL-GENUS2-01",
+                "genus_g": 2,
+                "bad_primes_count": 3,
+                "firewall_gain": 1.25,
+            },
+            "Wave 67 (Cap 223): Faltings Mordell Finiteness Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-mesospheric-plasma/layers",
+            None,
+            "Wave 67 (Opt B): Planetary Mesospheric Plasma Layers List",
+        ),
+        (
+            "POST",
+            "/api/planetary-mesospheric-plasma/harvest-mesospheric-power",
+            {
+                "layer_id": "MESOPAUSE-NOCTILUCENT-01",
+                "electrojet_multiplier": 1.05,
+                "plasma_efficiency": 0.987,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 67 (Opt B): Planetary Mesospheric Plasma Power Harvest",
+        ),
     ]
 
 

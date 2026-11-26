@@ -153,6 +153,10 @@ from app.routers import (
     ribet_level_lowering_routes,
     iwasawa_main_conjecture_routes,
     planetary_stratospheric_jetstream_routes,
+    kato_euler_system_routes,
+    gross_zagier_heegner_routes,
+    faltings_mordell_finiteness_routes,
+    planetary_mesospheric_plasma_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -742,6 +746,10 @@ app.include_router(mazur_eisenstein_torsion_routes.router)
 app.include_router(ribet_level_lowering_routes.router)
 app.include_router(iwasawa_main_conjecture_routes.router)
 app.include_router(planetary_stratospheric_jetstream_routes.router)
+app.include_router(kato_euler_system_routes.router)
+app.include_router(gross_zagier_heegner_routes.router)
+app.include_router(faltings_mordell_finiteness_routes.router)
+app.include_router(planetary_mesospheric_plasma_routes.router)
 
 
 # ---------------------
@@ -759,7 +767,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "10.6.0",
+        "version": "10.7.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],
