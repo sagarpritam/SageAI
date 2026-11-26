@@ -3359,6 +3359,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 67 (Opt B): Planetary Mesospheric Plasma Power Harvest",
         ),
+        # Wave 68 (Caps 224-226 & Option B Wave 68)
+        (
+            "GET",
+            "/api/szpiro-abc-height/bounds",
+            None,
+            "Wave 68 (Cap 224): Szpiro ABC Bounds List",
+        ),
+        (
+            "POST",
+            "/api/szpiro-abc-height/evaluate-abc-radical",
+            {
+                "bound_id": "SZPIRO-DISCRIMINANT-01",
+                "conductor_n": 11,
+                "szpiro_exponent": 6.0,
+                "shield_gain": 1.25,
+            },
+            "Wave 68 (Cap 224): Szpiro ABC Radical Evaluate",
+        ),
+        (
+            "GET",
+            "/api/andre-oort-shimura/varieties",
+            None,
+            "Wave 68 (Cap 225): Andre-Oort Varieties List",
+        ),
+        (
+            "POST",
+            "/api/andre-oort-shimura/evaluate-special-points",
+            {
+                "variety_id": "ANDRE-OORT-CM-POINTS-01",
+                "shimura_dimension": 2,
+                "cm_discriminant": 19,
+                "barrier_gain": 1.25,
+            },
+            "Wave 68 (Cap 225): Andre-Oort Special Points Evaluate",
+        ),
+        (
+            "GET",
+            "/api/langlands-arthur-trace/endoscopies",
+            None,
+            "Wave 68 (Cap 226): Arthur Endoscopies List",
+        ),
+        (
+            "POST",
+            "/api/langlands-arthur-trace/evaluate-arthur-trace",
+            {
+                "endoscopy_id": "ARTHUR-ENDOSCOPY-SL2-01",
+                "group_rank": 2,
+                "packet_dimension": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 68 (Cap 226): Arthur Endoscopy Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-thermospheric-dynamo/zones",
+            None,
+            "Wave 68 (Opt B): Planetary Thermospheric Dynamo Zones List",
+        ),
+        (
+            "POST",
+            "/api/planetary-thermospheric-dynamo/harvest-thermospheric-power",
+            {
+                "zone_id": "THERMOSPHERE-JOULE-RING-01",
+                "dynamo_multiplier": 1.05,
+                "dynamo_efficiency": 0.988,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 68 (Opt B): Planetary Thermospheric Dynamo Power Harvest",
+        ),
     ]
 
 

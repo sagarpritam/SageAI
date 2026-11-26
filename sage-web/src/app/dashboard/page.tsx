@@ -355,6 +355,10 @@ import { KatoEulerSystemStudio } from "@/components/KatoEulerSystemStudio";
 import { GrossZagierHeegnerStudio } from "@/components/GrossZagierHeegnerStudio";
 import { FaltingsMordellStudio } from "@/components/FaltingsMordellStudio";
 import { MesosphericPlasmaStudio } from "@/components/MesosphericPlasmaStudio";
+import { SzpiroAbcHeightStudio } from "@/components/SzpiroAbcHeightStudio";
+import { AndreOortShimuraStudio } from "@/components/AndreOortShimuraStudio";
+import { ArthurEndoscopyStudio } from "@/components/ArthurEndoscopyStudio";
+import { ThermosphericDynamoStudio } from "@/components/ThermosphericDynamoStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -441,6 +445,10 @@ const tabs = [
   { id: "gross-zagier-heegner", label: "Gross-Zagier Height (Cap 222)", icon: Compass },
   { id: "faltings-mordell-finiteness", label: "Faltings Mordell (Cap 223)", icon: Flame },
   { id: "planetary-mesospheric-plasma", label: "Mesospheric Plasma (Option B W67)", icon: Sparkles },
+  { id: "szpiro-abc-height", label: "Szpiro ABC Height (Cap 224)", icon: GitBranch },
+  { id: "andre-oort-shimura", label: "Andre-Oort Shimura (Cap 225)", icon: Compass },
+  { id: "langlands-arthur-trace", label: "Arthur Endoscopy (Cap 226)", icon: Flame },
+  { id: "planetary-thermospheric-dynamo", label: "Thermospheric Dynamo (Option B W68)", icon: Radio },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -964,6 +972,10 @@ export default function DashboardPage() {
           {activeTab === "gross-zagier-heegner" && <GrossZagierHeegnerStudio />}
           {activeTab === "faltings-mordell-finiteness" && <FaltingsMordellStudio />}
           {activeTab === "planetary-mesospheric-plasma" && <MesosphericPlasmaStudio />}
+          {activeTab === "szpiro-abc-height" && <SzpiroAbcHeightStudio />}
+          {activeTab === "andre-oort-shimura" && <AndreOortShimuraStudio />}
+          {activeTab === "langlands-arthur-trace" && <ArthurEndoscopyStudio />}
+          {activeTab === "planetary-thermospheric-dynamo" && <ThermosphericDynamoStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

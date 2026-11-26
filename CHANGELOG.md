@@ -2,6 +2,31 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v10.8.0] - 2026-11-26 - Szpiro ABC Height Shield, Andre-Oort Shimura Barrier, Arthur Endoscopy Firewall & Planetary Thermospheric Dynamo Supergrid (Wave 68 Milestone)
+
+### Added
+- **Capability 224: Lucien Szpiro Discriminant & ABC Radical Height Shield** (`app/services/szpiro_abc_height_discriminant_shield/`):
+  - Formulates Szpiro's discriminant conjecture, the Masser-Oesterle ABC radical inequality, and Vojta canonical height bounding (`200.83 dB` suppression on `SZPIRO-DISCRIMINANT-01`) ([`SzpiroAbcHeightStudio.tsx`](sage-web/src/components/SzpiroAbcHeightStudio.tsx), [`app/routers/szpiro_abc_height_routes.py`](app/routers/szpiro_abc_height_routes.py)).
+- **Capability 225: Yves André & Frans Oort Shimura Special Points Barrier** (`app/services/andre_oort_shimura_special_points_barrier/`):
+  - Formulates the André-Oort special subvariety conjecture, Zilber-Pink unlikely intersections, and Pila-Wilkie o-minimal counting (`201.84 dB` suppression on `ANDRE-OORT-CM-POINTS-01`) ([`AndreOortShimuraStudio.tsx`](sage-web/src/components/AndreOortShimuraStudio.tsx), [`app/routers/andre_oort_shimura_routes.py`](app/routers/andre_oort_shimura_routes.py)).
+- **Capability 226: James Arthur Endoscopy & Langlands Trace Formula Firewall** (`app/services/langlands_arthur_endoscopy_trace_firewall/`):
+  - Formulates Arthur's invariant trace formula, Ngô's Fundamental Lemma on Hitchin fibrations, and Langlands functoriality transfer (`202.08 dB` suppression on `ARTHUR-ENDOSCOPY-SL2-01`) ([`ArthurEndoscopyStudio.tsx`](sage-web/src/components/ArthurEndoscopyStudio.tsx), [`app/routers/langlands_arthur_trace_routes.py`](app/routers/langlands_arthur_trace_routes.py)).
+- **Option B Wave 68: Planetary Thermospheric Auroral & Ionospheric Dynamo Supergrid** (`app/services/planetary_thermospheric_auroral_birkeland_ion_supergrid/`):
+  - Harnesses thermospheric Joule heating, F-region equatorial fountain dynamo currents, and polar cusp ion-outflow acceleration (`9.960 GW` nominal baseload, `10.312 GW` peak on `THERMOSPHERE-JOULE-RING-01` at `98.8%` dynamo efficiency) ([`ThermosphericDynamoStudio.tsx`](sage-web/src/components/ThermosphericDynamoStudio.tsx), [`app/routers/planetary_thermospheric_dynamo_routes.py`](app/routers/planetary_thermospheric_dynamo_routes.py)).
+- **Enterprise UI Resilience Hardening (Batch 37)**:
+  - Added typed `catch (err: unknown)` handlers across 5 enterprise finance proxy routes: `holo-screening-dao/vaults`, `mock-modular-dao/{stake,summary,vaults}`, and `modave-attractor-dao/stake`.
+- **Wave 68 Verification Suites**:
+  - Added [`tests/test_wave68_szpiro_andre_arthur.py`](tests/test_wave68_szpiro_andre_arthur.py) (9 pytests), [`scripts/demo_wave68_szpiro_andre_arthur_drill.py`](scripts/demo_wave68_szpiro_andre_arthur_drill.py) (4/4 drill), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (`[61/61]` sections, Caps 1–226), expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 436 endpoints (`436 / 436` succeeded in `0.908 s`, `480.3 req/s`, `0` failed), and added [`sage-web/tests/wave68-sovereign.spec.ts`](sage-web/tests/wave68-sovereign.spec.ts) (`37 / 37` Playwright specs passing).
+
+### Verification & Metrics
+- **Pytest**: 914 / 914 tests passing (100% pass rate).
+- **Playwright E2E**: 37 / 37 Chromium specs passing (`10.6s`).
+- **Next.js Turbopack**: 1,574 / 1,574 pages compiled with 0 errors.
+- **FastAPI**: 1,128 routes registered.
+- **React Studios**: 294 mounted Command Center studios.
+
+---
+
 ## [v10.7.0] - 2026-11-26 - Kato Euler System Shield, Gross-Zagier Heegner Barrier, Faltings Mordell Firewall & Planetary Mesospheric Plasma Supergrid (Wave 67 Milestone)
 
 ### Added

@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Kato Euler System Shield, Gross-Zagier Heegner Barrier, Faltings Mordell Firewall & Planetary Mesospheric Plasma Supergrid.",
+    detail: "Szpiro ABC Height Shield, Andre-Oort Shimura Barrier, Arthur Endoscopy Firewall & Planetary Thermospheric Dynamo Supergrid.",
   },
 ];
 

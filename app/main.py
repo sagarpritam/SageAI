@@ -157,6 +157,10 @@ from app.routers import (
     gross_zagier_heegner_routes,
     faltings_mordell_finiteness_routes,
     planetary_mesospheric_plasma_routes,
+    szpiro_abc_height_routes,
+    andre_oort_shimura_routes,
+    langlands_arthur_trace_routes,
+    planetary_thermospheric_dynamo_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -750,6 +754,10 @@ app.include_router(kato_euler_system_routes.router)
 app.include_router(gross_zagier_heegner_routes.router)
 app.include_router(faltings_mordell_finiteness_routes.router)
 app.include_router(planetary_mesospheric_plasma_routes.router)
+app.include_router(szpiro_abc_height_routes.router)
+app.include_router(andre_oort_shimura_routes.router)
+app.include_router(langlands_arthur_trace_routes.router)
+app.include_router(planetary_thermospheric_dynamo_routes.router)
 
 
 # ---------------------
@@ -767,7 +775,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "10.7.0",
+        "version": "10.8.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

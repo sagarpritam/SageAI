@@ -9,7 +9,7 @@ export async function GET() {
     if (res.ok) {
       return NextResponse.json(await res.json());
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Mock Modular DAO summary:", err);
   }
 

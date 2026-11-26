@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!res.ok) throw new Error("Backend response error");
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Modave Attractor stake receipt:", err);
     return NextResponse.json({
       stake_id: `MODAVE-STAKE-${Date.now().toString(36).toUpperCase()}`,

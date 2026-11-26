@@ -527,13 +527,13 @@ test.describe('SageAI Web E2E Test Suite', () => {
     expect(download.suggestedFilename()).toContain('SageAI_sarif_');
   });
 
-  test('Landing page displays v10.7.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
+  test('Landing page displays v10.8.0 Sovereign Architecture, interactive tabs, 2026 CVEs, and reconciled pricing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('text=Initializing Core...')).not.toBeVisible({ timeout: 8000 });
 
-    // Hero v10.7.0 metadata & live stats
-    await expect(page.locator('text=SageAI v10.7.0').first()).toBeVisible();
-    await expect(page.locator('text=223 Sovereign Capabilities').first()).toBeVisible();
+    // Hero v10.8.0 metadata & live stats
+    await expect(page.locator('text=SageAI v10.8.0').first()).toBeVisible();
+    await expect(page.locator('text=226 Sovereign Capabilities').first()).toBeVisible();
 
     // Sovereign Architecture showcase default tab (10-Pillar Sovereign Defense Grid)
     const pillarsTab = page.locator('button:has-text("10-Pillar Sovereign Defense Grid")');
@@ -547,9 +547,9 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#architecture').getByRole('heading', { name: '5-LLM Consensus Arena' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Post-Quantum Cryptography' })).toBeVisible();
 
-    // Switch to Waves 1-67 Milestone tab
-    await page.locator('button:has-text("Waves 1–67")').click();
-    await expect(page.locator('#architecture').getByRole('heading', { name: 'Kato Euler System Shield, Gross-Zagier Heegner Barrier, Faltings Mordell Firewall & Planetary Mesospheric Plasma Supergrid (v10.7.0)' })).toBeVisible();
+    // Switch to Waves 1-68 Milestone tab
+    await page.locator('button:has-text("Waves 1–68")').click();
+    await expect(page.locator('#architecture').getByRole('heading', { name: 'Szpiro ABC Height Shield, Andre-Oort Shimura Barrier, Arthur Endoscopy Firewall & Planetary Thermospheric Dynamo Supergrid (v10.8.0)' })).toBeVisible();
     await expect(page.locator('#architecture').getByRole('heading', { name: 'Centesimal Quantum Gravity & Magneto-Inertial Fusion' })).toBeVisible();
 
     // 2026 CISA KEV vulnerability feed
@@ -561,31 +561,31 @@ test.describe('SageAI Web E2E Test Suite', () => {
     await expect(page.locator('#pricing')).toContainText('$2,000');
 
     // Footer version badge updated
-    await expect(page.locator('footer')).toContainText('VERSION: 10.7.0-STABLE');
+    await expect(page.locator('footer')).toContainText('VERSION: 10.8.0-STABLE');
   });
 
-  test('Pricing, Features, and How It Works pages showcase SageAI v10.7.0 metrics and tiers', async ({ page }) => {
+  test('Pricing, Features, and How It Works pages showcase SageAI v10.8.0 metrics and tiers', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page.locator('text=SageAI v10.7.0').first()).toBeVisible();
+    await expect(page.locator('text=SageAI v10.8.0').first()).toBeVisible();
     await expect(page.locator('text=$199').first()).toBeVisible();
     await expect(page.locator('text=$499').first()).toBeVisible();
     await expect(page.locator('text=$2,000').first()).toBeVisible();
-    await expect(page.locator('text=All 290 Studios (Waves 1–67)').first()).toBeVisible();
+    await expect(page.locator('text=All 294 Studios (Waves 1–68)').first()).toBeVisible();
 
     await page.goto('/features');
-    await expect(page.locator('text=v10.7.0').first()).toBeVisible();
+    await expect(page.locator('text=v10.8.0').first()).toBeVisible();
     await expect(page.locator('text=10-Pillar Sovereign Defense Grid').first()).toBeVisible();
     await expect(page.locator('text=5-LLM Consensus Arena').first()).toBeVisible();
-    await expect(page.locator('text=Trans-Century Frontier (Caps 100–223)').first()).toBeVisible();
+    await expect(page.locator('text=Trans-Century Frontier (Caps 100–226)').first()).toBeVisible();
 
     await page.goto('/how-it-works');
-    await expect(page.locator('text=v10.7.0').first()).toBeVisible();
+    await expect(page.locator('text=v10.8.0').first()).toBeVisible();
     await expect(page.locator('text=THE ABYSS OSINT').first()).toBeVisible();
     await expect(page.locator('text=Zero-Egress PQC FIPS 203/204').first()).toBeVisible();
     await expect(page.locator('text=SagePatch AST & Merkle Ledger').first()).toBeVisible();
   });
 
-  test('Authenticated Command Center displays v10.7.0 badge, 290 active studios, and Wave 67 modules', async ({ context, page }) => {
+  test('Authenticated Command Center displays v10.8.0 badge, 294 active studios, and Wave 68 modules', async ({ context, page }) => {
     await mockAuthenticatedSession(context, page);
 
     await page.route('/api/notifications*', async (route) => {
@@ -604,7 +604,7 @@ test.describe('SageAI Web E2E Test Suite', () => {
 
     await page.goto('/dashboard');
     await expect(page.locator('h1:has-text("Command Center")')).toBeVisible();
-    await expect(page.getByText(/(?:v10\.[0-7]\.0|v[89]\.[0-9]\.0)\s+•\s+Waves 1–(?:6[0-7]|5[1-9])\s+•\s+(?:20[258]|21[147]|22[03]|19[0-9]) Capabilities/).first()).toBeVisible();
+    await expect(page.getByText(/(?:v10\.[0-8]\.0|v[89]\.[0-9]\.0)\s+•\s+Waves 1–(?:6[0-8]|5[1-9])\s+•\s+(?:20[258]|21[147]|22[036]|19[0-9]) Capabilities/).first()).toBeVisible();
     await expect(page.locator('text=Active Modules').first()).toBeVisible();
 
     const searchInput = page.locator('input[placeholder*="Search"][placeholder*="modules..."]');
