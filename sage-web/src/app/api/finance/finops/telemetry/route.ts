@@ -24,7 +24,7 @@ export async function GET() {
       const data = await safeUpstreamJson<typeof FALLBACK_TELEMETRY>(res, FALLBACK_TELEMETRY);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback FinOps telemetry:", e);
   }
   return NextResponse.json(FALLBACK_TELEMETRY);

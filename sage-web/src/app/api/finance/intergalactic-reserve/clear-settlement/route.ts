@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       settlement_id: `ir-settle-${Math.random().toString(36).substring(2, 10)}`,
       pool_id: 'pool-sol-alpha-centauri-01',

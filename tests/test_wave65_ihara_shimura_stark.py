@@ -108,4 +108,4 @@ def test_wave65_planetary_oceanic_thermohaline_metrics():
 def test_wave65_health_version():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("10.5.0", "10.6.0", "10.7.0", "10.8.0", "10.9.0", "11.0.0", "11.1.0", "11.2.0", "11.3.0")
+    assert res.json()["version"] in ("10.5.0", "10.6.0", "10.7.0", "10.8.0", "10.9.0", "11.0.0", "11.1.0", "11.2.0", "11.3.0", "11.4.0")

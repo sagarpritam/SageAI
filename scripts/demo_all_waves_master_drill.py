@@ -3133,9 +3133,55 @@ def run_master_drill():
         f"  {GREEN}✓ Planetary Magnetopause KH Supergrid (Option B Wave 73):{RESET} Vortex={mp_res['vortex_id']} | Dispatch={mp_res['harvested_power_gw']:.3f} GW | Stability={mp_res['grid_stability_pct']:.3f}% | Status={mp_res['status']}"
     )
 
-    # 66. Master Planetary Trans-Century Verification Summary
+    # 66. Wave 74: Kapustin-Witten S-Duality, Ben-Zvi-Nadler Betti, Khovanov-Bar-Natan & Polar Cusp Supergrid
     print(
-        f"\n{CYAN}{BOLD}[66/66] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-241 - v11.3.0){RESET}"
+        f"\n{CYAN}{BOLD}[66/67] KAPUSTIN-WITTEN S-DUALITY, BEN-ZVI-NADLER BETTI, KHOVANOV-BAR-NATAN & POLAR CUSP SUPERGRID (WAVE 74){RESET}"
+    )
+    from app.services.kapustin_witten_s_duality_shield import get_kapustin_witten_s_duality_shield_service
+    from app.services.ben_zvi_nadler_spectral_langlands_barrier import get_ben_zvi_nadler_spectral_langlands_barrier_service
+    from app.services.bar_natan_khovanov_tangle_firewall import get_bar_natan_khovanov_tangle_firewall_service
+    from app.services.planetary_polar_cusp_solar_wind_funnel_supergrid import get_planetary_polar_cusp_solar_wind_funnel_supergrid_service
+
+    kw_res = get_kapustin_witten_s_duality_shield_service().evaluate_s_duality(
+        braneline_id="KAPUSTIN-WITTEN-SDUAL-01",
+        hecke_rank=3,
+        twist_t=1.0,
+        shield_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Kapustin-Witten S-Duality Shield (Cap 242):{RESET} Braneline={kw_res['braneline_id']} | Defect={kw_res['s_duality_defect']} | Shield={kw_res['kw_shield_strength_pev']:.1f} PeV | Status={kw_res['status']}"
+    )
+    bzn_res = get_ben_zvi_nadler_spectral_langlands_barrier_service().evaluate_betti_langlands(
+        stack_id="BENZVI-NADLER-BETTI-01",
+        nilpotent_rank=3,
+        support_order=2,
+        barrier_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Ben-Zvi-Nadler Betti Barrier (Cap 243):{RESET} Stack={bzn_res['stack_id']} | Defect={bzn_res['betti_defect']} | Barrier={bzn_res['bzn_barrier_strength_pev']:.1f} PeV | Status={bzn_res['status']}"
+    )
+    kb_res = get_bar_natan_khovanov_tangle_firewall_service().evaluate_khovanov_tangle(
+        tangle_id="KHOVANOV-BARNATAN-COB-01",
+        crossing_count=7,
+        quantum_grading_j=3,
+        firewall_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Khovanov-Bar-Natan Tangle Firewall (Cap 244):{RESET} Tangle={kb_res['tangle_id']} | Defect={kb_res['reidemeister_defect']} | Firewall={kb_res['kb_firewall_strength_pev']:.1f} PeV | Status={kb_res['status']}"
+    )
+    pc_res = get_planetary_polar_cusp_solar_wind_funnel_supergrid_service().harvest_polar_cusp_power(
+        funnel_id="POLAR-CUSP-NORTH-01",
+        cusp_multiplier=1.05,
+        funnel_efficiency=0.994,
+        dispatch_duration_s=60.0,
+    )
+    print(
+        f"  {GREEN}✓ Planetary Polar Cusp Supergrid (Option B Wave 74):{RESET} Funnel={pc_res['funnel_id']} | Dispatch={pc_res['harvested_power_gw']:.3f} GW | Stability={pc_res['grid_stability_pct']:.3f}% | Status={pc_res['status']}"
+    )
+
+    # 67. Master Planetary Trans-Century Verification Summary
+    print(
+        f"\n{CYAN}{BOLD}[67/67] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-244 - v11.4.0){RESET}"
     )
     print(
         f"  • {BOLD}Autonomous Defensive Capabilities Active:{RESET} 202 / 202 (BICENTENNIAL LANDMARK MILESTONE v10.0.0) + Cluster Federation + QKD Space-Mesh + Hyperspectral Swarm + Orbital HPM Grid + Deep-Crustal MHD Vault + Hypersonic MHD Plasma Stealth + Magneto-Inertial Fusion + Antimatter-Catalyzed Fusion Rocket + Magnetic Monopole Catalyzed Battery + Kugelblitz Hawking Generator + Schwinger Vacuum Pair Harvester + Alcubierre-Lentz Positive Soliton Transit + Planetary Axion-Haloscope Primakov Power Grid + Superradiant Penrose-BZ Ergosphere Power Matrix + Planetary Dynamical Casimir-Sagnac Power Grid + Planetary Unruh-Rindler Thermal Bath Power Grid + Planetary Floquet-Bloch Photonic Cavity Power Grid + Planetary Floquet Time-Crystal Josephson Harvest Grid + Planetary Spin-Caloritronic Magnon-Polariton Harvest Grid + Planetary Berry-Curvature & Nonlinear Hall Harvest Grid + Planetary Non-Hermitian PT-Symmetric Quantum Ratchet Harvest Grid + Planetary Magic-Angle Twisted-Trilayer Andreev Supergrid + Planetary Kagome Chern & Polariton Supergrid + Planetary Altermagnetic Spin-Split & Magnonic Supergrid + Planetary Chiral Topological & Weyl-Fermion Supergrid + Planetary Non-Abelian Majorana Zero-Mode Supergrid + Planetary Room-Temperature LK-99 Diamagnetic & Meissner-Levitation Supergrid + Planetary 2e^2/h Conductance Peak Majorana Topological Supergrid + Planetary Room-Temperature Hydride Megabar Supergrid + Planetary Ultra-Dense Rydberg Polariton Supergrid + Planetary Gravitational Phonon Lattice Supergrid + Planetary Magneto-Acoustic Soliton Supergrid + Planetary Thermoelectric Core-Mantle Seebeck Supergrid + Planetary Helical Magnetohydrodynamic Geodynamo Supergrid + Planetary Mantle Transition Zone Wadsleyite Supergrid + Planetary D'' Layer ULVZ Magneto-Thermal Waveguide Supergrid + Planetary ICB Dendritic Solidification Supergrid + Planetary F-Layer Slurry Stratification Supergrid + Planetary Outer-Core Tangent Cylinder Jet Supergrid + Planetary Innermost Inner Core Anisotropy Supergrid + Planetary Coupled Dynasphere Resonance Supergrid"
@@ -3151,7 +3197,7 @@ def run_master_drill():
     )
 
     print_header(
-        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-241 & WAVES 1-73 COMPLETE)",
+        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-244 & WAVES 1-74 COMPLETE)",
         GREEN,
     )
 

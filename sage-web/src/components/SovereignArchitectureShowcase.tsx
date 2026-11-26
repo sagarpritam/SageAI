@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Costello BV Renormalization Shield, PTVV Shifted Symplectic Barrier, Gaitsgory-Rozenblyum DAG Firewall & Planetary Magnetopause Supergrid.",
+    detail: "Kapustin-Witten S-Duality Shield, Ben-Zvi-Nadler Betti Barrier, Khovanov-Bar-Natan Tangle Firewall & Planetary Polar Cusp Supergrid.",
   },
 ];
 

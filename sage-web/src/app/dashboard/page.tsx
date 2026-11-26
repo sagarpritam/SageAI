@@ -379,6 +379,10 @@ import { CostelloBvRenormStudio } from "@/components/CostelloBvRenormStudio";
 import { ShiftedSymplecticStudio } from "@/components/ShiftedSymplecticStudio";
 import { GaitsgoryRozenblyumStudio } from "@/components/GaitsgoryRozenblyumStudio";
 import { MagnetopauseVortexStudio } from "@/components/MagnetopauseVortexStudio";
+import { KapustinWittenStudio } from "@/components/KapustinWittenStudio";
+import { BenZviNadlerStudio } from "@/components/BenZviNadlerStudio";
+import { KhovanovTangleStudio } from "@/components/KhovanovTangleStudio";
+import { PolarCuspFunnelStudio } from "@/components/PolarCuspFunnelStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -489,6 +493,10 @@ const tabs = [
   { id: "ptvv-shifted-symplectic", label: "PTVV Shifted Symplectic (Cap 240)", icon: Compass },
   { id: "gaitsgory-rozenblyum-dag", label: "Gaitsgory-Rozenblyum DAG (Cap 241)", icon: Flame },
   { id: "planetary-magnetopause", label: "Magnetopause KH (Option B W73)", icon: Atom },
+  { id: "kapustin-witten-sduality", label: "Kapustin-Witten S-Duality (Cap 242)", icon: GitBranch },
+  { id: "ben-zvi-nadler-betti", label: "Ben-Zvi-Nadler Betti (Cap 243)", icon: Compass },
+  { id: "khovanov-barnatan-tangle", label: "Khovanov-Bar-Natan Tangle (Cap 244)", icon: Flame },
+  { id: "planetary-polar-cusp", label: "Polar Cusp Funnel (Option B W74)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1036,6 +1044,10 @@ export default function DashboardPage() {
           {activeTab === "ptvv-shifted-symplectic" && <ShiftedSymplecticStudio />}
           {activeTab === "gaitsgory-rozenblyum-dag" && <GaitsgoryRozenblyumStudio />}
           {activeTab === "planetary-magnetopause" && <MagnetopauseVortexStudio />}
+          {activeTab === "kapustin-witten-sduality" && <KapustinWittenStudio />}
+          {activeTab === "ben-zvi-nadler-betti" && <BenZviNadlerStudio />}
+          {activeTab === "khovanov-barnatan-tangle" && <KhovanovTangleStudio />}
+          {activeTab === "planetary-polar-cusp" && <PolarCuspFunnelStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

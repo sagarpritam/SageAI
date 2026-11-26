@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       reserve_clearinghouse_id: 'ir-clearinghouse-basel6-01',
       status: 'BASEL_VI_INTERGALACTIC_CLEARING_ACTIVE',

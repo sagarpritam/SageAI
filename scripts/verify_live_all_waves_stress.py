@@ -3770,6 +3770,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 73 (Opt B): Planetary Magnetopause Power Harvest",
         ),
+        (
+            "GET",
+            "/api/kapustin-witten-sduality/branelines",
+            None,
+            "Wave 74 (Cap 242): Kapustin-Witten S-Duality Branelines",
+        ),
+        (
+            "POST",
+            "/api/kapustin-witten-sduality/evaluate-s-duality",
+            {
+                "braneline_id": "KAPUSTIN-WITTEN-SDUAL-01",
+                "hecke_rank": 3,
+                "twist_t": 1.0,
+                "shield_gain": 1.25,
+            },
+            "Wave 74 (Cap 242): Kapustin-Witten S-Duality Shield",
+        ),
+        (
+            "GET",
+            "/api/ben-zvi-nadler-betti/stacks",
+            None,
+            "Wave 74 (Cap 243): Ben-Zvi-Nadler Betti Stacks",
+        ),
+        (
+            "POST",
+            "/api/ben-zvi-nadler-betti/evaluate-betti-langlands",
+            {
+                "stack_id": "BENZVI-NADLER-BETTI-01",
+                "nilpotent_rank": 3,
+                "support_order": 2,
+                "barrier_gain": 1.25,
+            },
+            "Wave 74 (Cap 243): Ben-Zvi-Nadler Betti Barrier",
+        ),
+        (
+            "GET",
+            "/api/khovanov-barnatan-tangle/tangles",
+            None,
+            "Wave 74 (Cap 244): Khovanov-Bar-Natan Tangles",
+        ),
+        (
+            "POST",
+            "/api/khovanov-barnatan-tangle/evaluate-khovanov-tangle",
+            {
+                "tangle_id": "KHOVANOV-BARNATAN-COB-01",
+                "crossing_count": 7,
+                "quantum_grading_j": 3,
+                "firewall_gain": 1.25,
+            },
+            "Wave 74 (Cap 244): Khovanov-Bar-Natan Tangle Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-polar-cusp/funnels",
+            None,
+            "Wave 74 (Opt B): Planetary Polar Cusp Funnels",
+        ),
+        (
+            "POST",
+            "/api/planetary-polar-cusp/harvest-polar-cusp-power",
+            {
+                "funnel_id": "POLAR-CUSP-NORTH-01",
+                "cusp_multiplier": 1.05,
+                "funnel_efficiency": 0.994,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 74 (Opt B): Planetary Polar Cusp Power Harvest",
+        ),
     ]
 
 

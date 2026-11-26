@@ -57,7 +57,7 @@ export async function GET() {
       const data = await safeUpstreamJson<typeof FALLBACK_WORKLOADS>(res, FALLBACK_WORKLOADS);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback FinOps workloads:", e);
   }
   return NextResponse.json(FALLBACK_WORKLOADS);

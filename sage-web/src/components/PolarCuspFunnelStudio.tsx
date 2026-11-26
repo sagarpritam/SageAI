@@ -1,0 +1,230 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Atom, RefreshCw, Zap, Activity } from "lucide-react";
+
+interface PolarCuspFunnel {
+  funnel_id: string;
+  magnetic_latitude: string;
+  solar_wind_speed_kms: number;
+  nominal_baseload_gw: number;
+  funnel_state: string;
+}
+
+interface PolarCuspMetrics {
+  active_funnels_count: number;
+  harvest_events_total: number;
+  total_baseload_dispatch_gw: number;
+  mean_funnel_efficiency_pct: number;
+  cusp_coupling_status: string;
+}
+
+interface PolarCuspDispatchResult {
+  funnel_id: string;
+  status: string;
+  cusp_coupling_state: string;
+  harvested_power_gw: number;
+  cusp_flux_mw: number;
+  grid_stability_pct: number;
+}
+
+export function PolarCuspFunnelStudio() {
+  const [funnels, setFunnels] = useState<PolarCuspFunnel[]>([]);
+  const [metrics, setMetrics] = useState<PolarCuspMetrics | null>(null);
+  const [selectedId, setSelectedId] = useState("POLAR-CUSP-NORTH-01");
+  const [cuspMultiplier, setCuspMultiplier] = useState(1.05);
+  const [funnelEfficiency, setFunnelEfficiency] = useState(0.994);
+  const [dispatchDuration, setDispatchDuration] = useState(60.0);
+  const [result, setResult] = useState<PolarCuspDispatchResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const [fRes, mRes] = await Promise.all([
+        fetch("/api/planetary-polar-cusp/funnels"),
+        fetch("/api/planetary-polar-cusp/metrics"),
+      ]);
+      if (fRes.ok) {
+        const fData = await fRes.json();
+        setFunnels(fData.funnels || []);
+      }
+      if (mRes.ok) {
+        setMetrics(await mRes.json());
+      }
+    } catch (err) {
+      console.error("Failed to load Polar Cusp Supergrid telemetry", err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleHarvest = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/planetary-polar-cusp/harvest-polar-cusp-power", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          funnel_id: selectedId,
+          cusp_multiplier: cuspMultiplier,
+          funnel_efficiency: funnelEfficiency,
+          dispatch_duration_s: dispatchDuration,
+        }),
+      });
+      if (res.ok) {
+        setResult(await res.json());
+        await loadData();
+      }
+    } catch (err) {
+      console.error("Polar Cusp power dispatch failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 rounded-xl border border-cyan-500/30 bg-slate-950/80 p-6 text-slate-100">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-500/20 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-cyan-500/20 p-2.5 text-cyan-400">
+            <Atom className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white">
+              Planetary Polar Cusp &amp; Magnetosheath Solar-Wind Funnel Supergrid
+            </h2>
+            <p className="text-xs text-slate-400">
+              Option B Wave 74 · Polar Magnetic Null 76°–85° Solar-Wind Tap (11.120 GW Baseload)
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={loadData}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-500/20"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Refresh Funnels
+        </button>
+      </div>
+
+      {metrics && (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Active Funnels</div>
+            <div className="mt-1 text-xl font-bold text-cyan-300">{metrics.active_funnels_count}</div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Nominal Baseload</div>
+            <div className="mt-1 text-xl font-bold text-emerald-400">
+              {metrics.total_baseload_dispatch_gw.toFixed(3)} GW
+            </div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Harvest Events</div>
+            <div className="mt-1 text-xl font-bold text-white">{metrics.harvest_events_total}</div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Cusp Coupling</div>
+            <div className="mt-1 text-sm font-semibold text-cyan-300">{metrics.cusp_coupling_status}</div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-cyan-300">
+            <Zap className="h-4 w-4" /> Dispatch Polar Cusp Solar-Wind Power
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Polar Cusp Funnel</label>
+              <select
+                value={selectedId}
+                onChange={(e) => setSelectedId(e.target.value)}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              >
+                {funnels.map((f) => (
+                  <option key={f.funnel_id} value={f.funnel_id}>
+                    {f.funnel_id} ({f.magnetic_latitude})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Cusp Multiplier</label>
+              <input
+                type="number"
+                step="0.01"
+                value={cuspMultiplier}
+                onChange={(e) => setCuspMultiplier(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Funnel Efficiency</label>
+              <input
+                type="number"
+                step="0.001"
+                value={funnelEfficiency}
+                onChange={(e) => setFunnelEfficiency(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Duration (s)</label>
+              <input
+                type="number"
+                value={dispatchDuration}
+                onChange={(e) => setDispatchDuration(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleHarvest}
+            disabled={loading}
+            className="w-full rounded-lg bg-cyan-600 px-4 py-2 text-xs font-semibold text-white hover:bg-cyan-500 disabled:opacity-50"
+          >
+            {loading ? "Harvesting Polar Cusp Flux..." : "Harvest Polar Cusp Baseload"}
+          </button>
+
+          {result && (
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/30 p-3 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-emerald-300">
+                <Activity className="h-4 w-4" /> {result.status} ({result.cusp_coupling_state})
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-slate-400">
+                <span>Dispatch: {result.harvested_power_gw.toFixed(3)} GW</span>
+                <span>Flux: {result.cusp_flux_mw.toFixed(1)} MW</span>
+                <span>Stability: {result.grid_stability_pct.toFixed(3)}%</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h3 className="text-sm font-semibold text-cyan-300">Polar Cusp &amp; Magnetosheath Funnels</h3>
+          <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+            {funnels.map((f) => (
+              <div
+                key={f.funnel_id}
+                className="flex items-center justify-between rounded-md border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs"
+              >
+                <div>
+                  <div className="font-semibold text-white">{f.funnel_id}</div>
+                  <div className="text-[11px] text-slate-400">
+                    {f.magnetic_latitude} · {f.solar_wind_speed_kms} km/s · {f.nominal_baseload_gw.toFixed(2)} GW
+                  </div>
+                </div>
+                <span className="rounded bg-cyan-500/20 px-2 py-0.5 text-[10px] font-semibold text-cyan-300">
+                  {f.funnel_state}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
