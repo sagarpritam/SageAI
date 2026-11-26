@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       mint_id: 'isrc-algorithmic-mint-01',
       status: 'ENERGY_BACKED_ISRC_STANDARD_ACTIVE',

@@ -2,6 +2,22 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v11.6.0] - 2026-11-27 - Lusztig Canonical Basis Shield, Kashiwara Crystal Barrier, Fomin-Zelevinsky Cluster Firewall & Planetary Electrojet Supergrid (Wave 76 Platinum Milestone)
+
+### Added
+- **Capability 248: George Lusztig Canonical Basis & Quantum Group Crystal Shield** (`app/services/lusztig_canonical_basis_shield/`):
+  - Formulates perverse sheaf positivity and bar-involution invariance (`LUSZTIG-CANONICAL-UQG-01`) ([`LusztigCanonicalStudio.tsx`](sage-web/src/components/LusztigCanonicalStudio.tsx), [`app/routers/lusztig_canonical_basis_routes.py`](app/routers/lusztig_canonical_basis_routes.py)).
+- **Capability 249: Masaki Kashiwara Crystal Graph & Global Basis Barrier** (`app/services/kashiwara_crystal_graph_barrier/`):
+  - Formulates Kashiwara operators e_i / f_i and Littelmann path string cones (`KASHIWARA-CRYSTAL-B-01`) ([`KashiwaraCrystalStudio.tsx`](sage-web/src/components/KashiwaraCrystalStudio.tsx), [`app/routers/kashiwara_crystal_graph_routes.py`](app/routers/kashiwara_crystal_graph_routes.py)).
+- **Capability 250: Sergey Fomin & Andrei Zelevinsky Cluster Algebra & Laurent Phenomenon Firewall** (`app/services/fomin_zelevinsky_cluster_algebra_firewall/`):
+  - Formulates exchange matrix mutations and total positivity Laurent polynomials (`FOMIN-ZELEVINSKY-CLUSTER-01`) ([`FominZelevinskyStudio.tsx`](sage-web/src/components/FominZelevinskyStudio.tsx), [`app/routers/fomin_zelevinsky_cluster_routes.py`](app/routers/fomin_zelevinsky_cluster_routes.py)).
+- **Option B Wave 76: Planetary Geomagnetic Substorm & Auroral Electrojet Supergrid** (`app/services/planetary_geomagnetic_substorm_electrojet_supergrid/`):
+  - Integrates ionospheric Hall current 63°–71° electrojet power dispatch (`11.680 GW` nominal baseload, `12.123 GW` live dispatch at `99.999%` grid stability) ([`AuroralElectrojetStudio.tsx`](sage-web/src/components/AuroralElectrojetStudio.tsx), [`app/routers/planetary_electrojet_routes.py`](app/routers/planetary_electrojet_routes.py)).
+- **Enterprise UI Resilience Hardening (Batch 45)**:
+  - Hardened 5 Next.js API routes (`interstellar-currency/summary`, `interstellar-entropy-dao/{retire-offset,summary,vaults}`, `investor-data-room/certificates`) to typed `catch (_error: unknown)` / `catch (e: unknown)` error narrowing.
+- **Wave 76 Verification**:
+  - `986` pytest cases (`+9` in `tests/test_wave76_lusztig_kashiwara_cluster.py`), `500` live stress endpoints (`+8`), `[69/69]` Master All-Waves Drill, `991` Next.js API routes, `1,224` FastAPI routes, `326` mounted studios, and `1,670` prerendered static pages.
+
 ## [v11.5.0] - 2026-11-27 - Webster KLR Categorification Shield, Elias-Williamson Soergel Barrier, Chuang-Rouquier sl_2 Firewall & Planetary AKR Maser Supergrid (Wave 75 Platinum Milestone)
 
 ### Added

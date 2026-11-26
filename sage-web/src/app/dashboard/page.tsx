@@ -387,6 +387,10 @@ import { WebsterKlrStudio } from "@/components/WebsterKlrStudio";
 import { SoergelBimoduleStudio } from "@/components/SoergelBimoduleStudio";
 import { ChuangRouquierStudio } from "@/components/ChuangRouquierStudio";
 import { AuroralAkrMaserStudio } from "@/components/AuroralAkrMaserStudio";
+import { LusztigCanonicalStudio } from "@/components/LusztigCanonicalStudio";
+import { KashiwaraCrystalStudio } from "@/components/KashiwaraCrystalStudio";
+import { FominZelevinskyStudio } from "@/components/FominZelevinskyStudio";
+import { AuroralElectrojetStudio } from "@/components/AuroralElectrojetStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -505,6 +509,10 @@ const tabs = [
   { id: "elias-williamson-soergel", label: "Soergel Bimodules (Cap 246)", icon: Compass },
   { id: "chuang-rouquier-sl2", label: "Chuang-Rouquier sl2 (Cap 247)", icon: Flame },
   { id: "planetary-akr-maser", label: "Auroral AKR Maser (Option B W75)", icon: Atom },
+  { id: "lusztig-canonical-basis", label: "Lusztig Canonical (Cap 248)", icon: GitBranch },
+  { id: "kashiwara-crystal-graph", label: "Kashiwara Crystal (Cap 249)", icon: Compass },
+  { id: "fomin-zelevinsky-cluster", label: "Fomin-Zelevinsky (Cap 250)", icon: Flame },
+  { id: "planetary-electrojet", label: "Auroral Electrojet (Option B W76)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1060,6 +1068,10 @@ export default function DashboardPage() {
           {activeTab === "elias-williamson-soergel" && <SoergelBimoduleStudio />}
           {activeTab === "chuang-rouquier-sl2" && <ChuangRouquierStudio />}
           {activeTab === "planetary-akr-maser" && <AuroralAkrMaserStudio />}
+          {activeTab === "lusztig-canonical-basis" && <LusztigCanonicalStudio />}
+          {activeTab === "kashiwara-crystal-graph" && <KashiwaraCrystalStudio />}
+          {activeTab === "fomin-zelevinsky-cluster" && <FominZelevinskyStudio />}
+          {activeTab === "planetary-electrojet" && <AuroralElectrojetStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

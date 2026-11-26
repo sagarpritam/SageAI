@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       dao_system_id: 'entropy-dao-basel7-01',
       status: 'BASEL_VII_ENTROPY_OFFSET_TRADING_ACTIVE',

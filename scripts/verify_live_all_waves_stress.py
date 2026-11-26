@@ -3906,6 +3906,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 75 (Opt B): Planetary AKR Maser Power Harvest",
         ),
+        (
+            "GET",
+            "/api/lusztig-canonical-basis/bases",
+            None,
+            "Wave 76 (Cap 248): Lusztig Canonical Bases",
+        ),
+        (
+            "POST",
+            "/api/lusztig-canonical-basis/evaluate-canonical-basis",
+            {
+                "basis_id": "LUSZTIG-CANONICAL-UQG-01",
+                "crystal_rank": 4,
+                "bar_order": 2,
+                "shield_gain": 1.25,
+            },
+            "Wave 76 (Cap 248): Lusztig Canonical Shield",
+        ),
+        (
+            "GET",
+            "/api/kashiwara-crystal-graph/crystals",
+            None,
+            "Wave 76 (Cap 249): Kashiwara Crystal Graphs",
+        ),
+        (
+            "POST",
+            "/api/kashiwara-crystal-graph/evaluate-crystal-graph",
+            {
+                "crystal_id": "KASHIWARA-CRYSTAL-B-01",
+                "operator_rank": 6,
+                "string_cone_dim": 4,
+                "barrier_gain": 1.25,
+            },
+            "Wave 76 (Cap 249): Kashiwara Crystal Barrier",
+        ),
+        (
+            "GET",
+            "/api/fomin-zelevinsky-cluster/clusters",
+            None,
+            "Wave 76 (Cap 250): Fomin-Zelevinsky Cluster Seeds",
+        ),
+        (
+            "POST",
+            "/api/fomin-zelevinsky-cluster/evaluate-cluster-mutation",
+            {
+                "cluster_id": "FOMIN-ZELEVINSKY-CLUSTER-01",
+                "seed_rank": 5,
+                "mutation_depth": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 76 (Cap 250): Fomin-Zelevinsky Cluster Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-electrojet/electrojets",
+            None,
+            "Wave 76 (Opt B): Planetary Auroral Electrojets",
+        ),
+        (
+            "POST",
+            "/api/planetary-electrojet/harvest-electrojet-power",
+            {
+                "electrojet_id": "ELECTROJET-WESTWARD-01",
+                "substorm_multiplier": 1.05,
+                "induction_efficiency": 0.996,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 76 (Opt B): Planetary Electrojet Power Harvest",
+        ),
     ]
 
 

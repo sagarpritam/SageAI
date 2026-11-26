@@ -58,7 +58,7 @@ export async function GET() {
       const data = await safeUpstreamJson(res, FALLBACK_CERTIFICATES);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback LP certificates:", e);
   }
   return NextResponse.json(FALLBACK_CERTIFICATES);

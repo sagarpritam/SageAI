@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Webster KLR Categorification Shield, Elias-Williamson Soergel Barrier, Chuang-Rouquier sl_2 Firewall & Planetary AKR Maser Supergrid.",
+    detail: "Lusztig Canonical Basis Shield, Kashiwara Crystal Barrier, Fomin-Zelevinsky Cluster Firewall & Planetary Electrojet Supergrid.",
   },
 ];
 
