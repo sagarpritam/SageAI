@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (res.ok) {
       return NextResponse.json(await res.json());
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn("Using fallback Grothendieck-Serre DAO stake receipt:", err);
   }
 

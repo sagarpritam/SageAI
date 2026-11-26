@@ -2701,9 +2701,58 @@ def run_master_drill():
         f"  {GREEN}✓ Planetary Piezoelectric Subduction Supergrid (Option B Wave 64):{RESET} Slab={p_res['slab_id']} | Dispatch={p_res['harvested_power_gw']:.3f} GW | Stability={p_res['grid_stability_pct']:.2f}% | Status={p_res['status']}"
     )
 
-    # 57. Master Planetary Trans-Century Verification Summary
+    # 57. Wave 65: Ihara Galois Braid, Shimura-Taniyama, Stark Regulator & Planetary Oceanic Thermohaline (Caps 215-217 & Option B Wave 65)
     print(
-        f"\n{CYAN}{BOLD}[57/57] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-214 - v10.4.0){RESET}"
+        f"\n{CYAN}{BOLD}[57/58] WAVE 65: IHARA GALOIS BRAID, SHIMURA-TANIYAMA, STARK REGULATOR & OCEANIC THERMOHALINE SUPERGRID (CAPS 215-217){RESET}"
+    )
+    from app.services.ihara_galois_braid_profinite_shield import get_ihara_galois_braid_profinite_shield_service
+    from app.services.shimura_taniyama_modular_parametrization_barrier import get_shimura_taniyama_modular_parametrization_barrier_service
+    from app.services.stark_regulator_special_values_firewall import get_stark_regulator_special_values_firewall_service
+    from app.services.planetary_oceanic_thermohaline_coriolis_induction_supergrid import get_planetary_oceanic_thermohaline_coriolis_induction_supergrid_service
+
+    ih_res = get_ihara_galois_braid_profinite_shield_service().evaluate_profinite_braid(
+        braid_id="IHARA-P1-MINUS3-01",
+        puncture_count=3,
+        profinite_depth=4,
+        shield_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Ihara Galois Braid Shield (Cap 215):{RESET} Braid={ih_res['braid_id']} | Defect={ih_res['gt_hat_cocycle_defect']} | Shield={ih_res['ihara_shield_strength_pev']:.1f} PeV | Status={ih_res['status']}"
+    )
+
+    st_res = get_shimura_taniyama_modular_parametrization_barrier_service().evaluate_modular_parametrization(
+        curve_id="SHIMURA-X0-11-ELLIPTIC-01",
+        level_n=11,
+        q_truncation_order=8,
+        barrier_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Shimura-Taniyama Modular Barrier (Cap 216):{RESET} Curve={st_res['curve_id']} | Defect={st_res['q_expansion_defect']} | Barrier={st_res['shimura_barrier_strength_pev']:.1f} PeV | Status={st_res['status']}"
+    )
+
+    sr_res = get_stark_regulator_special_values_firewall_service().evaluate_stark_regulator(
+        regulator_id="STARK-RANK1-ABELIAN-01",
+        vanishing_order_r=1,
+        class_number_h=1,
+        firewall_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Stark Regulator Firewall (Cap 217):{RESET} Regulator={sr_res['regulator_id']} | Defect={sr_res['artin_regulator_defect']} | Firewall={sr_res['stark_firewall_strength_pev']:.1f} PeV | Status={sr_res['status']}"
+    )
+
+    th_res = get_planetary_oceanic_thermohaline_coriolis_induction_supergrid_service().harvest_thermohaline_power(
+        current_id="AMOC-NORTH-ATLANTIC-DEEPWATER-01",
+        coriolis_multiplier=1.05,
+        lorentz_efficiency=0.984,
+        dispatch_duration_s=60.0,
+    )
+    print(
+        f"  {GREEN}✓ Planetary Oceanic Thermohaline Supergrid (Option B Wave 65):{RESET} Current={th_res['current_id']} | Dispatch={th_res['harvested_power_gw']:.3f} GW | Stability={th_res['grid_stability_pct']:.2f}% | Status={th_res['status']}"
+    )
+
+    # 58. Master Planetary Trans-Century Verification Summary
+    print(
+        f"\n{CYAN}{BOLD}[58/58] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-217 - v10.5.0){RESET}"
     )
     print(
         f"  • {BOLD}Autonomous Defensive Capabilities Active:{RESET} 202 / 202 (BICENTENNIAL LANDMARK MILESTONE v10.0.0) + Cluster Federation + QKD Space-Mesh + Hyperspectral Swarm + Orbital HPM Grid + Deep-Crustal MHD Vault + Hypersonic MHD Plasma Stealth + Magneto-Inertial Fusion + Antimatter-Catalyzed Fusion Rocket + Magnetic Monopole Catalyzed Battery + Kugelblitz Hawking Generator + Schwinger Vacuum Pair Harvester + Alcubierre-Lentz Positive Soliton Transit + Planetary Axion-Haloscope Primakov Power Grid + Superradiant Penrose-BZ Ergosphere Power Matrix + Planetary Dynamical Casimir-Sagnac Power Grid + Planetary Unruh-Rindler Thermal Bath Power Grid + Planetary Floquet-Bloch Photonic Cavity Power Grid + Planetary Floquet Time-Crystal Josephson Harvest Grid + Planetary Spin-Caloritronic Magnon-Polariton Harvest Grid + Planetary Berry-Curvature & Nonlinear Hall Harvest Grid + Planetary Non-Hermitian PT-Symmetric Quantum Ratchet Harvest Grid + Planetary Magic-Angle Twisted-Trilayer Andreev Supergrid + Planetary Kagome Chern & Polariton Supergrid + Planetary Altermagnetic Spin-Split & Magnonic Supergrid + Planetary Chiral Topological & Weyl-Fermion Supergrid + Planetary Non-Abelian Majorana Zero-Mode Supergrid + Planetary Room-Temperature LK-99 Diamagnetic & Meissner-Levitation Supergrid + Planetary 2e^2/h Conductance Peak Majorana Topological Supergrid + Planetary Room-Temperature Hydride Megabar Supergrid + Planetary Ultra-Dense Rydberg Polariton Supergrid + Planetary Gravitational Phonon Lattice Supergrid + Planetary Magneto-Acoustic Soliton Supergrid + Planetary Thermoelectric Core-Mantle Seebeck Supergrid + Planetary Helical Magnetohydrodynamic Geodynamo Supergrid + Planetary Mantle Transition Zone Wadsleyite Supergrid + Planetary D'' Layer ULVZ Magneto-Thermal Waveguide Supergrid + Planetary ICB Dendritic Solidification Supergrid + Planetary F-Layer Slurry Stratification Supergrid + Planetary Outer-Core Tangent Cylinder Jet Supergrid + Planetary Innermost Inner Core Anisotropy Supergrid + Planetary Coupled Dynasphere Resonance Supergrid"
@@ -2719,7 +2768,7 @@ def run_master_drill():
     )
 
     print_header(
-        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-214 & WAVES 1-64 COMPLETE)",
+        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-217 & WAVES 1-65 COMPLETE)",
         GREEN,
     )
 

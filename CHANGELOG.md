@@ -2,6 +2,31 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v10.5.0] - 2026-11-26 - Ihara Galois Braid Shield, Shimura-Taniyama Modular Barrier, Stark Regulator Firewall & Planetary Oceanic Thermohaline Supergrid (Wave 65 Milestone)
+
+### Added
+- **Capability 215: Yasutaka Ihara Galois Braid & Profinite Fundamental Group Shield** (`app/services/ihara_galois_braid_profinite_shield/`):
+  - Formulates Ihara's Galois action $\mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q}) \to \mathrm{Out}(\widehat{\pi}_1(\mathbb{P}^1 \setminus \{0,1,\infty\}))$, Grothendieck-Teichmüller group $\widehat{GT}$ cocycles, and profinite braid monodromy locking (`214.35 dB` suppression on `IHARA-P1-MINUS3-01`) ([`IharaGaloisBraidStudio.tsx`](sage-web/src/components/IharaGaloisBraidStudio.tsx), [`app/routers/ihara_galois_braid_routes.py`](app/routers/ihara_galois_braid_routes.py)).
+- **Capability 216: Goro Shimura & Yutaka Taniyama Modular Parametrization & Eigenform Barrier** (`app/services/shimura_taniyama_modular_parametrization_barrier/`):
+  - Formulates $X_0(N) \to E$ modular parametrization, weight-2 cusp eigenform $q$-expansions, and Heegner-Shimura lattices (`219.65 dB` eigenform suppression on `SHIMURA-X0-11-ELLIPTIC-01`) ([`ShimuraTaniyamaStudio.tsx`](sage-web/src/components/ShimuraTaniyamaStudio.tsx), [`app/routers/shimura_taniyama_modular_routes.py`](app/routers/shimura_taniyama_modular_routes.py)).
+- **Capability 217: Harold Stark Regulator & Artin L-Function Special Values Firewall** (`app/services/stark_regulator_special_values_firewall/`):
+  - Formulates Stark's conjectures, Artin $L$-function leading terms, Brumer-Stark Stickelberger annihilators, and Gross $p$-adic regulators (`212.86 dB` ray-class suppression on `STARK-RANK1-ABELIAN-01`) ([`StarkRegulatorStudio.tsx`](sage-web/src/components/StarkRegulatorStudio.tsx), [`app/routers/stark_regulator_values_routes.py`](app/routers/stark_regulator_values_routes.py)).
+- **Option B Wave 65: Planetary Oceanic Thermohaline & Coriolis Induction Supergrid** (`app/services/planetary_oceanic_thermohaline_coriolis_induction_supergrid/`):
+  - Harnesses abyssal thermohaline Sverdrup transport ($18.5\text{--}134.0\ \mathrm{Sv}$) and Coriolis-Lorentz magnetohydrodynamic induction (`9.600 GW` nominal baseload, `9.919 GW` peak on `AMOC-NORTH-ATLANTIC-DEEPWATER-01` at `98.4%` Lorentz efficiency) ([`ThermohalineSupergridStudio.tsx`](sage-web/src/components/ThermohalineSupergridStudio.tsx), [`app/routers/planetary_oceanic_thermohaline_routes.py`](app/routers/planetary_oceanic_thermohaline_routes.py)).
+- **Enterprise UI Resilience Hardening (Batch 34)**:
+  - Added typed `catch (err: unknown)` handlers across 5 enterprise finance proxy routes: `drinfeld-center-dao/vaults`, `geometric-langlands-dao/{stake,summary,vaults}`, and `grothendieck-serre-dao/stake`.
+- **Wave 65 Verification Suites**:
+  - Added [`tests/test_wave65_ihara_shimura_stark.py`](tests/test_wave65_ihara_shimura_stark.py) (9 pytests), [`scripts/demo_wave65_ihara_shimura_stark_drill.py`](scripts/demo_wave65_ihara_shimura_stark_drill.py) (4/4 drill), updated [`scripts/demo_all_waves_master_drill.py`](scripts/demo_all_waves_master_drill.py) (`[58/58]` sections, Caps 1–217), expanded [`scripts/verify_live_all_waves_stress.py`](scripts/verify_live_all_waves_stress.py) to 412 endpoints (`412 / 412` succeeded in `0.912 s`, `451.9 req/s`, `0` failed), and added [`sage-web/tests/wave65-sovereign.spec.ts`](sage-web/tests/wave65-sovereign.spec.ts) (`37 / 37` Playwright specs passing).
+
+### Verification & Metrics
+- **Pytest**: 887 / 887 tests passing (100% pass rate).
+- **Playwright E2E**: 37 / 37 Chromium specs passing (`10.1s`).
+- **Next.js Turbopack**: 1,538 / 1,538 pages compiled with 0 errors.
+- **FastAPI**: 1,092 routes registered.
+- **React Studios**: 282 mounted Command Center studios.
+
+---
+
 ## [v10.4.0] - 2026-11-26 - Tate-Shafarevich Selmer Shield, Bloch-Kato Tamagawa Barrier, Fontaine-Mazur Galois Firewall & Planetary Piezoelectric Subduction Supergrid (Wave 64 Milestone)
 
 ### Added

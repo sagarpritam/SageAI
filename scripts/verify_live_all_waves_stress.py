@@ -3152,6 +3152,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 64 (Opt B): Planetary Piezoelectric Subduction Power Harvest",
         ),
+        # Wave 65 (Caps 215-217 & Option B Wave 65)
+        (
+            "GET",
+            "/api/ihara-galois-braid/braids",
+            None,
+            "Wave 65 (Cap 215): Ihara Galois Braids List",
+        ),
+        (
+            "POST",
+            "/api/ihara-galois-braid/evaluate-profinite-braid",
+            {
+                "braid_id": "IHARA-P1-MINUS3-01",
+                "puncture_count": 3,
+                "profinite_depth": 4,
+                "shield_gain": 1.25,
+            },
+            "Wave 65 (Cap 215): Ihara Galois Braid Evaluate",
+        ),
+        (
+            "GET",
+            "/api/shimura-taniyama-modular/curves",
+            None,
+            "Wave 65 (Cap 216): Shimura-Taniyama Curves List",
+        ),
+        (
+            "POST",
+            "/api/shimura-taniyama-modular/evaluate-modular-parametrization",
+            {
+                "curve_id": "SHIMURA-X0-11-ELLIPTIC-01",
+                "level_n": 11,
+                "q_truncation_order": 8,
+                "barrier_gain": 1.25,
+            },
+            "Wave 65 (Cap 216): Shimura-Taniyama Parametrization Evaluate",
+        ),
+        (
+            "GET",
+            "/api/stark-regulator-values/regulators",
+            None,
+            "Wave 65 (Cap 217): Stark Regulators List",
+        ),
+        (
+            "POST",
+            "/api/stark-regulator-values/evaluate-stark-regulator",
+            {
+                "regulator_id": "STARK-RANK1-ABELIAN-01",
+                "vanishing_order_r": 1,
+                "class_number_h": 1,
+                "firewall_gain": 1.25,
+            },
+            "Wave 65 (Cap 217): Stark Regulator Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-oceanic-thermohaline/currents",
+            None,
+            "Wave 65 (Opt B): Planetary Oceanic Thermohaline Currents List",
+        ),
+        (
+            "POST",
+            "/api/planetary-oceanic-thermohaline/harvest-thermohaline-power",
+            {
+                "current_id": "AMOC-NORTH-ATLANTIC-DEEPWATER-01",
+                "coriolis_multiplier": 1.05,
+                "lorentz_efficiency": 0.984,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 65 (Opt B): Planetary Oceanic Thermohaline Power Harvest",
+        ),
     ]
 
 

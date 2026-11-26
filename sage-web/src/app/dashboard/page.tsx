@@ -343,6 +343,10 @@ import { TateShafarevichStudio } from "@/components/TateShafarevichStudio";
 import { BlochKatoTamagawaStudio } from "@/components/BlochKatoTamagawaStudio";
 import { FontaineMazurStudio } from "@/components/FontaineMazurStudio";
 import { PiezoSubductionStudio } from "@/components/PiezoSubductionStudio";
+import { IharaGaloisBraidStudio } from "@/components/IharaGaloisBraidStudio";
+import { ShimuraTaniyamaStudio } from "@/components/ShimuraTaniyamaStudio";
+import { StarkRegulatorStudio } from "@/components/StarkRegulatorStudio";
+import { ThermohalineSupergridStudio } from "@/components/ThermohalineSupergridStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -417,6 +421,10 @@ const tabs = [
   { id: "bloch-kato-tamagawa", label: "Bloch-Kato Tamagawa (Cap 213)", icon: Award },
   { id: "fontaine-mazur-geometricity", label: "Fontaine-Mazur (Cap 214)", icon: KeyRound },
   { id: "planetary-piezoelectric-tectonic-subduction", label: "Piezo Subduction (Option B W64)", icon: Mountain },
+  { id: "ihara-galois-braid", label: "Ihara Galois Braid (Cap 215)", icon: GitBranch },
+  { id: "shimura-taniyama-modular", label: "Shimura-Taniyama (Cap 216)", icon: Compass },
+  { id: "stark-regulator-values", label: "Stark Regulator (Cap 217)", icon: Flame },
+  { id: "planetary-oceanic-thermohaline", label: "Thermohaline Grid (Option B W65)", icon: Waves },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -928,6 +936,10 @@ export default function DashboardPage() {
           {activeTab === "bloch-kato-tamagawa" && <BlochKatoTamagawaStudio />}
           {activeTab === "fontaine-mazur-geometricity" && <FontaineMazurStudio />}
           {activeTab === "planetary-piezoelectric-tectonic-subduction" && <PiezoSubductionStudio />}
+          {activeTab === "ihara-galois-braid" && <IharaGaloisBraidStudio />}
+          {activeTab === "shimura-taniyama-modular" && <ShimuraTaniyamaStudio />}
+          {activeTab === "stark-regulator-values" && <StarkRegulatorStudio />}
+          {activeTab === "planetary-oceanic-thermohaline" && <ThermohalineSupergridStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

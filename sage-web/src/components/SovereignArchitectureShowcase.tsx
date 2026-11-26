@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Tate-Shafarevich Selmer Shield, Bloch-Kato Tamagawa Barrier, Fontaine-Mazur Galois Firewall & Planetary Piezoelectric Subduction Supergrid.",
+    detail: "Ihara Galois Braid Shield, Shimura-Taniyama Modular Barrier, Stark Regulator Firewall & Planetary Oceanic Thermohaline Supergrid.",
   },
 ];
 
