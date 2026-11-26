@@ -68,7 +68,7 @@ export async function GET() {
       const data = await safeUpstreamJson(res, FALLBACK_GRANTS);
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback ESOP grants:", e);
   }
   return NextResponse.json(FALLBACK_GRANTS);

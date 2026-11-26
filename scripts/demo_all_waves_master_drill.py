@@ -3087,9 +3087,55 @@ def run_master_drill():
         f"  {GREEN}✓ Planetary Magnetotail Plasmoid Supergrid (Option B Wave 72):{RESET} Lobe={mt_res['lobe_id']} | Dispatch={mt_res['harvested_power_gw']:.3f} GW | Stability={mt_res['grid_stability_pct']:.3f}% | Status={mt_res['status']}"
     )
 
-    # 65. Master Planetary Trans-Century Verification Summary
+    # 65. Wave 73: Costello BV Renorm, PTVV Shifted Symplectic, Gaitsgory-Rozenblyum DAG & Magnetopause Supergrid
     print(
-        f"\n{CYAN}{BOLD}[65/65] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-238 - v11.2.0){RESET}"
+        f"\n{CYAN}{BOLD}[65/66] COSTELLO BV RENORM, PTVV SHIFTED SYMPLECTIC, GAITSGORY-ROZENBLYUM DAG & MAGNETOPAUSE SUPERGRID (WAVE 73){RESET}"
+    )
+    from app.services.costello_bv_renormalization_shield import get_costello_bv_renormalization_shield_service
+    from app.services.pantev_toen_shifted_symplectic_barrier import get_pantev_toen_shifted_symplectic_barrier_service
+    from app.services.gaitsgory_rozenblyum_dg_indcoherent_firewall import get_gaitsgory_rozenblyum_dg_indcoherent_firewall_service
+    from app.services.planetary_magnetopause_kelvin_helmholtz_vortex_supergrid import get_planetary_magnetopause_kelvin_helmholtz_vortex_supergrid_service
+
+    cb_res = get_costello_bv_renormalization_shield_service().evaluate_bv_renorm(
+        theory_id="COSTELLO-BV-RENORM-01",
+        loop_order=2,
+        scale_cutoff=0.01,
+        shield_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Costello BV Renorm Shield (Cap 239):{RESET} Theory={cb_res['theory_id']} | Defect={cb_res['quantum_master_defect']} | Shield={cb_res['costello_shield_strength_pev']:.1f} PeV | Status={cb_res['status']}"
+    )
+    ptvv_res = get_pantev_toen_shifted_symplectic_barrier_service().evaluate_shifted_symplectic(
+        stack_id="PTVV-SHIFTED-SYMPLECTIC-01",
+        symplectic_shift_n=-1,
+        lagrangian_rank=3,
+        barrier_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ PTVV Shifted Symplectic Barrier (Cap 240):{RESET} Stack={ptvv_res['stack_id']} | Defect={ptvv_res['darboux_defect']} | Barrier={ptvv_res['ptvv_barrier_strength_pev']:.1f} PeV | Status={ptvv_res['status']}"
+    )
+    gr_res = get_gaitsgory_rozenblyum_dg_indcoherent_firewall_service().evaluate_indcoherent_crystal(
+        crystal_id="GAITSGORY-ROZENBLYUM-INDCOH-01",
+        serre_order=3,
+        algebroid_rank=4,
+        firewall_gain=1.25,
+    )
+    print(
+        f"  {GREEN}✓ Gaitsgory-Rozenblyum DAG Firewall (Cap 241):{RESET} Crystal={gr_res['crystal_id']} | Defect={gr_res['indcoherent_defect']} | Firewall={gr_res['gr_firewall_strength_pev']:.1f} PeV | Status={gr_res['status']}"
+    )
+    mp_res = get_planetary_magnetopause_kelvin_helmholtz_vortex_supergrid_service().harvest_magnetopause_power(
+        vortex_id="MAGNETOPAUSE-KH-DAWN-01",
+        vortex_multiplier=1.05,
+        kh_efficiency=0.993,
+        dispatch_duration_s=60.0,
+    )
+    print(
+        f"  {GREEN}✓ Planetary Magnetopause KH Supergrid (Option B Wave 73):{RESET} Vortex={mp_res['vortex_id']} | Dispatch={mp_res['harvested_power_gw']:.3f} GW | Stability={mp_res['grid_stability_pct']:.3f}% | Status={mp_res['status']}"
+    )
+
+    # 66. Master Planetary Trans-Century Verification Summary
+    print(
+        f"\n{CYAN}{BOLD}[66/66] GRAND TRANS-CENTURY CONSOLIDATED DEFENSE MATRIX TELEMETRY (CAPABILITIES 1-241 - v11.3.0){RESET}"
     )
     print(
         f"  • {BOLD}Autonomous Defensive Capabilities Active:{RESET} 202 / 202 (BICENTENNIAL LANDMARK MILESTONE v10.0.0) + Cluster Federation + QKD Space-Mesh + Hyperspectral Swarm + Orbital HPM Grid + Deep-Crustal MHD Vault + Hypersonic MHD Plasma Stealth + Magneto-Inertial Fusion + Antimatter-Catalyzed Fusion Rocket + Magnetic Monopole Catalyzed Battery + Kugelblitz Hawking Generator + Schwinger Vacuum Pair Harvester + Alcubierre-Lentz Positive Soliton Transit + Planetary Axion-Haloscope Primakov Power Grid + Superradiant Penrose-BZ Ergosphere Power Matrix + Planetary Dynamical Casimir-Sagnac Power Grid + Planetary Unruh-Rindler Thermal Bath Power Grid + Planetary Floquet-Bloch Photonic Cavity Power Grid + Planetary Floquet Time-Crystal Josephson Harvest Grid + Planetary Spin-Caloritronic Magnon-Polariton Harvest Grid + Planetary Berry-Curvature & Nonlinear Hall Harvest Grid + Planetary Non-Hermitian PT-Symmetric Quantum Ratchet Harvest Grid + Planetary Magic-Angle Twisted-Trilayer Andreev Supergrid + Planetary Kagome Chern & Polariton Supergrid + Planetary Altermagnetic Spin-Split & Magnonic Supergrid + Planetary Chiral Topological & Weyl-Fermion Supergrid + Planetary Non-Abelian Majorana Zero-Mode Supergrid + Planetary Room-Temperature LK-99 Diamagnetic & Meissner-Levitation Supergrid + Planetary 2e^2/h Conductance Peak Majorana Topological Supergrid + Planetary Room-Temperature Hydride Megabar Supergrid + Planetary Ultra-Dense Rydberg Polariton Supergrid + Planetary Gravitational Phonon Lattice Supergrid + Planetary Magneto-Acoustic Soliton Supergrid + Planetary Thermoelectric Core-Mantle Seebeck Supergrid + Planetary Helical Magnetohydrodynamic Geodynamo Supergrid + Planetary Mantle Transition Zone Wadsleyite Supergrid + Planetary D'' Layer ULVZ Magneto-Thermal Waveguide Supergrid + Planetary ICB Dendritic Solidification Supergrid + Planetary F-Layer Slurry Stratification Supergrid + Planetary Outer-Core Tangent Cylinder Jet Supergrid + Planetary Innermost Inner Core Anisotropy Supergrid + Planetary Coupled Dynasphere Resonance Supergrid"
@@ -3105,7 +3151,7 @@ def run_master_drill():
     )
 
     print_header(
-        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-238 & WAVES 1-72 COMPLETE)",
+        "🎯 MASTER ALL-WAVES DRILL 100% OPERATIONAL & VERIFIED (CAPABILITIES 1-241 & WAVES 1-73 COMPLETE)",
         GREEN,
     )
 

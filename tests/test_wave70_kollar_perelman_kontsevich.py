@@ -107,4 +107,4 @@ def test_wave70_planetary_van_allen_belt_metrics():
 def test_wave70_health_version():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("11.0.0", "11.1.0", "11.2.0")
+    assert res.json()["version"] in ("11.0.0", "11.1.0", "11.2.0", "11.3.0")

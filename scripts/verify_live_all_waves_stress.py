@@ -3702,6 +3702,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 72 (Opt B): Planetary Magnetotail Power Harvest",
         ),
+        (
+            "GET",
+            "/api/costello-bv-renorm/theories",
+            None,
+            "Wave 73 (Cap 239): Costello BV Factorization Theories",
+        ),
+        (
+            "POST",
+            "/api/costello-bv-renorm/evaluate-bv-renorm",
+            {
+                "theory_id": "COSTELLO-BV-RENORM-01",
+                "loop_order": 2,
+                "scale_cutoff": 0.01,
+                "shield_gain": 1.25,
+            },
+            "Wave 73 (Cap 239): Costello BV Renorm Shield",
+        ),
+        (
+            "GET",
+            "/api/ptvv-shifted-symplectic/stacks",
+            None,
+            "Wave 73 (Cap 240): PTVV Shifted Symplectic Stacks",
+        ),
+        (
+            "POST",
+            "/api/ptvv-shifted-symplectic/evaluate-shifted-symplectic",
+            {
+                "stack_id": "PTVV-SHIFTED-SYMPLECTIC-01",
+                "symplectic_shift_n": -1,
+                "lagrangian_rank": 3,
+                "barrier_gain": 1.25,
+            },
+            "Wave 73 (Cap 240): PTVV Shifted Symplectic Barrier",
+        ),
+        (
+            "GET",
+            "/api/gaitsgory-rozenblyum-dag/crystals",
+            None,
+            "Wave 73 (Cap 241): Gaitsgory-Rozenblyum IndCoh Crystals",
+        ),
+        (
+            "POST",
+            "/api/gaitsgory-rozenblyum-dag/evaluate-indcoherent-crystal",
+            {
+                "crystal_id": "GAITSGORY-ROZENBLYUM-INDCOH-01",
+                "serre_order": 3,
+                "algebroid_rank": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 73 (Cap 241): Gaitsgory-Rozenblyum DAG Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-magnetopause/vortices",
+            None,
+            "Wave 73 (Opt B): Planetary Magnetopause Vortices",
+        ),
+        (
+            "POST",
+            "/api/planetary-magnetopause/harvest-magnetopause-power",
+            {
+                "vortex_id": "MAGNETOPAUSE-KH-DAWN-01",
+                "vortex_multiplier": 1.05,
+                "kh_efficiency": 0.993,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 73 (Opt B): Planetary Magnetopause Power Harvest",
+        ),
     ]
 
 
