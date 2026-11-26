@@ -107,4 +107,4 @@ def test_wave69_planetary_exospheric_geocorona_metrics():
 def test_wave69_health_version():
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json()["version"] in ("10.9.0")
+    assert res.json()["version"] in ("10.9.0", "11.0.0")

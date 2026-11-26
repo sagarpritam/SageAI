@@ -363,6 +363,10 @@ import { JacquetLanglandsStudio } from "@/components/JacquetLanglandsStudio";
 import { BeilinsonRegulatorStudio } from "@/components/BeilinsonRegulatorStudio";
 import { MilnorKTheoryStudio } from "@/components/MilnorKTheoryStudio";
 import { ExosphericGeocoronaStudio } from "@/components/ExosphericGeocoronaStudio";
+import { KollarBirkarStudio } from "@/components/KollarBirkarStudio";
+import { PerelmanWEntropyStudio } from "@/components/PerelmanWEntropyStudio";
+import { KontsevichWallStudio } from "@/components/KontsevichWallStudio";
+import { VanAllenBeltStudio } from "@/components/VanAllenBeltStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -457,6 +461,10 @@ const tabs = [
   { id: "beilinson-deligne-regulator", label: "Beilinson Regulator (Cap 228)", icon: Compass },
   { id: "milnor-norm-residue", label: "Milnor K-Theory (Cap 229)", icon: Flame },
   { id: "planetary-exospheric-geocorona", label: "Exospheric Geocorona (Option B W69)", icon: Globe },
+  { id: "kollar-birkar-mmp", label: "Kollar-Birkar MMP (Cap 230)", icon: GitBranch },
+  { id: "perelman-w-entropy", label: "Perelman W-Entropy (Cap 231)", icon: Compass },
+  { id: "kontsevich-wall-crossing", label: "Kontsevich Wall (Cap 232)", icon: Flame },
+  { id: "planetary-van-allen-belt", label: "Van Allen Belt (Option B W70)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -988,6 +996,10 @@ export default function DashboardPage() {
           {activeTab === "beilinson-deligne-regulator" && <BeilinsonRegulatorStudio />}
           {activeTab === "milnor-norm-residue" && <MilnorKTheoryStudio />}
           {activeTab === "planetary-exospheric-geocorona" && <ExosphericGeocoronaStudio />}
+          {activeTab === "kollar-birkar-mmp" && <KollarBirkarStudio />}
+          {activeTab === "perelman-w-entropy" && <PerelmanWEntropyStudio />}
+          {activeTab === "kontsevich-wall-crossing" && <KontsevichWallStudio />}
+          {activeTab === "planetary-van-allen-belt" && <VanAllenBeltStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

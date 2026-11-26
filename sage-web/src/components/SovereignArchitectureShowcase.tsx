@@ -160,7 +160,7 @@ const FRONTIER_WAVES = [
     wave: `${PLATFORM_WAVES_RANGE} • Current`,
     range: `Capabilities 101–${PLATFORM_CAPABILITIES_COUNT} + Option B`,
     title: `${PLATFORM_MILESTONE} (v${PLATFORM_VERSION})`,
-    detail: "Jacquet-Langlands Quaternion Shield, Beilinson-Deligne Regulator Barrier, Milnor Norm Residue Firewall & Planetary Exospheric Geocorona Supergrid.",
+    detail: "Kollar-Birkar MMP Shield, Perelman W-Entropy Barrier, Kontsevich Wall-Crossing Firewall & Planetary Van Allen Belt Supergrid.",
   },
 ];
 

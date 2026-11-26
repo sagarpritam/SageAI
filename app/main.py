@@ -165,6 +165,10 @@ from app.routers import (
     beilinson_deligne_regulator_routes,
     milnor_norm_residue_routes,
     planetary_exospheric_geocorona_routes,
+    kollar_birkar_mmp_routes,
+    perelman_w_entropy_routes,
+    kontsevich_wall_crossing_routes,
+    planetary_van_allen_belt_routes,
     false_vacuum_routes,
     fibonacci_anyon_braiding_routes,
     fibonacci_anyon_routes,
@@ -766,6 +770,10 @@ app.include_router(jacquet_langlands_quaternion_routes.router)
 app.include_router(beilinson_deligne_regulator_routes.router)
 app.include_router(milnor_norm_residue_routes.router)
 app.include_router(planetary_exospheric_geocorona_routes.router)
+app.include_router(kollar_birkar_mmp_routes.router)
+app.include_router(perelman_w_entropy_routes.router)
+app.include_router(kontsevich_wall_crossing_routes.router)
+app.include_router(planetary_van_allen_belt_routes.router)
 
 
 # ---------------------
@@ -783,7 +791,7 @@ async def health_check():
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
-        "version": "10.9.0",
+        "version": "11.0.0",
         "environment": settings.ENV,
         "database": db_health["database"],
         "database_latency_ms": db_health["latency_ms"],

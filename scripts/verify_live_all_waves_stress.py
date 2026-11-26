@@ -3497,6 +3497,75 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 69 (Opt B): Planetary Exospheric Geocorona Power Harvest",
         ),
+        # Wave 70 (Caps 230-232 & Option B Wave 70)
+        (
+            "GET",
+            "/api/kollar-birkar-mmp/models",
+            None,
+            "Wave 70 (Cap 230): Kollar-Birkar MMP Models List",
+        ),
+        (
+            "POST",
+            "/api/kollar-birkar-mmp/evaluate-mmp-threshold",
+            {
+                "model_id": "KOLLAR-LOG-CANONICAL-01",
+                "variety_dimension": 3,
+                "epsilon_lc": 0.05,
+                "shield_gain": 1.25,
+            },
+            "Wave 70 (Cap 230): Kollar-Birkar MMP Evaluate",
+        ),
+        (
+            "GET",
+            "/api/perelman-w-entropy/flows",
+            None,
+            "Wave 70 (Cap 231): Perelman W-Entropy Flows List",
+        ),
+        (
+            "POST",
+            "/api/perelman-w-entropy/evaluate-w-entropy",
+            {
+                "flow_id": "PERELMAN-W-ENTROPY-01",
+                "tau_scale": 1.5,
+                "kappa_noncollapse": 0.95,
+                "barrier_gain": 1.25,
+            },
+            "Wave 70 (Cap 231): Perelman W-Entropy Evaluate",
+        ),
+        (
+            "GET",
+            "/api/kontsevich-wall-crossing/chambers",
+            None,
+            "Wave 70 (Cap 232): Kontsevich Chambers List",
+        ),
+        (
+            "POST",
+            "/api/kontsevich-wall-crossing/evaluate-wall-crossing",
+            {
+                "chamber_id": "KONTSEVICH-SOIBELMAN-01",
+                "bps_charge_rank": 2,
+                "dt_invariant_order": 4,
+                "firewall_gain": 1.25,
+            },
+            "Wave 70 (Cap 232): Kontsevich Wall-Crossing Evaluate",
+        ),
+        (
+            "GET",
+            "/api/planetary-van-allen-belt/belts",
+            None,
+            "Wave 70 (Opt B): Planetary Van Allen Belts List",
+        ),
+        (
+            "POST",
+            "/api/planetary-van-allen-belt/harvest-betatron-power",
+            {
+                "belt_id": "VAN-ALLEN-INNER-PROTON-01",
+                "cyclotron_multiplier": 1.05,
+                "betatron_efficiency": 0.99,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 70 (Opt B): Planetary Van Allen Belt Power Harvest",
+        ),
     ]
 
 
