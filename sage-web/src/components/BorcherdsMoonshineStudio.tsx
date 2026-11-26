@@ -1,250 +1,232 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Shield, Activity, RefreshCw, Zap, Lock, AlertTriangle, Cpu } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Flame, RefreshCw, ShieldCheck, Layers } from "lucide-react";
 
-interface BorcherdsAlgebra {
-  algebra_id: string;
-  name: string;
-  central_charge: number;
-  group: string;
-  borcherds_dimension: number;
-  base_fidelity_pct: number;
-  modular_invariance_verified: boolean;
+interface MoonshineRecord {
+  moonshine_id: string;
+  automorphic_group: string;
+  j_invariant_coeff: number;
+  denominator_formula_rank: number;
+  moonshine_state: string;
 }
 
-interface BorcherdsTelemetry {
-  algebra_id: string;
+interface BorcherdsMetrics {
+  active_algebras_count: number;
+  evaluations_total: number;
+  mean_firewall_strength_pev: number;
+  borcherds_moonshine_compliance_pct: number;
+}
+
+interface BorcherdsEvalResult {
+  moonshine_id: string;
   status: string;
-  modular_invariance_defect: number;
-  monster_symmetry_verified: boolean;
-  central_charge: number;
-  q_expansion_order: number;
-  borcherds_dimension: number;
-  borcherds_barrier_strength_pev: number;
-  non_modular_suppression_db: number;
+  hauptmodul_j_verified: boolean;
+  borcherds_firewall_strength_pev: number;
+  moonshine_suppression_db: number;
   effective_fidelity_pct: number;
-  timestamp: number;
 }
 
 export function BorcherdsMoonshineStudio() {
-  const [algebras, setAlgebras] = useState<BorcherdsAlgebra[]>([]);
-  const [selectedAlgebra, setSelectedAlgebra] = useState<string>("");
-  const [centralCharge, setCentralCharge] = useState<number>(24);
-  const [qExpansionOrder, setQExpansionOrder] = useState<number>(4);
-  const [barrierGain, setBarrierGain] = useState<number>(1.25);
-  const [telemetry, setTelemetry] = useState<BorcherdsTelemetry | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [algebras, setAlgebras] = useState<MoonshineRecord[]>([]);
+  const [metrics, setMetrics] = useState<BorcherdsMetrics | null>(null);
+  const [selectedId, setSelectedId] = useState("BORCHERDS-MONSTER-VOA-01");
+  const [denominatorRank, setDenominatorRank] = useState(2);
+  const [hauptmodulOrder, setHauptmodulOrder] = useState(1);
+  const [firewallGain, setFirewallGain] = useState(1.25);
+  const [result, setResult] = useState<BorcherdsEvalResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const fetchAlgebras = async () => {
+  const loadData = async () => {
     try {
-      const res = await fetch("/api/borcherds-kac-moody-moonshine/algebras");
-      if (!res.ok) throw new Error("Failed to fetch Borcherds Moonshine algebras");
-      const data = await res.json();
-      setAlgebras(data.algebras || []);
-      if (data.algebras?.length > 0 && !selectedAlgebra) {
-        setSelectedAlgebra(data.algebras[0].algebra_id);
+      const [aRes, mRes] = await Promise.all([
+        fetch("/api/borcherds-moonshine/algebras"),
+        fetch("/api/borcherds-moonshine/metrics"),
+      ]);
+      if (aRes.ok) {
+        const aData = await aRes.json();
+        setAlgebras(aData.algebras || []);
       }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error fetching algebras");
+      if (mRes.ok) {
+        setMetrics(await mRes.json());
+      }
+    } catch (err) {
+      console.error("Failed to load Borcherds Moonshine telemetry", err);
     }
   };
 
   useEffect(() => {
-    fetchAlgebras();
+    loadData();
   }, []);
 
-  const handleEvaluateAutomorphicProduct = async () => {
-    if (!selectedAlgebra) return;
+  const handleEvaluate = async () => {
     setLoading(true);
-    setError(null);
     try {
-      const res = await fetch("/api/borcherds-kac-moody-moonshine/evaluate-automorphic-product", {
+      const res = await fetch("/api/borcherds-moonshine/evaluate-borcherds-moonshine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          algebra_id: selectedAlgebra,
-          central_charge: Number(centralCharge),
-          q_expansion_order: Number(qExpansionOrder),
-          barrier_gain: Number(barrierGain),
+          moonshine_id: selectedId,
+          denominator_rank: denominatorRank,
+          hauptmodul_order: hauptmodulOrder,
+          firewall_gain: firewallGain,
         }),
       });
-      if (!res.ok) throw new Error("Failed to evaluate automorphic product");
-      const data = await res.json();
-      setTelemetry(data);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Evaluation failed");
+      if (res.ok) {
+        setResult(await res.json());
+        await loadData();
+      }
+    } catch (err) {
+      console.error("Borcherds Moonshine evaluation failed", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-100 shadow-2xl space-y-6">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-purple-500/10 border border-purple-500/30 rounded-lg text-purple-400">
-            <Cpu className="w-6 h-6" />
+    <div className="space-y-6 rounded-xl border border-rose-500/30 bg-slate-950/80 p-6 text-slate-100">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-rose-500/20 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-rose-500/20 p-2.5 text-rose-400">
+            <Flame className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              Borcherds Automorphic Products & Monstrous Moonshine Barrier
-              <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded font-mono border border-purple-500/30">
-                CAP-198
-              </span>
+            <h2 className="text-lg font-bold text-white">
+              Richard Borcherds Monster Lie Algebra &amp; Monstrous Moonshine Firewall
             </h2>
-            <p className="text-sm text-slate-400">
-              Richard Borcherds, Igor Frenkel, James Lepowsky & Arne Meurman Monstrous Moonshine, VOA V^♮ (c=24), and singular theta lifts.
+            <p className="text-xs text-slate-400">
+              Capability 253 · Hauptmodul j-Invariant &amp; Automorphic Denominator Formulas
             </p>
           </div>
         </div>
         <button
-          onClick={fetchAlgebras}
-          className="p-2 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-lg transition-colors border border-slate-700/50"
-          title="Refresh Algebras"
+          onClick={loadData}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-3.5 w-3.5" /> Refresh Moonshine
         </button>
       </div>
 
-      {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-center space-x-3 text-rose-400 text-sm">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-          <span>{error}</span>
+      {metrics && (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Moonshine Algebras</div>
+            <div className="mt-1 text-xl font-bold text-rose-300">{metrics.active_algebras_count}</div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Moonshine Compliance</div>
+            <div className="mt-1 text-xl font-bold text-emerald-400">
+              {metrics.borcherds_moonshine_compliance_pct.toFixed(2)}%
+            </div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Evaluations</div>
+            <div className="mt-1 text-xl font-bold text-white">{metrics.evaluations_total}</div>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div className="text-xs text-slate-400">Mean Firewall</div>
+            <div className="mt-1 text-sm font-semibold text-cyan-300">
+              {(metrics.mean_firewall_strength_pev / 1e12).toFixed(2)} TPeV
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Target Moonshine Algebra
-          </label>
-          <select
-            value={selectedAlgebra}
-            onChange={(e) => setSelectedAlgebra(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500"
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-rose-300">
+            <Layers className="h-4 w-4" /> Evaluate Borcherds Moonshine Firewall
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Moonshine Module</label>
+              <select
+                value={selectedId}
+                onChange={(e) => setSelectedId(e.target.value)}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              >
+                {algebras.map((a) => (
+                  <option key={a.moonshine_id} value={a.moonshine_id}>
+                    {a.moonshine_id} ({a.automorphic_group})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Denominator Rank</label>
+              <input
+                type="number"
+                value={denominatorRank}
+                min={1}
+                onChange={(e) => setDenominatorRank(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Hauptmodul Order</label>
+              <input
+                type="number"
+                value={hauptmodulOrder}
+                min={1}
+                onChange={(e) => setHauptmodulOrder(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-400">Firewall Gain</label>
+              <input
+                type="number"
+                step="0.05"
+                value={firewallGain}
+                onChange={(e) => setFirewallGain(Number(e.target.value))}
+                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleEvaluate}
+            disabled={loading}
+            className="w-full rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
           >
-            {algebras.map((alg) => (
-              <option key={alg.algebra_id} value={alg.algebra_id}>
-                {alg.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            {loading ? "Verifying Hauptmodul j..." : "Lock Borcherds Moonshine Firewall"}
+          </button>
 
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Central Charge (c)
-          </label>
-          <input
-            type="number"
-            value={centralCharge}
-            onChange={(e) => setCentralCharge(Number(e.target.value))}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500"
-            min={1}
-            max={48}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            q-Expansion Order
-          </label>
-          <input
-            type="number"
-            value={qExpansionOrder}
-            onChange={(e) => setQExpansionOrder(Number(e.target.value))}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500"
-            min={1}
-            max={12}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Barrier Gain Multiplier
-          </label>
-          <input
-            type="number"
-            step="0.05"
-            value={barrierGain}
-            onChange={(e) => setBarrierGain(Number(e.target.value))}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500"
-            min={1.0}
-            max={3.0}
-          />
-        </div>
-      </div>
-
-      <button
-        onClick={handleEvaluateAutomorphicProduct}
-        disabled={loading || !selectedAlgebra}
-        className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-lg shadow-lg shadow-purple-950/40 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-      >
-        {loading ? (
-          <RefreshCw className="w-5 h-5 animate-spin" />
-        ) : (
-          <>
-            <Lock className="w-5 h-5" />
-            <span>Lock Borcherds Monstrous Moonshine Barrier</span>
-          </>
-        )}
-      </button>
-
-      {telemetry && (
-        <div className="mt-6 space-y-4">
-          <div className="p-4 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Activity className="w-5 h-5 text-purple-400" />
-              <div>
-                <span className="text-xs text-slate-400">Barrier Status</span>
-                <p className="text-sm font-semibold text-purple-400">{telemetry.status}</p>
+          {result && (
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/30 p-3 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-emerald-300">
+                <ShieldCheck className="h-4 w-4" /> {result.status}
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-slate-400">
+                <span>Firewall: {(result.borcherds_firewall_strength_pev / 1e12).toFixed(2)} TPeV</span>
+                <span>Suppression: {result.moonshine_suppression_db.toFixed(2)} dB</span>
+                <span>Fidelity: {result.effective_fidelity_pct.toFixed(1)}%</span>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-xs text-slate-400">Effective Fidelity</span>
-              <p className="text-sm font-bold text-white">{telemetry.effective_fidelity_pct.toFixed(4)}%</p>
-            </div>
-          </div>
+          )}
+        </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-lg">
-              <span className="text-xs text-slate-400">Modular Invariance Defect</span>
-              <p className="text-lg font-bold text-pink-400 font-mono mt-1">
-                {telemetry.modular_invariance_defect.toFixed(8)}
-              </p>
-              <span className="text-[10px] text-slate-500">Monster Symmetry: {telemetry.monster_symmetry_verified ? "LOCKED" : "UNLOCKED"}</span>
-            </div>
-
-            <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-lg">
-              <span className="text-xs text-slate-400">Barrier Strength</span>
-              <p className="text-lg font-bold text-purple-400 font-mono mt-1">
-                {telemetry.borcherds_barrier_strength_pev} PeV
-              </p>
-              <span className="text-[10px] text-slate-500">c = {telemetry.central_charge} | q-order = {telemetry.q_expansion_order}</span>
-            </div>
-
-            <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-lg">
-              <span className="text-xs text-slate-400">Non-Modular Suppression</span>
-              <p className="text-lg font-bold text-indigo-400 font-mono mt-1">
-                {telemetry.non_modular_suppression_db} dB
-              </p>
-              <span className="text-[10px] text-slate-500">Dim = {telemetry.borcherds_dimension}</span>
-            </div>
-
-            <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-lg">
-              <span className="text-xs text-slate-400">Algebra ID</span>
-              <p className="text-sm font-bold text-slate-200 font-mono mt-1 truncate">
-                {telemetry.algebra_id}
-              </p>
-              <span className="text-[10px] text-slate-500">
-                {new Date(telemetry.timestamp * 1000).toLocaleTimeString()}
-              </span>
-            </div>
+        <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h3 className="text-sm font-semibold text-rose-300">Moonshine Automorphic Registry</h3>
+          <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+            {algebras.map((a) => (
+              <div
+                key={a.moonshine_id}
+                className="flex items-center justify-between rounded-md border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs"
+              >
+                <div>
+                  <div className="font-semibold text-white">{a.moonshine_id}</div>
+                  <div className="text-[11px] text-slate-400">
+                    {a.automorphic_group} · j={a.j_invariant_coeff} · rank={a.denominator_formula_rank}
+                  </div>
+                </div>
+                <span className="rounded bg-rose-500/20 px-2 py-0.5 text-[10px] font-semibold text-rose-300">
+                  {a.moonshine_state}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

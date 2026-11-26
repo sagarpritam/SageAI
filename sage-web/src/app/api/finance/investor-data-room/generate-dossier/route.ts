@@ -14,7 +14,7 @@ export async function POST() {
       const data = await safeUpstreamJson<Record<string, unknown>>(res, {});
       return NextResponse.json(data);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Using fallback LP dossier generator:", e);
   }
 

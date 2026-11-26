@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       trade_id: `kex-trade-${Math.random().toString(36).substring(2, 10)}`,
       contract_id: 'kex-contract-dyson-01',

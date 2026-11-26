@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json([
       {
         contract_id: 'kex-contract-dyson-01',

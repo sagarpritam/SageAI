@@ -320,7 +320,7 @@ import { BeilinsonBernsteinStudio } from "@/components/BeilinsonBernsteinStudio"
 import { ConnesKreimerStudio } from "@/components/ConnesKreimerStudio";
 import { TangentCylinderJetStudio } from "@/components/TangentCylinderJetStudio";
 import { ScholzePerfectoidStudio } from "@/components/ScholzePerfectoidStudio";
-import { BorcherdsMoonshineStudio } from "@/components/BorcherdsMoonshineStudio";
+import { BorcherdsMoonshineStudio as BorcherdsMonsterMoonshineStudio } from "@/components/BorcherdsMoonshineStudio";
 import { KontsevichMotivesStudio } from "@/components/KontsevichMotivesStudio";
 import { InnermostInnerCoreStudio } from "@/components/InnermostInnerCoreStudio";
 import { FarguesFontaineStudio } from "@/components/FarguesFontaineStudio";
@@ -391,6 +391,10 @@ import { LusztigCanonicalStudio } from "@/components/LusztigCanonicalStudio";
 import { KashiwaraCrystalStudio } from "@/components/KashiwaraCrystalStudio";
 import { FominZelevinskyStudio } from "@/components/FominZelevinskyStudio";
 import { AuroralElectrojetStudio } from "@/components/AuroralElectrojetStudio";
+import { KacMoodyAffineStudio } from "@/components/KacMoodyAffineStudio";
+import { FrenkelVoaStudio } from "@/components/FrenkelVoaStudio";
+import { BorcherdsMoonshineStudio as Wave77BorcherdsMoonshineStudio } from "@/components/BorcherdsMoonshineStudio";
+import { PlasmapauseWhistlerStudio } from "@/components/PlasmapauseWhistlerStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -513,6 +517,10 @@ const tabs = [
   { id: "kashiwara-crystal-graph", label: "Kashiwara Crystal (Cap 249)", icon: Compass },
   { id: "fomin-zelevinsky-cluster", label: "Fomin-Zelevinsky (Cap 250)", icon: Flame },
   { id: "planetary-electrojet", label: "Auroral Electrojet (Option B W76)", icon: Atom },
+  { id: "kac-moody-affine", label: "Kac-Moody Affine (Cap 251)", icon: GitBranch },
+  { id: "frenkel-voa-chiral", label: "Frenkel-Ben-Zvi VOA (Cap 252)", icon: Compass },
+  { id: "borcherds-moonshine", label: "Borcherds Moonshine (Cap 253)", icon: Flame },
+  { id: "planetary-plasmapause", label: "Plasmapause Whistler (Option B W77)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1001,7 +1009,7 @@ export default function DashboardPage() {
           {activeTab === "connes-kreimer-hopf" && <ConnesKreimerStudio />}
           {activeTab === "planetary-outer-core-tangent-cylinder-jet" && <TangentCylinderJetStudio />}
           {activeTab === "scholze-perfectoid-spaces" && <ScholzePerfectoidStudio />}
-          {activeTab === "borcherds-kac-moody-moonshine" && <BorcherdsMoonshineStudio />}
+          {activeTab === "borcherds-kac-moody-moonshine" && <Wave77BorcherdsMoonshineStudio />}
           {activeTab === "kontsevich-noncommutative-motives" && <KontsevichMotivesStudio />}
           {activeTab === "planetary-innermost-inner-core-anisotropy" && <InnermostInnerCoreStudio />}
           {activeTab === "fargues-fontaine-curve" && <FarguesFontaineStudio />}
@@ -1072,6 +1080,10 @@ export default function DashboardPage() {
           {activeTab === "kashiwara-crystal-graph" && <KashiwaraCrystalStudio />}
           {activeTab === "fomin-zelevinsky-cluster" && <FominZelevinskyStudio />}
           {activeTab === "planetary-electrojet" && <AuroralElectrojetStudio />}
+          {activeTab === "kac-moody-affine" && <KacMoodyAffineStudio />}
+          {activeTab === "frenkel-voa-chiral" && <FrenkelVoaStudio />}
+          {activeTab === "borcherds-moonshine" && <Wave77BorcherdsMoonshineStudio />}
+          {activeTab === "planetary-plasmapause" && <PlasmapauseWhistlerStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

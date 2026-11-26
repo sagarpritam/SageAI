@@ -13,7 +13,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch (_error: unknown) {
     return NextResponse.json({
       exchange_id: 'kardashev-futures-exchange-01',
       status: 'BASEL_V_ENERGY_DERIVATIVES_TRADING_ACTIVE',

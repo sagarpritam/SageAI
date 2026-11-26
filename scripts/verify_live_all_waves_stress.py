@@ -3974,6 +3974,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 76 (Opt B): Planetary Electrojet Power Harvest",
         ),
+        (
+            "GET",
+            "/api/kac-moody-affine/algebras",
+            None,
+            "Wave 77 (Cap 251): Kac-Moody Affine Algebras",
+        ),
+        (
+            "POST",
+            "/api/kac-moody-affine/evaluate-kac-moody",
+            {
+                "algebra_id": "KAC-MOODY-AFFINE-01",
+                "central_level_k": 2,
+                "imaginary_root_mult": 4,
+                "shield_gain": 1.25,
+            },
+            "Wave 77 (Cap 251): Kac-Moody Affine Shield",
+        ),
+        (
+            "GET",
+            "/api/frenkel-voa-chiral/algebras",
+            None,
+            "Wave 77 (Cap 252): Frenkel-Ben-Zvi VOAs",
+        ),
+        (
+            "POST",
+            "/api/frenkel-voa-chiral/evaluate-voa-chiral",
+            {
+                "voa_id": "FRENKEL-VOA-CHIRAL-01",
+                "central_charge_c": 24,
+                "zhu_rank": 4,
+                "barrier_gain": 1.25,
+            },
+            "Wave 77 (Cap 252): Frenkel-Ben-Zvi VOA Barrier",
+        ),
+        (
+            "GET",
+            "/api/borcherds-moonshine/algebras",
+            None,
+            "Wave 77 (Cap 253): Borcherds Moonshine Algebras",
+        ),
+        (
+            "POST",
+            "/api/borcherds-moonshine/evaluate-borcherds-moonshine",
+            {
+                "moonshine_id": "BORCHERDS-MONSTER-VOA-01",
+                "denominator_rank": 2,
+                "hauptmodul_order": 1,
+                "firewall_gain": 1.25,
+            },
+            "Wave 77 (Cap 253): Borcherds Moonshine Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-plasmapause/waveguides",
+            None,
+            "Wave 77 (Opt B): Planetary Plasmapause Waveguides",
+        ),
+        (
+            "POST",
+            "/api/planetary-plasmapause/harvest-plasmapause-power",
+            {
+                "waveguide_id": "PLASMAPAUSE-CHORUS-01",
+                "whistler_multiplier": 1.05,
+                "waveguide_efficiency": 0.996,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 77 (Opt B): Planetary Plasmapause Power Harvest",
+        ),
     ]
 
 
