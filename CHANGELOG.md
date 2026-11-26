@@ -2,6 +2,22 @@
 
 All notable changes to the SageAI Sovereign Enterprise Cybersecurity platform are documented in this file.
 
+## [v11.1.0] - 2026-11-26 - Nakajima Quiver Yangian Shield, Pandharipande-Thomas BPS Barrier, Joyce-Song Hall Firewall & Planetary Ring-Current Alfvén Supergrid (Wave 71 Platinum Milestone)
+
+### Added
+- **Capability 233: Hiraku Nakajima Quiver Variety & Quantum Loop Yangian Shield** (`app/services/nakajima_quiver_variety_yangian_shield/`):
+  - Formulates Nakajima quiver variety hyperkähler quotients, Maulik-Okounkov stable envelopes, and Yangian R-matrix spectral gap locking (`NAKAJIMA-QUIVER-ADE-01`) ([`NakajimaQuiverStudio.tsx`](sage-web/src/components/NakajimaQuiverStudio.tsx), [`app/routers/nakajima_quiver_yangian_routes.py`](app/routers/nakajima_quiver_yangian_routes.py)).
+- **Capability 234: Rahul Pandharipande & Richard Thomas Stable Pairs & Gopakumar-Vafa BPS Barrier** (`app/services/pandharipande_thomas_gv_bps_barrier/`):
+  - Formulates Pandharipande-Thomas Calabi-Yau 3-fold stable pair invariants and Gopakumar-Vafa BPS integrality locking (`PT-STABLE-PAIR-CY3-01`) ([`PandharipandeThomasStudio.tsx`](sage-web/src/components/PandharipandeThomasStudio.tsx), [`app/routers/pandharipande_thomas_bps_routes.py`](app/routers/pandharipande_thomas_bps_routes.py)).
+- **Capability 235: Dominic Joyce & Yinan Song Generalized DT & Hall Algebra Firewall** (`app/services/joyce_song_motivic_dt_invariants_firewall/`):
+  - Formulates Joyce-Song generalized Donaldson-Thomas invariants, Behrend function weighted Euler characteristics, and Ringel-Hall algebra wall-crossing locking (`JOYCE-SONG-HALL-ALGEBRA-01`) ([`JoyceSongHallStudio.tsx`](sage-web/src/components/JoyceSongHallStudio.tsx), [`app/routers/joyce_song_hall_routes.py`](app/routers/joyce_song_hall_routes.py)).
+- **Option B Wave 71: Planetary Ring-Current & Plasmasphere Alfvén Maser Supergrid** (`app/services/planetary_ring_current_plasmasphere_alfven_supergrid/`):
+  - Integrates equatorial L-shell 3.0–6.5 ring-current ion-cyclotron Alfvén maser power dispatch (`10.320 GW` nominal baseload, `10.780 GW` live dispatch at `100.00%` grid stability) ([`RingCurrentAlfvenStudio.tsx`](sage-web/src/components/RingCurrentAlfvenStudio.tsx), [`app/routers/planetary_ring_current_routes.py`](app/routers/planetary_ring_current_routes.py)).
+- **Enterprise UI Resilience Hardening (Batch 40)**:
+  - Hardened 5 Next.js API routes (`pbh-cluster-merger/vaults`, `penrose-process-dao/{stake,summary,vaults}`, `programmable-carbon-repo/execute-repo`) to typed `catch (err: unknown)` / `catch (error: unknown)` error narrowing.
+- **Wave 71 Verification**:
+  - `941` pytest cases (`+9` in `tests/test_wave71_nakajima_pt_joyce.py`), `460` live stress endpoints (`+8`), `[64/64]` Master All-Waves Drill, `931` Next.js API routes, `1,164` FastAPI routes, `306` mounted studios, and `1,610` prerendered static pages.
+
 ## [v11.0.0] - 2026-11-26 - Kollár-Birkar MMP Shield, Perelman W-Entropy Barrier, Kontsevich Wall-Crossing Firewall & Planetary Van Allen Belt Supergrid (Wave 70 Platinum Milestone)
 
 ### Added

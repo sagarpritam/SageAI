@@ -367,6 +367,10 @@ import { KollarBirkarStudio } from "@/components/KollarBirkarStudio";
 import { PerelmanWEntropyStudio } from "@/components/PerelmanWEntropyStudio";
 import { KontsevichWallStudio } from "@/components/KontsevichWallStudio";
 import { VanAllenBeltStudio } from "@/components/VanAllenBeltStudio";
+import { NakajimaQuiverStudio } from "@/components/NakajimaQuiverStudio";
+import { PandharipandeThomasStudio } from "@/components/PandharipandeThomasStudio";
+import { JoyceSongHallStudio } from "@/components/JoyceSongHallStudio";
+import { RingCurrentAlfvenStudio } from "@/components/RingCurrentAlfvenStudio";
 import PerelmanRicciFlowStudio from "@/components/PerelmanRicciFlowStudio";
 import GromovWittenStudio from "@/components/GromovWittenStudio";
 import QuillenDeterminantStudio from "@/components/QuillenDeterminantStudio";
@@ -465,6 +469,10 @@ const tabs = [
   { id: "perelman-w-entropy", label: "Perelman W-Entropy (Cap 231)", icon: Compass },
   { id: "kontsevich-wall-crossing", label: "Kontsevich Wall (Cap 232)", icon: Flame },
   { id: "planetary-van-allen-belt", label: "Van Allen Belt (Option B W70)", icon: Atom },
+  { id: "nakajima-quiver-yangian", label: "Nakajima Quiver (Cap 233)", icon: GitBranch },
+  { id: "pandharipande-thomas-bps", label: "Pandharipande-Thomas (Cap 234)", icon: Compass },
+  { id: "joyce-song-hall", label: "Joyce-Song Hall (Cap 235)", icon: Flame },
+  { id: "planetary-ring-current", label: "Ring-Current Alfvén (Option B W71)", icon: Atom },
   { id: "lurie-higher-topos-spectral", label: "Lurie Spectral (Cap 188)", icon: Layers },
   { id: "grr-baum-fulton-macpherson", label: "GRR Baum-Fulton (Cap 189)", icon: Shield },
   { id: "kazhdan-lusztig-hecke", label: "Kazhdan-Lusztig (Cap 190)", icon: Compass },
@@ -1000,6 +1008,10 @@ export default function DashboardPage() {
           {activeTab === "perelman-w-entropy" && <PerelmanWEntropyStudio />}
           {activeTab === "kontsevich-wall-crossing" && <KontsevichWallStudio />}
           {activeTab === "planetary-van-allen-belt" && <VanAllenBeltStudio />}
+          {activeTab === "nakajima-quiver-yangian" && <NakajimaQuiverStudio />}
+          {activeTab === "pandharipande-thomas-bps" && <PandharipandeThomasStudio />}
+          {activeTab === "joyce-song-hall" && <JoyceSongHallStudio />}
+          {activeTab === "planetary-ring-current" && <RingCurrentAlfvenStudio />}
           {activeTab === "lurie-higher-topos-spectral" && <LurieToposStudio />}
           {activeTab === "grr-baum-fulton-macpherson" && <GRRBaumFultonStudio />}
           {activeTab === "kazhdan-lusztig-hecke" && <KazhdanLusztigStudio />}

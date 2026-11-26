@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       const data = await res.json();
       return NextResponse.json(data);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Using fallback Programmable Carbon Repo execute receipt:', error);
   }
 

@@ -3566,6 +3566,74 @@ def build_wave_endpoints() -> List[EndpointSpec]:
             },
             "Wave 70 (Opt B): Planetary Van Allen Belt Power Harvest",
         ),
+        (
+            "GET",
+            "/api/nakajima-quiver-yangian/quivers",
+            None,
+            "Wave 71 (Cap 233): Nakajima Quiver Variety Registry",
+        ),
+        (
+            "POST",
+            "/api/nakajima-quiver-yangian/evaluate-quiver-yangian",
+            {
+                "quiver_id": "NAKAJIMA-QUIVER-ADE-01",
+                "framing_rank": 2,
+                "equivariant_weight": 3,
+                "shield_gain": 1.25,
+            },
+            "Wave 71 (Cap 233): Nakajima Quiver Yangian Shield",
+        ),
+        (
+            "GET",
+            "/api/pandharipande-thomas-bps/pairs",
+            None,
+            "Wave 71 (Cap 234): Pandharipande-Thomas Stable Pairs",
+        ),
+        (
+            "POST",
+            "/api/pandharipande-thomas-bps/evaluate-pt-bps",
+            {
+                "pair_id": "PT-STABLE-PAIR-CY3-01",
+                "euler_char": 1,
+                "curve_degree": 2,
+                "barrier_gain": 1.25,
+            },
+            "Wave 71 (Cap 234): Pandharipande-Thomas BPS Barrier",
+        ),
+        (
+            "GET",
+            "/api/joyce-song-hall/invariants",
+            None,
+            "Wave 71 (Cap 235): Joyce-Song Hall Algebra Invariants",
+        ),
+        (
+            "POST",
+            "/api/joyce-song-hall/evaluate-joyce-song",
+            {
+                "invariant_id": "JOYCE-SONG-HALL-ALGEBRA-01",
+                "chern_rank": 2,
+                "behrend_weight": 1,
+                "firewall_gain": 1.25,
+            },
+            "Wave 71 (Cap 235): Joyce-Song Motivic DT Firewall",
+        ),
+        (
+            "GET",
+            "/api/planetary-ring-current/tori",
+            None,
+            "Wave 71 (Opt B): Planetary Ring-Current Tori",
+        ),
+        (
+            "POST",
+            "/api/planetary-ring-current/harvest-ring-current-power",
+            {
+                "torus_id": "RING-CURRENT-TORUS-01",
+                "alfven_multiplier": 1.05,
+                "alfven_efficiency": 0.991,
+                "dispatch_duration_s": 60.0,
+            },
+            "Wave 71 (Opt B): Planetary Ring-Current Power Harvest",
+        ),
     ]
 
 
